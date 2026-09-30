@@ -1,0 +1,35 @@
+# Môi trường ảo & Python cache
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb_checkpoints
+
+# Dữ liệu & Lưu trữ bảo mật (HIPAA/PHI)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/vector_store/*
+!data/vector_store/.gitkeep
+*.csv
+*.parquet
+*.pt
+*.bin
+*.onnx
+
+# Biến môi trường & Logs
+.env
+.env.local
+*.log
+
+# Node & Next.js Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# IDE
+.vscode/
+.idea/
