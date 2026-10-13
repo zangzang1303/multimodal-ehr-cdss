@@ -35,7 +35,7 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 3 đóng vai trò kiến trúc
 * **Đầu ra (Deliverables):**
   - `src/api/main.py`.
   - `Dockerfile` (Backend).
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -55,7 +55,7 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 3 đóng vai trò kiến trúc
   Truy cập trình duyệt tại `http://localhost:3000`.
 * **Đầu ra (Deliverables):**
   - Khung mã nguồn thư mục `frontend/` hoàn chỉnh.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -68,7 +68,7 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 3 đóng vai trò kiến trúc
   3. `BaselinePredictionResult`: Cấu trúc trả về dự đoán gồm tên bệnh, xác suất (0.0 đến 1.0) và tên baseline thực hiện dự đoán.
 * **Đầu ra (Deliverables):**
   - `src/api/schemas.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -90,15 +90,15 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 3 đóng vai trò kiến trúc
 * **Đầu ra (Deliverables):**
   - `.flake8`, `pyproject.toml`, `pytest.ini`.
   - `tests/test_api_endpoints.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 3 (ACCEPTANCE CRITERIA)
-- [ ] Backend FastAPI khởi động mượt mà tại cổng 8000, endpoint `/health` trả về HTTP 200.
-- [ ] Frontend Next.js khởi động mượt mà tại cổng 3000, không có cảnh báo hay lỗi biên dịch TypeScript.
-- [ ] Lệnh `pytest tests/test_api_endpoints.py` vượt qua 100% test cases.
-- [ ] Pydantic Schemas trong `src/api/schemas.py` xác thực đúng các trường dữ liệu theo `configs/data_schema.yaml`.
+- [x] Backend FastAPI khởi động mượt mà tại cổng 8000, endpoint `/health` trả về HTTP 200.
+- [x] Frontend Next.js khởi động mượt mà tại cổng 3000, không có cảnh báo hay lỗi biên dịch TypeScript.
+- [x] Lệnh `pytest tests/test_api_endpoints.py` vượt qua 100% test cases.
+- [x] Pydantic Schemas trong `src/api/schemas.py` xác thực đúng các trường dữ liệu theo `configs/data_schema.yaml`.
 
 ---
 

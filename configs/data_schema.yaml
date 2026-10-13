@@ -1,0 +1,91 @@
+# ==============================================================================
+# Temp data, need changing.
+# ==============================================================================
+
+features:
+  numerical:
+    - name: "age"
+      type: "int"
+      min: 18
+      max: 110
+      unit: "years"
+      description: "Patient chronological age"
+    - name: "systolic_bp"
+      type: "float"
+      normal_range: [90.0, 130.0]
+      min: 60.0
+      max: 240.0
+      unit: "mmHg"
+      description: "Systolic Blood Pressure"
+    - name: "diastolic_bp"
+      type: "float"
+      normal_range: [60.0, 85.0]
+      min: 40.0
+      max: 140.0
+      unit: "mmHg"
+      description: "Diastolic Blood Pressure"
+    - name: "heart_rate"
+      type: "float"
+      normal_range: [60.0, 100.0]
+      min: 30.0
+      max: 220.0
+      unit: "bpm"
+      description: "Resting Heart Rate"
+    - name: "respiratory_rate"
+      type: "float"
+      normal_range: [12.0, 20.0]
+      min: 8.0
+      max: 50.0
+      unit: "breaths/min"
+      description: "Respiratory Rate"
+    - name: "spo2"
+      type: "float"
+      normal_range: [95.0, 100.0]
+      min: 60.0
+      max: 100.0
+      unit: "%"
+      description: "Blood Oxygen Saturation"
+    - name: "temperature"
+      type: "float"
+      normal_range: [36.5, 37.5]
+      min: 35.0
+      max: 42.0
+      unit: "Celsius"
+      description: "Body Temperature"
+    - name: "wbc_count"
+      type: "float"
+      normal_range: [4.0, 10.0]
+      min: 1.0
+      max: 50.0
+      unit: "10^9/L"
+      description: "White Blood Cell Count"
+    - name: "crp"
+      type: "float"
+      normal_range: [0.0, 5.0]
+      min: 0.0
+      max: 300.0
+      unit: "mg/L"
+      description: "C-Reactive Protein"
+
+  categorical:
+    - name: "gender"
+      categories: ["M", "F", "OTHER"]
+      description: "Patient biological sex / administrative gender"
+    - name: "smoking_status"
+      categories: ["NEVER", "FORMER", "CURRENT"]
+      description: "Patient tobacco smoking exposure"
+    - name: "history_hypertension"
+      categories: [0, 1]
+      description: "Pre-existing diagnosis of arterial hypertension (0: No, 1: Yes)"
+    - name: "history_diabetes"
+      categories: [0, 1]
+      description: "Pre-existing diagnosis of diabetes mellitus (0: No, 1: Yes)"
+
+targets:
+  task_type: "multiclass"
+  num_classes: 4
+  labels:
+    0: "ASTHMA"
+    1: "COPD"
+    2: "CONGESTIVE_HEART_FAILURE"
+    3: "COMMUNITY_ACQUIRED_PNEUMONIA"
