@@ -36,7 +36,7 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 2 giữ vai trò thiết kế 
      - `3`: `COMMUNITY_ACQUIRED_PNEUMONIA` (Viêm phổi mắc phải cộng đồng).
 * **Đầu ra (Deliverables):**
   - Tệp `configs/data_schema.yaml` hoàn chỉnh.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -60,7 +60,7 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 2 giữ vai trò thiết kế 
   - `scripts/generate_synthetic_ehr.py`.
   - `data/raw/patients_raw.parquet`.
   - `data/raw/clinical_notes_raw.jsonl`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -79,15 +79,15 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 2 giữ vai trò thiết kế 
 * **Đầu ra (Deliverables):**
   - Tệp `.gitignore` được cập nhật chính xác.
   - Tệp `data/README.md`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 2 (ACCEPTANCE CRITERIA)
-- [ ] Tệp `configs/data_schema.yaml` chuẩn hóa đầy đủ 9 biến số, 4 biến phân loại, 4 nhãn bệnh, khớp hoàn toàn với đặc tả dự án.
-- [ ] Chạy thành công lệnh `python scripts/generate_synthetic_ehr.py` tạo ra tối thiểu 2.000 bản ghi.
-- [ ] Kiểm tra `patients_raw.parquet` đọc được bằng `pandas.read_parquet()` và `clinical_notes_raw.jsonl` có số lượng dòng khớp chính xác với số lượng `patient_id`.
-- [ ] Bàn giao schema và đường dẫn dữ liệu thô cho Thành viên 1 và Thành viên 3.
+- [x] Tệp `configs/data_schema.yaml` chuẩn hóa đầy đủ 9 biến số, 4 biến phân loại, 4 nhãn bệnh, khớp hoàn toàn với đặc tả dự án.
+- [x] Chạy thành công lệnh `python scripts/generate_synthetic_ehr.py` tạo ra tối thiểu 2.000 bản ghi.
+- [x] Kiểm tra `patients_raw.parquet` đọc được bằng `pandas.read_parquet()` và `clinical_notes_raw.jsonl` có số lượng dòng khớp chính xác với số lượng `patient_id`.
+- [x] Bàn giao schema và đường dẫn dữ liệu thô cho Thành viên 1 và Thành viên 3.
 
 ---
 

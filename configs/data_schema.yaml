@@ -1,0 +1,75 @@
+
+features:
+  numerical:
+    - name: "age"
+      type: "int"
+      min: 18
+      max: 110
+      unit: "years"
+    - name: "systolic_bp"
+      type: "float"
+      normal_range: [90.0, 130.0]
+      min: 60.0
+      max: 240.0
+      unit: "mmHg"
+    - name: "diastolic_bp"
+      type: "float"
+      normal_range: [60.0, 85.0]
+      min: 40.0
+      max: 140.0
+      unit: "mmHg"
+    - name: "heart_rate"
+      type: "float"
+      normal_range: [60.0, 100.0]
+      min: 30.0
+      max: 220.0
+      unit: "bpm"
+    - name: "respiratory_rate"
+      type: "float"
+      normal_range: [12.0, 20.0]
+      min: 8.0
+      max: 50.0
+      unit: "breaths/min"
+    - name: "spo2"
+      type: "float"
+      normal_range: [95.0, 100.0]
+      min: 60.0
+      max: 100.0
+      unit: "%"
+    - name: "temperature"
+      type: "float"
+      normal_range: [36.5, 37.5]
+      min: 35.0
+      max: 42.0
+      unit: "Celsius"
+    - name: "wbc_count"
+      type: "float"
+      normal_range: [4.0, 10.0]
+      min: 1.0
+      max: 50.0
+      unit: "10^9/L"
+    - name: "crp"
+      type: "float"
+      normal_range: [0.0, 5.0]
+      min: 0.0
+      max: 300.0
+      unit: "mg/L"
+
+  categorical:
+    - name: "gender"
+      categories: ["M", "F", "OTHER"]
+    - name: "smoking_status"
+      categories: ["NEVER", "FORMER", "CURRENT"]
+    - name: "history_hypertension"
+      categories: [0, 1]
+    - name: "history_diabetes"
+      categories: [0, 1]
+
+targets:
+  task_type: "multiclass"
+  num_classes: 4
+  labels:
+    0: "ASTHMA"
+    1: "COPD"
+    2: "CONGESTIVE_HEART_FAILURE"
+    3: "COMMUNITY_ACQUIRED_PNEUMONIA"
