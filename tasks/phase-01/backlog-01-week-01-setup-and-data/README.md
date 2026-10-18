@@ -32,6 +32,6 @@ Thiết lập toàn bộ hạ tầng cơ bản, các tệp cấu hình tham số
 Backlog 01 (Tuần 1) chỉ được xem là hoàn thành khi:
 - [ ] Chạy `python scripts/verify_env.py` trả về `CUDA Available: True`, hiển thị đúng tên GPU và phiên bản PyTorch.
 - [ ] Tệp `configs/data_schema.yaml` và `configs/model_config.yaml` đã được tạo đầy đủ, đúng cú pháp YAML và được cả 3 thành viên thống nhất.
-- [ ] Tệp dữ liệu thô `data/raw/patients_raw.parquet` và `data/raw/clinical_notes_raw.jsonl` tồn tại cục bộ, có ít nhất 2.000 ca bệnh và không bị commit lên Git (đã thêm vào `.gitignore`).
+- [x] Tệp dữ liệu thô `data/raw/patients_raw.parquet` và `data/raw/clinical_notes_raw.jsonl` tồn tại cục bộ, có ít nhất 2.000 ca bệnh và không bị commit lên Git (đã thêm vào `.gitignore`).
 - [ ] Backend FastAPI khởi động thành công (`uvicorn src.api.main:app --reload`), truy cập `http://localhost:8000/health` trả về mã 200 `{"status": "healthy"}`.
 - [ ] Frontend Next.js khởi động thành công (`npm run dev`), truy cập `http://localhost:3000` hiển thị màn hình khởi động không có lỗi runtime.
