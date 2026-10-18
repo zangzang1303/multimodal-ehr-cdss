@@ -41,14 +41,11 @@ export interface PredictionProbabilities {
 }
 
 export interface BaselinePredictionResult {
-  model_id: "classical" | "tabular_deep" | "text_only";
-  model_name: string;
-  predicted_class: string;
-  confidence: number;
-  probabilities: PredictionProbabilities;
-  calibrated: boolean;
-  ece_warning?: string;
-  latency_ms: number;
+  baseline_name: string;
+  disease_name: keyof PredictionProbabilities;
+  probability: number;
+  probabilities?: PredictionProbabilities | null;
+  model_version?: string | null;
 }
 
 /**

@@ -179,7 +179,7 @@ class BaselinePredictionResult(BaseModel):
         description="Name of the baseline model executing inference",
         examples=["XGBoost", "FT-Transformer", "Bio_ClinicalBERT"],
     )
-    disease_name: str = Field(
+    disease_name: DiseaseLabel = Field(
         ...,
         description="Predicted diagnosis class",
         examples=["COMMUNITY_ACQUIRED_PNEUMONIA"],

@@ -152,3 +152,10 @@ def test_baseline_prediction_result_schema():
             disease_name="ASTHMA",
             probability=1.2,
         )
+
+    with pytest.raises(ValidationError):
+        BaselinePredictionResult(
+            baseline_name="FT-Transformer",
+            disease_name="UNKNOWN",
+            probability=0.5,
+        )

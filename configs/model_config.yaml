@@ -1,0 +1,44 @@
+# Phase 1 baseline settings. All models predict the four labels in data_schema.yaml.
+training:
+  seed: 42
+  early_stopping_patience: 5
+  num_classes: 4
+
+classical:
+  random_forest:
+    n_estimators: 200
+    max_depth: 12
+    random_state: 42
+  xgboost:
+    n_estimators: 300
+    max_depth: 6
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    eval_metric: mlogloss
+    random_state: 42
+  catboost:
+    iterations: 300
+    depth: 6
+    learning_rate: 0.05
+    random_seed: 42
+    verbose: false
+
+ft_transformer:
+  d_token: 128
+  n_blocks: 4
+  attention_n_heads: 4
+  attention_dropout: 0.1
+  ffn_dropout: 0.1
+  ffn_d_hidden: 256
+  learning_rate: 0.0001
+  weight_decay: 0.00001
+  batch_size: 64
+
+clinical_bert:
+  pretrained_model_name: emilyalsentzer/Bio_ClinicalBERT
+  max_seq_length: 512
+  dropout_rate: 0.2
+  learning_rate: 0.00002
+  batch_size: 16
+  epochs: 5

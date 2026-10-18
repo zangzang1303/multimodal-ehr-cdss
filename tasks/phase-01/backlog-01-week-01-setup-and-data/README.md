@@ -30,8 +30,31 @@ Thiết lập toàn bộ hạ tầng cơ bản, các tệp cấu hình tham số
 
 ## 4. TIÊU CHUẨN NGHIỆM THU ĐỂ CHUYỂN SANG TUẦN 2 (DEFINITION OF DONE)
 Backlog 01 (Tuần 1) chỉ được xem là hoàn thành khi:
-- [ ] Chạy `python scripts/verify_env.py` trả về `CUDA Available: True`, hiển thị đúng tên GPU và phiên bản PyTorch.
-- [ ] Tệp `configs/data_schema.yaml` và `configs/model_config.yaml` đã được tạo đầy đủ, đúng cú pháp YAML và được cả 3 thành viên thống nhất.
+- [x] Chạy `python scripts/verify_env.py` trả về `CUDA Available: True`, hiển thị đúng tên GPU và phiên bản PyTorch.
+- [x] Tệp `configs/data_schema.yaml` và `configs/model_config.yaml` đã được tạo đầy đủ, đúng cú pháp YAML; contract API được đối chiếu bằng `tests/test_week01_contract.py`.
 - [x] Tệp dữ liệu thô `data/raw/patients_raw.parquet` và `data/raw/clinical_notes_raw.jsonl` tồn tại cục bộ, có ít nhất 2.000 ca bệnh và không bị commit lên Git (đã thêm vào `.gitignore`).
-- [ ] Backend FastAPI khởi động thành công (`uvicorn src.api.main:app --reload`), truy cập `http://localhost:8000/health` trả về mã 200 `{"status": "healthy"}`.
-- [ ] Frontend Next.js khởi động thành công (`npm run dev`), truy cập `http://localhost:3000` hiển thị màn hình khởi động không có lỗi runtime.
+- [x] Backend FastAPI khởi động thành công (`uvicorn src.api.main:app --reload`), truy cập `http://localhost:8000/health` trả về mã 200 và trường `status` là `healthy`.
+- [x] Frontend Next.js khởi động thành công (`npm run dev`), truy cập `http://localhost:3000` trả HTTP 200; `npm run build` thành công.
+
+## 5. CÁCH NGHIỆM THU CỤC BỘ
+
+Trên Windows có GPU NVIDIA và driver hỗ trợ CUDA 12.6, cài bộ PyTorch đồng bộ
+vào `.venv` từ [kênh CUDA chính thức của PyTorch](https://pytorch.org/get-started/previous-versions/)
+trước khi cài các phụ thuộc còn lại:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu126
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe scripts/verify_env.py
+.\.venv\Scripts\python.exe scripts/check_clinical_tokenizer.py
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+`verify_env.py` trả mã lỗi nếu thiếu thư viện hoặc PyTorch không truy cập được CUDA.
+Dữ liệu thô được sinh lại bằng `python scripts/generate_synthetic_ehr.py --num_samples 2000`
+và được Git bỏ qua theo `.gitignore`. Với frontend trên PowerShell có chính sách chặn
+script, dùng `npm.cmd ci` và `npm.cmd run dev` trong thư mục `frontend`.
+Nếu Avast chặn npm với `UNABLE_TO_VERIFY_LEAF_SIGNATURE`, trỏ biến
+`NODE_EXTRA_CA_CERTS` đến tệp PEM của **Avast Web/Mail Shield Root** đã được
+Windows tin cậy. Tệp `.npm-ca.pem` cục bộ được `.gitignore` bỏ qua; giữ kiểm tra
+TLS của npm bật.

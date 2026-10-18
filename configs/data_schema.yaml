@@ -1,6 +1,4 @@
-# ==============================================================================
-# Temp data, need changing.
-# ==============================================================================
+# Phase 1 raw EHR contract. WBC and CRP may be absent before week 2 imputation.
 
 features:
   numerical:
