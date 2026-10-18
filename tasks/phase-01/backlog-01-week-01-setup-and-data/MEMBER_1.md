@@ -31,7 +31,7 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 1 chịu trách nhiệm thiế
 * **Đầu ra (Deliverables):**
   - Tệp `requirements.txt` cập nhật.
   - Script `scripts/verify_env.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -62,7 +62,7 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 1 chịu trách nhiệm thiế
      - `num_classes`: 4.
 * **Đầu ra (Deliverables):**
   - Tệp `configs/model_config.yaml` hoàn chỉnh.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -80,15 +80,15 @@ Trong Tuần 1 của Giai đoạn 1, Thành viên 1 chịu trách nhiệm thiế
      ```
 * **Đầu ra (Deliverables):**
   - Script test tokenizer hoặc ghi chú kiến trúc tại `docs/notes_tabular_encoder.md`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 1 (ACCEPTANCE CRITERIA)
-- [ ] Chạy `python scripts/verify_env.py` xuất ra trạng thái CUDA hợp lệ và không báo lỗi thiếu thư viện.
-- [ ] Tệp `configs/model_config.yaml` được đọc thành công bằng `yaml.safe_load(open('configs/model_config.yaml'))` mà không có lỗi cú pháp.
-- [ ] Tải được HuggingFace Tokenizer về cache cục bộ.
-- [ ] Bàn giao `configs/model_config.yaml` cho Thành viên 2 và Thành viên 3.
+- [x] Chạy `python scripts/verify_env.py` trong `.venv` xuất ra `CUDA Available: True` và không báo lỗi thiếu thư viện trọng yếu.
+- [x] Tệp `configs/model_config.yaml` được đọc thành công bằng `yaml.safe_load` và đối chiếu với data contract trong test.
+- [x] Tải được HuggingFace Tokenizer về cache cục bộ bằng `scripts/check_clinical_tokenizer.py`.
+- [x] `configs/model_config.yaml` đã có trong repo để Thành viên 2 và Thành viên 3 sử dụng.
 
 ---
 
