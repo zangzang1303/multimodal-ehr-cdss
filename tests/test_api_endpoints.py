@@ -36,8 +36,9 @@ def test_health_check_payload_structure(client):
 
 def test_cors_preflight_and_headers(client):
     """
-    Verify CORS configuration permits http://localhost:3000.
+    Verify CORS configuration permits http://localhost:3000 and dynamic localhost ports.
     """
+    # Preflight GET on /health
     response = client.options(
         "/health",
         headers={
@@ -47,6 +48,38 @@ def test_cors_preflight_and_headers(client):
     )
     assert response.status_code == 200
     assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"
+
+    # Preflight POST on /api/v1/predict/baseline
+    post_preflight = client.options(
+        "/api/v1/predict/baseline",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert post_preflight.status_code == 200
+    assert post_preflight.headers.get("access-control-allow-origin") == "http://localhost:3000"
+
+    # Dynamic localhost port (e.g. 3001)
+    port_3001_preflight = client.options(
+        "/health",
+        headers={
+            "Origin": "http://localhost:3001",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert port_3001_preflight.status_code == 200
+    assert port_3001_preflight.headers.get("access-control-allow-origin") == "http://localhost:3001"
+
+
+def test_direct_options_requests(client):
+    """
+    Verify direct OPTIONS requests return HTTP 200.
+    """
+    assert client.options("/health").status_code == 200
+    assert client.options("/api/v1/predict/status").status_code == 200
+    assert client.options("/api/v1/predict/baseline").status_code == 200
 
 
 def test_inference_status_endpoint(client):
@@ -159,3 +192,47 @@ def test_baseline_prediction_result_schema():
             disease_name="UNKNOWN",
             probability=0.5,
         )
+
+
+def test_predict_baseline_endpoint(client):
+    """
+    Verify POST /api/v1/predict/baseline accepts PatientInferenceRequest
+    and returns predictions for all 3 baselines (Task 3.3).
+    """
+    payload = {
+        "patient_id": "PT-001",
+        "tabular_features": {
+            "age": 64,
+            "systolic_bp": 135.0,
+            "diastolic_bp": 85.0,
+            "heart_rate": 88.0,
+            "respiratory_rate": 22.0,
+            "spo2": 92.0,
+            "temperature": 37.2,
+            "wbc_count": 8.5,
+            "crp": 12.0,
+            "gender": "M",
+            "smoking_status": "CURRENT",
+            "history_hypertension": 1,
+            "history_diabetes": 0,
+        },
+        "clinical_notes": "Bệnh nhân nam 64 tuổi có tiền sử hút thuốc lá, khó thở tăng dần khi gắng sức.",
+    }
+
+    response = client.post("/api/v1/predict/baseline", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["patient_id"] == "PT-001"
+    assert "baseline_results" in data
+    results = data["baseline_results"]
+
+    # Verify all 3 baselines are present
+    assert "classical_tabular" in results
+    assert "tabular_deep" in results
+    assert "text_only" in results
+
+    for key in ["classical_tabular", "tabular_deep", "text_only"]:
+        assert "predicted_class" in results[key]
+        assert "confidence" in results[key]
+        assert 0.0 <= results[key]["confidence"] <= 1.0

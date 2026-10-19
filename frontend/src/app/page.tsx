@@ -11,6 +11,9 @@ import {
   Sun,
 } from "lucide-react";
 import { getHealth, HealthResponse } from "@/lib/api";
+import PatientDataForm from "@/components/PatientDataForm";
+
+
 
 export default function Home() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -108,7 +111,7 @@ export default function Home() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full flex flex-col justify-center">
+      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full flex flex-col justify-center">
         {/* Hero Section */}
         <div className="text-center mx-auto mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight mb-4">
@@ -200,7 +203,13 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Doctor Clinical Intake & 3-Baselines Prediction Form */}
+        <div className="mt-8">
+          <PatientDataForm />
+        </div>
       </main>
+
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-6 text-center text-xs text-slate-500 transition-colors">
