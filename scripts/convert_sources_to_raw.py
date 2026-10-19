@@ -612,11 +612,11 @@ def convert_sources_to_raw(
             record_idx += 1
             count_for_class += 1
 
-    # Shuffle dataset so classes are distributed naturally
+   
     combined = list(zip(selected_records, selected_clinical_notes))
     random.shuffle(combined)
 
-    # Renumber sequentially PT-0001 to PT-NNNN for clean standardization
+   
     final_records = []
     final_notes = []
     for i, (rec, note) in enumerate(combined, start=1):
@@ -639,7 +639,7 @@ def convert_sources_to_raw(
 
     df_final = pd.DataFrame(final_records)
 
-    # Enforce exact column order & types as in configs/data_schema.yaml
+    
     expected_cols = [
         "patient_id",
         "encounter_id",
@@ -662,7 +662,7 @@ def convert_sources_to_raw(
     ]
     df_final = df_final[expected_cols]
 
-    # Save to output_dir
+   
     os.makedirs(output_dir, exist_ok=True)
     parquet_path = os.path.join(output_dir, "patients_raw.parquet")
     jsonl_path = os.path.join(output_dir, "clinical_notes_raw.jsonl")
