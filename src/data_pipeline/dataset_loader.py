@@ -1,10 +1,7 @@
-
-
 from __future__ import annotations
 
 import json
 import logging
-import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -21,7 +18,9 @@ from src.data_pipeline.temporal_aligner import TemporalAligner
 
 logger = logging.getLogger(__name__)
 if not logger.handlers:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
 
 
 NUMERICAL_COLS_DEFAULT: List[str] = [
@@ -55,7 +54,7 @@ def create_patient_level_splits(
     val_size: float = 0.15,
     seed: int = 42,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-   
+
     if patient_col not in df.columns:
         raise ValueError(f"patient_col '{patient_col}' not found in DataFrame.")
     if target_col not in df.columns:
@@ -190,7 +189,6 @@ def _get_default_tokenizer():
 
 class MultimodalEHRDataset(Dataset):
 
-
     def __init__(
         self,
         df: pd.DataFrame,
@@ -260,11 +258,17 @@ class MultimodalEHRDataset(Dataset):
                 return str(row[text_field])
 
         parts = []
-        for part_name in ["chief_complaint", "history_of_present_illness", "physical_examination_notes"]:
+        for part_name in [
+            "chief_complaint",
+            "history_of_present_illness",
+            "physical_examination_notes",
+        ]:
             if part_name in row and pd.notna(row[part_name]):
                 parts.append(str(row[part_name]))
 
-        return " ".join(parts) if parts else "Bệnh nhân nhập viện không có ghi chú lâm sàng chi tiết."
+        return (
+            " ".join(parts) if parts else "Bệnh nhân nhập viện không có ghi chú lâm sàng chi tiết."
+        )
 
     def __len__(self) -> int:
         return len(self.df)

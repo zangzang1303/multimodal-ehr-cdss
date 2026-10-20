@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -12,7 +10,6 @@ from src.data_pipeline.dataset_loader import (
     MultimodalEHRDataset,
     create_patient_level_splits,
     get_data_loaders,
-    process_and_save_patient_splits,
 )
 
 
@@ -100,7 +97,9 @@ def test_multimodal_ehr_dataset_tensor_shapes(synthetic_patient_df):
     # Shapes and dtypes
     assert isinstance(sample["tabular_tensor"], torch.Tensor)
     assert sample["tabular_tensor"].dtype == torch.float32
-    assert sample["tabular_tensor"].shape == (13,), f"Expected [13], got {sample['tabular_tensor'].shape}"
+    assert sample["tabular_tensor"].shape == (
+        13,
+    ), f"Expected [13], got {sample['tabular_tensor'].shape}"
 
     assert isinstance(sample["input_ids"], torch.Tensor)
     assert sample["input_ids"].dtype == torch.int64

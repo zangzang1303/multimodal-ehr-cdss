@@ -593,6 +593,56 @@ export default function BaselinesBenchmarkPage() {
           </div>
         </div>
 
+        {/* 3.5. Confusion Matrix Analysis (Delivered by Member 2) */}
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-sky-500" />
+                Ma Trận Nhầm Lẫn Đối Chiếu 3 Baselines (Confusion Matrix Analysis)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Được sinh tự động từ Hold-out Test Set (300 DPI) để phân tích các ca bệnh dự đoán sai giữa 4 nhóm bệnh.
+              </p>
+            </div>
+            <span className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-mono">
+              data/confusion_matrices_baselines.png
+            </span>
+          </div>
+
+          <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/confusion_matrices_baselines.png"
+              alt="Ma trận nhầm lẫn 3 mô hình Baselines đối chứng"
+              className="w-full h-auto rounded-lg shadow-sm"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-1">
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
+              <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-sky-500" />
+                Đặc Điểm Mô Hình Bảng (XGBoost &amp; FT-Transformer)
+              </div>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Nhận diện chính xác 100% Viêm phổi (CAP) nhờ dấu ấn viêm và sốt rõ rệt. Tuy nhiên, tỷ lệ nhầm lẫn giữa Hen (ASTHMA) và COPD ở mức 5.6% - 8.3% do thiếu chỉ số FEV1/FVC (đã khóa để chống rò rỉ).
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
+              <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                Đặc Điểm Mô Hình Văn Bản (Bio_ClinicalBERT)
+              </div>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Khai thác tốt tiền sử hút thuốc nhiều năm và bệnh mạn tính. Tuy nhiên, có đến 32.4% ca Suy tim (CHF) bị đoán nhầm sang COPD do triệu chứng cơ năng &quot;khó thở, ho đờm&quot; quá tương đồng.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* 4. Proposed Optimal Architecture Deep-Dive Callout */}
         <div
           id="proposed-solution"
