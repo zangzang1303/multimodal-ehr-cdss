@@ -20,6 +20,24 @@ if not logger.handlers:
 
 class ClinicalImputer:
 
+    DEFAULT_NUMERICAL_COLS = [
+        "age",
+        "systolic_bp",
+        "diastolic_bp",
+        "heart_rate",
+        "respiratory_rate",
+        "spo2",
+        "temperature",
+        "wbc_count",
+        "crp",
+    ]
+    DEFAULT_CATEGORICAL_COLS = [
+        "gender",
+        "smoking_status",
+        "history_hypertension",
+        "history_diabetes",
+    ]
+
     def __init__(
         self,
         max_iter: int = 10,
@@ -63,14 +81,25 @@ class ClinicalImputer:
         if self.user_numerical_cols is not None:
             num_cols = [c for c in self.user_numerical_cols if c in df.columns]
         else:
-            num_cols = [
-                c for c in df.select_dtypes(include=[np.number]).columns if c not in excluded
+            known_numerical = [c for c in self.DEFAULT_NUMERICAL_COLS if c in df.columns]
+            num_cols = known_numerical or [
+                c
+                for c in df.select_dtypes(include=[np.number]).columns
+                if c not in excluded and c != "diagnosis_label"
             ]
 
         if self.user_categorical_cols is not None:
             cat_cols = [c for c in self.user_categorical_cols if c in df.columns]
         else:
-            cat_cols = [c for c in df.columns if c not in num_cols and c not in excluded]
+            known_categorical = [c for c in self.DEFAULT_CATEGORICAL_COLS if c in df.columns]
+            cat_cols = known_categorical or [
+                c
+                for c in df.columns
+                if c not in num_cols
+                and c not in excluded
+                and c not in {"patient_id", "encounter_id", "diagnosis_label"}
+                and not c.endswith("_timestamp")
+            ]
 
         return num_cols, cat_cols
 
@@ -110,6 +139,11 @@ class ClinicalImputer:
 
         out_df = X.copy()
 
+        required = self.fitted_numerical_cols + self.fitted_categorical_cols
+        missing_columns = [column for column in required if column not in out_df.columns]
+        if missing_columns:
+            raise ValueError(f"Input is missing fitted feature columns: {missing_columns}")
+
         if self.create_indicators:
 
             indicator_targets = self.fitted_numerical_cols + self.fitted_categorical_cols
@@ -134,13 +168,11 @@ class ClinicalImputer:
                 cat_imputed = self.cat_imputer.transform(out_df[cols_to_impute])
                 out_df[cols_to_impute] = cat_imputed
 
-        remaining_nans = out_df.isna().sum().sum()
+        remaining_nans = out_df[required].isna().sum().sum() if required else 0
         if remaining_nans > 0:
-            logger.warning(
-                "ClinicalImputer: %d residual NaNs detected; filling with forward/backward fill.",
-                remaining_nans,
+            raise RuntimeError(
+                f"ClinicalImputer left {remaining_nans} missing feature values after transform"
             )
-            out_df = out_df.ffill().bfill().fillna(0)
 
         return out_df
 

@@ -33,7 +33,32 @@ Tuần 2 giải quyết trực diện các sai sót phương pháp luận nghiê
 
 ## 4. TIÊU CHUẨN NGHIỆM THU ĐỂ CHUYỂN SANG TUẦN 3 (DEFINITION OF DONE)
 Backlog 02 (Tuần 2) chỉ được xem là hoàn thành khi:
-- [ ] Chạy `pytest tests/test_data_pipeline.py -v` vượt qua 100% test cases (chứng minh không rò rỉ nhãn, không còn dữ liệu định danh, và dữ liệu khuyết được gán đầy đủ).
-- [ ] Module `src/models/baselines.py` khởi tạo được cả 3 lớp mô hình và chạy thử nghiệm forward pass thành công với dữ liệu mẫu (dummy batch).
-- [ ] Khung script `scripts/run_baselines.py` nhận tham số CLI và sẵn sàng nạp dữ liệu sạch.
-- [ ] Giao diện `PatientDataForm.tsx` trên Next.js (cổng 3000) nhập liệu được 9 chỉ số số học và đoạn văn bản ghi chú lâm sàng mà không có lỗi giao diện.
+- [x] Chạy `pytest tests/test_data_pipeline.py -v` vượt qua 100% test cases (chứng minh không rò rỉ nhãn, không còn dữ liệu định danh, và dữ liệu khuyết được gán đầy đủ).
+- [x] Module `src/models/baselines.py` khởi tạo được cả 3 lớp mô hình và chạy thử nghiệm forward pass thành công với dữ liệu mẫu (dummy batch).
+- [x] Khung script `scripts/run_baselines.py` nhận tham số CLI, kiểm tra đủ `train/val/test.parquet`, và sẵn sàng nạp dữ liệu sạch.
+- [x] Giao diện `PatientDataForm.tsx` trên Next.js nhập đủ 9 chỉ số, 4 biến phân loại và ghi chú; production build và API prediction contract đều vượt kiểm thử.
+
+---
+
+## 5. TỔNG KẾT NGHIỆM THU BACKLOG 02
+
+Backlog 02 đã hoàn thành và sẵn sàng chuyển sang bước chia dữ liệu theo bệnh nhân ở Tuần 3:
+
+- **Data & Privacy:** De-ID che các mẫu PHI tiếng Việt/Anh; temporal lock loại mọi sự kiện tại hoặc sau chẩn đoán và các biến tiêu chuẩn vàng; MICE chỉ xử lý 9 biến số và 4 biến phân loại, giữ nguyên ID/nhãn để ngăn rò rỉ outcome.
+- **Modeling:** Có pipeline Random Forest/XGBoost/CatBoost, FT-Transformer số học và wrapper Bio_ClinicalBERT. Smoke test offline của ba nhánh đều trả tensor/xác suất kích thước `[batch, 4]`.
+- **Evaluation:** Có Macro AUROC, Macro AUPRC, Macro F1, accuracy, multiclass Brier score và ECE, kèm xác thực shape/miền xác suất.
+- **Application:** Form Next.js gọi `POST /api/v1/predict/baseline`; backend khử định danh ghi chú trước mock inference và trả đủ ba kết quả.
+- **Automation:** `python scripts/run_baselines.py --help` mô tả CLI; `--smoke-test` cho phép kiểm tra kiến trúc trước khi `data/processed/train.parquet`, `val.parquet`, `test.parquet` được tạo ở Tuần 3.
+
+### Lệnh nghiệm thu
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe scripts/run_baselines.py --smoke-test
+cd frontend
+npm.cmd run build
+```
+
+### Ranh giới bàn giao sang Tuần 3
+
+Backlog này dựng khung và kiểm tra forward pass; chưa công bố chất lượng mô hình. Huấn luyện/benchmark chính thức chỉ thực hiện sau patient-level split để tránh một bệnh nhân xuất hiện ở nhiều tập. Text baseline Bio_ClinicalBERT dùng backbone huấn luyện chủ yếu trên ghi chú tiếng Anh, nên kết quả trên ghi chú tiếng Việt phải được báo cáo như một giới hạn thực nghiệm.

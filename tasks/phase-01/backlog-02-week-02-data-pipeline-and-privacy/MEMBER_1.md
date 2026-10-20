@@ -28,7 +28,7 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 1 tập trung xây dựng toà
      - Đi qua Dropout ($p = 0.2$) và Linear Head: $W_{cls} \in \mathbb{R}^{768 \times 4}$ để xuất ra 4 logits tương ứng 4 bệnh lý.
 * **Đầu ra (Deliverables):**
   - `src/models/baselines.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -45,7 +45,7 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 1 tập trung xây dựng toà
      $$\text{ECE} = \sum_{m=1}^M \frac{|B_m|}{N} |\text{acc}(B_m) - \text{conf}(B_m)|$$
 * **Đầu ra (Deliverables):**
   - `src/evaluation/metrics.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -60,15 +60,15 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 1 tập trung xây dựng toà
   2. Viết khung nạp dữ liệu và khung vòng lặp huấn luyện, sẵn sàng tiếp nhận dữ liệu sạch phân chia theo cấp độ bệnh nhân từ Thành viên 2 ở Tuần 3.
 * **Đầu ra (Deliverables):**
   - `scripts/run_baselines.py` (khung mã nguồn).
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 1 (ACCEPTANCE CRITERIA)
-- [ ] Lớp `ClassicalTabularBaseline` huấn luyện thử và dự đoán xác suất thành công trên dữ liệu bảng giả lập.
-- [ ] Lớp `TextOnlyBaseline` thực hiện forward pass thành công với một batch dummy token `(input_ids, attention_mask)` và trả về tensor kích thước `[batch_size, 4]`.
-- [ ] Chạy unit test kiểm thử hàm `compute_multiclass_metrics` trong `src/evaluation/metrics.py` xuất ra đúng dict chứa 5 chỉ số (AUROC, AUPRC, F1, Brier, ECE).
-- [ ] Script `scripts/run_baselines.py --help` hiển thị đầy đủ hướng dẫn CLI.
+- [x] Lớp `ClassicalTabularBaseline` huấn luyện thử và dự đoán xác suất thành công trên dữ liệu bảng giả lập.
+- [x] Lớp `TextOnlyBaseline` thực hiện forward pass thành công với một batch dummy token `(input_ids, attention_mask)` và trả về tensor kích thước `[batch_size, 4]`.
+- [x] `compute_multiclass_metrics` xuất đúng AUROC, AUPRC, F1, accuracy, Brier và ECE, đồng thời từ chối ma trận xác suất không hợp lệ.
+- [x] `scripts/run_baselines.py --help` hiển thị đầy đủ hướng dẫn CLI; `--smoke-test` xác nhận cả ba model family hoạt động khi chưa có dữ liệu processed của Tuần 3.
 
 ---
 
