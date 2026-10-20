@@ -55,7 +55,7 @@ export async function getHealth(): Promise<HealthResponse> {
   const response = await fetch(`${API_BASE_URL}/health`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     cache: "no-store",
   });
@@ -74,7 +74,7 @@ export async function getInferenceStatus(): Promise<{ status: string; supported_
   const response = await fetch(`${API_BASE_URL}/api/v1/predict/status`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     cache: "no-store",
   });
@@ -85,3 +85,47 @@ export async function getInferenceStatus(): Promise<{ status: string; supported_
 
   return response.json();
 }
+
+export interface BaselineModelResult {
+  predicted_class: string;
+  confidence: number;
+}
+
+export interface PatientInferenceRequest {
+  patient_id?: string;
+  tabular_features: TabularFeatures;
+  clinical_notes?: string;
+}
+
+export interface BaselineInferenceResponse {
+  patient_id: string;
+  baseline_results: {
+    classical_tabular: BaselineModelResult;
+    tabular_deep: BaselineModelResult;
+    text_only: BaselineModelResult;
+    [key: string]: BaselineModelResult;
+  };
+}
+
+/**
+ * Call backend to predict across 3 baseline models
+ */
+export async function predictBaselines(
+  payload: PatientInferenceRequest
+): Promise<BaselineInferenceResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/predict/baseline`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Inference failed (${response.status}): ${errorText}`);
+  }
+
+  return response.json();
+}
+

@@ -207,3 +207,45 @@ class BaselinePredictionResult(BaseModel):
         default="1.0.0-phase1",
         description="Model checkpoint or artifact version",
     )
+
+
+class BaselineModelResult(BaseModel):
+    """
+    Result for an individual baseline model.
+    """
+
+    predicted_class: str = Field(..., description="Predicted disease class label")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Model prediction confidence score")
+
+
+class PatientInferenceRequest(BaseModel):
+    """
+    Request payload for baseline inference containing tabular features and optional clinical note.
+    """
+
+    patient_id: str = Field(
+        default="PT-001",
+        description="Patient unique identifier",
+        examples=["PT-001"],
+    )
+    tabular_features: TabularFeatures = Field(
+        ...,
+        description="Continuous vital signs and categorical indicators",
+    )
+    clinical_notes: Optional[str] = Field(
+        default="",
+        description="Unstructured clinical notes / free text",
+        examples=["Patient presents with cough and dyspnea..."],
+    )
+
+
+class PatientInferenceResponse(BaseModel):
+    """
+    Response payload returning predictions across the 3 baseline models.
+    """
+
+    patient_id: str = Field(..., description="Patient identifier")
+    baseline_results: Dict[str, BaselineModelResult] = Field(
+        ...,
+        description="Results from 3 baseline models: classical_tabular, tabular_deep, text_only",
+    )

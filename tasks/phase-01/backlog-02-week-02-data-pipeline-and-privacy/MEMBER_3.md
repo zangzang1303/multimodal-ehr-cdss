@@ -29,7 +29,7 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 3 đóng vai trò bảo chứn
   ```
 * **Đầu ra (Deliverables):**
   - `tests/test_data_pipeline.py` (vượt qua 100% test cases).
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -49,7 +49,7 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 3 đóng vai trò bảo chứn
      - Nút *"Chạy Dự Đoán 3 Baselines"* gửi request tới Backend.
 * **Đầu ra (Deliverables):**
   - `frontend/src/components/PatientDataForm.tsx`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -74,14 +74,15 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 3 đóng vai trò bảo chứn
 * **Đầu ra (Deliverables):**
   - `src/api/routes/inference.py`.
   - Cập nhật `src/api/main.py` để mount route.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 3 (ACCEPTANCE CRITERIA)
-- [ ] Chạy lệnh `pytest tests/test_data_pipeline.py -v` đạt 100% Pass không có bất kỳ Warning/Error nào.
-- [ ] Giao diện form trên Next.js hiển thị đẹp mắt, nhập liệu mượt mà, bấm *"Load Sample Patient"* tự động điền đầy đủ số và text.
-- [ ] Bấm nút *"Chạy Dự Đoán 3 Baselines"* trên web gọi thành công API tới backend và nhận về phản hồi HTTP 200.
+- [x] Chạy lệnh `pytest tests/test_data_pipeline.py -v` đạt 100% Pass không có bất kỳ Warning/Error nào.
+- [x] Giao diện form trên Next.js hiển thị đẹp mắt, nhập liệu mượt mà, bấm *"Load Sample Patient"* tự động điền đầy đủ số và text.
+- [x] Bấm nút *"Chạy Dự Đoán 3 Baselines"* trên web gọi thành công API tới backend và nhận về phản hồi HTTP 200.
+
 
 ---
 
