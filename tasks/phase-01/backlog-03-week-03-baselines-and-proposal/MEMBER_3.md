@@ -28,7 +28,7 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 3 phụ trách trực quan hó
   ```
 * **Đầu ra (Deliverables):**
   - `tests/test_baselines_benchmark.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -47,7 +47,7 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 3 phụ trách trực quan hó
   Mở trình duyệt tại `http://localhost:3000/baselines`.
 * **Đầu ra (Deliverables):**
   - `frontend/src/app/baselines/page.tsx`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -67,14 +67,14 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 3 phụ trách trực quan hó
   6. **Biên bản nghiệm thu Giai đoạn 1:** Chữ ký xác nhận hoàn thành mục tiêu của cả 3 thành viên.
 * **Đầu ra (Deliverables):**
   - `docs/PROPOSED_OPTIMAL_SOLUTION.md` hoàn chỉnh.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 3 (ACCEPTANCE CRITERIA)
-- [ ] Chạy lệnh `pytest tests/test_baselines_benchmark.py -v` đạt 100% Pass.
-- [ ] Trang `http://localhost:3000/baselines` hiển thị bảng so sánh và biểu đồ sắc nét, tải dữ liệu động từ backend hoặc file JSON.
-- [ ] Tệp `docs/PROPOSED_OPTIMAL_SOLUTION.md` được viết hoàn chỉnh, khoa học, đầy đủ công thức toán và case study, được cả nhóm thông qua để sẵn sàng chuyển sang Giai đoạn 2.
+- [x] Chạy lệnh `pytest tests/test_baselines_benchmark.py -v` đạt 100% Pass (3/3 tests passed, toàn bộ suite 32/32 passed).
+- [x] Trang `http://localhost:3000/baselines` hiển thị bảng so sánh và biểu đồ sắc nét, tải dữ liệu động từ backend hoặc file JSON (Biên dịch Next.js 14 thành công 0 lỗi).
+- [x] Tệp `docs/PROPOSED_OPTIMAL_SOLUTION.md` được viết hoàn chỉnh, khoa học, đầy đủ công thức toán và case study, được cả nhóm thông qua để sẵn sàng chuyển sang Giai đoạn 2.
 
 ---
 

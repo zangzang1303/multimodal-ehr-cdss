@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   AlertCircle,
+  ArrowRight,
+  BarChart3,
   CheckCircle2,
   HeartPulse,
   Moon,
   RefreshCw,
-  Server,
   Sun,
 } from "lucide-react";
 import { getHealth, HealthResponse } from "@/lib/api";
 import PatientDataForm from "@/components/PatientDataForm";
-
-
 
 export default function Home() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -50,7 +50,7 @@ export default function Home() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Failed to connect to FastAPI backend");
+        setError("Không thể kết nối tới FastAPI Backend");
       }
     } finally {
       setLastChecked(new Date());
@@ -87,22 +87,56 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Header Action: Dark/Light Mode Toggle */}
-          <div className="flex items-center space-x-3">
+          {/* Header Action: Ultra-Compact Backend Status Pill & Dark/Light Mode Toggle */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Ultra-compact Backend Status Pill */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100/90 dark:bg-slate-900/90 text-xs shadow-sm">
+              {loading ? (
+                <span className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="hidden sm:inline">Backend:</span> Kết nối...
+                </span>
+              ) : health?.status === "healthy" ? (
+                <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
+                  <span className="hidden sm:inline">Backend:</span> Online
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  <span className="hidden sm:inline">Backend:</span> Offline
+                </span>
+              )}
+
+              <button
+                onClick={checkBackendHealth}
+                disabled={loading}
+                title={lastChecked ? `Kiểm tra lại kết nối (Lần cuối: ${lastChecked.toLocaleTimeString()})` : "Kiểm tra kết nối"}
+                className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors disabled:opacity-50 ml-0.5"
+                aria-label="Kiểm tra lại kết nối backend"
+              >
+                <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
+              </button>
+            </div>
+
+            {/* Dark/Light Theme Toggle */}
             <button
               onClick={toggleTheme}
               aria-label="Toggle Theme"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all text-xs font-medium"
             >
               {isDark ? (
                 <>
                   <Sun className="w-4 h-4 text-amber-400" />
-                  <span className="hidden sm:inline">Chế độ sáng</span>
+                  <span className="hidden sm:inline">Sáng</span>
                 </>
               ) : (
                 <>
                   <Moon className="w-4 h-4 text-sky-500" />
-                  <span className="hidden sm:inline">Chế độ tối</span>
+                  <span className="hidden sm:inline">Tối</span>
                 </>
               )}
             </button>
@@ -111,105 +145,77 @@ export default function Home() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full flex flex-col justify-center">
+      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 w-full flex flex-col justify-center">
         {/* Hero Section */}
-        <div className="text-center mx-auto mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight mb-4">
+        <div className="text-center mx-auto mb-6">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight mb-2">
             Multimodal Clinical Decision Support System
           </h1>
-          <p className="text-lg sm:text-xl text-sky-600 dark:text-sky-400 font-medium mb-3">
+          <p className="text-base sm:text-lg text-sky-600 dark:text-sky-400 font-medium mb-2">
             Phase 1: Baselines & Research Benchmark
           </p>
-          <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+          <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto">
             Khung ứng dụng lâm sàng giai đoạn 1 hỗ trợ kết nối dữ liệu bệnh án điện tử đa phương thức
             và đánh giá các mô hình nền tảng đối chứng.
           </p>
         </div>
 
-        {/* Backend Health Check Card with Online Status Dot */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 shadow-sm backdrop-blur-sm relative overflow-hidden transition-colors">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center flex-shrink-0">
-                <Server className="w-6 h-6 text-sky-600 dark:text-sky-400" />
-              </div>
-              <div>
-                {/* Backend Status with Online Green Dot */}
-                {loading ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                    Đang kết nối...
-                  </span>
-                ) : health?.status === "healthy" ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    Online
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                    <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                    Offline
-                  </span>
-                )}
-
-                <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                    FastAPI Backend Core
-                  </h2>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions & Details */}
-            <div className="flex sm:flex-row items-center sm:items-center justify-between w-full sm:w-auto gap-3">
-              <div className="text-left sm:text-right text-xs text-slate-500 dark:text-slate-400">
-                <div>
-                  Phiên bản:{" "}
-                  <span className="font-mono text-slate-700 dark:text-slate-200">
-                    {health ? health.version : "N/A"}
-                  </span>
-                </div>
-                <div className="text-[11px] text-slate-400">
-                  Cập nhật: {lastChecked ? lastChecked.toLocaleTimeString() : "N/A"}
-                </div>
-              </div>
-
-              <button
-                onClick={checkBackendHealth}
-                disabled={loading}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-semibold shadow-md shadow-sky-600/20 flex items-center gap-2 transition-all disabled:opacity-50"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-                Kiểm tra kết nối
-              </button>
-            </div>
-          </div>
-
-          {error && (
-            <div className="mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 text-xs flex items-center gap-2">
+        {/* Offline Warning Banner if Backend Is Offline */}
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 text-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
               <span>
                 {error}. Đảm bảo dịch vụ FastAPI đang khởi chạy tại{" "}
-                <code className="font-mono bg-rose-950/20 px-1 py-0.5 rounded">
+                <code className="font-mono bg-rose-950/20 px-1 py-0.5 rounded text-[11px]">
                   http://localhost:8000
                 </code>
-                .
               </span>
             </div>
-          )}
+            <button
+              onClick={checkBackendHealth}
+              disabled={loading}
+              className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-700 dark:text-rose-200 text-[11px] font-semibold transition-colors flex-shrink-0"
+            >
+              Thử lại
+            </button>
+          </div>
+        )}
+
+        {/* Quick Link to Benchmark Baselines Dashboard */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-sky-500/10 via-emerald-500/5 to-transparent border border-sky-500/20 dark:border-sky-500/30 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center flex-shrink-0 text-sky-600 dark:text-sky-400">
+              <BarChart3 className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                Dashboard Đối So Sánh 3 Baselines
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 font-medium">
+                  Hold-out Test (N=300)
+                </span>
+              </div>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
+                Đối chiếu hiệu năng giữa XGBoost, FT-Transformer và Bio_ClinicalBERT kèm phân tích điểm mù lâm sàng &amp; ECE.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/baselines"
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-semibold shadow-sm flex items-center justify-center gap-2 transition-all flex-shrink-0 self-stretch sm:self-auto"
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Xem Benchmark Baselines</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
         {/* Doctor Clinical Intake & 3-Baselines Prediction Form */}
-        <div className="mt-8">
+        <div>
           <PatientDataForm />
         </div>
       </main>
-
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-6 text-center text-xs text-slate-500 transition-colors">

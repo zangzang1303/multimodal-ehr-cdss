@@ -236,3 +236,17 @@ def test_predict_baseline_endpoint(client):
         assert "predicted_class" in results[key]
         assert "confidence" in results[key]
         assert 0.0 <= results[key]["confidence"] <= 1.0
+
+
+def test_benchmarks_baselines_endpoint(client):
+    opt_resp = client.options("/api/v1/benchmarks/baselines")
+    assert opt_resp.status_code == 200
+
+    response = client.get("/api/v1/benchmarks/baselines")
+    assert response.status_code == 200
+    data = response.json()
+    assert "benchmark_metadata" in data
+    results = data.get("results", data)
+    assert "baseline_1_classical_tabular" in results
+    assert "baseline_2_tabular_deep" in results
+    assert "baseline_3_text_only" in results
