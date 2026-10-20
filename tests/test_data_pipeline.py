@@ -280,6 +280,29 @@ def test_clinical_imputer_aliases():
     assert TabularMICEImputer is ClinicalImputer
 
 
+def test_clinical_imputer_never_treats_target_or_identifiers_as_features():
+    """The feature imputer must preserve outcome and identifier columns verbatim."""
+    frame = pd.DataFrame(
+        {
+            "patient_id": ["PT-001", "PT-002", "PT-003", "PT-004"],
+            "encounter_id": ["E-1", "E-2", "E-3", "E-4"],
+            "diagnosis_label": [0, 1, 2, 3],
+            "age": [30.0, 55.0, np.nan, 70.0],
+            "wbc_count": [7.0, np.nan, 11.0, 8.0],
+            "gender": ["M", "F", "M", "F"],
+            "smoking_status": ["NEVER", "FORMER", None, "CURRENT"],
+            "history_hypertension": [0, 1, 0, 1],
+            "history_diabetes": [0, 0, 1, 1],
+        }
+    )
+    output = ClinicalImputer(max_iter=10).fit_transform(frame)
+    assert output["patient_id"].tolist() == frame["patient_id"].tolist()
+    assert output["encounter_id"].tolist() == frame["encounter_id"].tolist()
+    assert output["diagnosis_label"].tolist() == frame["diagnosis_label"].tolist()
+    assert "diagnosis_label_is_missing" not in output.columns
+    assert output[["age", "wbc_count", "smoking_status"]].isna().sum().sum() == 0
+
+
 # =====================================================================
 # 4. TASK 3.1 SPECIFICATION CONTRACT TESTS
 # =====================================================================
