@@ -11,16 +11,15 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from src.data_pipeline.deidentifier import ClinicalDeidentifier
 from src.data_pipeline.temporal_aligner import TemporalAligner
 from src.data_pipeline.imputer import ClinicalImputer, ClinicalMICEImputer, TabularMICEImputer
 
-
 # =====================================================================
 # 1. DEIDENTIFIER TESTS
 # =====================================================================
+
 
 def test_deidentifier_clinical_note_redaction():
     """Test Member 3 specification sentence and standard PHI tokens."""
@@ -56,7 +55,12 @@ def test_deidentifier_100_synthetic_sentences():
     deid = ClinicalDeidentifier(spacy_model=None, use_ner=False)
 
     names = ["Nguyễn Văn An", "Trần Thị Bình", "Lê Văn Cường", "Phạm Thị Dung", "Hoàng Văn Em"]
-    hospitals = ["Bệnh viện Chợ Rẫy", "Bệnh viện Bạch Mai", "Phòng khám Đa khoa Sài Gòn", "Bệnh viện Quân y 103"]
+    hospitals = [
+        "Bệnh viện Chợ Rẫy",
+        "Bệnh viện Bạch Mai",
+        "Phòng khám Đa khoa Sài Gòn",
+        "Bệnh viện Quân y 103",
+    ]
     phones = ["+84912345678", "0987654321", "0381234567", "0909123456"]
     dates = ["15/04/2025", "2026-01-30", "01/12/2024", "ngày 20 tháng 10 năm 2025"]
     ids = ["001201004567", "079090001234", "123456789"]
@@ -119,27 +123,29 @@ def test_deidentifier_with_spacy_ner():
     assert "[REDACTED_DATE]" in redacted
 
 
-
 # =====================================================================
 # 2. TEMPORAL ALIGNER TESTS
 # =====================================================================
+
 
 def test_temporal_aligner_time_locking():
     """Verify events occurring at or after diagnosis (t_event >= t_diag) are dropped."""
     aligner = TemporalAligner()
 
-    data = pd.DataFrame({
-        "event_id": [1, 2, 3, 4],
-        "event_time": [
-            "2026-03-12 08:00:00",  # Prior -> KEEP
-            "2026-03-12 09:15:00",  # Prior -> KEEP
-            "2026-03-12 09:30:00",  # Exact diag time (t_event == t_diag) -> DROP
-            "2026-03-12 10:00:00",  # Post diag (t_event > t_diag) -> DROP
-        ],
-        "diagnostic_time": ["2026-03-12 09:30:00"] * 4,
-        "feature_name": ["heart_rate", "systolic_bp", "fev1", "crp"],
-        "value": [88.0, 125.0, 1.8, 12.0],
-    })
+    data = pd.DataFrame(
+        {
+            "event_id": [1, 2, 3, 4],
+            "event_time": [
+                "2026-03-12 08:00:00",  # Prior -> KEEP
+                "2026-03-12 09:15:00",  # Prior -> KEEP
+                "2026-03-12 09:30:00",  # Exact diag time (t_event == t_diag) -> DROP
+                "2026-03-12 10:00:00",  # Post diag (t_event > t_diag) -> DROP
+            ],
+            "diagnostic_time": ["2026-03-12 09:30:00"] * 4,
+            "feature_name": ["heart_rate", "systolic_bp", "fev1", "crp"],
+            "value": [88.0, 125.0, 1.8, 12.0],
+        }
+    )
 
     filtered = aligner.filter_events_by_time(
         data,
@@ -157,17 +163,19 @@ def test_temporal_aligner_gold_standard_blacklist():
     """Verify gold-standard diagnostic criteria are stripped from predictors."""
     aligner = TemporalAligner()
 
-    df = pd.DataFrame({
-        "patient_id": [101, 102, 103],
-        "age": [65, 72, 58],
-        "systolic_bp": [130.0, 140.0, 120.0],
-        "fev1": [1.8, 2.1, 1.5],                  # COPD Gold Standard
-        "fvc": [2.6, 2.9, 2.3],                   # COPD Gold Standard
-        "fev1_fvc_ratio": [0.69, 0.72, 0.65],     # COPD Gold Standard
-        "lvef": [45.0, 55.0, 38.0],               # Heart Failure Gold Standard
-        "sputum_culture_bacteria": ["S.pneumoniae", "Negative", "Klebsiella"],  # Pneumonia
-        "crp": [15.2, 3.4, 45.0],                 # Valid Predictor
-    })
+    df = pd.DataFrame(
+        {
+            "patient_id": [101, 102, 103],
+            "age": [65, 72, 58],
+            "systolic_bp": [130.0, 140.0, 120.0],
+            "fev1": [1.8, 2.1, 1.5],  # COPD Gold Standard
+            "fvc": [2.6, 2.9, 2.3],  # COPD Gold Standard
+            "fev1_fvc_ratio": [0.69, 0.72, 0.65],  # COPD Gold Standard
+            "lvef": [45.0, 55.0, 38.0],  # Heart Failure Gold Standard
+            "sputum_culture_bacteria": ["S.pneumoniae", "Negative", "Klebsiella"],  # Pneumonia
+            "crp": [15.2, 3.4, 45.0],  # Valid Predictor
+        }
+    )
 
     detected_leaks = aligner.check_gold_standard_leakage(df)
     assert set(detected_leaks) == {
@@ -209,6 +217,7 @@ def test_temporal_aligner_filter_features_dict():
 # 3. MICE IMPUTER TESTS
 # =====================================================================
 
+
 def test_clinical_imputer_mice_and_indicators():
     """Verify MICE completes missing values and appends binary missingness indicators."""
     np.random.seed(42)
@@ -245,7 +254,9 @@ def test_clinical_imputer_mice_and_indicators():
 
     # Acceptance criteria assertions:
     # 1. 0 remaining NaNs
-    assert imputed_df.isna().sum().sum() == 0, f"Remaining NaNs: {imputed_df.isna().sum().to_dict()}"
+    assert (
+        imputed_df.isna().sum().sum() == 0
+    ), f"Remaining NaNs: {imputed_df.isna().sum().to_dict()}"
 
     # 2. Indicators exist and are binary 0 or 1
     for col in ["systolic_bp", "diastolic_bp", "wbc_count", "crp", "temperature"]:
@@ -267,3 +278,24 @@ def test_clinical_imputer_aliases():
     """Verify alias equivalence for ClinicalMICEImputer and TabularMICEImputer."""
     assert ClinicalMICEImputer is ClinicalImputer
     assert TabularMICEImputer is ClinicalImputer
+
+
+# =====================================================================
+# 4. TASK 3.1 SPECIFICATION CONTRACT TESTS
+# =====================================================================
+
+
+def test_deidentifier():
+    """Exact test function per Task 3.1 specification."""
+    test_deidentifier_clinical_note_redaction()
+
+
+def test_temporal_aligner():
+    """Exact test function per Task 3.1 specification."""
+    test_temporal_aligner_time_locking()
+    test_temporal_aligner_gold_standard_blacklist()
+
+
+def test_imputer():
+    """Exact test function per Task 3.1 specification."""
+    test_clinical_imputer_mice_and_indicators()

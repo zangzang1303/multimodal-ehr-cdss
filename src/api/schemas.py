@@ -213,6 +213,7 @@ class BaselineModelResult(BaseModel):
     """
     Result for an individual baseline model.
     """
+
     predicted_class: str = Field(..., description="Predicted disease class label")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Model prediction confidence score")
 
@@ -221,6 +222,7 @@ class PatientInferenceRequest(BaseModel):
     """
     Request payload for baseline inference containing tabular features and optional clinical note.
     """
+
     patient_id: str = Field(
         default="PT-001",
         description="Patient unique identifier",
@@ -241,6 +243,7 @@ class PatientInferenceResponse(BaseModel):
     """
     Response payload returning predictions across the 3 baseline models.
     """
+
     patient_id: str = Field(..., description="Patient identifier")
     baseline_results: Dict[str, BaselineModelResult] = Field(
         ...,

@@ -9,8 +9,12 @@ from src.api.schemas import (
     PatientInferenceRequest,
     PatientInferenceResponse,
 )
+from src.data_pipeline.deidentifier import ClinicalDeidentifier
 
 router = APIRouter(prefix="/predict")
+
+# Initialize ClinicalDeidentifier for pre-inference PHI protection
+deidentifier = ClinicalDeidentifier(spacy_model=None, use_ner=False)
 
 
 @router.options("/status")
@@ -44,10 +48,20 @@ async def predict_baseline(request: PatientInferenceRequest) -> PatientInference
     """
     patient_id = request.patient_id or "PT-001"
     tf = request.tabular_features
-    notes_text = (request.clinical_notes or "").lower()
+
+    # Sanitize clinical notes using Member 2's De-identification pipeline
+    raw_notes = request.clinical_notes or ""
+    sanitized_notes = deidentifier.deidentify_text(raw_notes) if raw_notes else ""
+    notes_text = sanitized_notes.lower()
 
     # Rule-assisted mock prediction matching clinical indications
-    if tf.wbc_count > 12.0 or tf.crp > 30.0 or tf.temperature > 38.0 or "sốt" in notes_text or "đờm" in notes_text:
+    if (
+        tf.wbc_count > 12.0
+        or tf.crp > 30.0
+        or tf.temperature > 38.0
+        or "sốt" in notes_text
+        or "đờm" in notes_text
+    ):
         pred_tab = "COMMUNITY_ACQUIRED_PNEUMONIA"
         conf_tab = 0.76
         pred_deep = "COMMUNITY_ACQUIRED_PNEUMONIA"
