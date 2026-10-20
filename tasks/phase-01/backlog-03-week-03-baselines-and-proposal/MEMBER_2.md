@@ -26,7 +26,7 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 2 hoàn thiện khâu xử lý
 * **Đầu ra (Deliverables):**
   - Hàm `create_patient_level_splits` trong `src/data_pipeline/dataset_loader.py`.
   - 3 tệp dữ liệu sạch trong `data/processed/`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -43,7 +43,7 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 2 hoàn thiện khâu xử lý
   2. Viết hàm `get_data_loaders(batch_size=64)` trả về 3 DataLoader: `train_loader`, `val_loader`, `test_loader`.
 * **Đầu ra (Deliverables):**
   - Lớp `MultimodalEHRDataset` và hàm `get_data_loaders`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -58,15 +58,15 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 2 hoàn thiện khâu xử lý
 * **Đầu ra (Deliverables):**
   - `data/confusion_matrices_baselines.png`.
   - Mục 2 trong `docs/PROPOSED_OPTIMAL_SOLUTION.md`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 2 (ACCEPTANCE CRITERIA)
-- [ ] 3 tệp Parquet trong `data/processed/` được tạo thành công; chạy script kiểm tra giao tập `set(train_patients) & set(test_patients) == set()` (100% không trùng lặp bệnh nhân).
-- [ ] Lớp `MultimodalEHRDataset` khởi tạo DataLoader nạp mượt mà, trả về đúng 4 tensor với shape chuẩn.
-- [ ] Tệp `data/confusion_matrices_baselines.png` hiển thị trực quan tỷ lệ nhầm lẫn giữa 4 nhóm bệnh.
-- [ ] Cung cấp các case study cụ thể cho bản Báo cáo Đề xuất Phương án Tối ưu.
+- [x] 3 tệp Parquet trong `data/processed/` được tạo thành công; chạy script kiểm tra giao tập `set(train_patients) & set(test_patients) == set()` (100% không trùng lặp bệnh nhân).
+- [x] Lớp `MultimodalEHRDataset` khởi tạo DataLoader nạp mượt mà, trả về đúng 4 tensor với shape chuẩn.
+- [x] Tệp `data/confusion_matrices_baselines.png` hiển thị trực quan tỷ lệ nhầm lẫn giữa 4 nhóm bệnh.
+- [x] Cung cấp các case study cụ thể cho bản Báo cáo Đề xuất Phương án Tối ưu.
 
 ---
 
