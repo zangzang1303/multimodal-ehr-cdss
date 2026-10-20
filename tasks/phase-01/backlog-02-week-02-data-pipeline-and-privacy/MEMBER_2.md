@@ -27,7 +27,7 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 2 gánh vác trọng trách c�
   3. **Surrogate Token Replacement:** Thay thế toàn bộ thực thể nhạy cảm bằng các token ngữ cảnh: `[REDACTED_NAME]`, `[REDACTED_DATE]`, `[REDACTED_HOSPITAL]`, `[REDACTED_PHONE]`, `[REDACTED_ID]` nhằm giữ trọn vẹn ngữ nghĩa ngữ pháp cho Text Encoder.
 * **Đầu ra (Deliverables):**
   - `src/data_pipeline/deidentifier.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -47,7 +47,7 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 2 gánh vác trọng trách c�
      - Nếu phát hiện bất kỳ biến nào trong blacklist lọt vào dữ liệu đầu vào, hàm phải phát tín hiệu cảnh báo hoặc loại bỏ tự động kèm log cảnh báo.
 * **Đầu ra (Deliverables):**
   - `src/data_pipeline/temporal_aligner.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -61,15 +61,15 @@ Trong Tuần 2 của Giai đoạn 1, Thành viên 2 gánh vác trọng trách c�
   4. Xuất báo cáo tỷ lệ missingness của từng feature trước và sau khi gán.
 * **Đầu ra (Deliverables):**
   - `src/data_pipeline/imputer.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 2 (ACCEPTANCE CRITERIA)
-- [ ] Chạy thử nghiệm `deidentifier.py` trên 100 câu bệnh án thô: 100% tên người, số điện thoại, ngày khám, CCCD được che bằng token chuẩn.
-- [ ] Thử nghiệm `temporal_aligner.py` với ca bệnh giả định có kết quả sau $t_{diag}$: xác nhận kết quả bị loại bỏ thành công.
-- [ ] Thử nghiệm `imputer.py` trên bảng có 25% NaN: bảng sau gán không còn bất kỳ giá trị NaN nào, các cột `_is_missing` được tạo đầy đủ.
-- [ ] Bàn giao 3 module cho Thành viên 3 để tích hợp vào bộ Unit Tests tự động.
+- [x] Chạy thử nghiệm `deidentifier.py` trên 100 câu bệnh án thô: 100% tên người, số điện thoại, ngày khám, CCCD được che bằng token chuẩn.
+- [x] Thử nghiệm `temporal_aligner.py` với ca bệnh giả định có kết quả sau $t_{diag}$: xác nhận kết quả bị loại bỏ thành công.
+- [x] Thử nghiệm `imputer.py` trên bảng có 25% NaN: bảng sau gán không còn bất kỳ giá trị NaN nào, các cột `_is_missing` được tạo đầy đủ.
+- [x] Bàn giao 3 module cho Thành viên 3 để tích hợp vào bộ Unit Tests tự động.
 
 ---
 

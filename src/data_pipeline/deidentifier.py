@@ -1,100 +1,220 @@
-"""
-MOCK FILE - DO THÀNH VIÊN 3 TẠO MOCK ĐỂ PHỤC VỤ TEST / PHÁT TRIỂN
-CẦN THAY THẾ (TODO: REPLACE WITH MEMBER 2'S ACTUAL IMPLEMENTATION IN SPRINT)
-Mô tả: Module khử định danh PHI/PII (Regex + Biomedical NER / Rule-based)
-Tuân thủ: HIPAA 18 Safe Harbor Identifiers
-"""
 
+
+from __future__ import annotations
+
+import logging
 import re
-from typing import Optional
+from typing import Any, Iterable, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
+if not logger.handlers:
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 
 class ClinicalDeidentifier:
-    """
-    Mock implementation of ClinicalDeidentifier for testing and system development.
-    Replaces sensitive clinical entities (CCCD, phone, email, dates, hospitals, doctor/patient names)
-    with standardized surrogate tokens:
-    [REDACTED_NAME], [REDACTED_DATE], [REDACTED_HOSPITAL], [REDACTED_PHONE], [REDACTED_ID].
-    """
+   
 
-    def __init__(self, spacy_model: Optional[str] = "en_core_web_sm"):
+    DEFAULT_SPACY_MODEL = "en_core_web_sm"
+
+    def __init__(
+        self,
+        spacy_model: Optional[str] = "en_core_web_sm",
+        use_ner: bool = True,
+        email_token: str = "[REDACTED_EMAIL]",
+        id_token: str = "[REDACTED_ID]",
+        phone_token: str = "[REDACTED_PHONE]",
+        date_token: str = "[REDACTED_DATE]",
+        name_token: str = "[REDACTED_NAME]",
+        hospital_token: str = "[REDACTED_HOSPITAL]",
+        loc_token: str = "[REDACTED_LOC]",
+    ) -> None:
+       
         self.spacy_model_name = spacy_model
+        self.use_ner = use_ner
+
+        self.EMAIL_TOKEN = email_token
+        self.ID_TOKEN = id_token
+        self.PHONE_TOKEN = phone_token
+        self.DATE_TOKEN = date_token
+        self.NAME_TOKEN = name_token
+        self.HOSPITAL_TOKEN = hospital_token
+        self.LOC_TOKEN = loc_token
+
         self.nlp = None
+        if self.use_ner and self.spacy_model_name:
+            self._init_spacy_model(self.spacy_model_name)
 
-        if spacy_model:
+      
+        self._compile_patterns()
+
+    def _init_spacy_model(self, model_name: str) -> None:
+       
+        try:
+            import spacy
             try:
-                import spacy
-                self.nlp = spacy.load(spacy_model)
-            except Exception:
-                # Fallback to rule engine if model is not downloaded
-                self.nlp = None
+                self.nlp = spacy.load(model_name)
+                logger.info("ClinicalDeidentifier: Loaded spaCy model '%s'.", model_name)
+            except OSError:
+                logger.warning(
+                    "spaCy model '%s' not found locally. Attempting to download...",
+                    model_name,
+                )
+                try:
+                    spacy.cli.download(model_name)
+                    self.nlp = spacy.load(model_name)
+                    logger.info("ClinicalDeidentifier: Successfully downloaded and loaded '%s'.", model_name)
+                except Exception as dl_err:
+                    logger.warning(
+                        "Unable to auto-download '%s' (%s). Falling back to blank model.",
+                        model_name,
+                        dl_err,
+                    )
+                    self.nlp = spacy.blank("en")
+        except ImportError:
+            logger.warning("spaCy is not installed. NER-based masking will be disabled.")
+            self.nlp = None
 
-        # Regex patterns for clinical de-identification
-        self.phone_pattern = re.compile(
-            r'(?:\+84|0)(?:3[2-9]|5[689]|7[06-9]|8[1-9]|9[0-9])\d{7}\b|\b(?:\+84|0)\d{9,10}\b'
-        )
+    def _compile_patterns(self) -> None:
+       
+        
         self.email_pattern = re.compile(
-            r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'
+            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}\b",
+            re.IGNORECASE,
         )
-        # CCCD / CMND / National ID (9 - 12 digits)
-        self.id_pattern = re.compile(
-            r'\b\d{12}\b|\b\d{9}\b'
+
+     
+       
+        self.phone_pattern = re.compile(
+            r"(?:\+84|\b0)(?:[\s.-]?)(?:3|5|7|8|9)(?:[\s.-]?\d){8}\b"
         )
-        # Date patterns (DD/MM/YYYY, YYYY-MM-DD, DD-MM-YYYY)
-        self.date_pattern = re.compile(
-            r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\d{4}[/-]\d{1,2}[/-]\d{1,2}\b'
+
+      
+        self.labeled_id_pattern = re.compile(
+            r"\b(?:CCCD|CMND|BHYT|MRN|HSBA|Mã thẻ|Số thẻ|Mã định danh|Định danh|SSN)[:\s]+([A-Za-z0-9\-_]{6,16})\b",
+            re.IGNORECASE,
         )
-        # Hospital & healthcare facility patterns in Vietnamese
-        self.hospital_pattern = re.compile(
-            r'(?:Bệnh viện|BV|Phòng khám|Trạm y tế)\s+([A-ZÀ-Ỹ][a-zà-ỹ0-9]+(?:\s+[A-ZÀ-Ỹ][a-zà-ỹ0-9]+)*)',
-            re.UNICODE,
+     
+        self.bhyt_pattern = re.compile(
+            r"\b(?:DN|GD|TE|CA|QN|HC|XK|HT|TB|NO|CT|XB|TN|CS|XN|MS|HD|TQ|TA|TY|HG|LS|PV|CN|HS|SV|GB|CB|CF|CH|KC|HN|DT|DK|XD|BT|TS|TC|TV)\d{13}\b"
         )
-        # Doctor / Patient naming patterns in Vietnamese
-        self.doctor_pattern = re.compile(
-            r'(?:Bác sĩ|Bác sỹ|BS\.?|bác sĩ|bác sỹ)\s+([A-ZÀ-Ỹ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỹ][a-zà-ỹ]+){1,3})',
-            re.UNICODE,
+
+        self.standalone_id_pattern = re.compile(r"\b\d{9}\b|\b\d{12}\b")
+
+        
+        self.date_patterns = [
+            re.compile(r"\bngày\s+\d{1,2}\s+tháng\s+\d{1,2}\s+năm\s+\d{4}\b", re.IGNORECASE),
+            re.compile(r"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b"),
+            re.compile(r"\b\d{4}[/-]\d{1,2}[/-]\d{1,2}\b"),
+            re.compile(r"\b\d{1,2}\.\d{1,2}\.\d{2,4}\b"),
+        ]
+
+        self.doctor_context_pattern = re.compile(
+            r"(?:\b(?i:bác sĩ|bác sỹ|bs\.|bs|y sĩ|điều dưỡng|dr\.|doctor)\s+)"
+            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]*){1,5})\b"
         )
-        self.patient_pattern = re.compile(
-            r'(?:Bệnh nhân|bệnh nhân|BN\.?)\s+([A-ZÀ-Ỹ][a-zà-ỹ]+(?:\s+[A-ZÀ-Ỹ][a-zà-ỹ]+){1,3})',
-            re.UNICODE,
+        
+        self.patient_context_pattern = re.compile(
+            r"(?:\b(?i:bệnh nhân|bn\.|bn|patient|pt\.)\s+)"
+            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]*){1,5})\b"
+        )
+        
+        self.contact_context_pattern = re.compile(
+            r"(?:\b(?i:người nhà|thân nhân|liên hệ|người giám hộ|family|contact)\s*(?::|-)?\s*)"
+            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]*){1,5})\b"
+        )
+
+     
+        self.hospital_context_pattern = re.compile(
+            r"\b(?i:bệnh viện|bv|phòng khám|trạm y tế|trung tâm y tế)\s+([A-ZÀ-ỸĐ][a-zà-ỹđ0-9]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ0-9]*)*)\b"
+        )
+        self.hospital_en_pattern = re.compile(
+            r"\b([A-Z][a-zA-Z0-9]*(?:\s+[A-Z][a-zA-Z0-9]*)*\s+(?i:hospital|clinic|health center|medical center|infirmary))\b"
         )
 
     def deidentify_text(self, text: str) -> str:
-        """
-        De-identify unstructured clinical notes by replacing PHI with surrogate tokens.
-        """
-        if not text:
-            return ""
+        
+        if not isinstance(text, str) or not text.strip():
+            return "" if text is None else text
 
-        redacted = text
+        result = text
 
-        # 1. Redact Email & Phone
-        redacted = self.email_pattern.sub("[REDACTED_ID]", redacted)
-        redacted = self.phone_pattern.sub("[REDACTED_PHONE]", redacted)
+      
+        
+        result = self.doctor_context_pattern.sub(
+            lambda m: m.group(0).replace(m.group(1), self.NAME_TOKEN),
+            result,
+        )
+       
+        result = self.patient_context_pattern.sub(
+            lambda m: m.group(0).replace(m.group(1), self.NAME_TOKEN),
+            result,
+        )
+       
+        result = self.contact_context_pattern.sub(
+            lambda m: m.group(0).replace(m.group(1), self.NAME_TOKEN),
+            result,
+        )
 
-        # 2. Redact Date
-        redacted = self.date_pattern.sub("[REDACTED_DATE]", redacted)
+       
+        result = self.hospital_context_pattern.sub(self.HOSPITAL_TOKEN, result)
+        result = self.hospital_en_pattern.sub(self.HOSPITAL_TOKEN, result)
 
-        # 3. Redact National ID / CCCD (12 or 9 digits)
-        redacted = self.id_pattern.sub("[REDACTED_ID]", redacted)
+     
+       
+        result = self.email_pattern.sub(self.EMAIL_TOKEN, result)
 
-        # 4. Redact Doctor and Patient names
-        redacted = self.doctor_pattern.sub(r"Bác sĩ [REDACTED_NAME]", redacted)
-        redacted = self.patient_pattern.sub(r"bệnh nhân [REDACTED_NAME]", redacted)
+        result = self.phone_pattern.sub(self.PHONE_TOKEN, result)
 
-        # 5. Redact Hospital / Facility
-        redacted = self.hospital_pattern.sub(r"[REDACTED_HOSPITAL]", redacted)
+        for date_pat in self.date_patterns:
+            result = date_pat.sub(self.DATE_TOKEN, result)
 
-        # 6. Fallback spaCy NER if available for any remaining entities
-        if self.nlp:
-            try:
-                doc = self.nlp(redacted)
-                for ent in doc.ents:
-                    if ent.label_ in ("PERSON", "PER"):
-                        redacted = redacted.replace(ent.text, "[REDACTED_NAME]")
-                    elif ent.label_ in ("ORG", "FACILITY") and "[REDACTED" not in ent.text:
-                        redacted = redacted.replace(ent.text, "[REDACTED_HOSPITAL]")
-            except Exception:
-                pass
+       
+        result = self.labeled_id_pattern.sub(
+            lambda m: m.group(0).replace(m.group(1), self.ID_TOKEN),
+            result,
+        )
+      
+        result = self.bhyt_pattern.sub(self.ID_TOKEN, result)
 
-        return redacted
+     
+        result = self.standalone_id_pattern.sub(self.ID_TOKEN, result)
+
+    
+        if self.nlp is not None:
+            doc = self.nlp(result)
+            entities_to_replace: List[Tuple[int, int, str]] = []
+            hospital_keywords = {"hospital", "clinic", "bệnh viện", "phòng khám", "center", "centre"}
+
+            for ent in doc.ents:
+                ent_text = ent.text.strip()
+                if ent_text.startswith("[REDACTED_"):
+                    continue
+
+                token_to_use = None
+                if ent.label_ in ["PERSON", "PER"]:
+                    token_to_use = self.NAME_TOKEN
+                elif ent.label_ in ["FAC", "FACILITY", "ORG"]:
+                    if any(kw in ent_text.lower() for kw in hospital_keywords):
+                        token_to_use = self.HOSPITAL_TOKEN
+                elif ent.label_ in ["GPE", "LOC"]:
+                    token_to_use = self.LOC_TOKEN
+                elif ent.label_ in ["DATE", "TIME"]:
+                    token_to_use = self.DATE_TOKEN
+
+                if token_to_use:
+                    entities_to_replace.append((ent.start_char, ent.end_char, token_to_use))
+
+            
+            for start, end, token in sorted(entities_to_replace, key=lambda x: x[0], reverse=True):
+                result = result[:start] + token + result[end:]
+
+        return result
+
+    def anonymize(self, text: str) -> str:
+        return self.deidentify_text(text)
+
+    def deidentify(self, text: str) -> str:
+        return self.deidentify_text(text)
+
+    def deidentify_batch(self, texts: Iterable[str]) -> List[str]:
+        return [self.deidentify_text(t) for t in texts]
