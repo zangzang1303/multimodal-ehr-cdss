@@ -111,6 +111,30 @@ def test_deidentifier_english_and_formats():
     assert "[REDACTED_ID]" in redacted
 
 
+def test_deidentifier_structured_vietnamese_ehr_header():
+    deid = ClinicalDeidentifier(spacy_model=None, use_ner=False)
+    text = (
+        "Facility: BỆNH VIỆN CHỢ RẪY | Department of Medicine\n"
+        "Patient ID: PT-0763 | Encounter ID: ENC-0763\n"
+        "Patient Name: Vũ Thu Linh | Gender: F | Age: 65\n"
+        "Attending Physician: BS.CKII. Nguyễn Văn Bình\n"
+        "Insurance ID (BHYT): DN488538211092\n"
+        "Residential Address: Southbridge, Vietnam"
+    )
+    redacted = deid.deidentify_text(text)
+    assert "BỆNH VIỆN CHỢ RẪY" not in redacted
+    assert "PT-0763" not in redacted
+    assert "ENC-0763" not in redacted
+    assert "Vũ Thu Linh" not in redacted
+    assert "Nguyễn Văn Bình" not in redacted
+    assert "DN488538211092" not in redacted
+    assert "Southbridge, Vietnam" not in redacted
+    assert "[REDACTED_HOSPITAL]" in redacted
+    assert redacted.count("[REDACTED_ID]") == 3
+    assert "[REDACTED_NAME]" in redacted
+    assert "[REDACTED_LOC]" in redacted
+
+
 def test_deidentifier_with_spacy_ner():
     """Verify Biomedical NER integration with spaCy model."""
     deid = ClinicalDeidentifier(spacy_model="en_core_web_sm", use_ner=True)

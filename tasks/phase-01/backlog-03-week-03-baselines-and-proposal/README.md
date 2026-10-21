@@ -38,8 +38,8 @@ Tuần 3 là tuần về đích của Giai đoạn 1. Mục tiêu tối hậu l�
 
 ## 4. TIÊU CHUẨN NGHIỆM THU ĐỂ KẾT THÚC GIAI ĐOẠN 1 (DEFINITION OF DONE)
 Backlog 03 (Tuần 3) và GIAI ĐOẠN 1 chỉ được xem là hoàn thành khi:
-- [ ] Tồn tại 3 tệp dữ liệu sạch: `data/processed/train.parquet`, `data/processed/val.parquet`, `data/processed/test.parquet` với 100% không có rò rỉ bệnh nhân giữa các tập.
-- [ ] Chạy thành công lệnh `python scripts/run_baselines.py` xuất ra tệp `data/baseline_results.json` ghi nhận đầy đủ AUROC, AUPRC, Macro-F1, Brier Score của cả 3 Baselines.
-- [ ] Tệp `data/baseline_curves.png` hiển thị đồ thị so sánh ROC, PR-Curve và Calibration Reliability Diagram của 3 mô hình.
-- [ ] Tệp tài liệu `docs/PROPOSED_OPTIMAL_SOLUTION.md` được hoàn thiện đầy đủ, phân tích rõ điểm mù của 3 baselines và đề xuất kiến trúc Multimodal Fusion + RAG rõ ràng từng công thức toán và module.
-- [ ] Trang `/baselines` trên giao diện web hiển thị bảng so sánh đối chứng trực quan cho bác sĩ.
+- [x] Tồn tại 3 tệp dữ liệu sạch: `data/processed/train.parquet`, `data/processed/val.parquet`, `data/processed/test.parquet` với 100% không có rò rỉ bệnh nhân giữa các tập.
+- [x] Chạy thành công lệnh `python scripts/run_baselines.py` xuất ra tệp `data/baseline_results.json` ghi nhận đầy đủ AUROC, AUPRC, Macro-F1, Brier Score của cả 3 Baselines.
+- [x] Tệp `data/baseline_curves.png` hiển thị đồ thị so sánh ROC, PR-Curve và Calibration Reliability Diagram của 3 mô hình.
+- [x] Tệp tài liệu `docs/PROPOSED_OPTIMAL_SOLUTION.md` được hoàn thiện đầy đủ, phân tích rõ điểm mù của 3 baselines và đề xuất kiến trúc Multimodal Fusion + RAG rõ ràng từng công thức toán và module.
+- [x] Trang `/baselines` trên giao diện web hiển thị bảng so sánh đối chứng trực quan cho bác sĩ.

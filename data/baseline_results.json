@@ -1,82 +1,127 @@
 {
-  "_mock_status": "MOCK FILE - DO THÀNH VIÊN 3 TẠO MOCK ĐỂ PHỤC VỤ TEST & PHÁT TRIỂN TUẦN 3 - CẦN THAY THẾ KHI THÀNH VIÊN 1 CHẠY XONG scripts/run_baselines.py (TODO: REPLACE WITH MEMBER 1'S ACTUAL BENCHMARK RUN)",
   "benchmark_metadata": {
-    "evaluation_date": "2026-10-20T10:00:00",
-    "test_samples": 300,
+    "evaluation_date": "2026-10-21T01:27:44.601508+00:00",
+    "test_samples": 286,
     "num_classes": 4,
     "classes": [
       "ASTHMA",
       "COPD",
-      "CONGESTIVE_HEART_FAILURE",
-      "COMMUNITY_ACQUIRED_PNEUMONIA"
-    ]
+      "HEART_FAILURE",
+      "PNEUMONIA"
+    ],
+    "device": "cuda",
+    "seed": 42,
+    "patient_level_split": true
   },
   "results": {
     "baseline_1_classical_tabular": {
-      "model_type": "XGBoost",
-      "data_modality": "Structured Tabular Only",
-      "macro_auroc": 0.8145,
-      "macro_auprc": 0.7421,
-      "macro_f1": 0.738,
-      "accuracy": 0.7533,
-      "brier_score": 0.2412,
-      "ece": 0.0874
+      "model_type": "CatBoost",
+      "data_modality": "Structured tabular only",
+      "selection_metric": "validation macro AUROC",
+      "candidate_validation_auroc": {
+        "XGBoost": 0.999526,
+        "CatBoost": 0.999771
+      },
+      "macro_auroc": 0.998766,
+      "macro_auprc": 0.996335,
+      "macro_f1": 0.975568,
+      "accuracy": 0.975524,
+      "brier_score": 0.044971,
+      "ece": 0.026451,
+      "validation": {
+        "macro_auroc": 0.999771,
+        "macro_auprc": 0.999291,
+        "macro_f1": 0.985913,
+        "accuracy": 0.986014,
+        "brier_score": 0.023795,
+        "ece": 0.023071
+      }
     },
     "baseline_2_tabular_deep": {
-      "model_type": "FT-Transformer (Tabular DL)",
-      "data_modality": "Structured Tabular Only",
-      "macro_auroc": 0.8312,
-      "macro_auprc": 0.7605,
-      "macro_f1": 0.7495,
-      "accuracy": 0.7667,
-      "brier_score": 0.229,
-      "ece": 0.0921
+      "model_type": "FT-Transformer",
+      "data_modality": "Structured tabular only",
+      "epochs_completed": 20,
+      "macro_auroc": 0.990263,
+      "macro_auprc": 0.972376,
+      "macro_f1": 0.943586,
+      "accuracy": 0.944056,
+      "brier_score": 0.087843,
+      "ece": 0.022285,
+      "validation": {
+        "macro_auroc": 0.994927,
+        "macro_auprc": 0.98509,
+        "macro_f1": 0.947214,
+        "accuracy": 0.947552,
+        "brier_score": 0.073795,
+        "ece": 0.014436
+      }
     },
     "baseline_3_text_only": {
       "model_type": "Bio_ClinicalBERT",
-      "data_modality": "Unstructured Clinical Notes Only",
-      "macro_auroc": 0.826,
-      "macro_auprc": 0.754,
-      "macro_f1": 0.743,
-      "accuracy": 0.7567,
-      "brier_score": 0.2378,
-      "ece": 0.1085
+      "data_modality": "De-identified clinical notes only",
+      "fine_tuning": "last encoder block and classification head",
+      "max_sequence_length": 512,
+      "learning_rate": 2e-05,
+      "epochs_completed": 5,
+      "macro_auroc": 0.996036,
+      "macro_auprc": 0.989071,
+      "macro_f1": 0.936311,
+      "accuracy": 0.937063,
+      "brier_score": 0.078921,
+      "ece": 0.018084,
+      "validation": {
+        "macro_auroc": 0.991367,
+        "macro_auprc": 0.974872,
+        "macro_f1": 0.940481,
+        "accuracy": 0.940559,
+        "brier_score": 0.103933,
+        "ece": 0.024929
+      }
     }
   },
-  "baseline_1_classical_tabular": {
-    "model_type": "XGBoost",
-    "data_modality": "Structured Tabular Only",
-    "macro_auroc": 0.8145,
-    "macro_auprc": 0.7421,
-    "macro_f1": 0.738,
-    "accuracy": 0.7533,
-    "brier_score": 0.2412,
-    "ece": 0.0874
-  },
-  "baseline_2_tabular_deep": {
-    "model_type": "FT-Transformer (Tabular DL)",
-    "data_modality": "Structured Tabular Only",
-    "macro_auroc": 0.8312,
-    "macro_auprc": 0.7605,
-    "macro_f1": 0.7495,
-    "accuracy": 0.7667,
-    "brier_score": 0.229,
-    "ece": 0.0921
-  },
-  "baseline_3_text_only": {
-    "model_type": "Bio_ClinicalBERT",
-    "data_modality": "Unstructured Clinical Notes Only",
-    "macro_auroc": 0.826,
-    "macro_auprc": 0.754,
-    "macro_f1": 0.743,
-    "accuracy": 0.7567,
-    "brier_score": 0.2378,
-    "ece": 0.1085
-  },
+  "error_analysis": [
+    {
+      "category": "tabular_correct_text_wrong",
+      "patient_id": "PT-0319",
+      "true_label": "COPD",
+      "tabular_prediction": "COPD",
+      "tabular_confidence": 0.911861,
+      "text_prediction": "HEART_FAILURE",
+      "text_confidence": 0.455734
+    },
+    {
+      "category": "tabular_correct_text_wrong",
+      "patient_id": "PT-0460",
+      "true_label": "COPD",
+      "tabular_prediction": "COPD",
+      "tabular_confidence": 0.979755,
+      "text_prediction": "ASTHMA",
+      "text_confidence": 0.507538
+    },
+    {
+      "category": "text_correct_tabular_wrong",
+      "patient_id": "PT-0320",
+      "true_label": "ASTHMA",
+      "tabular_prediction": "COPD",
+      "tabular_confidence": 0.81484,
+      "text_prediction": "ASTHMA",
+      "text_confidence": 0.68285
+    },
+    {
+      "category": "text_correct_tabular_wrong",
+      "patient_id": "PT-0763",
+      "true_label": "ASTHMA",
+      "tabular_prediction": "COPD",
+      "tabular_confidence": 0.844594,
+      "text_prediction": "ASTHMA",
+      "text_confidence": 0.889194
+    }
+  ],
   "summary_findings": {
-    "highest_auroc_model": "FT-Transformer (0.8312)",
-    "calibration_warning": "Tất cả 3 baseline đều có ECE > 0.08 (chưa được hiệu chuẩn, có hiện tượng overconfidence).",
-    "clinical_blindspot": "Mô hình bảng số thiếu ngữ cảnh bệnh sử; mô hình text thiếu độ nhạy chỉ số sinh tồn. Cần phương án Multimodal Late Fusion ở Giai đoạn 2."
+    "highest_auroc_model": "CatBoost",
+    "highest_macro_auroc": 0.998766,
+    "calibration_finding": "All three ECE values are below 0.05 on this synthetic hold-out set.",
+    "clinical_blindspot": "Tabular and text baselines observe complementary evidence; Phase 2 evaluates multimodal fusion.",
+    "external_validity_warning": "The synthetic cohort is highly separable; these scores do not establish performance on external clinical data."
   }
 }
-
