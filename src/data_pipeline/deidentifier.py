@@ -77,6 +77,23 @@ class ClinicalDeidentifier:
 
     def _compile_patterns(self) -> None:
 
+        # Structured EHR exports often carry PHI in labelled header fields. These
+        # rules are language-aware and do not depend on an English NER model.
+        self.structured_name_pattern = re.compile(
+            r"(?i)((?:Patient Name|Tên bệnh nhân|Họ và tên|Doctor Name|Tên bác sĩ|Attending Physician)\s*:\s*)"
+            r"[^\r\n|]+"
+        )
+        self.structured_facility_pattern = re.compile(
+            r"(?im)^(\s*(?:Facility|Hospital|Cơ sở|Bệnh viện)\s*:\s*)[^\r\n|]+"
+        )
+        self.structured_id_pattern = re.compile(
+            r"(?i)\b((?:(?:Patient|Encounter|Medical Record|MRN)\s+ID|"
+            r"Citizen ID/SSN|Insurance ID(?:\s*\(BHYT\))?)\s*:\s*)[A-Za-z0-9_-]+"
+        )
+        self.structured_location_pattern = re.compile(
+            r"(?im)^(\s*(?:Residential Address|Home Address|Địa chỉ)\s*:\s*)[^\r\n|]+"
+        )
+
         self.email_pattern = re.compile(
             r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}\b",
             re.IGNORECASE,
@@ -130,6 +147,19 @@ class ClinicalDeidentifier:
             return "" if text is None else text
 
         result = text
+
+        result = self.structured_name_pattern.sub(
+            lambda m: m.group(1) + self.NAME_TOKEN, result
+        )
+        result = self.structured_facility_pattern.sub(
+            lambda m: m.group(1) + self.HOSPITAL_TOKEN, result
+        )
+        result = self.structured_id_pattern.sub(
+            lambda m: m.group(1) + self.ID_TOKEN, result
+        )
+        result = self.structured_location_pattern.sub(
+            lambda m: m.group(1) + self.LOC_TOKEN, result
+        )
 
         result = self.doctor_context_pattern.sub(
             lambda m: m.group(0).replace(m.group(1), self.NAME_TOKEN),
