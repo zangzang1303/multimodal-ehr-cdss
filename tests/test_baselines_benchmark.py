@@ -40,6 +40,8 @@ def test_baseline_results_contains_all_models():
     """Verify presence of all 3 required baseline keys in the benchmark results."""
     with open(BENCHMARK_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
+    assert "_mock_status" not in data
+    assert data["benchmark_metadata"]["patient_level_split"] is True
 
     # Check either in top-level or in 'results' dict
     source_dict = data.get("results", data)

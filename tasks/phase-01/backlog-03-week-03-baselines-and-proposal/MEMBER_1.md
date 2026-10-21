@@ -54,7 +54,7 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 1 tiếp nhận 3 tập dữ l
 * **Đầu ra (Deliverables):**
   - `scripts/run_baselines.py`.
   - `data/baseline_results.json`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -67,7 +67,7 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 1 tiếp nhận 3 tập dữ l
   3. **Subplot 3 (Reliability Diagrams):** Đường cong độ tin cậy thể hiện rõ hiện tượng **Overconfidence** (sai lệch giữa độ tự tin dự đoán và độ chính xác thực tế - giải thích vì sao ECE của cả 3 baseline đều $> 0.08$).
 * **Đầu ra (Deliverables):**
   - Tệp ảnh `data/baseline_curves.png`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -83,15 +83,15 @@ Trong Tuần 3 của Giai đoạn 1, Thành viên 1 tiếp nhận 3 tập dữ l
   3. **Luận giải giải pháp Hiệu chuẩn Xác suất (Calibration):** Đề xuất giải pháp **Temperature Scaling** đưa vào Giai đoạn 2 để hạ $ECE$ từ $> 0.08$ về $< 0.05$.
 * **Đầu ra (Deliverables):**
   - Mục 3 & Mục 4 trong `docs/PROPOSED_OPTIMAL_SOLUTION.md`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
 ## 3. TIÊU CHUẨN NGHIỆM THU CỦA THÀNH VIÊN 1 (ACCEPTANCE CRITERIA)
-- [ ] Chạy thành công `python scripts/run_baselines.py` không phát sinh lỗi bộ nhớ GPU (OOM) và ghi nhận đầy đủ số liệu 3 Baselines vào `data/baseline_results.json`.
-- [ ] Tệp `data/baseline_curves.png` được tạo với độ phân giải cao (300 DPI), đầy đủ chú thích trục và nhãn mô hình.
-- [ ] Hoàn thành nội dung lý thuyết và công thức toán học cho bản đề xuất phương án tối ưu.
-- [ ] Bàn giao kết quả thực nghiệm cho Thành viên 2 và Thành viên 3.
+- [x] Chạy thành công `python scripts/run_baselines.py` không phát sinh lỗi bộ nhớ GPU (OOM) và ghi nhận đầy đủ số liệu 3 Baselines vào `data/baseline_results.json`.
+- [x] Tệp `data/baseline_curves.png` được tạo với độ phân giải cao (300 DPI), đầy đủ chú thích trục và nhãn mô hình.
+- [x] Hoàn thành nội dung lý thuyết và công thức toán học cho bản đề xuất phương án tối ưu.
+- [x] Bàn giao kết quả thực nghiệm cho Thành viên 2 và Thành viên 3.
 
 ---
 

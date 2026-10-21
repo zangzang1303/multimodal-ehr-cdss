@@ -87,7 +87,7 @@ export default function BaselinesBenchmarkPage() {
   const b3 = (rawResults.baseline_3_text_only ||
     FALLBACK_BENCHMARK_RESULTS.results.baseline_3_text_only) as typeof FALLBACK_BENCHMARK_RESULTS.results.baseline_3_text_only;
 
-  const baselineRows = [
+  const rawBaselineRows = [
     {
       id: "baseline_1",
       key: "baseline_1_classical_tabular",
@@ -101,11 +101,6 @@ export default function BaselinesBenchmarkPage() {
       accuracy: b1.accuracy,
       brier: b1.brier_score,
       ece: b1.ece,
-      isBestAuroc: false,
-      isBestAuprc: false,
-      isBestF1: false,
-      isBestBrier: false,
-      isBestEce: true, // 0.0874 is lowest ECE among the three
     },
     {
       id: "baseline_2",
@@ -120,11 +115,6 @@ export default function BaselinesBenchmarkPage() {
       accuracy: b2.accuracy,
       brier: b2.brier_score,
       ece: b2.ece,
-      isBestAuroc: true, // 0.8312 Highest
-      isBestAuprc: true, // 0.7605 Highest
-      isBestF1: true, // 0.7495 Highest
-      isBestBrier: true, // 0.2290 Lowest (best)
-      isBestEce: false,
     },
     {
       id: "baseline_3",
@@ -139,19 +129,24 @@ export default function BaselinesBenchmarkPage() {
       accuracy: b3.accuracy,
       brier: b3.brier_score,
       ece: b3.ece,
-      isBestAuroc: false,
-      isBestAuprc: false,
-      isBestF1: false,
-      isBestBrier: false,
-      isBestEce: false,
     },
   ];
+  const baselineRows = rawBaselineRows.map((row) => ({
+    ...row,
+    isBestAuroc: row.auroc === Math.max(...rawBaselineRows.map((item) => item.auroc)),
+    isBestAuprc: row.auprc === Math.max(...rawBaselineRows.map((item) => item.auprc)),
+    isBestF1: row.f1 === Math.max(...rawBaselineRows.map((item) => item.f1)),
+    isBestBrier: row.brier === Math.min(...rawBaselineRows.map((item) => item.brier)),
+    isBestEce: row.ece === Math.min(...rawBaselineRows.map((item) => item.ece)),
+  }));
+  const minEce = Math.min(...rawBaselineRows.map((item) => item.ece));
+  const maxEce = Math.max(...rawBaselineRows.map((item) => item.ece));
 
   // Recharts Data preparation
   const performanceChartData = [
     {
-      model: "XGBoost (B1)",
-      fullName: "Baseline 1: XGBoost",
+      model: `${b1.model_type || "Classical"} (B1)`,
+      fullName: `Baseline 1: ${b1.model_type || "Classical"}`,
       AUROC: +(b1.macro_auroc * 100).toFixed(2),
       AUPRC: +(b1.macro_auprc * 100).toFixed(2),
       MacroF1: +(b1.macro_f1 * 100).toFixed(2),
@@ -177,7 +172,7 @@ export default function BaselinesBenchmarkPage() {
 
   const calibrationChartData = [
     {
-      model: "XGBoost (B1)",
+      model: `${b1.model_type || "Classical"} (B1)`,
       ECE: +(b1.ece * 100).toFixed(2),
       BrierScore: +(b1.brier_score * 100).toFixed(2),
       SafeThreshold: 5.0, // 5% ECE clinical safety threshold
@@ -218,7 +213,7 @@ export default function BaselinesBenchmarkPage() {
                 Benchmark Đối Chứng Baselines
               </span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
-                Hold-out Test (N=300)
+                Hold-out Test (N={data.benchmark_metadata?.test_samples ?? 0})
               </span>
             </div>
           </div>
@@ -264,7 +259,7 @@ export default function BaselinesBenchmarkPage() {
               Đối So Sánh Hiệu Năng 3 Baselines Đơn Phương Thức
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Thực nghiệm đối chứng đánh giá khả năng chẩn đoán phân biệt 4 bệnh hô hấp & tim mạch trên tập Hold-out Test độc lập (300 bệnh nhân).
+              Thực nghiệm đối chứng đánh giá khả năng chẩn đoán phân biệt 4 bệnh hô hấp & tim mạch trên tập Hold-out Test độc lập ({data.benchmark_metadata?.test_samples ?? 0} bệnh nhân).
             </p>
           </div>
 
@@ -291,7 +286,7 @@ export default function BaselinesBenchmarkPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-base font-bold text-amber-900 dark:text-amber-300 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-500" />
-                  Cảnh Báo Lâm Sàng: Điểm Mù Đơn Phương Thức & Hiện Tượng Overconfidence (ECE &gt; 0.08)
+                  Phạm Vi Diễn Giải: Điểm Mù Đơn Phương Thức & Hiệu Chuẩn Xác Suất
                 </h3>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-mono font-semibold">
                   Nghiên cứu JMIR (Hunik et al., 2024)
@@ -303,7 +298,7 @@ export default function BaselinesBenchmarkPage() {
                   <strong>1. Điểm mù dữ liệu đơn lẻ (Unimodal Blindspot):</strong> Mô hình dữ liệu bảng (XGBoost, FT-Transformer) tuy có AUROC cao nhờ chỉ số xét nghiệm cấp tính nhưng <em>hoàn toàn mù mờ</em> trước bệnh sử hút thuốc nhiều năm, thói quen sinh hoạt và mô tả cơn khó thở kịch phát. Ngược lại, mô hình ClinicalBERT đọc hiểu ghi chú nhưng thiếu độ nhạy lượng hóa của SpO2 và chỉ số viêm (WBC, CRP).
                 </p>
                 <p>
-                  <strong>2. Hiện tượng Overconfidence nguy hiểm (ECE &gt; 0.08):</strong> Cả 3 mô hình đối chứng đều có Sai số Hiệu chuẩn Dự kiến (ECE) dao động từ <strong>8.74% đến 10.85%</strong> (vượt xa ngưỡng an toàn lâm sàng &lt; 5%). Mô hình đưa ra độ tự tin dự đoán quá cao trong khi chẩn đoán thực tế lại sai, tiềm ẩn rủi ro nghiêm trọng khi triển khai thực địa.
+                  <strong>2. Hiệu chuẩn trên tập kiểm thử tổng hợp:</strong> ECE của ba mô hình dao động từ <strong>{(minEce * 100).toFixed(2)}% đến {(maxEce * 100).toFixed(2)}%</strong>. Kết quả này chỉ phản ánh tập hold-out tổng hợp hiện tại; cần kiểm định và hiệu chuẩn lại trên dữ liệu bệnh viện độc lập trước khi triển khai lâm sàng.
                 </p>
               </div>
 
@@ -332,7 +327,7 @@ export default function BaselinesBenchmarkPage() {
                 Bảng Đối So Sánh Trực Diện 3 Baselines (Head-to-Head Benchmark Table)
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Đánh giá trên tập Hold-out Test 300 bệnh nhân không rò rỉ (Stratified Patient Group Split).
+                Đánh giá trên tập Hold-out Test {data.benchmark_metadata?.test_samples ?? 0} bệnh nhân không rò rỉ (Stratified Patient Group Split).
               </p>
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
@@ -455,7 +450,7 @@ export default function BaselinesBenchmarkPage() {
                 Hiệu Năng Phân Biệt Lâm Sàng (AUROC, AUPRC & Macro-F1)
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                FT-Transformer vượt trội XGBoost +1.67% AUROC; ClinicalBERT đạt 82.60%.
+                Các số liệu được tải trực tiếp từ kết quả benchmark thực trên tập hold-out.
               </p>
             </div>
 
@@ -528,7 +523,7 @@ export default function BaselinesBenchmarkPage() {
                 Khoảng Lệch Hiệu Chuẩn ECE vs Ngưỡng An Toàn Lâm Sàng (5.0%)
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tất cả 3 mô hình đều vi phạm ngưỡng an toàn (đường nét đứt màu đỏ), đòi hỏi Temperature Scaling.
+                Đường nét đứt 5% là mốc theo dõi nội bộ; cần đánh giá lại trên dữ liệu bệnh viện độc lập.
               </p>
             </div>
 

@@ -33,45 +33,45 @@ Trong 3 tuần triển khai Giai đoạn 1, nhóm nghiên cứu đã:
    - Module gán khuyết đa biến MICE (`ClinicalMICEImputer`) kết hợp sinh cột cờ báo khuyết nhị phân (*Missingness Indicators*).
 2. Thiết lập quy chuẩn phân chia dữ liệu cấp độ bệnh nhân (**Stratified Patient-Level Group Split**) với 70% Train, 15% Validation, 15% Hold-out Test độc lập, bảo đảm 100% không có hiện tượng rò rỉ bệnh nhân (*Zero Data Leakage*).
 3. Triển khai và huấn luyện đối chứng **3 Mô hình Baselines đơn phương thức (Unimodal Baselines)**:
-   - *Baseline 1 (Classical Tabular):* Pipeline XGBoost với chuẩn hóa dữ liệu bảng.
+   - *Baseline 1 (Classical Tabular):* So sánh XGBoost và CatBoost trên validation; CatBoost được chọn theo Macro AUROC.
    - *Baseline 2 (Tabular Deep Learning):* Mạng FT-Transformer rút gọn với Feature Tokenizer và Multi-Head Attention.
    - *Baseline 3 (Clinical NLP):* Mô hình ngôn ngữ y sinh `Bio_ClinicalBERT` tiền huấn luyện trên MIMIC-III Clinical Notes.
 
 ### 1.3. Kết Luận Then Chốt Từ Thực Nghiệm Đối Chứng
-- Mặc dù FT-Transformer đạt **Macro AUROC 0.8312** và Bio_ClinicalBERT đạt **Macro AUROC 0.8260**, không một mô hình đơn phương thức nào có thể cung cấp khả năng chẩn đoán toàn diện và an toàn.
+- Trên tập test tổng hợp, CatBoost đạt **Macro AUROC 0.9988**, Bio_ClinicalBERT đạt **0.9960** và FT-Transformer đạt **0.9903**. Kết quả cao cho thấy bộ dữ liệu tổng hợp hiện tại dễ phân tách, chưa chứng minh khả năng khái quát trên dữ liệu bệnh viện.
 - **Điểm mù đơn phương thức (Unimodal Blindspot):** Mô hình bảng số học bị mù trước diễn tiến bệnh mạn tính và thói quen sinh hoạt; trong khi mô hình văn bản bị thiếu độ nhạy lượng hóa trước các cơn suy hô hấp hoặc sốc nhiễm trùng cấp tính.
-- **Hiện tượng Overconfidence nguy hiểm:** Cả 3 baseline đều có Sai số Hiệu chuẩn Dự kiến ($ECE > 0.08$), vượt xa ngưỡng an toàn lâm sàng ($ECE < 0.05$).
-- **Quyết định chiến lược:** Bắt buộc phải chuyển giao sang Giai đoạn 2 với kiến trúc **Multimodal Cross-Attention Late Fusion** kết hợp **Temperature Scaling** ($ECE < 0.05$) và tầng **Agentic RAG đối chiếu phác đồ quốc tế** có trích dẫn ký tự bằng chứng (*Evidence Grounding*).
+- **Hiệu chuẩn trong phạm vi thử nghiệm:** ECE của ba mô hình nằm trong khoảng **0.0181–0.0265** trên hold-out tổng hợp. Cần kiểm định và hiệu chuẩn lại trên cohort bệnh viện độc lập trước mọi ứng dụng lâm sàng.
+- **Quyết định chiến lược:** Giai đoạn 2 đánh giá **Multimodal Cross-Attention Late Fusion**, hiệu chuẩn xác suất trên validation và tầng **Agentic RAG đối chiếu phác đồ quốc tế** có trích dẫn ký tự bằng chứng (*Evidence Grounding*).
 
 ---
 
 ## 2. BÁO CÁO KẾT QUẢ THỰC NGHIỆM ĐỐI CHỨNG (BENCHMARK ANALYSIS)
 
 ### 2.1. Bảng Số Liệu Đối So Sánh Trực Diện 3 Baselines
-Toàn bộ kết quả thực nghiệm dưới đây được đo đạc độc lập trên tập **Hold-out Test độc lập ($N = 300$ bệnh nhân)**, trích xuất trực tiếp từ tệp dữ liệu chuẩn `data/baseline_results.json`:
+Toàn bộ kết quả dưới đây được đo trên tập **Hold-out Test độc lập ($N = 286$ bệnh nhân tổng hợp)**, trích xuất trực tiếp từ `data/baseline_results.json`. Train/validation/test được chia theo `patient_id` với kích thước 1.428/286/286 và không có giao nhau.
 
 | Chỉ Số Đánh Giá (Metrics) | Baseline 1: Classical Tabular | Baseline 2: Tabular Deep Learning | Baseline 3: Clinical NLP | Phương Án Tốt Nhất Giai Đoạn 1 |
 | :--- | :---: | :---: | :---: | :---: |
-| **Kiến trúc mô hình** | XGBoost Classifier | FT-Transformer (Gorishniy et al.) | Bio_ClinicalBERT (Alsentzer et al.) | — |
-| **Phương thức dữ liệu** | Bảng số hóa (13 biến) | Bảng số hóa (13 biến) | Ghi chú lâm sàng tự do (512 tokens) | — |
-| **Macro AUROC** ↑ | $0.8145$ | **$0.8312$** *(+0.0167)* | $0.8260$ | **FT-Transformer** |
-| **Macro AUPRC** ↑ | $0.7421$ | **$0.7605$** *(+0.0184)* | $0.7540$ | **FT-Transformer** |
-| **Macro-F1** ↑ | $0.7380$ | **$0.7495$** *(+0.0115)* | $0.7430$ | **FT-Transformer** |
-| **Accuracy** ↑ | $0.7533$ | **$0.7667$** *(+0.0134)* | $0.7567$ | **FT-Transformer** |
-| **Brier Score** ↓ *(Càng thấp càng tốt)* | $0.2412$ | **$0.2290$** *(-0.0122)* | $0.2378$ | **FT-Transformer** |
-| **ECE (Expected Calibration Error)** ↓ | **$0.0874$ (8.74%)** | $0.0921$ (9.21%) | $0.1085$ (10.85%) | **XGBoost** |
+| **Kiến trúc mô hình** | CatBoost (chọn trên validation) | FT-Transformer (Gorishniy et al.) | Bio_ClinicalBERT (Alsentzer et al.) | — |
+| **Phương thức dữ liệu** | Bảng số hóa (13 biến) | Bảng số hóa | Ghi chú đã khử định danh (512 tokens) | — |
+| **Macro AUROC** ↑ | **$0.9988$** | $0.9903$ | $0.9960$ | **CatBoost** |
+| **Macro AUPRC** ↑ | **$0.9963$** | $0.9724$ | $0.9891$ | **CatBoost** |
+| **Macro-F1** ↑ | **$0.9756$** | $0.9436$ | $0.9363$ | **CatBoost** |
+| **Accuracy** ↑ | **$0.9755$** | $0.9441$ | $0.9371$ | **CatBoost** |
+| **Brier Score** ↓ *(Càng thấp càng tốt)* | **$0.0450$** | $0.0878$ | $0.0789$ | **CatBoost** |
+| **ECE (Expected Calibration Error)** ↓ | $0.0265$ (2.65%) | $0.0223$ (2.23%) | **$0.0181$ (1.81%)** | **Bio_ClinicalBERT** |
 
 ```
 So sánh Hiệu Năng Phân Biệt (Discrimination Metrics):
-FT-Transformer  ████████████████████████████████ 83.12% AUROC | 74.95% F1
-Bio_ClinicalBERT███████████████████████████████  82.60% AUROC | 74.30% F1
-XGBoost         ██████████████████████████████   81.45% AUROC | 73.80% F1
+CatBoost        ████████████████████████████████████████ 99.88% AUROC | 97.56% F1
+Bio_ClinicalBERT████████████████████████████████████████ 99.60% AUROC | 93.63% F1
+FT-Transformer  ████████████████████████████████████████ 99.03% AUROC | 94.36% F1
 
 Khoảng Lệch Hiệu Chuẩn An Toàn Lâm Sàng (ECE vs Ngưỡng 5.0%):
-Ngưỡng an toàn  █████ 5.00%
-XGBoost         █████████ 8.74%   (Lệch +3.74% so với ngưỡng)
-FT-Transformer  █████████ 9.21%   (Lệch +4.21% so với ngưỡng)
-Bio_ClinicalBERT███████████ 10.85% (Lệch +5.85% so với ngưỡng)
+Mốc theo dõi nội bộ █████ 5.00%
+CatBoost            ███ 2.65%
+FT-Transformer      ██  2.23%
+Bio_ClinicalBERT    ██  1.81%
 ```
 
 ### 2.2. Phân Tích Khoảng Cách Hiệu Năng Giữa Dữ Liệu Bảng & Dữ Liệu Văn Bản
@@ -79,7 +79,7 @@ Bio_ClinicalBERT███████████ 10.85% (Lệch +5.85% so với
 #### A. Thế mạnh và giới hạn của Nhánh Dữ Liệu Bảng (Baseline 1 & 2):
 1. **Thế mạnh:**
    - Khả năng nhận diện cực nhanh các biến động sinh lý tức thời: độ bão hòa oxy trong máu giảm sâu ($SpO_2 \le 90\%$), tăng bạch cầu cấp tính ($WBC > 15 \times 10^9/L$), phản ứng viêm rầm rộ ($CRP > 100\text{ mg/L}$), hoặc cơn tăng huyết áp kịch phát ($HA \ge 180/110\text{ mmHg}$).
-   - Mạng FT-Transformer vượt trội XGBoost **+1.67% AUROC** nhờ cơ chế `FeatureTokenizer` biến các số thực thành vector nhúng mật độ cao, giúp các tầng Transformer Encoder học được tương tác phi tuyến tính bậc cao giữa huyết áp, nhịp tim và chỉ số viêm mà các cây quyết định bị phân mảnh (*data fragmentation*).
+   - CatBoost đạt AUROC cao nhất trên bộ dữ liệu tổng hợp. FT-Transformer vẫn học được tương tác phi tuyến qua `FeatureTokenizer`, nhưng chưa vượt mô hình cây trên quy mô 1.428 mẫu train.
 2. **Giới hạn (Điểm mù - Blindspot):**
    - Hoàn toàn không nắm bắt được bối cảnh tiền sử: Một bệnh nhân có chỉ số sinh hiệu tại thời điểm khám bình thường nhưng có tiền sử hút thuốc 40 bao-năm sẽ bị mô hình bảng số đánh giá nguy cơ COPD rất thấp.
    - Không lượng hóa được tính chất cơ năng: Cảm giác khó thở khi nằm phẳng (*Orthopnea*), khó thở kịch phát về đêm (*PND*), hay tính chất đờm (đờm mủ xanh/vàng vs đờm bọt hồng) không thể mã hóa trọn vẹn thành biến số.
@@ -90,7 +90,7 @@ Bio_ClinicalBERT███████████ 10.85% (Lệch +5.85% so với
    - Khai thác hoàn hảo thông tin tiền căn gia đình, môi trường phơi nhiễm độc chất, và tiến triển triệu chứng theo thời gian.
 2. **Giới hạn (Điểm mù - Blindspot):**
    - Độ nhạy lượng hóa rất yếu: Khi ghi chú viết "bệnh nhân sốt, xét nghiệm CRP tăng nhẹ", mô hình văn bản không thể xác định CRP là $12\text{ mg/L}$ (nghĩ nhiều đến siêu vi/hen) hay $180\text{ mg/L}$ (nghi ngờ viêm phổi hoại tử hoặc nhiễm khuẩn huyết).
-   - Tần suất viết tắt và ghi chú vắn tắt của bác sĩ cấp cứu thường tạo ra độ nhiễu cao, khiến ECE của Bio_ClinicalBERT lên tới **10.85%** (mức sai lệch cao nhất trong 3 mô hình).
+   - Tần suất viết tắt và ghi chú vắn tắt có thể tạo nhiễu. Trong thử nghiệm hiện tại Bio_ClinicalBERT đạt ECE **1.81%**, nhưng giá trị này cần được tái thẩm định trên dữ liệu bệnh viện thực.
 
 ---
 

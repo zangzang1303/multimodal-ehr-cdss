@@ -23,6 +23,7 @@ classical:
     learning_rate: 0.05
     random_seed: 42
     verbose: false
+    allow_writing_files: false
 
 ft_transformer:
   d_token: 128
