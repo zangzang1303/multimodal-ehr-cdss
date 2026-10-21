@@ -638,6 +638,34 @@ export default function BaselinesBenchmarkPage() {
           </div>
         </div>
 
+        {/* 3.6. Benchmark Curves (Delivered by Member 1) */}
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-emerald-500" />
+                Đường Cong Hiệu Năng &amp; Hiệu Chuẩn Tin Cậy (ROC, PR &amp; Reliability Curves)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Trực quan hóa 3 phân đồ: One-vs-Rest ROC, Precision-Recall và Calibration Reliability Diagram trên tập Hold-out Test ($N=286$).
+              </p>
+            </div>
+            <span className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-mono">
+              data/baseline_curves.png
+            </span>
+          </div>
+
+          <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/baseline_curves.png"
+              alt="Đồ thị đường cong ROC, PR và Calibration Reliability Diagram của 3 Baselines"
+              className="w-full h-auto rounded-lg shadow-sm"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
         {/* 4. Proposed Optimal Architecture Deep-Dive Callout */}
         <div
           id="proposed-solution"
