@@ -1,0 +1,5 @@
+# Lightweight dependencies for the Phase 1 web demo.
+# Training dependencies remain in requirements.txt and are used locally/Colab.
+fastapi==0.144.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.1

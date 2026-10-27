@@ -5,6 +5,7 @@ Multimodal Clinical Decision Support System (M-CDSS) - Phase 1
 
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,7 +27,7 @@ app = FastAPI(
 )
 
 # CORS Configuration
-origins = [
+default_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:3001",
@@ -34,11 +35,20 @@ origins = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
+configured_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
+origins = [*default_origins, *configured_origins]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origin_regex=(
+        r"^(https?://(localhost|127\.0\.0\.1)(:\d+)?|"
+        r"https://[a-z0-9-]+\.vercel\.app)$"
+    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
