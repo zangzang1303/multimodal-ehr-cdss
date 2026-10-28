@@ -16,9 +16,26 @@ import re
 import json
 import random
 import argparse
+import hashlib
 from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
+
+DIAGNOSIS_TERMS = re.compile(
+    r"\b(asthma|status asthmaticus|copd|chronic obstructive(?: pulmonary disease)?|"
+    r"emphysema|congestive heart failure|heart failure|chf|"
+    r"community[- ]acquired pneumonia|bronchopneumonia|pneumonia)\b",
+    re.IGNORECASE,
+)
+
+
+def _fingerprint(value: str) -> str:
+    normalized = re.sub(r"\s+", " ", str(value).strip().lower())
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+def redact_target_diagnoses(value: str) -> str:
+    return DIAGNOSIS_TERMS.sub("[REDACTED_DIAGNOSIS]", str(value))
 
 
 
@@ -239,6 +256,7 @@ def index_mtsamples_by_class(mtsamples_df: pd.DataFrame) -> dict:
         for _, row in combined.iterrows():
             cc, hpi, pe, meds = parse_mtsamples_sections(row["transcription_clean"], row["description_clean"])
             indexed_samples[lbl].append({
+                "source_note_group": _fingerprint(row["transcription_clean"]),
                 "sample_name": row["sample_name_clean"].strip(),
                 "description": row["description_clean"].strip(),
                 "transcription": row["transcription_clean"].strip(),
@@ -249,6 +267,24 @@ def index_mtsamples_by_class(mtsamples_df: pd.DataFrame) -> dict:
             })
 
     return indexed_samples
+
+
+def deduplicate_mtsamples_across_labels(indexed_samples: dict) -> dict:
+    """Assign a source transcription to at most one target bucket.
+
+    A note mentioning multiple diseases must not connect otherwise independent
+    source-patient groups across labels during grouped splitting.
+    """
+    seen: set[str] = set()
+    deduplicated = {label: [] for label in indexed_samples}
+    for label in sorted(indexed_samples):
+        for sample in indexed_samples[label]:
+            fingerprint = sample["source_note_group"]
+            if fingerprint in seen:
+                continue
+            seen.add(fingerprint)
+            deduplicated[label].append(sample)
+    return deduplicated
 
 
 def map_disease_label(desc: str) -> int:
@@ -326,11 +362,10 @@ def build_clinical_note_from_mtsamples(
     wbc_str = f"{wbc:.1f} x10^9/L" if pd.notna(wbc) else "Pending lab analysis"
     crp_str = f"{crp:.1f} mg/L" if pd.notna(crp) else "Pending lab analysis"
 
-    cc = mtsample_entry["chief_complaint"]
-    hpi = mtsample_entry["history_of_present_illness"]
-    pe = mtsample_entry["physical_examination_notes"]
-    meds = mtsample_entry["prior_medications"]
-    transcription_body = mtsample_entry["transcription"]
+    cc = redact_target_diagnoses(mtsample_entry["chief_complaint"])
+    hpi = redact_target_diagnoses(mtsample_entry["history_of_present_illness"])
+    pe = redact_target_diagnoses(mtsample_entry["physical_examination_notes"])
+    meds = redact_target_diagnoses(mtsample_entry["prior_medications"])
 
    
     header = (
@@ -352,10 +387,10 @@ def build_clinical_note_from_mtsamples(
         f"PHYSICAL EXAMINATION:\n{pe}\n\n"
         f"MEDICATIONS:\n{meds}\n"
         f"----------------------------------------------------------------------\n"
-        f"CLINICAL TRANSCRIPTION & ASSESSMENT NOTE:\n"
+        f"PRE-DIAGNOSTIC NOTE (ASSESSMENT REMOVED):\n"
     )
 
-    raw_text = f"{header}{transcription_body}\n\n[Diagnostic Confirmation Finalized at: {diag_time}]"
+    raw_text = f"{header}[Diagnostic assessment withheld from model input.]"
 
     return {
         "patient_id": patient_id,
@@ -366,7 +401,8 @@ def build_clinical_note_from_mtsamples(
         "chief_complaint": cc,
         "history_of_present_illness": hpi,
         "physical_examination_notes": pe,
-        "prior_medications": meds
+        "prior_medications": meds,
+        "source_note_group": mtsample_entry["source_note_group"]
     }
 
 
@@ -394,7 +430,12 @@ def convert_sources_to_raw(
     mtsamples_by_class = None
     if use_mtsamples and mtsamples_df is not None:
         print("[*] Indexing MTSamples free-text notes for target disease categories...")
-        mtsamples_by_class = index_mtsamples_by_class(mtsamples_df)
+        mtsamples_by_class = deduplicate_mtsamples_across_labels(
+            index_mtsamples_by_class(mtsamples_df)
+        )
+        print("[*] Unique MTSamples retained per class:", {
+            label: len(samples) for label, samples in mtsamples_by_class.items()
+        })
 
     
     print("[*] Indexing patient demographics...")
@@ -553,8 +594,8 @@ def convert_sources_to_raw(
 
                 
             mtsample_entry = None
-            if mtsamples_by_class and len(mtsamples_by_class[lbl]) > 0:
-                cur_idx = mtsample_cursors[lbl] % len(mtsamples_by_class[lbl])
+            if mtsamples_by_class and mtsample_cursors[lbl] < len(mtsamples_by_class[lbl]):
+                cur_idx = mtsample_cursors[lbl]
                 mtsample_entry = mtsamples_by_class[lbl][cur_idx]
                 mtsample_cursors[lbl] += 1
 
@@ -589,8 +630,8 @@ def convert_sources_to_raw(
             synth_eid = f"ENC-SYNTH-{lbl}-{count_for_class:04d}"
 
             mtsample_entry = None
-            if mtsamples_by_class and len(mtsamples_by_class[lbl]) > 0:
-                cur_idx = mtsample_cursors[lbl] % len(mtsamples_by_class[lbl])
+            if mtsamples_by_class and mtsample_cursors[lbl] < len(mtsamples_by_class[lbl]):
+                cur_idx = mtsample_cursors[lbl]
                 mtsample_entry = mtsamples_by_class[lbl][cur_idx]
                 mtsample_cursors[lbl] += 1
 
@@ -658,7 +699,8 @@ def convert_sources_to_raw(
         "smoking_status",
         "history_hypertension",
         "history_diabetes",
-        "diagnosis_label"
+        "diagnosis_label",
+        "source_patient_group"
     ]
     df_final = df_final[expected_cols]
 
@@ -680,14 +722,14 @@ def convert_sources_to_raw(
     print("      DATA CONVERSION & VALIDATION REPORT (TASK 2.2)")
     print("=" * 65)
     df_check = pd.read_parquet(parquet_path)
-    print(f"[✓] patients_raw.parquet loaded successfully: {df_check.shape}")
-    print(f"[✓] clinical_notes_raw.jsonl count: {len(final_notes)} rows")
-    print(f"[✓] 1-to-1 match on patient_id & encounter_id: {df_check['patient_id'].nunique() == len(final_notes)}")
-    print(f"[✓] Class distribution: {df_check['diagnosis_label'].value_counts().sort_index().to_dict()}")
-    print(f"[✓] Missingness rate WBC: {df_check['wbc_count'].isna().mean():.1%}")
-    print(f"[✓] Missingness rate CRP: {df_check['crp'].isna().mean():.1%}")
-    print(f"[✓] MTSamples Clinical Free-Text Notes Integrated: {'YES' if mtsamples_by_class else 'NO (Built-in template)'}")
-    print(f"[✓] All 9 numerical and 4 categorical features conform to schema.")
+    print(f"[OK] patients_raw.parquet loaded successfully: {df_check.shape}")
+    print(f"[OK] clinical_notes_raw.jsonl count: {len(final_notes)} rows")
+    print(f"[OK] 1-to-1 match on patient_id & encounter_id: {df_check['patient_id'].nunique() == len(final_notes)}")
+    print(f"[OK] Class distribution: {df_check['diagnosis_label'].value_counts().sort_index().to_dict()}")
+    print(f"[OK] Missingness rate WBC: {df_check['wbc_count'].isna().mean():.1%}")
+    print(f"[OK] Missingness rate CRP: {df_check['crp'].isna().mean():.1%}")
+    print(f"[OK] MTSamples Clinical Free-Text Notes Integrated: {'YES' if mtsamples_by_class else 'NO (Built-in template)'}")
+    print(f"[OK] All 9 numerical and 4 categorical features conform to schema.")
     print("=" * 65)
 
 
@@ -717,12 +759,6 @@ def create_single_record(
     history_htn = 1 if p_id in htn_patients else 0
     history_dm = 1 if p_id in dm_patients else 0
 
-    if diag_label == 2:
-        if random.random() < 0.85:
-            history_htn = 1
-        if random.random() < 0.45:
-            history_dm = 1
-
     obs_enc = obs_map.get((p_id, e_id), {})
     obs_fallback = obs_pat_fallback.get(p_id, {})
 
@@ -735,50 +771,17 @@ def create_single_record(
         val = np.random.normal(default_mean, default_std)
         return float(np.clip(val, min_val, max_val))
 
-    if diag_label == 0:  # ASTHMA
-        sbp = get_vital("systolic_bp", 90.0, 165.0, 118.0, 10.0)
-        dbp = get_vital("diastolic_bp", 60.0, 95.0, 76.0, 7.0)
-        hr = get_vital("heart_rate", 65.0, 135.0, 88.0, 12.0)
-        rr = get_vital("respiratory_rate", 14.0, 32.0, 22.0, 3.0)
-        spo2 = get_vital("spo2", 86.0, 99.0, 94.5, 2.2)
-        temp = get_vital("temperature", 36.2, 37.6, 36.8, 0.3)
-        wbc = get_vital("wbc_count", 4.2, 13.0, 7.2, 1.8)
-        crp = get_vital("crp", 0.2, 15.0, 2.5, 2.0)
-        default_smoke = "NEVER" if random.random() < 0.70 else ("FORMER" if random.random() < 0.85 else "CURRENT")
-
-    elif diag_label == 1:  # COPD
-        sbp = get_vital("systolic_bp", 100.0, 185.0, 132.0, 14.0)
-        dbp = get_vital("diastolic_bp", 60.0, 105.0, 82.0, 9.0)
-        hr = get_vital("heart_rate", 65.0, 125.0, 88.0, 12.0)
-        rr = get_vital("respiratory_rate", 16.0, 36.0, 24.0, 4.0)
-        spo2 = get_vital("spo2", 78.0, 96.0, 90.5, 3.2)
-        temp = get_vital("temperature", 36.4, 38.2, 37.0, 0.4)
-        wbc = get_vital("wbc_count", 4.5, 17.0, 9.0, 2.5)
-        crp = get_vital("crp", 1.0, 45.0, 10.0, 6.0)
-        default_smoke = "FORMER" if random.random() < 0.60 else ("CURRENT" if random.random() < 0.85 else "NEVER")
-
-    elif diag_label == 2:  # CHF
-        sbp = get_vital("systolic_bp", 110.0, 210.0, 145.0, 18.0)
-        dbp = get_vital("diastolic_bp", 65.0, 120.0, 88.0, 11.0)
-        hr = get_vital("heart_rate", 70.0, 140.0, 96.0, 14.0)
-        rr = get_vital("respiratory_rate", 16.0, 36.0, 23.0, 3.5)
-        spo2 = get_vital("spo2", 84.0, 98.0, 92.5, 2.5)
-        temp = get_vital("temperature", 36.2, 37.5, 36.7, 0.3)
-        wbc = get_vital("wbc_count", 4.0, 14.0, 7.5, 2.0)
-        crp = get_vital("crp", 0.5, 30.0, 5.0, 3.5)
-        default_smoke = "FORMER" if random.random() < 0.45 else ("NEVER" if random.random() < 0.75 else "CURRENT")
-
-    else:  # CAP
-        sbp = get_vital("systolic_bp", 90.0, 170.0, 122.0, 15.0)
-        dbp = get_vital("diastolic_bp", 55.0, 95.0, 74.0, 10.0)
-        hr = get_vital("heart_rate", 80.0, 150.0, 106.0, 14.0)
-        rr = get_vital("respiratory_rate", 18.0, 42.0, 26.0, 4.5)
-        spo2 = get_vital("spo2", 82.0, 97.0, 91.0, 3.0)
-        temp = get_vital("temperature", 37.8, 41.0, 38.8, 0.7)
-        wbc = get_vital("wbc_count", 9.5, 26.0, 14.8, 3.5)
-        crp = get_vital("crp", 25.0, 220.0, 78.0, 32.0)
-        default_smoke = "NEVER" if random.random() < 0.55 else ("FORMER" if random.random() < 0.80 else "CURRENT")
-
+    # One target-independent population: diagnosis_label must never select
+    # clipping bounds, missing-value defaults, or exposure distributions.
+    sbp = get_vital("systolic_bp", 70.0, 240.0, 125.0, 20.0)
+    dbp = get_vital("diastolic_bp", 40.0, 140.0, 80.0, 12.0)
+    hr = get_vital("heart_rate", 35.0, 220.0, 88.0, 18.0)
+    rr = get_vital("respiratory_rate", 8.0, 50.0, 20.0, 6.0)
+    spo2 = get_vital("spo2", 60.0, 100.0, 94.0, 4.0)
+    temp = get_vital("temperature", 35.0, 42.0, 37.1, 0.8)
+    wbc = get_vital("wbc_count", 1.0, 50.0, 8.5, 3.0)
+    crp = get_vital("crp", 0.1, 300.0, 12.0, 15.0)
+    default_smoke = random.choice(["NEVER", "NEVER", "FORMER", "CURRENT"])
     smoking_status = obs_enc.get("smoking_status") or obs_fallback.get("smoking_status") or default_smoke
 
     # 15% - 25% missingness for MICE testing
@@ -851,7 +854,7 @@ def create_single_record(
             f"HISTORY OF PRESENT ILLNESS:\n{history_of_present_illness}\n\n"
             f"PHYSICAL EXAMINATION:\n{physical_examination}\n\n"
             f"MEDICATIONS:\n{prior_medications}\n\n"
-            f"Confirmed: {diag_time}."
+            f"Diagnostic assessment withheld from model input."
         )
 
         note = {
@@ -863,7 +866,8 @@ def create_single_record(
             "chief_complaint": chief_complaint,
             "history_of_present_illness": history_of_present_illness,
             "physical_examination_notes": physical_examination,
-            "prior_medications": prior_medications
+            "prior_medications": prior_medications,
+            "source_note_group": _fingerprint(f"fallback:{e_id}")
         }
 
     record = {
@@ -886,7 +890,8 @@ def create_single_record(
         "smoking_status": str(smoking_status),
         "history_hypertension": int(history_htn),
         "history_diabetes": int(history_dm),
-        "diagnosis_label": int(diag_label)
+        "diagnosis_label": int(diag_label),
+        "source_patient_group": _fingerprint(p_id)
     }
 
     return record, note

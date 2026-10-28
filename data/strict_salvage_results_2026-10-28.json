@@ -1,0 +1,127 @@
+{
+  "benchmark_metadata": {
+    "evaluation_date": "2026-10-28T03:21:31.187382+00:00",
+    "test_samples": 297,
+    "num_classes": 4,
+    "classes": [
+      "ASTHMA",
+      "COPD",
+      "HEART_FAILURE",
+      "PNEUMONIA"
+    ],
+    "device": "cuda",
+    "seed": 42,
+    "patient_level_split": true
+  },
+  "results": {
+    "baseline_1_classical_tabular": {
+      "model_type": "XGBoost",
+      "data_modality": "Structured tabular only",
+      "selection_metric": "validation macro AUROC",
+      "candidate_validation_auroc": {
+        "XGBoost": 1.0,
+        "CatBoost": 0.999877
+      },
+      "macro_auroc": 0.999729,
+      "macro_auprc": 0.999211,
+      "macro_f1": 0.986577,
+      "accuracy": 0.986532,
+      "brier_score": 0.020799,
+      "ece": 0.003325,
+      "validation": {
+        "macro_auroc": 1.0,
+        "macro_auprc": 1.0,
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "brier_score": 0.003328,
+        "ece": 0.013652
+      }
+    },
+    "baseline_2_tabular_deep": {
+      "model_type": "FT-Transformer",
+      "data_modality": "Structured tabular only",
+      "epochs_completed": 13,
+      "macro_auroc": 0.994685,
+      "macro_auprc": 0.98314,
+      "macro_f1": 0.942874,
+      "accuracy": 0.942761,
+      "brier_score": 0.078138,
+      "ece": 0.023976,
+      "validation": {
+        "macro_auroc": 0.991079,
+        "macro_auprc": 0.968424,
+        "macro_f1": 0.949532,
+        "accuracy": 0.94863,
+        "brier_score": 0.078436,
+        "ece": 0.016102
+      }
+    },
+    "baseline_3_text_only": {
+      "model_type": "Bio_ClinicalBERT",
+      "data_modality": "De-identified clinical notes only",
+      "fine_tuning": "last encoder block and classification head",
+      "max_sequence_length": 512,
+      "learning_rate": 2e-05,
+      "epochs_completed": 5,
+      "macro_auroc": 0.991177,
+      "macro_auprc": 0.977388,
+      "macro_f1": 0.925525,
+      "accuracy": 0.925926,
+      "brier_score": 0.110138,
+      "ece": 0.02227,
+      "validation": {
+        "macro_auroc": 0.987771,
+        "macro_auprc": 0.96471,
+        "macro_f1": 0.905034,
+        "accuracy": 0.90411,
+        "brier_score": 0.137796,
+        "ece": 0.025732
+      }
+    }
+  },
+  "error_analysis": [
+    {
+      "category": "tabular_correct_text_wrong",
+      "patient_id": "PT-0102",
+      "true_label": "ASTHMA",
+      "tabular_prediction": "ASTHMA",
+      "tabular_confidence": 0.996928,
+      "text_prediction": "COPD",
+      "text_confidence": 0.967868
+    },
+    {
+      "category": "tabular_correct_text_wrong",
+      "patient_id": "PT-0111",
+      "true_label": "COPD",
+      "tabular_prediction": "COPD",
+      "tabular_confidence": 0.953728,
+      "text_prediction": "ASTHMA",
+      "text_confidence": 0.654247
+    },
+    {
+      "category": "text_correct_tabular_wrong",
+      "patient_id": "PT-0729",
+      "true_label": "HEART_FAILURE",
+      "tabular_prediction": "COPD",
+      "tabular_confidence": 0.865528,
+      "text_prediction": "HEART_FAILURE",
+      "text_confidence": 0.99871
+    },
+    {
+      "category": "text_correct_tabular_wrong",
+      "patient_id": "PT-1611",
+      "true_label": "COPD",
+      "tabular_prediction": "HEART_FAILURE",
+      "tabular_confidence": 0.65575,
+      "text_prediction": "COPD",
+      "text_confidence": 0.93293
+    }
+  ],
+  "summary_findings": {
+    "highest_auroc_model": "XGBoost",
+    "highest_macro_auroc": 0.999729,
+    "calibration_finding": "All three ECE values are below 0.05 on this synthetic hold-out set.",
+    "clinical_blindspot": "Tabular and text baselines observe complementary evidence; Phase 2 evaluates multimodal fusion.",
+    "external_validity_warning": "The synthetic cohort is highly separable; these scores do not establish performance on external clinical data."
+  }
+}

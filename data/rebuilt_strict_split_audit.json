@@ -1,0 +1,46 @@
+{
+  "rows": {
+    "train": 1425,
+    "val": 273,
+    "test": 302
+  },
+  "overlap": {
+    "patient_id": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    },
+    "source_patient_group": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    },
+    "source_note_group": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    }
+  },
+  "class_counts": {
+    "train": {
+      "0": 358,
+      "1": 358,
+      "2": 340,
+      "3": 369
+    },
+    "val": {
+      "0": 71,
+      "1": 71,
+      "2": 54,
+      "3": 77
+    },
+    "test": {
+      "0": 71,
+      "1": 71,
+      "2": 106,
+      "3": 54
+    }
+  },
+  "passed": true,
+  "failures": []
+}

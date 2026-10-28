@@ -1,0 +1,49 @@
+{
+  "benchmark_metadata": {
+    "evaluation_date": "2026-10-28T03:15:59.381391+00:00",
+    "test_samples": 297,
+    "num_classes": 4,
+    "classes": [
+      "ASTHMA",
+      "COPD",
+      "HEART_FAILURE",
+      "PNEUMONIA"
+    ],
+    "device": "cuda",
+    "seed": 42,
+    "patient_level_split": true
+  },
+  "results": {
+    "baseline_1_classical_tabular": {
+      "model_type": "XGBoost",
+      "data_modality": "Structured tabular only",
+      "selection_metric": "validation macro AUROC",
+      "candidate_validation_auroc": {
+        "XGBoost": 1.0,
+        "CatBoost": 0.999877
+      },
+      "macro_auroc": 0.999729,
+      "macro_auprc": 0.999211,
+      "macro_f1": 0.986577,
+      "accuracy": 0.986532,
+      "brier_score": 0.020799,
+      "ece": 0.003325,
+      "validation": {
+        "macro_auroc": 1.0,
+        "macro_auprc": 1.0,
+        "macro_f1": 1.0,
+        "accuracy": 1.0,
+        "brier_score": 0.003328,
+        "ece": 0.013652
+      }
+    }
+  },
+  "error_analysis": [],
+  "summary_findings": {
+    "highest_auroc_model": "XGBoost",
+    "highest_macro_auroc": 0.999729,
+    "calibration_finding": "All three ECE values are below 0.05 on this synthetic hold-out set.",
+    "clinical_blindspot": "Tabular and text baselines observe complementary evidence; Phase 2 evaluates multimodal fusion.",
+    "external_validity_warning": "The synthetic cohort is highly separable; these scores do not establish performance on external clinical data."
+  }
+}

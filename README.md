@@ -290,8 +290,12 @@ python -m spacy download en_core_web_sm
 ### 6.2. Huấn Luyện & Đánh Giá Thực Nghiệm (Scientific CLI)
 
 ```bash
-# 1. Huấn luyện 3 Mô Hình Đối Chứng (Baselines: XGBoost, FT-Tabular, Text-BERT)
-python scripts/run_baselines.py --data_path data/processed/train.parquet --output_dir data/baseline_results.json
+# 0. Tạo split theo provenance và bắt buộc audit trước khi huấn luyện
+python -c "from src.data_pipeline.dataset_loader import process_and_save_patient_splits; process_and_save_patient_splits(processed_data_dir='data/processed_strict')"
+python scripts/audit_data_leakage.py --data-dir data/processed_strict --output data/strict_split_audit.json
+
+# 1. Huấn luyện 3 Baselines chỉ trên split đã vượt audit
+python scripts/run_baselines.py --data_dir data/processed_strict --output_file data/baseline_results.json
 
 # 2. Huấn luyện Mạng Đa Phương Thức Đề Xuất (Multimodal Cross-Attention Fusion)
 python scripts/train_multimodal.py \
