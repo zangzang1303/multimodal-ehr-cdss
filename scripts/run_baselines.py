@@ -46,6 +46,11 @@ def build_parser():
     parser.add_argument("--baseline", choices=CHOICES, default="all")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--local-files-only", action="store_true")
+    parser.add_argument(
+        "--allow-unsafe-split",
+        action="store_true",
+        help="Allow legacy splits without source provenance (not for reported results).",
+    )
     parser.add_argument("--smoke-test", action="store_true")
     return parser
 
@@ -58,7 +63,7 @@ def load_config(path):
     return config
 
 
-def load_splits(data_dir):
+def load_splits(data_dir, allow_unsafe=False):
     paths = {name: data_dir / f"{name}.parquet" for name in ("train", "val", "test")}
     missing = [str(p) for p in paths.values() if not p.is_file()]
     if missing:
@@ -67,6 +72,19 @@ def load_splits(data_dir):
     sets = {name: set(frame.patient_id) for name, frame in frames.items()}
     if sets["train"] & sets["val"] or sets["train"] & sets["test"] or sets["val"] & sets["test"]:
         raise ValueError("Patient leakage detected between processed splits")
+    provenance = ("source_patient_group", "source_note_group")
+    missing = [column for column in provenance if any(column not in frame for frame in frames.values())]
+    if missing and not allow_unsafe:
+        raise ValueError(
+            "Unsafe legacy split: missing provenance columns " + ", ".join(missing)
+            + ". Rebuild processed data or pass --allow-unsafe-split for smoke testing only."
+        )
+    for column in provenance:
+        if column not in frames["train"]:
+            continue
+        values = {name: set(frame[column].dropna().astype(str)) for name, frame in frames.items()}
+        if values["train"] & values["val"] or values["train"] & values["test"] or values["val"] & values["test"]:
+            raise ValueError(f"Source provenance leakage detected for {column}")
     return frames
 
 
@@ -329,7 +347,7 @@ def main(argv=None):
     args = build_parser().parse_args(argv); config = load_config(args.config)
     if args.smoke_test:
         print(json.dumps(smoke_test(config), indent=2)); return 0
-    set_seed(config["training"]["seed"]); frames = load_splits(args.data_dir)
+    set_seed(config["training"]["seed"]); frames = load_splits(args.data_dir, args.allow_unsafe_split)
     device = select_device(args.device)
     selected = ("tabular_classic","tabular_deep","text_only") if args.baseline == "all" else (args.baseline,)
     runners = {"tabular_classic": lambda: run_classical(frames,config),

@@ -79,6 +79,26 @@ def test_patient_level_splits_zero_leakage(synthetic_patient_df):
     assert set(test_df["diagnosis_label"].unique()) == {0, 1, 2, 3}
 
 
+def test_source_note_provenance_never_crosses_splits(synthetic_patient_df):
+    frame = synthetic_patient_df.copy()
+    frame["source_patient_group"] = frame["patient_id"]
+    frame["source_note_group"] = frame["patient_id"].map(
+        lambda value: f"NOTE-{int(value.split('-')[1]) // 2:03d}"
+    )
+    train_df, val_df, test_df = create_patient_level_splits(
+        frame,
+        seed=42,
+        group_cols=["source_patient_group", "source_note_group"],
+    )
+    for column in ("source_patient_group", "source_note_group"):
+        train_values, val_values, test_values = (
+            set(split[column]) for split in (train_df, val_df, test_df)
+        )
+        assert not (train_values & val_values)
+        assert not (train_values & test_values)
+        assert not (val_values & test_values)
+
+
 def test_multimodal_ehr_dataset_tensor_shapes(synthetic_patient_df):
     """Assert MultimodalEHRDataset yields correct tensor keys, shapes, and dtypes."""
     dataset = MultimodalEHRDataset(

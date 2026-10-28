@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import logging
 import os
 from pathlib import Path
@@ -54,6 +55,7 @@ def create_patient_level_splits(
     test_size: float = 0.15,
     val_size: float = 0.15,
     seed: int = 42,
+    group_cols: Optional[Sequence[str]] = None,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
    
     if patient_col not in df.columns:
@@ -65,6 +67,36 @@ def create_patient_level_splits(
     if total_rows == 0:
         raise ValueError("Cannot split an empty DataFrame.")
 
+    requested_group_cols = list(group_cols or [patient_col])
+    missing_group_cols = [col for col in requested_group_cols if col not in df.columns]
+    if missing_group_cols:
+        raise ValueError(f"group columns not found: {missing_group_cols}")
+
+    parent = list(range(total_rows))
+
+    def find(index: int) -> int:
+        while parent[index] != index:
+            parent[index] = parent[parent[index]]
+            index = parent[index]
+        return index
+
+    def union(left: int, right: int) -> None:
+        left_root, right_root = find(left), find(right)
+        if left_root != right_root:
+            parent[right_root] = left_root
+
+    for column in requested_group_cols:
+        first_seen: Dict[str, int] = {}
+        for index, value in enumerate(df[column]):
+            if pd.isna(value) or str(value).strip() == "":
+                continue
+            key = str(value)
+            if key in first_seen:
+                union(index, first_seen[key])
+            else:
+                first_seen[key] = index
+
+    groups = np.asarray([find(index) for index in range(total_rows)])
     n_splits_test = max(2, int(round(1.0 / test_size)))
     sgkf_test = StratifiedGroupKFold(n_splits=n_splits_test, shuffle=True, random_state=seed)
 
@@ -73,7 +105,7 @@ def create_patient_level_splits(
     best_diff = float("inf")
 
     for train_val_fold_idx, test_fold_idx in sgkf_test.split(
-        df, y=df[target_col], groups=df[patient_col]
+        df, y=df[target_col], groups=groups
     ):
         diff = abs(len(test_fold_idx) - target_test_count)
         if diff < best_diff:
@@ -83,6 +115,7 @@ def create_patient_level_splits(
     test_df = df.iloc[best_test_idx].copy().reset_index(drop=True)
     train_val_indices = [i for i in range(total_rows) if i not in set(best_test_idx)]
     train_val_df = df.iloc[train_val_indices].copy().reset_index(drop=True)
+    train_val_groups = groups[train_val_indices]
 
     effective_val_ratio = val_size / (1.0 - (len(test_df) / total_rows))
     n_splits_val = max(2, int(round(1.0 / effective_val_ratio)))
@@ -93,7 +126,7 @@ def create_patient_level_splits(
     best_val_diff = float("inf")
 
     for train_fold_idx, val_fold_idx in sgkf_val.split(
-        train_val_df, y=train_val_df[target_col], groups=train_val_df[patient_col]
+        train_val_df, y=train_val_df[target_col], groups=train_val_groups
     ):
         diff = abs(len(val_fold_idx) - target_val_count)
         if diff < best_val_diff:
@@ -119,6 +152,11 @@ def create_patient_level_splits(
             f"Train-Test={len(overlap_train_test)}, "
             f"Val-Test={len(overlap_val_test)}"
         )
+
+    for column in requested_group_cols:
+        split_values = [set(frame[column].dropna().astype(str)) for frame in (train_df, val_df, test_df)]
+        if split_values[0] & split_values[1] or split_values[0] & split_values[2] or split_values[1] & split_values[2]:
+            raise RuntimeError(f"Provenance leakage detected for group column: {column}")
 
     logger.info(
         "Patient-level split completed successfully: "
@@ -438,6 +476,7 @@ def process_and_save_patient_splits(
     chief_complaints = []
     histories = []
     physicals = []
+    source_note_groups = []
 
     for _, row in clean_df.iterrows():
         enc_id = str(row.get("encounter_id", ""))
@@ -454,12 +493,27 @@ def process_and_save_patient_splits(
         chief_complaints.append(note_entry.get("chief_complaint", ""))
         histories.append(note_entry.get("history_of_present_illness", ""))
         physicals.append(note_entry.get("physical_examination_notes", ""))
+        source_note_groups.append(note_entry.get("source_note_group", ""))
 
     clean_df["clinical_note"] = notes_text_list
     clean_df["text"] = notes_text_list
     clean_df["chief_complaint"] = chief_complaints
     clean_df["history_of_present_illness"] = histories
     clean_df["physical_examination_notes"] = physicals
+    clean_df["source_note_group"] = source_note_groups
+
+    if "source_patient_group" not in clean_df:
+        clean_df["source_patient_group"] = clean_df["patient_id"].astype(str)
+    note_basis = (
+        clean_df["chief_complaint"].fillna("").astype(str)
+        + "\n" + clean_df["history_of_present_illness"].fillna("").astype(str)
+        + "\n" + clean_df["physical_examination_notes"].fillna("").astype(str)
+    )
+    generated_note_groups = note_basis.map(
+        lambda text: hashlib.sha256(" ".join(text.lower().split()).encode("utf-8")).hexdigest()
+    )
+    empty_note_group = clean_df["source_note_group"].fillna("").astype(str).str.strip().eq("")
+    clean_df.loc[empty_note_group, "source_note_group"] = generated_note_groups[empty_note_group]
 
     logger.info("Step 3/5: Partitioning data at patient level (StratifiedGroupKFold)...")
     train_df, val_df, test_df = create_patient_level_splits(
@@ -469,6 +523,7 @@ def process_and_save_patient_splits(
         test_size=test_size,
         val_size=val_size,
         seed=seed,
+        group_cols=["source_patient_group", "source_note_group"],
     )
 
     logger.info("Step 4/5: Performing MICE imputation with strict Fit-Transform discipline...")
