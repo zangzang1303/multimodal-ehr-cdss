@@ -1,0 +1,205 @@
+Mục tiêu trọng tâm của Giai đoạn 1 là nghiên cứu nền tảng, thiết lập pipeline dữ liệu y sinh đạt chuẩn y khoa quốc tế, huấn luyện và đo đạc thực nghiệm 3 mô hình nền tảng đơn phương thức (Unimodal Baselines), phân tích sâu sắc các điểm mù lâm sàng và xây dựng đề xuất phương án tối ưu cho Giai đoạn 2.
+
+Dữ liệu thu thập từ Synthea Longitudinal EHR và MTSamples Clinical Text
+
+Dữ liệu định lượng được xây dựng dựa trên nền tảng Synthea, một công cụ mô phỏng hồ sơ bệnh án điện tử (EHR) mã nguồn mở hàng đầu thế giới được chứng nhận bởi các viện nghiên cứu y tế quốc tế.
+
+patients.csv: Dữ liệu nhân khẩu học (mã bệnh nhân, giới tính, ngày sinh, địa chỉ).
+
+encounters.csv: Dữ liệu đợt khám (mã đợt khám, thời điểm nhập viện, lý do khám, khoa phòng).
+
+conditions.csv: Chẩn đoán bệnh lý theo mã ICD-10 và SNOMED-CT kèm mốc thời gian chẩn đoán.
+
+observations.csv: Dữ liệu đo đạc chỉ số sinh tồn và xét nghiệm sinh hóa theo mã LOINC.
+
+Dữ liệu văn bản được trích xuất từ tập dữ liệu mở MTSamples, gồm các bản ghi chép lâm sàng thực tế của bác sĩ trong quá trình khám bệnh, hội chẩn và ra viện tại các bệnh viện. 
+
+Lọc chọn các bệnh án thuộc các chuyên khoa: Phổi, Tim mạch, Cấp cứu, và Hồi sức tích cực.
+
+Phạm vi dữ liệu cho 4 nhãn mục tiêu (Hen, Phổi tắc nghẽn mạn tính, Suy tim, Viêm phổi)
+
+Thực hiện 3 Baselines để ….
+
+Baseline 1: Sử dụng XGBoost cho dữ liệu dạng bảng 
+
+Baseline 2: Sử dụng Deep Learning - FT-Transformer cho dữ liệu dạng bảng
+
+Baseline 3: Xử Lý Ngôn Ngữ Tự Nhiên Y Sinh cho dữ liệu ghi chú tự do của bác sĩ
+
+Hướng Tiếp Cận & Mô Hình
+
+Macro AUROC
+
+Macro AUPRC
+
+Macro F1-Score
+
+Độ Chính Xác (Accuracy)
+
+Brier Score
+
+ECE (Sai Số Hiệu Chuẩn)
+
+Baseline 1: XGBoost
+
+0.8145
+
+0.7421
+
+0.7380
+
+75.3%
+
+0.2412
+
+0.0874
+
+Baseline 2: FT-Transformer
+
+0.8312
+
+0.7605
+
+0.7495
+
+76.7%
+
+0.2290
+
+0.0921
+
+Baseline 3: Bio_ClinicalBERT
+
+0.8260
+
+0.7540
+
+0.7430
+
+75.7%
+
+0.2378
+
+0.1085
+
+Phân Tích Mô Hình Bảng Số Học (Baseline 1: XGBoost & Baseline 2: FT-Transformer)
+
+Cả hai mô hình bảng đều đạt độ chính xác gần như tuyệt đối đối với bệnh nhân Viêm phổi mắc phải cộng đồng (100% nhận diện chính xác).
+
+XGBoost và FT-Transformer có tỷ lệ nhầm lẫn đáng kể giữa Hen phế quản và Phổi tắc nghẽn mạn tính (5.6%−8.3) do Cả Hen và Phổi tắc nghẽn mạn tính đều là bệnh lý co thắt đường dẫn khí dưới với biểu hiện sinh tồn tương đồng: giảm độ bão hòa oxy, thở nhanh nông và nhịp tim nhanh.
+
+Phân Tích Mô Hình Văn Bản Bệnh Án Tự Do (Baseline 3: Bio_ClinicalBERT)
+
+Nhận diện bệnh sử mạn tính: phân loại xuất sắc các ca bệnh có mô tả đặc trưng về hành vi thói quen (tiền sử hút thuốc lá/thuốc lào nhiều năm, tiếp xúc bụi nghề nghiệp) hoặc yếu tố cơ địa (dị ứng thời tiết từ nhỏ, tiền sử chàm da).
+
+Thất bại nghiêm trọng trong việc nhận diện Suy tim (CHF). Có đến 32.4% bệnh nhân Suy tim bị chẩn đoán nhầm thành Phổi tắc nghẽn mạn tính và 8.5% bị nhầm thành Viêm phổi.
+
+Triệu chứng cơ năng mà bác sĩ ghi chép cho bệnh nhân suy tim cấp thường là: "bệnh nhân khó thở dữ dội, tức ngực, ho khạc đờm trắng, mệt lả khi gắng sức". Đây chính là tập hợp từ vựng có tần suất xuất hiện cực kỳ dày đặc trong bệnh án của bệnh nhân phổi tắc nghẽn mạn tính và Viêm phổi. Nếu chỉ dựa vào văn bản mà không có các con số huyết động học (Huyết áp 190/105 mmHg, hoàn toàn không sốt), mô hình ngôn ngữ bị "nhiễu từ vựng" và đưa ra chẩn đoán sai lệch hoàn toàn.
+
+Bản chất hạn chế của các mô hình
+
+Điểm mù của dữ liệu dạng bảng
+
+Các chỉ số sinh tồn chỉ phản ánh trạng thái sinh lý tại đúng thời điểm đo đạc. Không có một con số sinh tồn nào có thể cho mô hình biết bệnh nhân đã hút thuốc lào suốt 30 năm hay thường xuyên ho đờm mạn tính vào mỗi sáng.
+
+Các thông số sinh tồn của Hen phế quản và Phổi tắc nghẽn mạn tính hoàn toàn nằm trong cùng một không gian phân bố, khiến mô hình bảng số bắt buộc phải đoán mò.
+
+Hiện tượng quá tự tin (Overconfidence) mô hình nơ-ron sâu thường xuyên đưa ra dự đoán với xác suất cực kỳ cao (90%−95%) ngay cả trong những ca bệnh mà nó chẩn đoán hoàn toàn sai.
+
+   Có 2 Case study:
+
+Ca Bệnh 1: Dữ Liệu Bảng Số Sai – Dữ Liệu Văn Bản Đúng
+
+Mã hồ sơ bệnh nhân: PT-0089 | Mã đợt khám: ENC-0089
+
+Nhãn chẩn đoán thực tế: Phổi tắc nghẽn mạn tính (Bệnh phổi tắc nghẽn mạn tính)
+
+Kết quả dự đoán của các mô hình đối chứng:
+
+Mô hình Bảng số (XGBoost / FT-Transformer): Dự đoán SAI thành ASTHMA (Xác suất: 64.2%).
+
+Mô hình Văn bản(Bio_ClinicalBERT): Dự đoán ĐÚNG Phổi tắc nghẽn mạn tính (Xác suất: 88.7%).
+
+Phương Thức Dữ Liệu
+
+Dữ Liệu Lâm Sàng Thu Thập Được Tại Đợt Khám
+
+Phân Tích Cơ Chế Bệnh Học & Điểm Mù
+
+Bảng số học (Tabular)
+
+• Huyết áp: 136/83 mmHg (bình thường)
+
+• Nhịp tim:84 bpm (bình thường)
+
+• Nhịp thở: 18 lần/phút (bình thường)
+
+• SpO2: 93.2% (giảm nhẹ)
+
+• Thân nhiệt: 36.5∘C
+
+ (không sốt)
+
+• WBC: 4.96×10^9/L (trong giới hạn bình thường)
+
+• CRP: 2.1 mg/L (âm tính, không có phản ứng viêm)
+
+Bệnh nhân đến khám định kỳ ở giai đoạn Phổi tắc nghẽn mạn tính ổn định ngoài đợt cấp. Toàn bộ các chỉ số sinh hiệu và xét nghiệm máu đều nằm trong giới hạn bình thường. Biến động duy nhất là SpO2 giảm nhẹ (93.2%). Bức tranh số học này hoàn toàn trùng khớp với một bệnh nhân Hen phế quản nhẹ ngoài cơn co thắt. Do không có kết quả đo FEV1, mô hình bảng số không có bất kỳ căn cứ số nào để phân biệt Hen và Phổi tắc nghẽn mạn tính.
+
+Ghi chú tự do (Clinical Text)
+
+Đoạn trích bệnh án:
+
+"Bệnh nhân nam, 62 tuổi, đến khám vì khó thở tăng dần khi đi bộ trên đường bằng khoảng 100m. Tiền sử hút thuốc lào liên tục 30 bao-năm. Ho khạc đờm trắng đục mạn tính vào mỗi buổi sáng suốt 2 năm qua. Nghe phổi rì rào phế nang giảm hai đáy phổi, lồng ngực hình thùng."
+
+Mô hình Bio_ClinicalBERT nắm bắt chính xác các thực thể ngữ nghĩa mang tính "bản án định bệnh" của Phổi tắc nghẽn mạn tính: "hút thuốc 30 bao-năm", "khó thở khi đi bộ đường bằng", "lồng ngực hình thùng", "ho khạc đờm buổi sáng". Đây là những thông tin quyết định mà không một chỉ số sinh hiệu tức thời nào phản ánh được.
+
+Dữ Liệu Văn Bản Sai – Dữ Liệu Bảng Số Đúng
+
+Mã hồ sơ bệnh nhân: PT-0126 | Mã đợt khám: ENC-0126
+
+Nhãn chẩn đoán thực tế (Ground Truth): CONGESTIVE_HEART_FAILURE (Suy tim sung huyết / Cơn phù phổi cấp)
+
+Kết quả dự đoán của các mô hình đối chứng:
+
+Mô hình Văn bản (Bio_ClinicalBERT): Dự đoán SAI thành COMMUNITY_ACQUIRED_PNEUMONIA (Xác suất: 58.3%) hoặc COPD (31.2%).
+
+Mô hình Bảng số (XGBoost / FT-Transformer): Dự đoán ĐÚNG HEART_FAILURE (Xác suất: 91.5%).
+
+Phương Thức Dữ Liệu
+
+Dữ Liệu Lâm Sàng Thu Thập Được Tại Đợt Khám
+
+Phân Tích Cơ Chế Bệnh Học & Điểm Mù
+
+Ghi chú tự do (Clinical Text)
+
+Đoạn trích bệnh án:
+
+"Bệnh nhân nhập viện cấp cứu lúc nửa đêm vì khó thở dữ dội, ho nhiều kèm khạc đờm bọt. Bệnh nhân mệt lả, lo âu, thở rít, vã mồ hôi. Nghe phổi có rale ẩm rải rác hai phế trường. Tiền sử có đợt viêm phế quản trước đó."
+
+Mô tả lâm sàng gồm "khó thở dữ dội, ho nhiều, rale ẩm rải rác hai phế trường" là các triệu chứng kinh điển có tần suất bắt gặp cực cao trong Viêm phổi cấp hoặc Đợt cấp COPD bội nhiễm. Khi bác sĩ cấp cứu dùng các từ ngữ này, mô hình ngôn ngữ bị đánh lừa bởi ngữ nghĩa phế quản - phổi thông thường và gán nhãn sai lệch sang bệnh nhiễm trùng hô hấp.
+
+Bảng số học (Tabular)
+
+• Huyết áp: 190/105 mmHg (Cơn tăng huyết áp khẩn cấp)
+
+• Nhịp thở: 32 lần/phút (Thở nhanh nông nguy kịch)
+
+• Nhịp tim: 118 bpm (Nhịp tim nhanh phản xạ)
+
+• SpO2: 84.0% (Thiếu oxy máu cấp tính nghiêm trọng)
+
+• Thân nhiệt: 36.8∘C (Hoàn toàn không sốt)
+
+• WBC: 6.1×109/L (Không tăng, loại trừ nhiễm trùng)
+
+• CRP: 3.1 mg/L (Âm tính, không có đáp ứng viêm cấp)
+
+Các con số sinh tồn tạo nên một "bức tranh huyết động học" kinh điển không thể chối cãi: Huyết áp vọt lên 190/105 mmHg kết hợp SpO2 tụt sâu 84% trong khi thân nhiệt và các chỉ dấu viêm (WBC, CRP) hoàn toàn bình thường. Đây chính là tam chứng kinh điển của Cơn phù phổi cấp do suy tim trái cấp tính trên nền tăng huyết áp. 
+
+Giải pháp cho giai đoạn 2
+
+Hợp nhất đa phương thức chú ý chéo:  Cho phép các con số sinh tồn bất thường (huyết áp vọt) trực tiếp kích hoạt sự chú ý vào các từ khóa bệnh sử tương ứng trong ghi chú văn bản.
+
+Giải trình bằng chứng minh bạch: Trích dẫn rõ ràng cơ sở chẩn đoán dựa trên phác đồ quốc tế chuẩn mực để bác sĩ có thể kiểm chứng độc lập trước khi ký y lệnh.

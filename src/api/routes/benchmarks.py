@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException
 router = APIRouter(prefix="/benchmarks")
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+STRICT_JSON_PATH = PROJECT_ROOT / "data" / "rebuilt_strict_results_2026-10-28.json"
 BASELINE_JSON_PATH = PROJECT_ROOT / "data" / "baseline_results.json"
 
 
@@ -22,12 +23,13 @@ async def options_baselines():
 @router.get("/baselines")
 async def get_baseline_benchmarks():
     """
-    Returns baseline model benchmark results from data/baseline_results.json.
+    Returns baseline model benchmark results from data/rebuilt_strict_results_2026-10-28.json or baseline_results.json.
     Includes validation metadata and calibration warnings.
     """
-    if BASELINE_JSON_PATH.exists():
+    target_path = STRICT_JSON_PATH if STRICT_JSON_PATH.exists() else BASELINE_JSON_PATH
+    if target_path.exists():
         try:
-            with open(BASELINE_JSON_PATH, "r", encoding="utf-8") as f:
+            with open(target_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             return data
         except Exception as e:
