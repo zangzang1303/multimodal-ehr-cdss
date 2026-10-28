@@ -1,0 +1,145 @@
+BÁO CÁO KẾT QUẢ GIAI ĐOẠN 1
+
+HỆ THỐNG M-CDSS
+
+Phiên bản strict split — 28/10/2026
+
+Dữ liệu tổng hợp và ghi chú lâm sàng đã khử định danh
+
+Tóm tắt điều hành
+
+Báo cáo này thay thế các số liệu benchmark trước đây. Kiểm tra lại phát hiện nguy cơ rò rỉ dữ liệu do ghi chú hoặc cụm nguồn có thể xuất hiện ở nhiều tập, văn bản chứa tín hiệu quá trực tiếp của nhãn, và một số luật sinh dữ liệu cũ phụ thuộc nhãn. Các kết quả accuracy 94–98% trước đây vì thế không còn là kết luận khoa học chính.
+
+Pipeline đã được tái chạy theo chuỗi: khôi phục CSV → converter mới → strict split theo nhóm nguồn → audit → baseline. Trên 302 mẫu kiểm thử độc lập theo nhóm, Bio_ClinicalBERT là baseline tốt nhất; tuy nhiên, đây vẫn chỉ là đánh giá nội bộ trên dữ liệu tổng hợp.
+
+Kết quả benchmark
+
+Baseline
+
+AUROC macro
+
+AUPRC macro
+
+F1 macro
+
+Accuracy
+
+Brier
+
+ECE
+
+CatBoost (bảng)
+
+0,9223
+
+0,7872
+
+0,6083
+
+0,6854
+
+0,3844
+
+0,0663
+
+FT-Transformer (bảng)
+
+0,8976
+
+0,7023
+
+0,5789
+
+0,6589
+
+0,4725
+
+0,1152
+
+Bio_ClinicalBERT (văn bản)
+
+0,9735
+
+0,9314
+
+0,8421
+
+0,8543
+
+0,2329
+
+0,0373
+
+Bio_ClinicalBERT đạt AUROC macro 0,9735 và accuracy 0,8543. Với nhánh dữ liệu bảng, CatBoost tốt hơn FT-Transformer. Các chỉ số calibration cần được đọc thận trọng: ECE của BERT là 0,0373, CatBoost là 0,0663 và FT-Transformer là 0,1152.
+
+Dữ liệu và strict split
+
+Nguồn CSV gồm cohort tổng hợp Synthea và MTSamples. Converter mới loại ghi chú trùng giữa nhãn, không quay vòng tái dùng ghi chú, loại transcription/assessment khỏi đầu vào, che tên chẩn đoán đích và lưu source_patient_group/source_note_group để truy vết. Tập raw có 2.000 bản ghi, cân bằng 500 bản ghi mỗi nhãn.
+
+Tập
+
+Số mẫu
+
+ASTHMA
+
+COPD
+
+HEART_FAILURE
+
+PNEUMONIA
+
+Huấn luyện
+
+1.425
+
+358
+
+358
+
+340
+
+369
+
+Xác thực
+
+273
+
+71
+
+71
+
+54
+
+77
+
+Kiểm thử
+
+302
+
+71
+
+71
+
+106
+
+54
+
+Split sử dụng connected components trên source_patient_group và source_note_group. Audit xác nhận giao nhau train/validation/test bằng 0 theo patient_id, source_patient_group và source_note_group; tất cả split có đủ bốn lớp.
+
+Diễn giải và kiểm tra độ tin cậy
+
+Một sanity check với cây quyết định nông (độ sâu 4) đạt accuracy 0,7285 trên strict test, thấp hơn rõ rệt so với kết quả cũ xấp xỉ 0,955. Sự sụt giảm này phù hợp với nhận định rằng pipeline cũ hưởng lợi từ leakage/lặp nguồn, không phải mô hình mới kém đi.
+
+Khoảng chênh validation–test ở FT-Transformer và BERT cho thấy mô hình vẫn nhạy với phân bố nhóm nguồn. Do đó kết quả hiện tại là baseline nội bộ đã được làm sạch, không phải hiệu năng lâm sàng ngoài thực tế.
+
+Giới hạn và khuyến nghị
+
+Dữ liệu tổng hợp và kho công khai không thay thế cohort bệnh viện thực hoặc phản ánh đầy đủ quy trình ghi chép tại Việt Nam. Strict split giảm mạnh leakage theo nguồn nhưng không loại bỏ hoàn toàn domain/style bias. Chưa có bootstrap confidence interval, đánh giá công bằng, hiệu chỉnh ngưỡng theo chi phí lâm sàng hay prospective evaluation.
+
+Không sử dụng mô hình để ra quyết định điều trị. Bước tiếp theo: fusion bảng–văn bản với cùng strict split; bootstrap CI và phân tích lỗi theo lớp; leave-source-out/temporal split; sau đó ngoại kiểm dữ liệu thực đã được phê duyệt.
+
+Artefact tái lập
+
+Kết quả: data/rebuilt_strict_results_2026-10-28.json | Audit: data/rebuilt_strict_split_audit.json | ROC/PR: data/rebuilt_strict_curves_2026-10-28.png | Confusion matrix: data/rebuilt_strict_confusion_2026-10-28.png
+
+Mã tái lập: scripts/convert_sources_to_raw.py; src/data_pipeline/dataset_loader.py; scripts/audit_data_leakage.py; scripts/run_baselines.py. Hướng dẫn lệnh được cập nhật trong README.md.

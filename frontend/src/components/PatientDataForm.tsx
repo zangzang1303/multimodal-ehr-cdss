@@ -202,6 +202,72 @@ export default function PatientDataForm() {
     setError(null);
   };
 
+  const handleLoadCase1 = () => {
+    setPatientId("PT-0044");
+    setTabular({
+      age: 18,
+      systolic_bp: 106.2,
+      diastolic_bp: 78.0,
+      heart_rate: 70.6,
+      respiratory_rate: 12.8,
+      spo2: 97.3,
+      temperature: 37.7,
+      wbc_count: 4.78,
+      crp: 24.28,
+      gender: "F",
+      smoking_status: "NEVER",
+      history_hypertension: 1,
+      history_diabetes: 0,
+    });
+    setClinicalNotes(
+      "CLINICAL ENCOUNTER NOTE - BỆNH VIỆN THỐNG NHẤT\n" +
+      "Patient ID: PT-0044 | Encounter ID: ENC-0044 | Name: Đặng Thu Mai | Age: 18 | Gender: F\n" +
+      "----------------------------------------------------------------------\n" +
+      "CHIEF COMPLAINT:\n" +
+      "Patient Đặng Thu Mai presents for evaluation of acute/subacute respiratory condition.\n\n" +
+      "HISTORY OF PRESENT ILLNESS:\n" +
+      "Patient 18yo presents on 12/05/1984 with cough, shortness of breath, and fatigue.\n\n" +
+      "PHYSICAL EXAMINATION:\n" +
+      "BP: 106.2/78.0 mmHg, HR: 70.6 bpm, SpO2: 97.3%. Auscultation of lungs reveals bilateral breath sounds.\n\n" +
+      "MEDICATIONS:\n" +
+      "Inhalers and cardiovascular medications as prescribed."
+    );
+    setError(null);
+  };
+
+  const handleLoadCase2 = () => {
+    setPatientId("PT-0254");
+    setTabular({
+      age: 65,
+      systolic_bp: 115.9,
+      diastolic_bp: 80.1,
+      heart_rate: 64.3,
+      respiratory_rate: 11.5,
+      spo2: 95.6,
+      temperature: 37.8,
+      wbc_count: 4.30,
+      crp: 7.14,
+      gender: "F",
+      smoking_status: "NEVER",
+      history_hypertension: 0,
+      history_diabetes: 0,
+    });
+    setClinicalNotes(
+      "ELECTRONIC HEALTH RECORD - BỆNH VIỆN CHỢ RẪY\n" +
+      "Patient ID: PT-0254 | Encounter ID: ENC-0254 | Name: Huỳnh Phương Mai | Age: 65 | Gender: F\n" +
+      "----------------------------------------------------------------------\n" +
+      "CHIEF COMPLAINT:\n" +
+      "Patient referred for evaluation of tracheostomy tube placement and treatment recommendations.\n\n" +
+      "HISTORY OF PRESENT ILLNESS:\n" +
+      "Suffering from end-stage [REDACTED_DIAGNOSIS], required tracheostomy tube placement 3 months ago when being treated for acute exacerbation. Resides in extended care facility with a capped tracheostomy tube.\n\n" +
+      "PHYSICAL EXAMINATION:\n" +
+      "Vital signs recorded. Auscultation of lungs reveals bilateral breath sounds with intermittent crackles/wheezes. Heart shows regular rhythm.\n\n" +
+      "MEDICATIONS:\n" +
+      "Prevacid, folic acid, aspirin, morphine sulfate, Pulmicort, Risperdal, Colace, clonazepam, prednisone."
+    );
+    setError(null);
+  };
+
   const handleReset = () => {
     setTabular(INITIAL_TABULAR);
     setClinicalNotes("");
@@ -254,13 +320,15 @@ export default function PatientDataForm() {
           color: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
         };
       case "CONGESTIVE_HEART_FAILURE":
+      case "HEART_FAILURE":
         return {
-          name: "CHF (Suy tim sung huyết)",
+          name: "HEART_FAILURE (Suy tim)",
           color: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
         };
       case "COMMUNITY_ACQUIRED_PNEUMONIA":
+      case "PNEUMONIA":
         return {
-          name: "CAP (Viêm phổi mắc phải cộng đồng)",
+          name: "PNEUMONIA (Viêm phổi)",
           color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
         };
       default:
@@ -290,7 +358,25 @@ export default function PatientDataForm() {
         </div>
 
         {/* Demo Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            id="btn-load-case-1"
+            onClick={handleLoadCase1}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-semibold transition-all shadow-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            Nạp Ca 1 (PT-0044)
+          </button>
+          <button
+            type="button"
+            id="btn-load-case-2"
+            onClick={handleLoadCase2}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold transition-all shadow-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+            Nạp Ca 2 (PT-0254)
+          </button>
           <button
             type="button"
             onClick={handleLoadSample}
@@ -318,10 +404,10 @@ export default function PatientDataForm() {
       )}
 
       {/* Main 2-Column Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form noValidate onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* CỘT TRÁI: Dữ Liệu Bảng Số (Tabular Features) */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <div id="tabular-data-card" className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm">
                 <FileSpreadsheet className="w-4 h-4 text-sky-500" />
@@ -359,7 +445,7 @@ export default function PatientDataForm() {
                         type="number"
                         min={field.min}
                         max={field.max}
-                        step={field.step || "any"}
+                        step="any"
                         value={val}
                         onChange={(e) =>
                           handleNumericalChange(field.key, e.target.value)
@@ -483,7 +569,7 @@ export default function PatientDataForm() {
           </div>
 
           {/* CỘT PHẢI: Ghi Chú Bệnh Án Tự Do (Clinical Notes) */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
+          <div id="clinical-notes-card" className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
             <div className="space-y-4 flex-1 flex flex-col">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-2 text-slate-900 dark:text-white font-semibold text-sm">
@@ -518,6 +604,7 @@ export default function PatientDataForm() {
             <div className="pt-2">
               <button
                 type="submit"
+                id="btn-run-inference"
                 disabled={loading}
                 className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-600 via-indigo-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white font-semibold text-sm shadow-lg shadow-sky-600/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
               >
@@ -540,7 +627,7 @@ export default function PatientDataForm() {
 
       {/* Hiển Thị Kết Quả 3 Baselines */}
       {predictionResponse && (
-        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5 animate-in fade-in duration-300">
+        <div id="prediction-results-card" className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5 animate-in fade-in duration-300">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white text-base">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
