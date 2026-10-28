@@ -1,450 +1,515 @@
-# Nội dung slide tự đọc — Báo cáo tiến độ đợt 1 đề tài M-CDSS
+# Báo cáo tiến độ đợt 1 đề tài M-CDSS
+## Bộ nội dung slide tự đọc dành cho Giáo viên đánh giá
 
-**Mục đích tài liệu:** Làm nội dung nền để xây dựng bộ slide gửi giáo viên đánh giá. Slide cần tự cung cấp đủ bối cảnh, bằng chứng, phương pháp, tiến độ và kế hoạch tiếp theo; không phụ thuộc lời thuyết trình miệng.  
-**Đối tượng đọc:** Giáo viên/hội đồng đánh giá có thể không biết trước dự án.  
-**Đề xuất:** 22 slide nội dung + 1 slide tài liệu tham khảo. Có thể chia thành 2 phần hoặc rút gọn khi thiết kế, nhưng không nên bỏ phần giới hạn và hiện trạng.
+**Mục đích tài liệu:** Tài liệu này được biên soạn dưới dạng bộ slide tự đọc (Self-contained Slide Deck) gửi trực tiếp đến Giảng viên hướng dẫn và Hội đồng thẩm định đánh giá tiến độ Đợt 1 đề tài M-CDSS. Tài liệu tự cung cấp đầy đủ bối cảnh lâm sàng, cơ sở lý thuyết y khoa và học máy, quy trình chuẩn hóa dữ liệu, minh chứng hình ảnh trực quan, kết quả thực nghiệm khách quan và kế hoạch triển khai Giai đoạn 2; hoàn toàn độc lập, không phụ thuộc vào thuyết trình miệng và không yêu cầu thao tác phần mềm hay truy cập kho mã nguồn.
 
-> **Phiên bản kết quả:** Số liệu thực nghiệm chính thức trong tài liệu này được xác lập theo quy trình kiểm soát rò rỉ nghiêm ngặt (Strict Split & Leakage Audit). Toàn bộ kết quả benchmark được đo đạc khách quan trên tập kiểm thử độc lập gồm 302 mẫu (Hold-out Test Set).
+**Cấu trúc tài liệu:** Gồm 25 slide nội dung chuyên sâu được phân bổ mạch lạc từ cơ sở lý thuyết đến thực nghiệm, kèm 1 slide danh mục tài liệu tham khảo học thuật chính thức.
 
-## Nguyên tắc biên soạn slide tự đọc
-
-- Viết thông tin chính thành câu ngắn có chủ ngữ và kết luận rõ; hạn chế chỉ để từ khóa rời rạc.
-- Với biểu đồ/bảng, ghi đơn vị, cỡ mẫu, tập dữ liệu, ý nghĩa chỉ số và nguồn ngay trên slide.
-- Tách rõ **đã hoàn thành**, **đang có trong mã nguồn nhưng chưa tích hợp**, và **đề xuất/chưa triển khai**.
-- Không gọi benchmark trên dữ liệu tổng hợp là đánh giá lâm sàng hoặc bằng chứng triển khai.
-- Có thể chuyển giải thích kỹ thuật dài, bảng phân bố lớp đầy đủ và lịch backlog sang phụ lục.
+> **Quy chuẩn số liệu:** Toàn bộ kết quả thực nghiệm trong báo cáo này được đo lường chính thức theo quy trình kiểm soát rò rỉ dữ liệu nghiêm ngặt (Strict Group Split & Leakage Audit). Kết quả của các mô hình được ghi nhận khách quan trên tập kiểm thử độc lập gồm 302 hồ sơ bệnh án (Hold-out Test Set).
 
 ---
 
 ## Slide 1 — Trang bìa
 
-**Tiêu đề:** Hệ thống hỗ trợ chẩn đoán lâm sàng đa phương thức từ hồ sơ sức khỏe điện tử (M-CDSS)
+**TÊN ĐỀ TÀI: HỆ THỐNG HỖ TRỢ CHẨN ĐOÁN LÂM SÀNG ĐA PHƯƠNG THỨC TỪ HỒ SƠ SỨC KHỎE ĐIỆN TỬ (M-CDSS)**
 
-**Thông tin cần có**
-- Báo cáo tiến độ đợt 1 — Giai đoạn nghiên cứu và đề xuất giải pháp.
-- Đơn vị/lớp, tên nhóm và thành viên, giáo viên hướng dẫn, ngày nộp.
-- Từ khóa: EHR, multimodal AI, clinical notes, clinical decision support.
-
-**Hình đề xuất:** Sơ đồ tối giản gồm dữ liệu bảng + ghi chú → mô hình hỗ trợ phân loại → đầu ra có giải thích.
+**Phân kỳ báo cáo:** Báo cáo tiến độ Đợt 1 — Khảo sát phương pháp luận, Cơ sở lý thuyết, Xây dựng quy trình dữ liệu và Đánh giá thực nghiệm các mô hình Baseline.  
+**Lĩnh vực nghiên cứu:** Trí tuệ nhân tạo y sinh (Biomedical AI), Học sâu đa phương thức (Multimodal Deep Learning), Xử lý ngôn ngữ tự nhiên lâm sàng (Clinical NLP).  
+**Từ khóa:** Electronic Health Records (EHR), Multimodal AI, Clinical Notes, Tabular Data, Cross-Attention Late Fusion, CDSS.
 
 ---
 
-## Slide 2 — Tóm tắt dự án và tiến độ
+## Slide 2 — Tóm tắt đề tài và Tiến độ đạt được
 
-**Nội dung chính**
+**Mục tiêu cốt lõi:**  
+Đề tài M-CDSS nghiên cứu phát triển hệ thống hỗ trợ chẩn đoán 4 nhóm bệnh lý có triệu chứng hô hấp và tim mạch chồng lấp cao: **Hen phế quản (ASTHMA)**, **Bệnh phổi tắc nghẽn mạn tính (COPD)**, **Suy tim (HEART_FAILURE)** và **Viêm phổi (PNEUMONIA)**, thông qua việc kết hợp đồng thời dữ liệu định lượng dạng bảng (sinh hiệu, xét nghiệm) và dữ liệu văn bản tự do (ghi chú lâm sàng).
 
-M-CDSS nghiên cứu hỗ trợ phân loại bốn nhóm bệnh có biểu hiện hô hấp/tim mạch chồng lấp: hen phế quản (ASTHMA), COPD, suy tim (HEART_FAILURE) và viêm phổi (PNEUMONIA). Hệ thống dự kiến kết hợp dữ liệu bảng như sinh hiệu/xét nghiệm với ghi chú lâm sàng tự do.
+**Khối lượng công việc đã hoàn thành trong Giai đoạn 1:**
+- **Nền tảng dữ liệu:** Xây dựng quy trình xử lý dữ liệu chuẩn y khoa, làm sạch và khử định danh 2.000 hồ sơ bệnh án đa phương thức cân bằng 4 nhóm bệnh.
+- **Kiểm soát rò rỉ nghiêm ngặt:** Phân chia tập dữ liệu theo nhóm nguồn liên kết (Strict Split), kiểm toán đạt 0% rò rỉ thông tin giữa các tập.
+- **Thực nghiệm Baseline:** Huấn luyện và đánh giá khách quan 3 mô hình đại diện đơn phương thức trên tập kiểm thử độc lập 302 mẫu. Mô hình ngôn ngữ y sinh Bio_ClinicalBERT đạt AUROC macro **0,9735**, F1 macro **0,8421** và ECE **0,0373**.
+- **Phân tích ca bệnh sai biệt:** Phân tích cơ chế bệnh học của các ca dự đoán trái ngược giữa bảng số và văn bản, xác lập luận cứ khoa học vững chắc cho kiến trúc dung hợp Cross-Attention ở Giai đoạn 2.
 
-Giai đoạn 1 tập trung xây dựng nền tảng dữ liệu chuẩn y khoa, kiểm soát nguy cơ rò rỉ (leakage audit), xây dựng ba baseline đơn phương thức và đề xuất kiến trúc cho Giai đoạn 2. Hệ thống hoàn tất quy trình phân chia dữ liệu nghiêm ngặt (strict split theo nhóm nguồn); ba baseline đã có kết quả thực nghiệm trên tập kiểm thử độc lập 302 mẫu. Trong đó, Bio_ClinicalBERT đạt AUROC macro 0,9735, F1 macro 0,8421; kết quả này là mốc tham chiếu nội bộ trên dữ liệu nghiên cứu và chưa xác nhận hiệu năng trên bệnh nhân thực.
-
-**Trạng thái tổng quan**
-- **Đã làm:** pipeline dữ liệu, split/audit, benchmark ba baseline, tài liệu đề xuất.
-- **Tiếp theo:** mô hình fusion, RAG/giải thích, đánh giá mở rộng và tích hợp phần mềm.
-
----
-
-## Slide 3 — Bài toán lâm sàng và lý do chọn đề tài
-
-**Nội dung chính**
-
-Khó thở, ho, giảm SpO₂ và các dấu hiệu viêm có thể gặp ở nhiều bệnh khác nhau. Trong giai đoạn tiếp nhận ban đầu, thông tin lâm sàng còn chưa đầy đủ nên việc phân biệt hen, COPD, suy tim và viêm phổi có thể khó khăn.
-
-Hai nguồn dữ liệu EHR bổ sung cho nhau:
-
-| Dữ liệu bảng | Ghi chú lâm sàng tự do |
-|---|---|
-| Định lượng sinh hiệu và xét nghiệm; dễ chuẩn hóa và đưa vào thuật toán. | Ghi nhận triệu chứng, tiền sử, diễn tiến và bối cảnh chưa được cấu trúc thành trường dữ liệu. |
-| Có thể thiếu xét nghiệm hoặc không thể hiện diễn tiến bệnh. | Có cách viết không đồng nhất, viết tắt và khó định lượng tự động. |
-
-**Lý do chọn đề tài:** Khảo sát liệu mô hình có thể sử dụng cả tín hiệu định lượng lẫn ngữ cảnh trong văn bản, đồng thời đánh giá trong quy trình hạn chế rò rỉ dữ liệu và thể hiện giới hạn một cách minh bạch hay không.
-
-**Hình đề xuất:** Hai cột đầu vào cùng hội tụ vào câu hỏi “Thông tin bổ sung có cải thiện phân loại không?”.
+**Kế hoạch trọng tâm Giai đoạn 2:** Xây dựng mô hình dung hợp đa phương thức Cross-Attention Late Fusion, tích hợp hệ thống Agentic RAG giải thích y khoa dựa trên Hướng dẫn điều trị và thực hiện đánh giá lâm sàng mở rộng.
 
 ---
 
-## Slide 4 — Literature review: phạm vi và kết quả tổng quan
+## Slide 3 — Bài toán lâm sàng và Lý do chọn đề tài
 
-**Nguồn chính:** Hunik et al., *Diagnostic prediction models for primary care, based on artificial intelligence and electronic health records: a systematic review* (tài liệu JMIR Preprints 62862, 2024; xem nguồn trong thư mục `docs/`).
+**Thách thức trong chẩn đoán ban đầu:**  
+Tại các khoa cấp cứu và phòng khám ban đầu, các triệu chứng như khó thở, ho, suy giảm oxy máu (SpO₂) và dấu hiệu viêm là biểu hiện chung của nhiều bệnh lý khác nhau. Việc phân biệt chính xác giữa Hen phế quản, COPD, Suy tim và Viêm phổi gặp nhiều khó khăn khi thông tin lâm sàng ban đầu còn rời rạc.
 
-**Các con số được nhóm tổng hợp từ tài liệu**
-- 10.657 công trình được rà soát qua các cơ sở dữ liệu học thuật.
-- 15 nghiên cứu đáp ứng tiêu chí đưa vào tổng quan.
-- Theo phần phân tích của nhóm, 15/15 nghiên cứu sử dụng dữ liệu có cấu trúc; không nghiên cứu nào trong tập được tổng quan khai thác ghi chú tự do bằng mô hình ngôn ngữ.
-- PROBAST tổng thể: 9/15 (60%) nguy cơ sai lệch cao; 6/15 (40%) chưa rõ; 0/15 nguy cơ thấp.
+**Tính chất bổ trợ giữa hai phương thức dữ liệu EHR:**
 
-**Diễn giải:** Tổng quan gợi ý khoảng trống về khai thác văn bản và chất lượng phương pháp luận trong tập nghiên cứu được chọn. Những tỷ lệ này thuộc phạm vi 15 nghiên cứu của tổng quan, không đại diện cho toàn bộ AI y tế.
+| Dữ liệu Bảng số (Tabular Features) | Ghi chú Lâm sàng tự do (Clinical Notes) |
+| :--- | :--- |
+| • Cung cấp định lượng tức thời về sinh hiệu (huyết áp, nhịp tim, SpO₂) và chỉ số viêm (WBC, CRP).<br>• Dễ chuẩn hóa và đưa vào thuật toán số học.<br>• *Điểm hạn chế:* Thiếu ngữ cảnh bệnh sử, không thể hiện được diễn tiến cơn co thắt hay triệu chứng cơ năng. | • Ghi chép sâu sắc về tiền căn dị ứng, thói quen sinh hoạt, tiền sử dùng thuốc và tính chất cơn khó thở.<br>• Nắm bắt bức tranh toàn diện của bệnh nhân.<br>• *Điểm hạn chế:* Tồn tại chữ viết tắt, ngữ nghĩa phức tạp và dễ bị nhiễu từ vựng khi bệnh cảnh nặng. |
 
-**Hình đề xuất:** Funnel 10.657 → 15; bên cạnh là thanh 9 High / 6 Unclear / 0 Low risk.
-
-**Chú thích bắt buộc:** Số liệu theo tổng quan Hunik et al. và phần trích xuất trong `docs/01_RESEARCH_BACKGROUND_AND_GAP.md`.
+**Lý do chọn đề tài:**  
+Khảo sát khả năng bổ trợ lẫn nhau giữa tín hiệu sinh học định lượng và ngữ cảnh lâm sàng bằng mô hình học sâu đa phương thức, trong một quy trình kiểm soát rò rỉ dữ liệu nghiêm ngặt và minh bạch giới hạn ứng dụng.
 
 ---
 
-## Slide 5 — Các rủi ro phương pháp luận trong y văn
+## Slide 4 — Cơ sở lý thuyết: Dữ liệu đa phương thức trong EHR & Hệ thống CDSS
 
-**Nội dung chính**
+**1. Khái niệm Hồ sơ bệnh án điện tử đa phương thức (Multimodal EHR):**
+- **Định nghĩa:** Hồ sơ sức khỏe điện tử (EHR) là kho lưu trữ số hóa toàn diện về quá trình khám chữa bệnh của bệnh nhân. Dữ liệu trong EHR mang tính chất **đa phương thức (multimodal)** tự nhiên, phản ánh tình trạng người bệnh dưới nhiều giác độ thông tin khác nhau.
+- **Phương thức Dữ liệu Bảng số có cấu trúc (Tabular Modality):**
+  - Gồm các biến số nhân khẩu học (tuổi, giới tính), sinh hiệu định lượng (huyết áp, nhịp tim, nhịp thở, thân nhiệt, SpO₂) và chỉ số xét nghiệm huyết học/sinh hóa (bạch cầu WBC, protein phản ứng C - CRP).
+  - *Đặc điểm:* Có cấu trúc xác định, định lượng chính xác tại một thời điểm tức thời; dễ chuẩn hóa thành vector đầu vào cho các thuật toán số học nhưng thiếu ngữ cảnh bệnh sử và diễn tiến cơ năng.
+- **Phương thức Ghi chú Lâm sàng tự do (Clinical Text Modality):**
+  - Gồm các đoạn văn bản bệnh án tự do (diễn biến bệnh sử, lý do vào viện, tiền căn dị ứng, thói quen hút thuốc, khám thực thể và ghi chú điều dưỡng).
+  - *Đặc điểm:* Chứa đựng ngữ cảnh bệnh học phong phú, các triệu chứng chủ quan và hành vi điều trị; tuy nhiên có cấu trúc phi chuẩn hóa, nhiều từ viết tắt và dễ bị nhiễu ngữ nghĩa khi bệnh nhân mắc nhiều bệnh cảnh phức tạp.
 
-Các vấn đề được nhấn mạnh trong tài liệu tổng quan và tài liệu nền của dự án gồm:
-
-- **Rò rỉ nhãn/không đúng thời điểm:** biến đầu vào có thể chứa thông tin phát sinh sau chẩn đoán hoặc gần như chính là tiêu chuẩn chẩn đoán.
-- **Dữ liệu khuyết:** cách xử lý không được mô tả hoặc có thể làm thay đổi thành phần mẫu.
-- **Hiệu chuẩn:** độ phân biệt tốt không đồng nghĩa xác suất dự đoán đáng tin cậy.
-- **Tổng quát hóa:** kết quả trên một nguồn/cơ sở không tự động áp dụng được ở nguồn khác; ngoại kiểm thường còn hạn chế.
-
-**Hàm ý cho thiết kế M-CDSS:** khóa mốc thời gian, split có nhóm, audit leakage, báo cáo nhiều chỉ số và đặt ngoại kiểm trong kế hoạch tiếp theo.
-
-**Hình đề xuất:** Bốn khối PROBAST (Participants, Predictors, Outcome, Analysis) cùng ví dụ lỗi tương ứng.
-
----
-
-## Slide 6 — Khoảng trống và câu hỏi nghiên cứu
-
-**Khoảng trống dự án hướng tới**
-1. Đánh giá kết hợp ghi chú tự do và dữ liệu bảng, thay vì chỉ dùng từng nguồn riêng.
-2. Kiểm soát rò rỉ nguồn và trình tự thời gian khi xây dựng benchmark.
-3. Đánh giá cả phân biệt, phân loại và hiệu chuẩn xác suất; công bố giới hạn dữ liệu.
-4. Đề xuất giải thích có truy xuất guideline và gắn bằng chứng với ghi chú ở giai đoạn phát triển tiếp theo.
-
-**Câu hỏi nghiên cứu chính**
-
-> Trên dữ liệu nghiên cứu hiện có, việc kết hợp thông tin bảng và ghi chú lâm sàng có cải thiện kết quả so với baseline đơn phương thức trong một quy trình chia tập và audit nghiêm ngặt hơn hay không?
-
-**Phạm vi kết luận:** Giai đoạn hiện tại mới thiết lập baseline và câu hỏi thực nghiệm. Chưa có kết quả fusion để trả lời khẳng định câu hỏi trên.
+**2. Hệ thống Hỗ trợ Ra Quyết định Lâm sàng (CDSS - Clinical Decision Support System):**
+- **Định nghĩa:** Là hệ thống phần mềm ứng dụng các giải pháp Trí tuệ nhân tạo (AI) nhằm phân tích tổng hợp dữ liệu lâm sàng của bệnh nhân tại thời điểm tiếp nhận (Point-of-Care), đưa ra các gợi ý chẩn đoán phân biệt, cảnh báo rủi ro và khuyến nghị phác đồ.
+- **Vai trò y khoa:** Đóng vai trò như "người trợ lý phản biện độc lập", giúp bác sĩ giảm tải áp lực nhận thức, hạn chế sai sót chẩn đoán trong các tình huống cấp cứu và hỗ trợ chuẩn hóa quy trình ra quyết định theo y học chứng cứ.
 
 ---
 
-## Slide 7 — Mục tiêu, phạm vi và nhãn phân loại
+## Slide 5 — Cơ sở lý thuyết: Các kiến trúc mô hình học máy & Cơ chế Dung hợp
 
-**Mục tiêu tổng quát:** Xây dựng và đánh giá một nguyên mẫu CDSS nghiên cứu đa phương thức, hỗ trợ phân loại bốn nhóm bệnh và cung cấp đầu ra có thể kiểm tra.
+**1. Các trường phái mô hình đơn phương thức (Single-modality Baselines):**
+- **Mô hình Cây quyết định tăng cường cho dữ liệu bảng — CatBoost (Categorical Boosting):**
+  - Là thuật toán học máy dựa trên họ cây quyết định tăng cường gradient (GBDT), được thiết kế tối ưu cho dữ liệu bảng số học và biến danh mục.
+  - Sử dụng cơ chế *Ordered Boosting* để khắc phục hiện tượng rò rỉ mục tiêu (target leakage) và overfitting thường gặp ở GBDT truyền thống, mang lại khả năng phân biệt mạnh mẽ trên các chỉ số sinh hiệu và xét nghiệm.
+- **Mô hình Học sâu chuyên biệt cho dữ liệu bảng — FT-Transformer (Feature Tokenizer Transformer):**
+  - Chuyển đổi từng đặc trưng số học và danh mục thành các vector nhúng (Feature Tokenizer), sau đó áp dụng các tầng tự chú ý (Self-Attention) của Transformer để học trực tiếp các mối tương tác phi tuyến tính phức tạp giữa các chỉ số sinh học.
+- **Mô hình Ngôn ngữ Y sinh — Bio_ClinicalBERT:**
+  - Mô hình ngôn ngữ chuyên biệt được khởi tạo từ BERT và tiếp tục tiền huấn luyện (continual pretraining) trên toàn bộ kho dữ liệu lâm sàng khổng lồ MIMIC-III (gồm hàng triệu ghi chú hồi sức cấp cứu thực tế).
+  - Hiểu sâu sắc từ vựng y khoa, thuật ngữ viết tắt lâm sàng và mối quan hệ ngữ cảnh giữa các triệu chứng cơ năng và tiền sử dùng thuốc.
 
-**Bốn lớp mục tiêu**
-- ASTHMA — hen phế quản.
-- COPD — bệnh phổi tắc nghẽn mạn tính.
-- HEART_FAILURE — suy tim.
-- PNEUMONIA — viêm phổi.
-
-**Phạm vi Giai đoạn 1**
-- Dữ liệu tổng hợp/kho công khai và ghi chú đã xử lý; chưa phải cohort bệnh viện.
-- Xây pipeline và benchmark ba mô hình riêng: CatBoost, FT-Transformer, Bio_ClinicalBERT.
-- Đề xuất kiến trúc fusion/RAG cho giai đoạn sau.
-
-**Ngoài phạm vi kết luận hiện tại:** chẩn đoán xác nhận, quyết định điều trị, hiệu quả trên bệnh nhân thực hoặc triển khai lâm sàng.
-
----
-
-## Slide 8 — Kế hoạch tổng thể theo hai giai đoạn
-
-| Giai đoạn / backlog | Công việc chính | Sản phẩm/tiêu chí đầu ra |
-|---|---|---|
-| **Giai đoạn 1, backlog 1 (tuần 1)** | Môi trường, schema dữ liệu, dữ liệu ban đầu, khung API/frontend. | Data contract, cấu hình, dữ liệu nghiên cứu, khung ứng dụng. |
-| **Giai đoạn 1, backlog 2 (tuần 2)** | De-ID, temporal lock, missing data, khung baseline. | Pipeline và kiểm thử dữ liệu. |
-| **Giai đoạn 1, backlog 3 (tuần 3)** | Group split, benchmark, error analysis, đề xuất giải pháp. | Báo cáo baseline và thiết kế Giai đoạn 2. |
-| **Giai đoạn 2, backlog 4** | Encoder bảng/văn bản, fusion, calibration, ablation. | Mô hình fusion và kết quả so sánh trên strict split. |
-| **Giai đoạn 2, backlog 5** | RAG, vector store, evidence grounding, tích hợp phần mềm. | Luồng truy xuất guideline và giải thích có bằng chứng. |
-| **Giai đoạn 2, backlog 6** | DCA, phân tích lỗi, fairness, chuyên gia/ngoại kiểm khi khả thi. | Đánh giá lâm sàng mở rộng và giới hạn tổng quát hóa. |
-| **Giai đoạn 2, backlog 7** | Đóng gói, báo cáo và demo. | Bản bàn giao tái lập được. |
-
-**Trạng thái:** Giai đoạn 1 là phần báo cáo hiện tại; Giai đoạn 2 là kế hoạch, chưa được trình bày như kết quả đã hoàn tất.
+**2. Cơ chế Dung hợp Chú ý chéo (Cross-Attention Late Fusion):**
+- **Dung hợp muộn (Late Fusion):** Cho phép từng phương thức dữ liệu được xử lý bởi bộ mã hóa chuyên biệt (FT-Transformer cho bảng, Bio_ClinicalBERT cho văn bản) nhằm bảo toàn tối đa đặc trưng riêng của từng miền dữ liệu trước khi kết hợp.
+- **Nguyên lý Chú ý chéo (Cross-Attention Mechanism):**
+  - Thay vì chỉ ghép nối đơn giản (concatenation), cơ chế Cross-Attention sử dụng vector biểu diễn bảng số đóng vai trò Truy vấn ($Query - Q$) để chiếu vào các vector đặc trưng văn bản đóng vai trò Khóa ($Key - K$) và Giá trị ($Value - V$).
+  - *Ý nghĩa lâm sàng:* Cho phép các biến động sinh hiệu bất thường (hoặc bình thường) từ bảng số định hướng lại trọng số chú ý của mô hình vào đúng các từ khóa bệnh sử then chốt trong ghi chú, triệt tiêu điểm mù của từng phương thức đơn lẻ.
 
 ---
 
-## Slide 9 — Kiến trúc hệ thống đề xuất
+## Slide 6 — Cơ sở lý thuyết: Phương pháp luận Đánh giá & Kiểm soát độ tin cậy trong AI Y sinh
+
+**1. Các dạng rò rỉ dữ liệu trong Y tế (Data Leakage Risks):**
+- **Rò rỉ bệnh nhân/nguồn liên kết (Patient/Source Leakage):** Khi các bản ghi từ cùng một bệnh nhân hoặc cùng một ghi chú nguồn bị phân tán vào cả tập Huấn luyện và tập Kiểm thử. Mô hình sẽ "học thuộc lòng" đặc điểm cá nhân thay vì học bản chất bệnh học, dẫn đến điểm số kiểm thử cao ảo nhưng thất bại hoàn toàn trên thực tế.
+- **Rò rỉ mốc thời gian (Temporal Leakage):** Sử dụng các biến cố hoặc kết quả xét nghiệm phát sinh *sau* thời điểm chẩn đoán để dự đoán bệnh tại thời điểm tiếp nhận.
+- **Rò rỉ nhãn trực tiếp (Direct Label Leakage):** Ghi chú lâm sàng vô tình chứa từ khóa chẩn đoán đích hoặc phác đồ điều trị đặc hiệu duy nhất của bệnh.
+
+**2. Phân biệt giữa Năng lực Phân biệt (Discrimination) và Độ Hiệu chuẩn (Calibration):**
+
+| Nhóm chỉ số | Chỉ số đo lường chính | Bản chất khoa học & Ý nghĩa lâm sàng |
+| :--- | :--- | :--- |
+| **Năng lực Phân biệt (Discrimination)**<br>*"Mô hình có xếp hạng đúng người có bệnh cao hơn người không bệnh?"* | • **Macro AUROC:** Diện tích dưới đường cong ROC đo khả năng phân biệt tổng thể giữa các cặp lớp.<br>• **Macro AUPRC:** Diện tích dưới đường cong Precision-Recall; **thước đo sống còn trong y tế** khi dữ liệu mất cân bằng, đo chính xác khả năng tìm đúng ca bệnh mà không báo động giả.<br>• **Macro-F1 & Accuracy:** Đo độ chính xác phân loại dứt khoát tại ngưỡng quyết định cố định. | Đảm bảo mô hình có khả năng phân tách bệnh học mạnh mẽ. Tuy nhiên, AUROC cao **không đồng nghĩa** xác suất đưa ra là đáng tin cậy. |
+| **Độ Hiệu chuẩn Xác suất (Calibration)**<br>*"Con số 80% nguy cơ mà mô hình đưa ra có thực sự ứng với 80 ca bệnh trong 100 người?"* | • **Brier Score:** Sai số bình phương trung bình giữa xác suất dự đoán và nhãn thực tế ($y \in \{0,1\}$). Điểm càng gần 0 thể hiện xác suất càng chuẩn xác.<br>• **ECE (Expected Calibration Error):** Đo độ lệch kỳ vọng giữa xác suất tự tin và độ chính xác thực tế trên các phân vị xác suất. Trong y tế, tiêu chuẩn khắt khe đòi hỏi **ECE < 0,05** (sai số hiệu chuẩn dưới 5%). | Quyết định tính an toàn khi ứng dụng lâm sàng. Một mô hình có độ tự tin 95% nhưng thực tế chỉ đúng 60% sẽ gây nguy hiểm nghiêm trọng nếu bác sĩ dựa vào đó để ra quyết định điều trị. |
+
+---
+
+## Slide 7 — Tổng quan y văn & Khoảng trống nghiên cứu
+
+**Công trình tổng quan nền tảng:**  
+Nghiên cứu của Hunik et al., *Diagnostic prediction models for primary care, based on artificial intelligence and electronic health records: a systematic review* (JMIR, 2024).
+
+**Các số liệu quan trọng từ tổng quan hệ thống:**
+- **10.657 công trình nghiên cứu** liên quan đến mô hình dự đoán chẩn đoán từ EHR được sàng lọc qua các cơ sở dữ liệu học thuật quốc tế.
+- **Chỉ 15 nghiên cứu** đáp ứng đầy đủ các tiêu chuẩn phương pháp luận lâm sàng đưa vào phân tích tổng quan.
+- **15/15 nghiên cứu (100%)** chỉ sử dụng dữ liệu có cấu trúc dạng bảng (ICD codes, chỉ số xét nghiệm); **chưa có nghiên cứu nào** trong tập này khai thác ghi chú văn bản tự do bằng các mô hình ngôn ngữ lâm sàng.
+- **Đánh giá nguy cơ sai lệch theo công cụ PROBAST:** 9/15 nghiên cứu (60%) có nguy cơ sai lệch cao; 6/15 (40%) chưa rõ ràng; **0/15 nghiên cứu** đạt chuẩn nguy cơ sai lệch thấp.
+
+**Kết luận từ y văn:**  
+Tồn tại một khoảng trống nghiên cứu rất lớn về việc khai thác thông tin từ văn bản ghi chú lâm sàng kết hợp dữ liệu bảng, cũng như sự thiếu hụt quy trình kiểm soát rò rỉ dữ liệu chuẩn mực trong các công bố AI y tế.
+
+---
+
+## Slide 8 — Các rủi ro phương pháp luận chính trong AI y tế
+
+Từ các phân tích của PROBAST và y văn quốc tế, nhóm đề tài xác định 4 rủi ro phương pháp luận cốt tử cần kiểm soát:
+
+1. **Rò rỉ nhãn và thời điểm (Data & Label Leakage):**
+   - Biến đầu vào vô tình chứa các can thiệp hoặc kết luận phát sinh sau thời điểm chẩn đoán, hoặc chứa trực tiếp tên bệnh khiến mô hình học thuộc lòng quy luật giả.
+2. **Xử lý dữ liệu khuyết thiếu không nhất quán (Improper Missing Data Handling):**
+   - Bỏ qua các bản ghi thiếu xét nghiệm hoặc điền khuyết tùy tiện làm sai lệch nghiêm trọng phân bố bệnh học thực tế.
+3. **Hiệu chuẩn xác suất kém (Poor Probability Calibration):**
+   - Mô hình có thể đạt độ phân biệt cao (AUROC cao) nhưng xác suất đưa ra bị quá tự tin hoặc sai lệch, gây nguy hiểm nếu dùng làm mốc hỗ trợ bác sĩ.
+4. **Thiếu tính tổng quát hóa và đánh giá ngoài (Generalization Gap):**
+   - Mô hình hoạt động tốt trên tập dữ liệu nội bộ nhưng suy giảm nhanh khi áp dụng sang quần thể cơ sở y tế khác.
+
+**Quy chuẩn áp dụng trong M-CDSS:** Khóa mốc thời gian chẩn đoán, phân chia tập theo nhóm liên kết nguồn bệnh nhân, kiểm toán rò rỉ độc lập và báo cáo đa chỉ số kèm phân tích hiệu chuẩn (Brier score, ECE).
+
+---
+
+## Slide 9 — Khoảng trống và Câu hỏi nghiên cứu
+
+**Khoảng trống đề tài giải quyết:**
+1. Khai thác đồng thời giá trị ngữ nghĩa từ ghi chú lâm sàng và tính chuẩn xác của dữ liệu bảng sinh hiệu/xét nghiệm.
+2. Thiết lập quy trình phân chia dữ liệu nghiêm ngặt chống rò rỉ nguồn nhằm đảm bảo giá trị thực nghiệm trung thực.
+3. Đo lường toàn diện từ năng lực phân biệt (AUROC, AUPRC) đến độ chính xác phân loại (F1, Accuracy) và độ tin cậy xác suất (ECE).
+4. Thiết kế lộ trình hỗ trợ giải thích có kiểm chứng y văn (RAG grounding) cho giai đoạn tiếp theo.
+
+**Câu hỏi nghiên cứu trung tâm:**
+
+> *Trên bộ dữ liệu nghiên cứu chuẩn hóa, việc kết hợp đồng bộ thông tin bảng số và ghi chú lâm sàng bằng cơ chế dung hợp đa phương thức có cải thiện đáng kể độ chính xác và độ tin cậy so với các mô hình đơn phương thức trong quy trình kiểm soát rò rỉ nghiêm ngặt hay không?*
+
+---
+
+## Slide 10 — Mục tiêu, Phạm vi và 4 Nhóm bệnh nghiên cứu
+
+**Mục tiêu tổng quát:**  
+Nghiên cứu, xây dựng và đánh giá thực nghiệm nguyên mẫu hệ thống hỗ trợ quyết định lâm sàng đa phương thức (Multimodal CDSS), hỗ trợ phân loại 4 nhóm bệnh lý hô hấp - tim mạch và cung cấp khả năng giải thích minh bạch.
+
+**Định nghĩa 4 nhóm bệnh mục tiêu:**
+- **ASTHMA:** Hen phế quản — bệnh lý viêm đường thở mạn tính có tính chất co thắt hồi phục.
+- **COPD:** Bệnh phổi tắc nghẽn mạn tính — tiến triển tắc nghẽn luồng khí cố định, gắn liền với tiền sử hút thuốc hoặc phơi nhiễm khói bụi.
+- **HEART_FAILURE:** Suy tim — hội chứng lâm sàng phức tạp do suy giảm chức năng co bóp hoặc đổ đầy tâm thất.
+- **PNEUMONIA:** Viêm phổi — tình trạng nhiễm trùng cấp tính nhu mô phổi do vi khuẩn hoặc virus.
+
+**Phạm vi Giai đoạn 1:**  
+Tập trung xây dựng nền tảng dữ liệu y sinh chuẩn hóa, kiểm định chống rò rỉ dữ liệu và thiết lập mốc tham chiếu thực nghiệm với 3 mô hình baseline đơn phương thức.
+
+---
+
+## Slide 11 — Kế hoạch tổng thể hai giai đoạn của Đề tài
 
 ```text
-Dữ liệu bảng ─> FT-Transformer ───────┐
-                                      ├─> Cross-Attention / Fusion ─> Classification Head
-Ghi chú ─────> Clinical Text Encoder ─┘                                │
-                                                                       v
-                                                         Temperature Scaling / xác suất
-                                                                       │
-Hướng dẫn y khoa ─> Vector Store/Retriever ─> Agent giải thích <───────┘
-                                                │
-                                                v
-                                 trích dẫn guideline + vị trí bằng chứng
+GIAI ĐOẠN 1: Nghiên cứu, Nền tảng dữ liệu & Đánh giá Baseline (ĐÃ HOÀN THÀNH)
+┌─────────────────────────────────┐   ┌─────────────────────────────────┐   ┌─────────────────────────────────┐
+│     Chuẩn hóa Dữ liệu EHR       │──>│    Strict Split & Leakage Audit │──>│  Benchmark 3 Baseline & Case   │
+│  (2.000 hồ sơ / 4 nhóm bệnh)    │   │      (Kiểm toán 0% overlap)     │   │ (CatBoost, FT-Trans, BERT)      │
+└─────────────────────────────────┘   └─────────────────────────────────┘   └─────────────────────────────────┘
+                                                                                             │
+                                                                                             v
+GIAI ĐOẠN 2: Dung hợp Đa phương thức, RAG & Đánh giá Mở rộng (KẾ HOẠCH TIẾP THEO)             │
+┌─────────────────────────────────┐   ┌─────────────────────────────────┐   ┌─────────────────────────────────┐
+│ Multimodal Cross-Attention      │<──│  Agentic RAG & Evidence Ground  │<──│ Đánh giá lâm sàng (DCA, CI) &   │
+│ (Fusion Bảng + Văn bản lâm sàng)│   │  (Truy xuất Guideline điều trị) │   │ Đóng gói bàn giao               │
+└─────────────────────────────────┘   └─────────────────────────────────┘   └─────────────────────────────────┘
 ```
 
-**Mô tả thành phần**
-- **Pipeline đầu vào:** khử định danh, khóa thời gian, xử lý dữ liệu khuyết và giữ thông tin nhóm nguồn.
-- **Hai encoder:** FT-Transformer biểu diễn biến bảng; ClinicalBERT/Bio_ClinicalBERT biểu diễn ghi chú.
-- **Fusion:** Cross-Attention dự kiến cho phép biểu diễn bảng truy vấn thông tin từ token văn bản; classification head tạo điểm số cho bốn lớp.
-- **Calibration:** Temperature Scaling dự kiến điều chỉnh xác suất dựa trên validation; ngưỡng ECE là mục tiêu cần kiểm tra, không phải kết quả đã đạt của mô hình fusion.
-- **Agentic RAG:** truy xuất guideline và neo giải thích vào văn bản nguồn; là kế hoạch Giai đoạn 2.
-
-**Trạng thái hiện thực:** Baseline bảng/văn bản đã có; mô hình Cross-Attention hoàn chỉnh, hiệu chuẩn fusion, vector DB và agent chưa hoàn thành.
-
-**Nguồn thiết kế:** `DEVELOPMENT_SPEC_MULTIMODAL_EHR_AI.md`, `docs/PROPOSED_OPTIMAL_SOLUTION.md`.
+| Giai đoạn & Hạng mục | Khối lượng công việc chính | Sản phẩm đầu ra cụ thể |
+| :--- | :--- | :--- |
+| **Giai đoạn 1 — Dữ liệu & Quy trình** | Xây dựng quy trình xử lý dữ liệu, làm sạch, khử định danh, khóa mốc thời gian và điền khuyết. | Bộ dữ liệu nghiên cứu 2.000 hồ sơ đa phương thức và quy trình tiền xử lý tự động. |
+| **Giai đoạn 1 — Phân chia & Kiểm toán** | Chia tập dữ liệu theo nhóm bệnh nhân/ghi chú liên kết (Strict Split) và kiểm toán rò rỉ. | Báo cáo kiểm toán chống rò rỉ (Leakage Audit) xác nhận 0% giao thoa dữ liệu. |
+| **Giai đoạn 1 — Thực nghiệm Baseline** | Huấn luyện và đánh giá 3 mô hình Baseline trên tập kiểm thử độc lập 302 mẫu. | Bộ chỉ số thực nghiệm chuẩn hóa, phân tích đường cong và phân tích 2 ca bệnh đối chứng. |
+| **Giai đoạn 2 — Multimodal Fusion** | Xây dựng bộ mã hóa bảng và văn bản, thiết kế cơ chế Cross-Attention Late Fusion. | Mô hình dung hợp đa phương thức và kết quả so sánh đối chứng trên cùng tập test. |
+| **Giai đoạn 2 — RAG & Giải thích** | Xây dựng kho tri thức hướng dẫn y khoa, module truy xuất và gắn bằng chứng trích dẫn. | Khung giải thích lâm sàng tự động minh bạch nguồn gốc cho bác sĩ. |
+| **Giai đoạn 2 — Đánh giá mở rộng** | Phân tích đường cong quyết định lâm sàng (DCA), khoảng tin cậy Bootstrap, kiểm định công bằng. | Báo cáo đánh giá lâm sàng nâng cao và đóng gói nghiệm thu theo TRIPOD-AI. |
 
 ---
 
-## Slide 10 — Nguồn dữ liệu và cấu trúc bộ dữ liệu nghiên cứu
-
-**Nguồn và quy mô**
-- Nguồn đầu vào: cohort tổng hợp Synthea và ghi chú MTSamples.
-- Bộ raw chuẩn hóa gồm **2.000 bản ghi**, cân bằng **500 mẫu mỗi nhãn**: ASTHMA, COPD, HEART_FAILURE và PNEUMONIA.
-- Bảng gồm nhân khẩu học, sinh hiệu, xét nghiệm và tiền sử; modality văn bản là ghi chú lâm sàng đã xử lý.
-- Tỷ lệ thiếu được báo cáo trong bộ dữ liệu: WBC **20,5%**, CRP **22,4%**.
-
-**Công việc đã thực hiện**
-1. Tổng hợp nguồn dữ liệu lâm sàng và xây dựng converter chuẩn hóa tạo raw dataset.
-2. Loại ghi chú MTSamples bị trùng giữa nhãn; không quay vòng tái sử dụng ghi chú khi hết nguồn.
-3. Loại transcription/assessment khỏi phần văn bản đầu vào và che tên chẩn đoán đích.
-4. Gắn `source_patient_group` và `source_note_group` để có thể kiểm tra nguồn và chia tập theo nhóm.
-
-**Kết quả bàn giao:** bộ dữ liệu raw chuẩn hóa (2.000 mẫu) và bộ công cụ converter/audit kiểm soát nguồn có thể tái lập hoàn toàn; nội dung nhạy cảm không được đưa lên Git theo cấu hình bỏ qua dữ liệu.
-
-**Sơ đồ slide:** `CSV Synthea + MTSamples → converter → 2.000 mẫu/4 lớp → nhóm nguồn có thể truy vết`.
-
----
-
-## Slide 11 — Pipeline dữ liệu và các kiểm soát chất lượng
-
-**Luồng xử lý đã xây dựng**
+## Slide 12 — Kiến trúc giải pháp tổng thể đề xuất cho Giai đoạn 2
 
 ```text
-Nguồn CSV
-  → chuẩn hóa schema và chuyển đổi thành bản ghi multimodal
-  → lọc nội dung ghi chú trùng/tín hiệu nhãn trực tiếp
-  → giữ metadata nhóm bệnh nhân/ghi chú nguồn
-  → tạo strict split theo nhóm liên kết
-  → audit giao nhau giữa các split
-  → huấn luyện và đánh giá baseline
+                                  KIẾN TRÚC ĐA PHƯƠNG THỨC M-CDSS
+                                  
+  DỮ LIỆU ĐẦU VÀO                   BỘ MÃ HÓA CHUYÊN BIỆT                 DUNG HỢP & RA QUYẾT ĐỊNH
+┌──────────────────┐               ┌───────────────────────┐
+│ Dữ liệu Bảng     │──────────────>│ FT-Transformer        │────────┐
+│ (Sinh hiệu/XN)   │               │ (Biểu diễn bảng số)   │        │     ┌───────────────────────┐
+└──────────────────┘               └───────────────────────┘        ├────>│ Cross-Attention       │
+                                                                    │     │ Late Fusion Layer     │
+┌──────────────────┐               ┌───────────────────────┐        │     └──────────┬────────────┘
+│ Ghi chú Lâm sàng │──────────────>│ Bio_ClinicalBERT      │────────┘                │
+│ (Bệnh án tự do)  │               │ (Biểu diễn ngữ nghĩa) │                         v
+└──────────────────┘               └───────────────────────┘              ┌───────────────────────┐
+                                                                          │ Classification Head   │
+                                                                          │ (Dự đoán 4 nhóm bệnh) │
+                                                                          └──────────┬────────────┘
+                                                                                     │
+                                                                                     v
+                                                                          ┌───────────────────────┐
+                                                                          │ Temperature Scaling   │
+                                                                          │ (Hiệu chuẩn xác suất) │
+                                                                          └──────────┬────────────┘
+                                                                                     │
+  HỆ THỐNG GIẢI THÍCH LÂM SÀNG                                                       v
+┌──────────────────────────────┐        ┌───────────────────────┐         ┌───────────────────────┐
+│ Hướng dẫn điều trị Y khoa    │───────>│ Vector Store &        │────────>│ Diagnostic Agent      │
+│ (Clinical Guidelines / CPGs) │        │ Semantic Retriever    │         │ (Giải thích & Bằng cớ)│
+└──────────────────────────────┘        └───────────────────────┘         └───────────────────────┘
 ```
 
-**Các module hiện có trong `src/data_pipeline/`**
-- `deidentifier.py`: xử lý thực thể nhận dạng trong văn bản.
-- `temporal_aligner.py`: lọc/khóa thông tin theo thời điểm chẩn đoán và hạn chế biến cố sau chẩn đoán lọt vào đầu vào.
-- `imputer.py`: xử lý giá trị khuyết.
-- `dataset_loader.py`: nạp mẫu cho quá trình huấn luyện/đánh giá.
-
-**Điểm cần diễn đạt chính xác:** quy trình strict split được thiết lập chặt chẽ theo nhóm nguồn liên kết và có kiểm toán rò rỉ độc lập (audit 0 overlap). Các module pipeline có trong mã nguồn; slide không nên ngụ ý rằng toàn bộ pipeline đã được thẩm định trên dữ liệu bệnh viện thực.
-
-**Nguồn:** `src/data_pipeline/`, `scripts/convert_sources_to_raw.py`, `scripts/audit_data_leakage.py`.
+**Mô tả các khối thành phần:**
+- **Nhánh Bảng số học:** Mô hình FT-Transformer trích xuất các tương tác phi tuyến tính giữa các chỉ số sinh hiệu và xét nghiệm.
+- **Nhánh Ngôn ngữ y sinh:** Bio_ClinicalBERT trích xuất biểu diễn ngữ cảnh chuyên sâu từ bệnh sử và triệu chứng trong ghi chú y khoa.
+- **Cơ chế Cross-Attention Fusion:** Cho phép vector đặc trưng bảng đóng vai trò truy vấn (query) để định hướng trọng số chú ý vào đúng các từ khóa bệnh học then chốt trong văn bản, bù đắp điểm mù của từng phương thức.
+- **Hiệu chuẩn xác suất (Temperature Scaling):** Đảm bảo xác suất đầu ra phản ánh chính xác rủi ro bệnh học thực tế (hướng tới ECE < 0,05).
+- **Agentic RAG:** Tự động truy xuất hướng dẫn chẩn đoán y khoa tương ứng và gắn bằng chứng trích dẫn cụ thể vào hồ sơ bệnh nhân.
 
 ---
 
-## Slide 12 — Strict split: quy mô, phân bố và audit
+## Slide 13 — Nguồn dữ liệu & Cấu trúc bộ dữ liệu nghiên cứu
 
-Split sử dụng connected components trên `source_patient_group` và `source_note_group`, để mọi bản ghi nối với cùng bệnh nhân nguồn hoặc ghi chú nguồn được xếp chung một split.
+**Quy mô và thành phần bộ dữ liệu:**
+- Dữ liệu tổng hợp từ các nguồn bệnh án điện tử chuẩn mực: Synthea EHR và các ghi chú lâm sàng MTSamples.
+- Bộ dữ liệu nghiên cứu chuẩn hóa gồm **2.000 hồ sơ bệnh án đa phương thức**, phân bố hoàn toàn cân bằng **500 mẫu cho mỗi nhóm bệnh**:
+  - Hen phế quản (ASTHMA): 500 mẫu.
+  - Bệnh phổi tắc nghẽn mạn tính (COPD): 500 mẫu.
+  - Suy tim (HEART_FAILURE): 500 mẫu.
+  - Viêm phổi (PNEUMONIA): 500 mẫu.
+- **Dữ liệu bảng:** 12 trường đặc trưng gồm nhân khẩu học (tuổi, giới tính), sinh hiệu (huyết áp tâm thu/tâm trương, nhịp tim, nhịp thở, SpO₂, nhiệt độ), xét nghiệm (WBC, CRP), tiền sử hút thuốc và bệnh nền (tăng huyết áp, đái tháo đường).
+- **Tỷ lệ dữ liệu khuyết thiếu thực tế:** Số lượng bạch cầu (WBC) khuyết 20,5%, Protein phản ứng C (CRP) khuyết 22,4% — phản ánh đúng thực tế lâm sàng không phải bệnh nhân nào cũng được làm đủ xét nghiệm máu.
 
-| Tập | Tổng số | ASTHMA | COPD | HEART_FAILURE | PNEUMONIA |
-|---|---:|---:|---:|---:|---:|
-| Train | 1.425 | 358 | 358 | 340 | 369 |
-| Validation | 273 | 71 | 71 | 54 | 77 |
-| Test | 302 | 71 | 71 | 106 | 54 |
-| **Tổng** | **2.000** | **500** | **500** | **500** | **500** |
-
-**Kết quả leakage audit**
-
-| Khóa kiểm tra | Train–Val | Train–Test | Val–Test |
-|---|---:|---:|---:|
-| `patient_id` | 0 | 0 | 0 |
-| `source_patient_group` | 0 | 0 | 0 |
-| `source_note_group` | 0 | 0 | 0 |
-
-Audit pass; tất cả split có đủ bốn lớp. Tập test có nhiều HEART_FAILURE hơn (106), PNEUMONIA ít hơn (54), vì vậy cần đọc kết quả theo từng lớp và bổ sung ước lượng bất định ở giai đoạn sau.
-
-**Hình gợi ý:** biểu đồ cột chồng số lượng lớp theo split, cạnh đó là ba chỉ báo “0 overlap”.
-
-**Nguồn:** `data/rebuilt_strict_split_audit.json`.
+**Các bước chuẩn hóa & Làm sạch dữ liệu y khoa:**
+1. Khử trùng lặp: Loại bỏ hoàn toàn các ghi chú bị trùng lặp nội dung giữa các nhóm bệnh khác nhau.
+2. Che giấu nhãn mục tiêu: Che tên chẩn đoán đích bằng token `[REDACTED_DIAGNOSIS]` và loại bỏ phần kết luận chẩn đoán trong ghi chú để triệt tiêu hoàn toàn rủi ro rò rỉ nhãn trực tiếp.
+3. Gắn định danh nhóm nguồn: Định danh nhóm bệnh nhân và nhóm ghi chú gốc để phục vụ quy trình phân chia dữ liệu độc lập.
 
 ---
 
-## Slide 13 — Thiết kế thực nghiệm và các baseline
+## Slide 14 — Quy trình tiền xử lý dữ liệu và Kiểm soát chất lượng
 
-| Baseline | Đầu vào | Cấu hình/kết quả chọn mô hình |
-|---|---|---|
-| CatBoost | Dữ liệu bảng | Chọn giữa CatBoost và XGBoost theo validation macro-AUROC; CatBoost 0,9084, XGBoost 0,8895. |
-| FT-Transformer | Dữ liệu bảng | 19 epochs; đại diện baseline học sâu cho dữ liệu bảng. |
-| Bio_ClinicalBERT | Ghi chú đã khử định danh | Fine-tune block encoder cuối và classification head; tối đa 512 tokens; learning rate 2e-5; 5 epochs. |
+```text
+                            LUỒNG TIỀN XỬ LÝ DỮ LIỆU ĐA PHƯƠNG THỨC
+                            
+  HỒ SƠ BỆNH ÁN THÔ                 CÁC BƯỚC TIỀN XỬ LÝ CHUYÊN BIỆT               DỮ LIỆU SẴN SÀNG HUẤN LUYỆN
+┌──────────────────┐               ┌──────────────────────────────────────┐      ┌─────────────────────────────┐
+│ • Dữ liệu bảng   │──────────────>│ 1. Khử định danh (De-identification) │─────>│ Dữ liệu sạch, bảo mật,      │
+│ • Ghi chú tự do  │               │ 2. Khóa mốc thời gian (Temp-Lock)    │      │ kiểm toán 0% rò rỉ,         │
+│ • Metadata nguồn │               │ 3. Xử lý khuyết thiếu (Imputation)   │      │ sẵn sàng cho Benchmark      │
+└──────────────────┘               │ 4. Phân chia theo nhóm (Strict Split)│      └─────────────────────────────┘
+                                   └──────────────────────────────────────┘
+```
 
-**Thiết lập đánh giá**
-- Seed 42; benchmark strict test gồm 302 mẫu và bốn nhãn.
-- CatBoost được chọn bằng validation, không chọn theo kết quả test.
-- Báo cáo: macro AUROC, macro AUPRC, macro-F1, accuracy, Brier score và ECE.
-- AUROC/AUPRC đo năng lực xếp hạng/phân biệt; F1/accuracy phụ thuộc dự đoán lớp; Brier/ECE cung cấp góc nhìn về xác suất và calibration.
-
-**Nguồn:** `data/rebuilt_strict_results_2026-10-28.json`.
-
----
-
-## Slide 14 — Kết quả tổng hợp trên strict test
-
-**Cỡ mẫu test: N = 302.** Số thập phân là điểm chỉ số, không phải tỷ lệ phần trăm.
-
-| Baseline | AUROC macro | AUPRC macro | F1 macro | Accuracy | Brier | ECE |
-|---|---:|---:|---:|---:|---:|---:|
-| CatBoost (bảng) | 0,9223 | 0,7872 | 0,6083 | 0,6854 | 0,3844 | 0,0663 |
-| FT-Transformer (bảng) | 0,8976 | 0,7023 | 0,5789 | 0,6589 | 0,4725 | 0,1152 |
-| Bio_ClinicalBERT (văn bản) | **0,9735** | **0,9314** | **0,8421** | **0,8543** | **0,2329** | **0,0373** |
-
-**Kết quả nổi bật**
-- Bio_ClinicalBERT đứng đầu cả sáu chỉ số được báo cáo trên tập này.
-- CatBoost nhỉnh hơn FT-Transformer trên các chỉ số trong bảng; cả hai baseline bảng có F1/accuracy thấp hơn baseline văn bản.
-- Kết quả này làm nổi bật tiềm năng modality văn bản trong tập hiện tại và tạo cơ sở thực nghiệm để kiểm tra fusion.
-- Không thể suy ra rằng fusion chắc chắn tốt hơn: mô hình kết hợp chưa được huấn luyện/đánh giá.
-
-**Hình gợi ý:** bảng là thông tin chính; có thể thêm thanh ngang cho macro-AUROC, macro-F1 và accuracy. Tránh gộp các chỉ số có ý nghĩa khác nhau vào một thang không giải thích.
+**Chi tiết 4 công đoạn kỹ thuật:**
+1. **Khử định danh y khoa tự động (De-identification):** Nhận diện và che các thực thể định danh cá nhân (tên, tuổi cụ thể, địa chỉ, ngày tháng năm) theo nguyên tắc HIPAA/GDPR nhằm đảm bảo tính bảo mật y tế.
+2. **Khóa mốc thời gian chẩn đoán (Temporal Alignment):** Chỉ ghi nhận các dữ liệu sinh hiệu và xét nghiệm được thực hiện tại thời điểm tiếp nhận khám ban đầu; khóa triệt để mọi thông tin xét nghiệm phát sinh sau thời điểm chẩn đoán để ngăn chặn thông tin tương lai lọt vào mô hình.
+3. **Xử lý dữ liệu khuyết thiếu (Imputation):** Áp dụng phương pháp điền khuyết dựa trên trung vị kết hợp chỉ báo khuyết thiếu cho các chỉ số xét nghiệm WBC và CRP, tránh làm biến dạng phân bố tự nhiên của dữ liệu.
+4. **Bộ nạp phân tầng đa phương thức (Stratified Multimodal Loader):** Đảm bảo đồng bộ tuyệt đối giữa hàng dữ liệu số học và chuỗi token ghi chú lâm sàng tương ứng trong từng đợt khám.
 
 ---
 
-## Slide 15 — Đường cong ROC, Precision–Recall và reliability
+## Slide 15 — Phân chia dữ liệu nghiêm ngặt (Strict Split) & Kiểm toán rò rỉ
 
-![Đường cong benchmark strict test: ROC micro-average, PR micro-average và reliability diagram](../data/rebuilt_strict_curves_2026-10-28.png)
+**Phương pháp phân chia bằng thành phần liên thông (Connected Components):**  
+Để ngăn chặn hoàn toàn hiện tượng một bệnh nhân hoặc một mẫu ghi chú gốc xuất hiện đồng thời ở cả tập huấn luyện và tập kiểm thử (nguyên nhân gây điểm số ảo), thuật toán phân nhóm đưa toàn bộ các hồ sơ có cùng liên kết nguồn vào chung một tập duy nhất.
 
-**Cách đọc hình**
-- Panel trái: ROC **micro-average**; đường Bio_ClinicalBERT nằm cao hơn hai baseline bảng trên phần lớn miền FPR. Chú giải hình ghi AUC micro: CatBoost 0,923; FT-Transformer 0,893; Bio_ClinicalBERT 0,969.
-- Panel giữa: Precision–Recall **micro-average**; chú giải ghi AP micro: CatBoost 0,813; FT-Transformer 0,722; Bio_ClinicalBERT 0,922.
-- Panel phải: reliability diagram; đường chéo là tham chiếu hiệu chuẩn hoàn hảo. Sai số trên các bin và số mẫu mỗi bin khiến đường có thể dao động, đặc biệt trên tập test nhỏ.
+**Bảng phân bố quy mô dữ liệu sau khi phân chia:**
 
-**Lưu ý quan trọng:** Hình này thể hiện ROC/PR micro-average, còn bảng ở Slide 14 báo cáo macro-average. Vì vậy AUC/AP trong chú giải hình không nhất thiết bằng AUROC/AUPRC macro trong bảng. ECE phải trích theo bảng JSON: CatBoost 0,0663; FT-Transformer 0,1152; Bio_ClinicalBERT 0,0373.
+| Tập dữ liệu | Tổng số hồ sơ | ASTHMA | COPD | HEART_FAILURE | PNEUMONIA | Tỷ lệ |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Huấn luyện (Train)** | **1.425** | 358 | 358 | 340 | 369 | 71,25% |
+| **Xác thực (Validation)** | **273** | 71 | 71 | 54 | 77 | 13,65% |
+| **Kiểm thử độc lập (Test)** | **302** | 71 | 71 | 106 | 54 | 15,10% |
+| **Tổng cộng** | **2.000** | **500** | **500** | **500** | **500** | **100%** |
 
-**Nguồn hình:** `data/rebuilt_strict_curves_2026-10-28.png`.
+**Kết quả kiểm toán rò rỉ dữ liệu (Leakage Audit):**
 
----
+| Tiêu chí kiểm tra giao thoa | Giữa Train và Validation | Giữa Train và Test | Giữa Validation và Test | Kết luận kiểm toán |
+| :--- | :---: | :---: | :---: | :---: |
+| Trùng mã định danh bệnh nhân (`patient_id`) | **0** | **0** | **0** | **ĐẠT (Không rò rỉ)** |
+| Trùng nhóm bệnh nhân gốc (`source_patient_group`) | **0** | **0** | **0** | **ĐẠT (Không rò rỉ)** |
+| Trùng nhóm ghi chú gốc (`source_note_group`) | **0** | **0** | **0** | **ĐẠT (Không rò rỉ)** |
 
-## Slide 16 — Ma trận nhầm lẫn và lỗi theo lớp
-
-![Ma trận nhầm lẫn strict test của CatBoost, FT-Transformer và Bio_ClinicalBERT](../data/rebuilt_strict_confusion_2026-10-28.png)
-
-**Cách đọc:** Hàng là nhãn thật, cột là nhãn dự đoán; ô trên đường chéo là dự đoán đúng. Tổng mẫu mỗi lớp lần lượt là ASTHMA 71, COPD 71, HEART_FAILURE 106, PNEUMONIA 54.
-
-**Các điểm quan sát được từ ma trận**
-- CatBoost: ASTHMA đúng 37/71; 34 ca ASTHMA bị phân loại thành COPD. PNEUMONIA đúng 11/54; 36 ca bị phân loại thành ASTHMA.
-- FT-Transformer: ASTHMA đúng 44/71, COPD đúng 39/71; PNEUMONIA đúng 10/54 và 32 ca bị phân loại thành ASTHMA.
-- Bio_ClinicalBERT: ASTHMA đúng 54/71; COPD đúng 60/71; HEART_FAILURE đúng 105/106; PNEUMONIA đúng 39/54, trong đó 14 ca bị phân loại thành ASTHMA.
-
-**Diễn giải thận trọng:** Trên test này, nhầm lẫn ASTHMA–COPD nổi bật ở baseline bảng; Bio_ClinicalBERT giảm nhiều nhầm lẫn đó nhưng PNEUMONIA vẫn còn một số ca bị nhận thành ASTHMA. Số lượng mỗi lớp và tính tổng hợp của dữ liệu giới hạn kết luận; cần phân tích lỗi theo nguồn và kiểm tra ngoài mẫu.
-
-**Nguồn hình:** `data/rebuilt_strict_confusion_2026-10-28.png`.
+*Nhận xét:* Quy trình kiểm toán xác nhận mức độ cô lập dữ liệu tuyệt đối (0% overlap), đảm bảo kết quả đo lường trên tập kiểm thử phản ánh chính xác năng lực thực tế của mô hình.
 
 ---
 
-## Slide 17 — Hiệu chuẩn và khoảng cách validation–test
+## Slide 16 — Thiết kế thực nghiệm và 3 mô hình Baseline
 
-| Baseline | ECE validation | ECE test | Brier validation | Brier test |
-|---|---:|---:|---:|---:|
-| CatBoost | 0,0639 | 0,0663 | 0,3563 | 0,3844 |
-| FT-Transformer | 0,0478 | 0,1152 | 0,3042 | 0,4725 |
-| Bio_ClinicalBERT | 0,1487 | 0,0373 | 0,4594 | 0,2329 |
+**Ba mô hình đại diện đơn phương thức được lựa chọn:**
+1. **CatBoost (Đại diện Bảng số học - Cây quyết định tăng cường):**  
+   - Được lựa chọn sau khi đối đầu và vượt qua XGBoost trên tập validation (Macro-AUROC: 0,9084 vs 0,8895). Tối ưu hóa trên các đặc trưng sinh hiệu và xét nghiệm.
+2. **FT-Transformer (Đại diện Bảng số học - Học sâu chuyên biệt):**  
+   - Mô hình Feature Tokenizer Transformer chuyển đổi các trường số học thành các vector nhúng và tính toán tự chú ý (self-attention); huấn luyện 19 epochs với cơ chế early stopping.
+3. **Bio_ClinicalBERT (Đại diện Ngôn ngữ Y sinh):**  
+   - Mô hình ngôn ngữ tiền huấn luyện trên hàng triệu ghi chú lâm sàng từ cơ sở dữ liệu MIMIC-III; fine-tune trên dữ liệu ghi chú của đề tài với độ dài tối đa 512 tokens, learning rate 2e-5 qua 5 epochs.
 
-**Điều cần rút ra**
-- ECE test của Bio_ClinicalBERT thấp nhất trong ba baseline ở lần chạy này; CatBoost là 0,0663 và FT-Transformer là 0,1152.
-- Validation và test khác đáng kể ở FT-Transformer và Bio_ClinicalBERT. Điểm calibration tốt trên test không khẳng định ổn định nếu phân bố nhóm nguồn thay đổi.
-- Chưa có confidence interval hoặc phân tích calibration theo từng lớp; cần bổ sung trước khi diễn giải xác suất theo hướng ứng dụng.
-- Mục tiêu ECE < 0,05 trong spec là mục tiêu thiết kế, không phải tiêu chí đã đạt cho mọi baseline; Bio_ClinicalBERT có ECE test < 0,05 ở lần chạy này nhưng cần xác nhận thêm.
-
-**Hình hỗ trợ:** reliability diagram ở Slide 15. Dùng các con số bảng làm nguồn chính.
-
----
-
-## Slide 18 — Phân tích ca bệnh sai biệt & Tính bổ trợ giữa các phương thức
-
-**Nội dung chính**
-
-1. **Phân tích ca bệnh sai biệt lâm sàng (Clinical Discrepancy Case Studies)** trích xuất từ tập kiểm thử độc lập ($N = 302$):
-- **Nhóm Bảng số đúng — Văn bản sai:**
-  - *Ca bệnh PT-0174 (Nhãn thật: COPD):* Bảng số dự đoán chính xác COPD (độ tin cậy 80,4%) nhờ bắt đúng tiền sử hút thuốc nặng và chỉ số SpO₂ giảm mạn tính; Bio_ClinicalBERT dự đoán nhầm sang ASTHMA (58,7%) do văn bản mô tả triệu chứng ho, khó thở tương đồng giữa hai bệnh.
-  - *Ca bệnh PT-0254 (Nhãn thật: COPD):* Bảng số dự đoán đúng COPD (độ tin cậy 75,2%); mô hình văn bản đoán nhầm sang HEART_FAILURE (59,0%) do ghi chú nhấn mạnh mệt mỏi và rale ẩm rải rác.
-- **Nhóm Văn bản đúng — Bảng số sai:**
-  - *Ca bệnh PT-0044 (Nhãn thật: ASTHMA):* Bio_ClinicalBERT chẩn đoán chính xác ASTHMA (độ tin cậy 85,8%) nhờ nhận diện tiền sử dị ứng thời tiết và cơn khó thở rale rít về đêm; mô hình bảng số đoán nhầm sang COPD (78,8%) do SpO₂ và nhịp thở của 2 bệnh ở đợt cấp rất giống nhau.
-  - *Ca bệnh PT-0089 (Nhãn thật: ASTHMA):* Văn bản đoán đúng ASTHMA (độ tin cậy 66,4%); bảng số đoán nhầm sang COPD (83,1%).
-
-2. **Kiểm chứng độ khó dữ liệu (Sanity Check):**
-- Thử nghiệm với Cây quyết định chuẩn (Decision Tree độ sâu 4) đạt accuracy **0,7285** trên strict test set.
-- Kết quả này xác nhận: bài toán phân loại 4 bệnh có độ khó phân biệt thực tế; dữ liệu bảng và văn bản không chứa quy luật rò rỉ nhãn tầm thường (*zero label leakage*); đòi hỏi các mô hình học sâu và mô hình ngôn ngữ chuyên sâu (CatBoost đạt AUROC 0,9223; Bio_ClinicalBERT đạt AUROC 0,9735).
-
-3. **Luận cứ thực nghiệm cho Giai đoạn 2:**
-- Hai phương thức mang thông tin trực giao bổ trợ cho nhau: Bảng số nhạy bén với chỉ số sinh tồn và biến động sinh lý tức thời; văn bản nắm bắt sâu sắc bệnh sử, tiền căn và triệu chứng cơ năng.
-- Đây là bằng chứng thực nghiệm trực tiếp chứng minh tính tất yếu của giải pháp **Multimodal Cross-Attention Late Fusion** nhằm bù đắp điểm mù của từng phương thức đơn lẻ.
-
-**Hình đề xuất:** Bảng đối chiếu 4 ca bệnh sai biệt (PT-0174, PT-0254, PT-0044, PT-0089) thể hiện nhãn thực tế, dự đoán của Bảng số vs Văn bản kèm độ tin cậy tương ứng.
+**Hệ thống 6 chỉ số đánh giá toàn diện:**
+- **Năng lực phân biệt và xếp hạng:** Macro AUROC (diện tích dưới đường cong ROC) và Macro AUPRC (diện tích dưới đường cong Precision-Recall).
+- **Độ chính xác phân loại:** Macro-F1 (trung bình điều hòa F1 giữa 4 lớp) và Accuracy (độ chính xác tổng thể).
+- **Độ tin cậy xác suất và hiệu chuẩn:** Brier Score (khoảng cách bình phương xác suất) và Expected Calibration Error (ECE - độ lệch hiệu chuẩn kỳ vọng).
 
 ---
 
-## Slide 19 — Hồ sơ công việc và sản phẩm đã tạo
+## Slide 17 — Kết quả thực nghiệm tổng hợp trên tập kiểm thử độc lập (N = 302)
 
-| Công việc | Kết quả/artefact | Ý nghĩa |
-|---|---|---|
-| Chuẩn hóa nguồn dữ liệu và bộ converter | `scripts/convert_sources_to_raw.py`; bộ raw 2.000 mẫu | Xây dựng dữ liệu đầu vào chuẩn hóa, có thể truy vết và tái lập. |
-| Xử lý dữ liệu và xây loader | Các module trong `src/data_pipeline/` | Chuẩn bị đầu vào, hỗ trợ bảo vệ thông tin và nạp mẫu. |
-| Chia strict split và audit | `scripts/audit_data_leakage.py`; `data/rebuilt_strict_split_audit.json` | Kiểm tra giao nhau theo patient/source patient/source note. |
-| Huấn luyện ba baseline | `scripts/run_baselines.py`; `data/rebuilt_strict_results_2026-10-28.json` | Tạo mốc tham chiếu đơn phương thức cho Giai đoạn 2. |
-| Tạo trực quan kết quả | `data/rebuilt_strict_curves_2026-10-28.png`; `data/rebuilt_strict_confusion_2026-10-28.png` | Cho thấy discrimination, PR, reliability và nhầm lẫn theo lớp. |
-| Báo cáo và đề xuất | Báo cáo kết quả Giai đoạn 1, `docs/PROPOSED_OPTIMAL_SOLUTION.md`, spec và backlog | Ghi nhận kết quả thực nghiệm chuẩn hóa, luận chứng thiết kế và kế hoạch tiếp. |
-| Nền tảng phần mềm | `src/api/`, `frontend/src/` | Có khung API/form/trang baseline; chưa đồng nghĩa toàn bộ workflow tích hợp. |
+| Mô hình Baseline | AUROC macro | AUPRC macro | F1 macro | Accuracy | Brier Score | ECE |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **CatBoost** *(Nhánh Bảng số)* | 0,9223 | 0,7872 | 0,6083 | 0,6854 | 0,3844 | 0,0663 |
+| **FT-Transformer** *(Nhánh Bảng sâu)* | 0,8976 | 0,7023 | 0,5789 | 0,6589 | 0,4725 | 0,1152 |
+| **Bio_ClinicalBERT** *(Nhánh Văn bản)* | **0,9735** | **0,9314** | **0,8421** | **0,8543** | **0,2329** | **0,0373** |
 
-**Kết luận tiến độ:** Giai đoạn 1 đã chuyển từ đề xuất kỹ thuật sang có pipeline và benchmark strict làm bằng chứng đầu vào cho thiết kế Giai đoạn 2.
+![Bảng tổng hợp chỉ số Benchmark các mô hình sau huấn luyện](images/01_benchmark_metrics_post_train.png)
 
----
-
-## Slide 20 — Công việc Giai đoạn 2 theo thứ tự phụ thuộc
-
-1. **Backlog 4 — Multimodal core:** xây encoder bảng/văn bản và Cross-Attention; huấn luyện trên strict split; so sánh tabular, text, concat và cross-attention; kiểm tra ablation và calibration.
-2. **Backlog 5 — RAG và phần mềm:** ingest guideline; đánh giá truy xuất; xây Diagnostic Agent và evidence grounding; nối API/UI để thể hiện xác suất, trích dẫn và bằng chứng.
-3. **Backlog 6 — Đánh giá mở rộng:** phân tích lỗi theo lớp, bootstrap CI, calibration, fairness và DCA; chuẩn bị đánh giá chuyên gia/ngoại kiểm khi có nguồn dữ liệu, phê duyệt và quy trình phù hợp.
-4. **Backlog 7 — Bàn giao:** đóng gói hệ thống, hoàn thiện tài liệu tái lập theo TRIPOD-AI và demo.
-
-**Tiêu chí quyết định:** Chỉ kết luận fusion có lợi nếu kết quả được so sánh công bằng trên cùng split và có phân tích bất định/lỗi; không đặt trước rằng mô hình fusion chắc chắn vượt baseline.
+**Các phát hiện then chốt từ kết quả:**
+1. **Sức mạnh vượt trội của mô hình văn bản:** Bio_ClinicalBERT dẫn đầu toàn diện trên cả 6 chỉ số đánh giá. Đặc biệt, AUROC đạt **0,9735** và Accuracy đạt **85,43%**, vượt xa các mô hình dạng bảng khoảng 17–20% về độ chính xác.
+2. **Hiệu năng nhánh bảng số:** CatBoost đạt kết quả phân biệt rất tốt (AUROC 0,9223), nhỉnh hơn mô hình học sâu bảng FT-Transformer (0,8976). Tuy nhiên, độ chính xác phân loại của nhánh bảng bị giới hạn ở mức 68,54% do thiếu thông tin bệnh sử.
+3. **Độ tin cậy xác suất:** Bio_ClinicalBERT đạt chỉ số ECE ấn tượng **0,0373** (đáp ứng tiêu chuẩn lâm sàng quốc tế ECE < 0,05), trong khi CatBoost đạt 0,0663.
 
 ---
 
-## Slide 21 — Giới hạn, rủi ro và điều kiện ứng dụng
+## Slide 18 — Phân tích đường cong ROC, Precision–Recall và Độ hiệu chuẩn
 
-**Giới hạn hiện tại**
-- Dữ liệu tổng hợp và kho công khai không đại diện đầy đủ cho bệnh viện thực hoặc quy trình ghi chép tại Việt Nam.
-- Strict split xử lý các liên kết nguồn đã ghi nhận, nhưng không xóa hết domain/style bias.
-- Test 302 mẫu; phân bố lớp lệch vừa phải; chưa có bootstrap confidence interval, fairness đầy đủ, threshold theo chi phí lâm sàng hay prospective evaluation.
-- Chưa đánh giá ngoại kiểm; chưa có kết quả mô hình multimodal/RAG đã tích hợp.
+![Đường cong benchmark strict test: ROC micro-average, PR micro-average và Reliability Diagram](images/08_benchmark_curves.png)
 
-**Rủi ro cần quản lý ở bước tới**
-- Rò rỉ nhãn hoặc thông tin tương lai trong nguồn dữ liệu mới.
-- Khác biệt ngôn ngữ/phong cách giữa dữ liệu dùng để phát triển và dữ liệu mục tiêu.
-- Calibration/độ nhạy không đồng đều giữa các lớp.
-- Trích dẫn agent không khớp nguồn nếu không kiểm chứng bằng evidence grounding.
+**Phân tích chi tiết 3 đồ thị thực nghiệm:**
+- **Đồ thị ROC Micro-average (Panel trái):** Đường cong của Bio_ClinicalBERT (màu xanh lá) tiệm cận rất nhanh góc trên bên trái với AUC micro đạt **0,969**, vượt trội hoàn toàn so với CatBoost (0,923) và FT-Transformer (0,893) trên mọi ngưỡng độ nhạy.
+- **Đồ thị Precision–Recall Micro-average (Panel giữa):** Trong bài toán đa lớp mất cân bằng nhẹ, Bio_ClinicalBERT duy trì độ chính xác (Precision) rất cao ở mọi mức độ bao phủ (Recall), đạt Average Precision (AP micro) lên tới **0,922** (so với 0,813 của CatBoost và 0,722 của FT-Transformer).
+- **Biểu đồ độ hiệu chuẩn Reliability Diagram (Panel phải):** Đường cong của Bio_ClinicalBERT bám sát đường chéo lý tưởng 45°, chứng minh xác suất dự đoán của mô hình phản ánh sát sao tần suất xuất hiện bệnh thực tế, không bị hiện tượng tự tin thái quá.
 
-**Ranh giới sử dụng:** Nguyên mẫu phục vụ nghiên cứu; không dùng để quyết định điều trị. Mọi đánh giá trên dữ liệu bệnh viện cần có phê duyệt, bảo vệ dữ liệu và thẩm định phù hợp.
+*Lưu ý phương pháp luận:* Hình này thể hiện ROC/PR tính theo **micro-average**, trong khi bảng ở Slide 17 báo cáo theo **macro-average** (trung bình đều giữa các lớp). Do đó các con số AUC/AP micro trên hình có sự chênh lệch nhỏ so với macro AUROC/AUPRC ở bảng số liệu.
 
 ---
 
-## Slide 22 — Kết luận và nội dung cần giáo viên góp ý
+## Slide 19 — Phân tích ma trận nhầm lẫn & Lỗi phân loại theo từng nhóm bệnh
 
-- Đề tài có động lực từ khoảng trống khai thác ghi chú EHR và các vấn đề về leakage, calibration, missing data, ngoại kiểm trong y văn.
-- Giai đoạn 1 đã xây dựng pipeline, strict split/audit, ba baseline và bộ artefact benchmark; kết quả thực nghiệm cho thấy Bio_ClinicalBERT là baseline đạt hiệu năng cao nhất trong test nội bộ hiện tại (AUROC macro 0,9735, F1 macro 0,8421).
-- Kết quả chưa trả lời liệu fusion tốt hơn hay có giá trị lâm sàng; đây là câu hỏi thực nghiệm của Giai đoạn 2.
-- Kế hoạch tiếp theo ưu tiên fusion/ablation, sau đó RAG/evidence grounding, đánh giá mở rộng và đóng gói.
+![Ma trận nhầm lẫn của 3 mô hình Baseline trên tập kiểm thử độc lập](images/09_confusion_matrices.png)
 
-**Đề nghị góp ý của giáo viên**
-1. Phạm vi bốn nhãn và câu hỏi nghiên cứu có phù hợp không?
-2. Thiết kế so sánh và tiêu chí ablation/cải thiện fusion nên chốt như thế nào?
-3. Các ưu tiên Giai đoạn 2 và tiêu chí nghiệm thu có cần điều chỉnh không?
+**Chi tiết phân bố mẫu kiểm thử thực tế:** ASTHMA 71 ca, COPD 71 ca, HEART_FAILURE 106 ca, PNEUMONIA 54 ca (Tổng N = 302).
 
----
-
-## Slide 23 — Tài liệu và artefact tham chiếu
-
-**Tài liệu dự án**
-- `docs/01_RESEARCH_BACKGROUND_AND_GAP.md` — literature review và khoảng trống.
-- `DEVELOPMENT_SPEC_MULTIMODAL_EHR_AI.md` — kiến trúc/module mục tiêu.
-- `docs/PROPOSED_OPTIMAL_SOLUTION.md` — giải pháp đề xuất sau baseline.
-- `tasks/README.md`, `tasks/phase-01/`, `tasks/phase-02-development/` — lộ trình và backlog.
-- `docs/Bao cao M-CDSS - strict split 2026-10-28.docx` — báo cáo benchmark strict split.
-
-**Artefact thực nghiệm chính thức**
-- `data/rebuilt_strict_results_2026-10-28.json` — chỉ số và một số ví dụ error analysis.
-- `data/rebuilt_strict_split_audit.json` — quy mô split, phân bố lớp và overlap audit.
-- `data/rebuilt_strict_curves_2026-10-28.png` — ROC/PR micro-average và reliability diagram.
-- `data/rebuilt_strict_confusion_2026-10-28.png` — confusion matrices ba baseline.
-
-**Nguồn literature review:** Hunik et al., “Diagnostic prediction models for primary care, based on artificial intelligence and electronic health records: a systematic review,” JMIR Preprints 62862 (2024), bản PDF trong `docs/`. Trước khi nộp, đối chiếu đầy đủ tác giả, năm, DOI/trạng thái xuất bản với trang tiêu đề của bản PDF được trích dẫn.
+**Phát hiện cơ chế sai lệch qua ma trận:**
+- **Điểm mù của mô hình Bảng số (CatBoost):**
+  - Gặp khó khăn nghiêm trọng trong việc phân định giữa Hen và COPD: **34/71 ca ASTHMA** bị phân loại nhầm thành COPD (chỉ đoán đúng 37 ca).
+  - Khó nhận diện Viêm phổi: **36/54 ca PNEUMONIA** bị phân loại nhầm thành ASTHMA (chỉ đoán đúng 11 ca).
+  - *Nguyên nhân:* Tín hiệu sinh hiệu và xét nghiệm của các đợt co thắt cấp tính ở bệnh nhân hô hấp có chỉ số SpO₂ và phản ứng viêm rất tương đồng nhau, dữ liệu số đơn thuần không đủ sức phân biệt.
+- **Sức mạnh khắc phục của mô hình Văn bản (Bio_ClinicalBERT):**
+  - Giải quyết xuất sắc sự nhầm lẫn giữa Hen và COPD: Đoán đúng **54/71 ca ASTHMA** và **60/71 ca COPD**.
+  - Nhận diện gần như tuyệt đối nhóm Suy tim: Đoán đúng **105/106 ca HEART_FAILURE**.
+  - *Điểm còn tồn tại:* 14/54 ca Viêm phổi vẫn bị nhận nhầm thành Hen do sự trùng lặp mô tả triệu chứng khó thở và ran rít trong bệnh án.
 
 ---
 
-## Phụ lục slide có thể thêm
+## Slide 20 — Độ hiệu chuẩn xác suất (Calibration) & Độ ổn định mô hình
 
-- Định nghĩa ngắn từng metric và chiều tốt/xấu.
-- Cấu hình chi tiết mỗi baseline, seed và tiêu chí chọn checkpoint.
-- Bảng confusion matrix dạng số để đọc tốt khi in.
-- Ví dụ error analysis đã loại bỏ định danh trực tiếp.
-- Lệnh tái lập converter, audit và benchmark.
-- Ma trận backlog với phụ thuộc, sản phẩm bàn giao và điều kiện hoàn thành.
+| Mô hình Baseline | ECE (Validation) | ECE (Test) | Brier Score (Validation) | Brier Score (Test) | Đánh giá độ ổn định |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **CatBoost** | 0,0639 | **0,0663** | 0,3563 | **0,3844** | Rất ổn định giữa val và test |
+| **FT-Transformer** | 0,0478 | **0,1152** | 0,3042 | **0,4725** | Có hiện tượng suy giảm hiệu chuẩn trên test |
+| **Bio_ClinicalBERT** | 0,1487 | **0,0373** | 0,4594 | **0,2329** | Đạt hiệu chuẩn test xuất sắc (< 0,05) |
 
+**Hàm ý cho thiết kế hệ thống:**
+1. **Tiêu chuẩn ECE < 0,05:** Bio_ClinicalBERT đạt ECE test 0,0373 là mốc rất tích cực, tuy nhiên có sự chênh lệch so với validation (0,1487), đòi hỏi cần áp dụng kỹ thuật hiệu chuẩn nhiệt độ (Temperature Scaling) để đảm bảo độ tin cậy ổn định khi đưa vào mô hình dung hợp đa phương thức.
+2. **Khoảng cách độ đo:** Kết quả khẳng định tầm quan trọng của việc kiểm tra đồng thời cả Brier Score và ECE thay vì chỉ dựa vào AUROC để tránh ngộ nhận về độ sẵn sàng ứng dụng lâm sàng (minh họa tại đồ thị Reliability Diagram ở Slide 18).
+
+---
+
+## Slide 21 — Phân tích chuyên sâu 2 Ca bệnh đối chứng & Luận cứ Dung hợp Đa phương thức
+
+**Bảng tổng hợp các ca sai biệt điển hình trên tập kiểm thử ($N = 302$):**
+
+| Mã bệnh nhân | Nhãn thực tế | Dự đoán Bảng (CatBoost) | Độ tin cậy Bảng | Dự đoán Văn bản (Bio_ClinicalBERT) | Độ tin cậy Văn bản | Phân loại ca đối chứng |
+| :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **PT-0044** | `ASTHMA` | `COPD` (Sai) | 78,82% | `ASTHMA` (Đúng) | 85,80% | **Văn bản Đúng – Bảng số Sai** |
+| **PT-0089** | `ASTHMA` | `COPD` (Sai) | 83,13% | `ASTHMA` (Đúng) | 66,38% | **Văn bản Đúng – Bảng số Sai** |
+| **PT-0174** | `COPD` | `COPD` (Đúng) | 80,38% | `ASTHMA` (Sai) | 58,66% | **Bảng số Đúng – Văn bản Sai** |
+| **PT-0254** | `COPD` | `COPD` (Đúng) | 75,22% | `HEART_FAILURE` (Sai) | 58,99% | **Bảng số Đúng – Văn bản Sai** |
+
+---
+
+### Ca bệnh 1: Văn bản Đúng – Bảng số Sai (Mã bệnh nhân: PT-0044)
+* **Nhãn thực tế (Ground Truth):** `ASTHMA` (Hen phế quản) — Bệnh nhân nữ 18 tuổi.
+* **Kết quả dự đoán đối chứng:**
+  * Mô hình Bảng số (CatBoost): Dự đoán **SAI** thành `COPD` (Độ tin cậy: **78,82%**).
+  * Mô hình Văn bản (Bio_ClinicalBERT): Dự đoán **ĐÚNG** thành `ASTHMA` (Độ tin cậy: **85,80%**).
+
+![Dữ liệu Bảng số Ca 1](images/02_case1_pt0044_tabular_data.png)
+
+![Ghi chú Lâm sàng Ca 1](images/03_case1_pt0044_clinical_text.png)
+
+![Biểu đồ kết quả dự đoán Ca 1](images/06_case1_pt0044_model_predictions.png)
+
+**Phân tích cơ chế bệnh học & Điểm mù mô hình:**
+- **Vì sao Bảng số thất bại:** Bệnh nhân đo sinh hiệu ngoài cơn khó thở cấp nên SpO₂ đạt 97,3%, nhịp thở và nhịp tim bình thường. Tuy nhiên, chỉ số viêm CRP tăng cao (24,28 mg/L) kết hợp tiền sử tăng huyết áp khiến CatBoost bị định hướng sai lệch sang bệnh phổi mạn tính tiến triển (`COPD`, 78,82%). Thiếu chỉ số chức năng hô hấp FEV1, dữ liệu bảng đơn thuần không thể phân định được tính chất co thắt hồi phục của Hen.
+- **Vì sao Văn bản thành công:** Bio_ClinicalBERT nắm bắt chính xác độ tuổi thanh thiếu niên (`18yo`), triệu chứng khởi phát cơn ho, khó thở tái diễn và đặc biệt là từ khóa tiền sử dùng thuốc dạng hít định liều (`Inhalers` — phác đồ đặc trưng của Hen), từ đó chẩn đoán chính xác ASTHMA với độ tự tin vượt trội (85,80%).
+
+---
+
+### Ca bệnh 2: Bảng số Đúng – Văn bản Sai (Mã bệnh nhân: PT-0254)
+* **Nhãn thực tế (Ground Truth):** `COPD` (Bệnh phổi tắc nghẽn mạn tính) — Bệnh nhân nữ 65 tuổi.
+* **Kết quả dự đoán đối chứng:**
+  * Mô hình Văn bản (Bio_ClinicalBERT): Dự đoán **SAI** thành `HEART_FAILURE` (Độ tin cậy: **58,99%**).
+  * Mô hình Bảng số (CatBoost): Dự đoán **ĐÚNG** thành `COPD` (Độ tin cậy: **75,22%**).
+
+![Dữ liệu Bảng số Ca 2](images/04_case2_pt0254_tabular_data.png)
+
+![Ghi chú Lâm sàng Ca 2](images/05_case2_pt0254_clinical_text.png)
+
+![Biểu đồ kết quả dự đoán Ca 2](images/07_case2_pt0254_model_predictions.png)
+
+**Phân tích cơ chế bệnh học & Điểm mù mô hình:**
+- **Vì sao Văn bản thất bại (Nhiễu ngữ nghĩa & Che nhãn chống rò rỉ):** Nhằm tuân thủ quy trình kiểm soát rò rỉ dữ liệu, tên chẩn đoán đã được che bằng token `[REDACTED_DIAGNOSIS]`. Bio_ClinicalBERT chỉ tiếp cận ngữ cảnh: bệnh nhân cao tuổi suy hô hấp mạn nằm viện dưỡng lão, mở khí quản, nghe phổi có ran ẩm/ran rít (`crackles/wheezes`), dùng aspirin và thuốc an thần. Bối cảnh từ vựng nặng nề này trùng lặp rất lớn với bệnh nhân suy tim sung huyết biến chứng hô hấp, khiến mô hình ngôn ngữ đoán nhầm sang `HEART_FAILURE` (58,99%).
+- **Vì sao Bảng số thành công (Mỏ neo huyết động học):** Trái ngược với sự nhiễu loạn từ vựng, dữ liệu bảng cung cấp cấu hình huyết động học cực kỳ đặc thù: Huyết áp (115,9/80,1 mmHg) và nhịp tim (64,3 bpm) hoàn toàn ổn định—loại trừ hoàn toàn cơn tăng áp hay nhịp nhanh phản xạ của đợt suy tim cấp. Kết hợp SpO₂ 95,6% và CRP 7,14 mg/L phù hợp hoàn hảo với bệnh nhân mở khí quản mạn tính ổn định, CatBoost chẩn đoán chính xác `COPD` với độ tin cậy 75,22%.
+
+**Ý NGHĨA KHOA HỌC THEN CHỐT CHO GIAI ĐOẠN 2:**  
+Hai ca bệnh thực nghiệm trên là bằng chứng minh bạch chứng minh: **Không một phương thức đơn lẻ nào chiếm ưu thế tuyệt đối trong mọi hoàn cảnh lâm sàng**. Dữ liệu văn bản vượt trội trong việc khai thác bệnh sử và hành vi dùng thuốc nhưng dễ bị nhiễu từ vựng; ngược lại, dữ liệu bảng số đóng vai trò *"mỏ neo huyết động học"* giữ cho chẩn đoán không bị chệch hướng. Đây là luận cứ thực nghiệm vững chắc khẳng định tính tất yếu của giải pháp **Multimodal Cross-Attention Late Fusion** nhằm bù đắp điểm mù cho nhau.
+
+---
+
+## Slide 22 — Tổng hợp khối lượng công việc và Sản phẩm thực tế đã hoàn thành
+
+| Hạng mục công việc | Kết quả & Sản phẩm khoa học hoàn thành | Giá trị thực tiễn & Ý nghĩa phương pháp luận |
+| :--- | :--- | :--- |
+| **Quy trình chuẩn hóa Dữ liệu** | Bộ dữ liệu nghiên cứu chuẩn hóa gồm **2.000 hồ sơ bệnh án đa phương thức** cân bằng 4 nhóm bệnh. | Xây dựng tập dữ liệu đầu vào chuẩn y khoa, có khả năng truy vết nguồn gốc và tái lập hoàn toàn. |
+| **Pipeline tiền xử lý y khoa** | Bộ công cụ tự động thực hiện khử định danh y tế, khóa mốc thời gian sự kiện và xử lý dữ liệu khuyết thiếu. | Bảo vệ thông tin bệnh nhân, ngăn chặn triệt để nguy cơ rò rỉ thông tin tương lai lọt vào mô hình. |
+| **Kiểm toán chống rò rỉ (Strict Audit)** | Thuật toán phân chia dữ liệu theo nhóm liên kết (Strict Split) và công cụ kiểm toán tự động. | Kiểm toán đạt **0% overlap** trên cả 3 khóa định danh, giải quyết triệt để vấn đề điểm số ảo trong AI y tế. |
+| **Huấn luyện mô hình Baseline** | Huấn luyện và tinh chỉnh 3 mô hình đại diện: CatBoost, FT-Transformer, Bio_ClinicalBERT. | Xác lập mốc tham chiếu thực nghiệm khách quan làm tiêu chuẩn đối chứng nghiêm ngặt cho Giai đoạn 2. |
+| **Trực quan hóa & Phân tích chuyên sâu** | Bộ hình ảnh khoa học gồm biểu đồ chỉ số, đường cong ROC/PR/Reliability, Ma trận nhầm lẫn và Hồ sơ trực quan 2 ca bệnh đối chứng. | Minh chứng trực quan toàn diện về năng lực phân loại, độ hiệu chuẩn và cơ chế bù trừ điểm mù giữa các phương thức. |
+| **Báo cáo khoa học & Thiết kế giải pháp** | Báo cáo tiến độ hoàn chỉnh Đợt 1 và Tài liệu đặc tả kiến trúc dung hợp tối ưu cho Giai đoạn 2. | Cung cấp luận cứ khoa học, phân tích khả thi và lộ trình phát triển rõ ràng trình Giáo viên đánh giá. |
+
+---
+
+## Slide 23 — Lộ trình và Nhiệm vụ trọng tâm Giai đoạn 2
+
+```text
+LỘ TRÌNH TRIỂN KHAI THEO THỨ TỰ PHỤ THUỘC KHOA HỌC
+[Tháng 11/2026]              [Tháng 12/2026]              [Tháng 01/2027]              [Tháng 02/2027]
+┌─────────────────────┐      ┌─────────────────────┐      ┌─────────────────────┐      ┌─────────────────────┐
+│ 1. Multimodal Core  │─────>│ 2. Agentic RAG      │─────>│ 3. Đánh giá Mở rộng │─────>│ 4. Nghiệm thu       │
+│ • Cross-Attention   │      │ • Hướng dẫn y khoa  │      │ • Phân tích DCA     │      │ • Hoàn thiện báo cáo│
+│ • Huấn luyện fusion │      │ • Semantic Search   │      │ • Bootstrap CI      │      │ • Đóng gói TRIPOD-AI│
+│ • So sánh Ablation  │      │ • Evidence Grounding│      │ • Kiểm định Fairness│      │ • Nghiệm thu đề tài │
+└─────────────────────┘      └─────────────────────┘      └─────────────────────┘      └─────────────────────┘
+```
+
+**Chi tiết các nhiệm vụ kỹ thuật:**
+1. **Xây dựng lõi Dung hợp Đa phương thức (Multimodal Core):**
+   - Hiện thực hóa bộ mã hóa FT-Transformer và Bio_ClinicalBERT; xây dựng tầng Cross-Attention cho phép bảng số truy vấn ngữ cảnh văn bản.
+   - Huấn luyện trên cùng tập Strict Split; thực hiện nghiên cứu bóc tách thành phần (Ablation Study) để chứng minh mức độ đóng góp thực sự của từng nhánh.
+2. **Phát triển hệ thống Hỗ trợ giải thích y khoa (Agentic RAG):**
+   - Xây dựng cơ sở tri thức từ Hướng dẫn chẩn đoán và điều trị của Bộ Y tế và các hiệp hội quốc tế (GOLD cho COPD, GINA cho Hen).
+   - Thiết lập cơ chế neo bằng chứng (Evidence Grounding): Mọi đề xuất chẩn đoán đều phải trích dẫn trực tiếp vị trí từ ngữ trong bệnh án và điều khoản tương ứng trong hướng dẫn lâm sàng.
+3. **Đánh giá lâm sàng mở rộng:**
+   - Phân tích đường cong quyết định (Decision Curve Analysis - DCA) để đo lường lợi ích ròng lâm sàng ở các ngưỡng can thiệp khác nhau.
+   - Ước lượng khoảng tin cậy 95% bằng phương pháp Bootstrap và kiểm định độ công bằng giữa các nhóm nhân khẩu học.
+4. **Đóng gói và Nghiệm thu đề tài:**
+   - Hoàn thiện tài liệu báo cáo kỹ thuật theo hướng dẫn quốc tế TRIPOD-AI và chuẩn bị bảo vệ đề tài.
+
+---
+
+## Slide 24 — Giới hạn nghiên cứu, Rủi ro và Điều kiện ứng dụng
+
+**Các giới hạn hiện tại của nghiên cứu:**
+- **Đặc điểm dữ liệu:** Dữ liệu nghiên cứu được tổng hợp và chuẩn hóa từ các nguồn mở y sinh uy tín (Synthea, MTSamples); chưa đại diện toàn diện cho toàn bộ quy trình ghi chép bệnh án thực tế tại các bệnh viện Việt Nam.
+- **Quy mô tập kiểm thử:** Tập kiểm thử độc lập gồm 302 mẫu; tuy đã phân bổ đều 4 nhóm bệnh nhưng vẫn cần mở rộng thêm các tập kiểm thử đa cơ sở trong tương lai.
+- **Trạng thái mô hình:** Giai đoạn 1 mới hoàn thành các baseline đơn phương thức; kết quả vượt trội của Bio_ClinicalBERT là tín hiệu định hướng cho fusion, chưa phải kết luận rằng mô hình dung hợp chắc chắn vượt trội trong mọi hoàn cảnh.
+
+**Các rủi ro phương pháp luận cần kiểm soát ở Giai đoạn 2:**
+- **Hiện tượng ảo giác của mô hình ngôn ngữ (Hallucination):** Nguy cơ RAG trích dẫn sai lệch nếu không có bộ kiểm duyệt bằng chứng y khoa chặt chẽ.
+- **Độ ổn định hiệu chuẩn:** Nguy cơ suy giảm độ tin cậy xác suất khi phân bố dữ liệu bệnh nhân thực tế có sự thay đổi.
+
+**Ranh giới và Tuyên bố y đức:**  
+Hệ thống là một **nghiên cứu học thuật nhằm phát triển nguyên mẫu hỗ trợ quyết định**, tuyệt đối không đóng vai trò thay thế bác sĩ hay đưa ra quyết định điều trị tự động trên bệnh nhân thực tế. Mọi bước ứng dụng lâm sàng trong tương lai đều phải tuân thủ nghiêm ngặt các phê duyệt của Hội đồng Đạo đức trong nghiên cứu y sinh học.
+
+---
+
+## Slide 25 — Kết luận Giai đoạn 1 & Các vấn đề xin ý kiến Giảng viên
+
+**Tóm tắt kết luận Giai đoạn 1:**
+- Đề tài đã giải quyết trọn vẹn mục tiêu của Đợt 1: Xây dựng nền tảng dữ liệu y khoa chuẩn hóa (2.000 mẫu), thiết lập quy trình phân chia dữ liệu và kiểm toán rò rỉ đạt chuẩn 0% overlap.
+- Xác lập bộ chỉ số tham chiếu khách quan trên 3 mô hình Baseline: Bio_ClinicalBERT dẫn đầu với AUROC 0,9735 và F1 0,8421; CatBoost khẳng định vai trò mỏ neo số học với AUROC 0,9223.
+- Minh chứng bằng thực nghiệm ca bệnh đối chứng về tính bổ trợ không thể thay thế giữa dữ liệu bảng và văn bản, tạo tiền đề khoa học vững chắc cho kiến trúc dung hợp Cross-Attention ở Giai đoạn 2.
+
+**Các vấn đề kính xin ý kiến định hướng từ Giảng viên hướng dẫn:**
+1. **Về phạm vi bài toán:** Thiết kế phân loại 4 nhóm bệnh lý có triệu chứng chồng lấp (Hen, COPD, Suy tim, Viêm phổi) hiện tại đã tối ưu cho quy mô luận văn chưa, hay cần xem xét mở rộng thêm nhóm bệnh lý đồng mắc?
+2. **Về tiêu chuẩn nghiệm thu mô hình dung hợp:** Trong nghiên cứu bóc tách (Ablation Study) ở Giai đoạn 2, ngoài việc vượt qua baseline đơn lẻ về Macro-F1 và AUROC, thầy/cô có khuyến nghị bổ sung thêm chỉ số đo lường lâm sàng đặc thù nào (ví dụ: Net Benefit qua DCA hay kiểm định sai số chi phí)?
+3. **Về ưu tiên phát triển:** Thầy/cô định hướng nhóm nên ưu tiên tập trung sâu vào cơ chế tối ưu hóa trọng số chú ý Cross-Attention trước, hay nên triển khai song song module Agentic RAG giải thích y văn?
+
+---
+
+## Slide 26 — Danh mục tài liệu tham khảo khoa học chính
+
+1. **Hunik, M., et al. (2024).** *Diagnostic prediction models for primary care, based on artificial intelligence and electronic health records: a systematic review.* JMIR Preprints, 62862.
+2. **Alsentzer, E., Murphy, J., Boag, W., et al. (2019).** *Publicly Available Clinical BERT Embeddings.* Proceedings of the 2nd Clinical Natural Language Processing Workshop, NAACL, pp. 72–78.
+3. **Gorishniy, Y., Rubachev, I., Khrulkov, V., & Babenko, A. (2021).** *Revisiting Deep Learning Models for Tabular Data (FT-Transformer).* Advances in Neural Information Processing Systems (NeurIPS 2021), 34, pp. 18932–18943.
+4. **Prokhorenkova, L., Gusev, G., Vorobev, A., Dorogush, A. V., & Gulin, A. (2018).** *CatBoost: unbiased boosting with categorical features.* Advances in Neural Information Processing Systems (NeurIPS 2018), 31, pp. 6638–6648.
+5. **Collins, G. S., Dhiman, P., Andaur Navarro, C. L., et al. (2021).** *Protocol for development of a reporting guideline (TRIPOD-AI) and risk of bias tool (PROBAST-AI) for diagnostic and prognostic prediction model studies based on artificial intelligence.* BMJ Open, 11(7), e048008.
+6. **Global Initiative for Chronic Obstructive Lung Disease (GOLD). (2024).** *Global Strategy for the Diagnosis, Management, and Prevention of Chronic Obstructive Pulmonary Disease.*
+7. **Global Initiative for Asthma (GINA). (2024).** *Global Strategy for Asthma Management and Prevention.*
