@@ -36,3 +36,4 @@ frontend/build/
 .npm-ca.pem
 .vscode/
 .idea/
+reports/*
