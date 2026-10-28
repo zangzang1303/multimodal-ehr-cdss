@@ -1,7 +1,7 @@
 {
   "benchmark_metadata": {
-    "evaluation_date": "2026-10-21T01:27:44.601508+00:00",
-    "test_samples": 286,
+    "evaluation_date": "2026-10-28T03:39:58.054607+00:00",
+    "test_samples": 302,
     "num_classes": 4,
     "classes": [
       "ASTHMA",
@@ -19,41 +19,41 @@
       "data_modality": "Structured tabular only",
       "selection_metric": "validation macro AUROC",
       "candidate_validation_auroc": {
-        "XGBoost": 0.999526,
-        "CatBoost": 0.999771
+        "XGBoost": 0.889529,
+        "CatBoost": 0.908433
       },
-      "macro_auroc": 0.998766,
-      "macro_auprc": 0.996335,
-      "macro_f1": 0.975568,
-      "accuracy": 0.975524,
-      "brier_score": 0.044971,
-      "ece": 0.026451,
+      "macro_auroc": 0.922315,
+      "macro_auprc": 0.787219,
+      "macro_f1": 0.608266,
+      "accuracy": 0.68543,
+      "brier_score": 0.384386,
+      "ece": 0.066278,
       "validation": {
-        "macro_auroc": 0.999771,
-        "macro_auprc": 0.999291,
-        "macro_f1": 0.985913,
-        "accuracy": 0.986014,
-        "brier_score": 0.023795,
-        "ece": 0.023071
+        "macro_auroc": 0.908433,
+        "macro_auprc": 0.775199,
+        "macro_f1": 0.704555,
+        "accuracy": 0.714286,
+        "brier_score": 0.356325,
+        "ece": 0.063913
       }
     },
     "baseline_2_tabular_deep": {
       "model_type": "FT-Transformer",
       "data_modality": "Structured tabular only",
-      "epochs_completed": 20,
-      "macro_auroc": 0.990263,
-      "macro_auprc": 0.972376,
-      "macro_f1": 0.943586,
-      "accuracy": 0.944056,
-      "brier_score": 0.087843,
-      "ece": 0.022285,
+      "epochs_completed": 19,
+      "macro_auroc": 0.897621,
+      "macro_auprc": 0.702308,
+      "macro_f1": 0.578943,
+      "accuracy": 0.65894,
+      "brier_score": 0.472502,
+      "ece": 0.115186,
       "validation": {
-        "macro_auroc": 0.994927,
-        "macro_auprc": 0.98509,
-        "macro_f1": 0.947214,
-        "accuracy": 0.947552,
-        "brier_score": 0.073795,
-        "ece": 0.014436
+        "macro_auroc": 0.923628,
+        "macro_auprc": 0.776677,
+        "macro_f1": 0.767932,
+        "accuracy": 0.769231,
+        "brier_score": 0.304165,
+        "ece": 0.047804
       }
     },
     "baseline_3_text_only": {
@@ -63,63 +63,63 @@
       "max_sequence_length": 512,
       "learning_rate": 2e-05,
       "epochs_completed": 5,
-      "macro_auroc": 0.996036,
-      "macro_auprc": 0.989071,
-      "macro_f1": 0.936311,
-      "accuracy": 0.937063,
-      "brier_score": 0.078921,
-      "ece": 0.018084,
+      "macro_auroc": 0.973453,
+      "macro_auprc": 0.931369,
+      "macro_f1": 0.842071,
+      "accuracy": 0.854305,
+      "brier_score": 0.232878,
+      "ece": 0.037293,
       "validation": {
-        "macro_auroc": 0.991367,
-        "macro_auprc": 0.974872,
-        "macro_f1": 0.940481,
-        "accuracy": 0.940559,
-        "brier_score": 0.103933,
-        "ece": 0.024929
+        "macro_auroc": 0.915193,
+        "macro_auprc": 0.752271,
+        "macro_f1": 0.722894,
+        "accuracy": 0.725275,
+        "brier_score": 0.459371,
+        "ece": 0.148723
       }
     }
   },
   "error_analysis": [
     {
       "category": "tabular_correct_text_wrong",
-      "patient_id": "PT-0319",
+      "patient_id": "PT-0174",
       "true_label": "COPD",
       "tabular_prediction": "COPD",
-      "tabular_confidence": 0.911861,
-      "text_prediction": "HEART_FAILURE",
-      "text_confidence": 0.455734
+      "tabular_confidence": 0.803762,
+      "text_prediction": "ASTHMA",
+      "text_confidence": 0.586596
     },
     {
       "category": "tabular_correct_text_wrong",
-      "patient_id": "PT-0460",
+      "patient_id": "PT-0254",
       "true_label": "COPD",
       "tabular_prediction": "COPD",
-      "tabular_confidence": 0.979755,
-      "text_prediction": "ASTHMA",
-      "text_confidence": 0.507538
+      "tabular_confidence": 0.752194,
+      "text_prediction": "HEART_FAILURE",
+      "text_confidence": 0.589959
     },
     {
       "category": "text_correct_tabular_wrong",
-      "patient_id": "PT-0320",
+      "patient_id": "PT-0044",
       "true_label": "ASTHMA",
       "tabular_prediction": "COPD",
-      "tabular_confidence": 0.81484,
+      "tabular_confidence": 0.788187,
       "text_prediction": "ASTHMA",
-      "text_confidence": 0.68285
+      "text_confidence": 0.858005
     },
     {
       "category": "text_correct_tabular_wrong",
-      "patient_id": "PT-0763",
+      "patient_id": "PT-0089",
       "true_label": "ASTHMA",
       "tabular_prediction": "COPD",
-      "tabular_confidence": 0.844594,
+      "tabular_confidence": 0.831332,
       "text_prediction": "ASTHMA",
-      "text_confidence": 0.889194
+      "text_confidence": 0.663755
     }
   ],
   "summary_findings": {
-    "highest_auroc_model": "CatBoost",
-    "highest_macro_auroc": 0.998766,
+    "highest_auroc_model": "Bio_ClinicalBERT",
+    "highest_macro_auroc": 0.973453,
     "calibration_finding": "All three ECE values are below 0.05 on this synthetic hold-out set.",
     "clinical_blindspot": "Tabular and text baselines observe complementary evidence; Phase 2 evaluates multimodal fusion.",
     "external_validity_warning": "The synthetic cohort is highly separable; these scores do not establish performance on external clinical data."

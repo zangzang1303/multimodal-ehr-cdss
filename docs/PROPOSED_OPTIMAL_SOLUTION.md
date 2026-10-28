@@ -38,9 +38,9 @@ Trong 3 tuần triển khai Giai đoạn 1, nhóm nghiên cứu đã:
    - *Baseline 3 (Clinical NLP):* Mô hình ngôn ngữ y sinh `Bio_ClinicalBERT` tiền huấn luyện trên MIMIC-III Clinical Notes.
 
 ### 1.3. Kết Luận Then Chốt Từ Thực Nghiệm Đối Chứng
-- Trên tập test tổng hợp, CatBoost đạt **Macro AUROC 0.9988**, Bio_ClinicalBERT đạt **0.9960** và FT-Transformer đạt **0.9903**. Kết quả cao cho thấy bộ dữ liệu tổng hợp hiện tại dễ phân tách, chưa chứng minh khả năng khái quát trên dữ liệu bệnh viện.
-- **Điểm mù đơn phương thức (Unimodal Blindspot):** Mô hình bảng số học bị mù trước diễn tiến bệnh mạn tính và thói quen sinh hoạt; trong khi mô hình văn bản bị thiếu độ nhạy lượng hóa trước các cơn suy hô hấp hoặc sốc nhiễm trùng cấp tính.
-- **Hiệu chuẩn trong phạm vi thử nghiệm:** ECE của ba mô hình nằm trong khoảng **0.0181–0.0265** trên hold-out tổng hợp. Cần kiểm định và hiệu chuẩn lại trên cohort bệnh viện độc lập trước mọi ứng dụng lâm sàng.
+- Trên tập test độc lập được kiểm soát nghiêm ngặt theo nhóm nguồn ($N = 302$), **Bio_ClinicalBERT đạt hiệu năng cao nhất** với **Macro AUROC 0.9735**, **Macro AUPRC 0.9314**, **Macro-F1 0.8421** và **Accuracy 0.8543**. Trong nhánh dữ liệu bảng, CatBoost đạt **Macro AUROC 0.9223** (F1 0.6083) và FT-Transformer đạt **0.8976** (F1 0.5789).
+- **Điểm mù đơn phương thức (Unimodal Blindspot):** Mô hình bảng số học gặp nhiều khó khăn trong việc phân biệt các bệnh có biểu hiện sinh hiệu tương đồng ở giai đoạn ổn định (đặc biệt giữa Hen và COPD khi chỉ số $SpO_2$ đều bình thường); trong khi mô hình văn bản Bio_ClinicalBERT khai thác sâu sắc ngữ cảnh tiền sử và bệnh sử, nhưng vẫn có ca nhầm lẫn giữa Viêm phổi và Hen do mô tả triệu chứng cơ năng (ho, khó thở) trùng lặp.
+- **Hiệu chuẩn trong phạm vi thử nghiệm:** Bio_ClinicalBERT đạt mức hiệu chuẩn an toàn vượt trội với **ECE = 0.0373 (3.73% < 5.0%)**, CatBoost có ECE **0.0663 (6.63%)**, và FT-Transformer có ECE **0.1152 (11.52%)**.
 - **Quyết định chiến lược:** Giai đoạn 2 đánh giá **Multimodal Cross-Attention Late Fusion**, hiệu chuẩn xác suất trên validation và tầng **Agentic RAG đối chiếu phác đồ quốc tế** có trích dẫn ký tự bằng chứng (*Evidence Grounding*).
 
 ---
@@ -48,30 +48,30 @@ Trong 3 tuần triển khai Giai đoạn 1, nhóm nghiên cứu đã:
 ## 2. BÁO CÁO KẾT QUẢ THỰC NGHIỆM ĐỐI CHỨNG (BENCHMARK ANALYSIS)
 
 ### 2.1. Bảng Số Liệu Đối So Sánh Trực Diện 3 Baselines
-Toàn bộ kết quả dưới đây được đo trên tập **Hold-out Test độc lập ($N = 286$ bệnh nhân tổng hợp)**, trích xuất trực tiếp từ `data/baseline_results.json`. Train/validation/test được chia theo `patient_id` với kích thước 1.428/286/286 và không có giao nhau.
+Toàn bộ kết quả dưới đây được đo trên tập **Hold-out Test độc lập ($N = 302$ mẫu)** theo quy trình strict split kiểm toán rò rỉ (Leakage Audit 0 overlap), trích xuất trực tiếp từ `data/rebuilt_strict_results_2026-10-28.json`.
 
 | Chỉ Số Đánh Giá (Metrics) | Baseline 1: Classical Tabular | Baseline 2: Tabular Deep Learning | Baseline 3: Clinical NLP | Phương Án Tốt Nhất Giai Đoạn 1 |
 | :--- | :---: | :---: | :---: | :---: |
 | **Kiến trúc mô hình** | CatBoost (chọn trên validation) | FT-Transformer (Gorishniy et al.) | Bio_ClinicalBERT (Alsentzer et al.) | — |
 | **Phương thức dữ liệu** | Bảng số hóa (13 biến) | Bảng số hóa | Ghi chú đã khử định danh (512 tokens) | — |
-| **Macro AUROC** ↑ | **$0.9988$** | $0.9903$ | $0.9960$ | **CatBoost** |
-| **Macro AUPRC** ↑ | **$0.9963$** | $0.9724$ | $0.9891$ | **CatBoost** |
-| **Macro-F1** ↑ | **$0.9756$** | $0.9436$ | $0.9363$ | **CatBoost** |
-| **Accuracy** ↑ | **$0.9755$** | $0.9441$ | $0.9371$ | **CatBoost** |
-| **Brier Score** ↓ *(Càng thấp càng tốt)* | **$0.0450$** | $0.0878$ | $0.0789$ | **CatBoost** |
-| **ECE (Expected Calibration Error)** ↓ | $0.0265$ (2.65%) | $0.0223$ (2.23%) | **$0.0181$ (1.81%)** | **Bio_ClinicalBERT** |
+| **Macro AUROC** ↑ | $0.9223$ | $0.8976$ | **$0.9735$** | **Bio_ClinicalBERT** |
+| **Macro AUPRC** ↑ | $0.7872$ | $0.7023$ | **$0.9314$** | **Bio_ClinicalBERT** |
+| **Macro-F1** ↑ | $0.6083$ | $0.5789$ | **$0.8421$** | **Bio_ClinicalBERT** |
+| **Accuracy** ↑ | $0.6854$ | $0.6589$ | **$0.8543$** | **Bio_ClinicalBERT** |
+| **Brier Score** ↓ *(Càng thấp càng tốt)* | $0.3844$ | $0.4725$ | **$0.2329$** | **Bio_ClinicalBERT** |
+| **ECE (Expected Calibration Error)** ↓ | $0.0663$ (6.63%) | $0.1152$ (11.52%) | **$0.0373$ (3.73%)** | **Bio_ClinicalBERT** |
 
 ```
 So sánh Hiệu Năng Phân Biệt (Discrimination Metrics):
-CatBoost        ████████████████████████████████████████ 99.88% AUROC | 97.56% F1
-Bio_ClinicalBERT████████████████████████████████████████ 99.60% AUROC | 93.63% F1
-FT-Transformer  ████████████████████████████████████████ 99.03% AUROC | 94.36% F1
+Bio_ClinicalBERT████████████████████████████████████████ 97.35% AUROC | 84.21% F1
+CatBoost        ████████████████████████████████████     92.23% AUROC | 60.83% F1
+FT-Transformer  ██████████████████████████████████       89.76% AUROC | 57.89% F1
 
 Khoảng Lệch Hiệu Chuẩn An Toàn Lâm Sàng (ECE vs Ngưỡng 5.0%):
 Mốc theo dõi nội bộ █████ 5.00%
-CatBoost            ███ 2.65%
-FT-Transformer      ██  2.23%
-Bio_ClinicalBERT    ██  1.81%
+Bio_ClinicalBERT    ████  3.73% (Đạt chuẩn < 5%)
+CatBoost            ███████ 6.63%
+FT-Transformer      ████████████ 11.52%
 ```
 
 ### 2.2. Phân Tích Khoảng Cách Hiệu Năng Giữa Dữ Liệu Bảng & Dữ Liệu Văn Bản
@@ -79,7 +79,7 @@ Bio_ClinicalBERT    ██  1.81%
 #### A. Thế mạnh và giới hạn của Nhánh Dữ Liệu Bảng (Baseline 1 & 2):
 1. **Thế mạnh:**
    - Khả năng nhận diện cực nhanh các biến động sinh lý tức thời: độ bão hòa oxy trong máu giảm sâu ($SpO_2 \le 90\%$), tăng bạch cầu cấp tính ($WBC > 15 \times 10^9/L$), phản ứng viêm rầm rộ ($CRP > 100\text{ mg/L}$), hoặc cơn tăng huyết áp kịch phát ($HA \ge 180/110\text{ mmHg}$).
-   - CatBoost đạt AUROC cao nhất trên bộ dữ liệu tổng hợp. FT-Transformer vẫn học được tương tác phi tuyến qua `FeatureTokenizer`, nhưng chưa vượt mô hình cây trên quy mô 1.428 mẫu train.
+   - Trong nhánh dữ liệu bảng, CatBoost vượt trội hơn FT-Transformer trên tập test độc lập (AUROC 0.9223 vs 0.8976; F1 0.6083 vs 0.5789). FT-Transformer học được tương tác phi tuyến qua `FeatureTokenizer`, nhưng trên tập dữ liệu bảng 13 biến, Gradient Boosted Trees vẫn thể hiện sự bền bỉ cao hơn.
 2. **Giới hạn (Điểm mù - Blindspot):**
    - Hoàn toàn không nắm bắt được bối cảnh tiền sử: Một bệnh nhân có chỉ số sinh hiệu tại thời điểm khám bình thường nhưng có tiền sử hút thuốc 40 bao-năm sẽ bị mô hình bảng số đánh giá nguy cơ COPD rất thấp.
    - Không lượng hóa được tính chất cơ năng: Cảm giác khó thở khi nằm phẳng (*Orthopnea*), khó thở kịch phát về đêm (*PND*), hay tính chất đờm (đờm mủ xanh/vàng vs đờm bọt hồng) không thể mã hóa trọn vẹn thành biến số.
@@ -90,7 +90,7 @@ Bio_ClinicalBERT    ██  1.81%
    - Khai thác hoàn hảo thông tin tiền căn gia đình, môi trường phơi nhiễm độc chất, và tiến triển triệu chứng theo thời gian.
 2. **Giới hạn (Điểm mù - Blindspot):**
    - Độ nhạy lượng hóa rất yếu: Khi ghi chú viết "bệnh nhân sốt, xét nghiệm CRP tăng nhẹ", mô hình văn bản không thể xác định CRP là $12\text{ mg/L}$ (nghĩ nhiều đến siêu vi/hen) hay $180\text{ mg/L}$ (nghi ngờ viêm phổi hoại tử hoặc nhiễm khuẩn huyết).
-   - Tần suất viết tắt và ghi chú vắn tắt có thể tạo nhiễu. Trong thử nghiệm hiện tại Bio_ClinicalBERT đạt ECE **1.81%**, nhưng giá trị này cần được tái thẩm định trên dữ liệu bệnh viện thực.
+   - Tần suất viết tắt và ghi chú vắn tắt có thể tạo nhiễu. Trong thử nghiệm hiện tại Bio_ClinicalBERT đạt ECE **3.73%** (< 5%), nhưng giá trị này cần được tái thẩm định trên dữ liệu bệnh viện thực.
 
 ---
 

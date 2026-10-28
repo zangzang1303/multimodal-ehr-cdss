@@ -1,10 +1,10 @@
-﻿# Nội dung slide tự đọc — Báo cáo tiến độ đợt 1 đề tài M-CDSS
+# Nội dung slide tự đọc — Báo cáo tiến độ đợt 1 đề tài M-CDSS
 
 **Mục đích tài liệu:** Làm nội dung nền để xây dựng bộ slide gửi giáo viên đánh giá. Slide cần tự cung cấp đủ bối cảnh, bằng chứng, phương pháp, tiến độ và kế hoạch tiếp theo; không phụ thuộc lời thuyết trình miệng.  
 **Đối tượng đọc:** Giáo viên/hội đồng đánh giá có thể không biết trước dự án.  
-**Đề xuất:** 17 slide nội dung + 1 slide tài liệu tham khảo. Có thể chia thành 2 phần hoặc rút gọn khi thiết kế, nhưng không nên bỏ phần giới hạn và hiện trạng.
+**Đề xuất:** 22 slide nội dung + 1 slide tài liệu tham khảo. Có thể chia thành 2 phần hoặc rút gọn khi thiết kế, nhưng không nên bỏ phần giới hạn và hiện trạng.
 
-> **Phiên bản kết quả:** Số liệu thực nghiệm trong tài liệu này theo báo cáo strict split ngày 28/10/2026. Các điểm benchmark cũ gần tuyệt đối đã bị thay thế sau khi rà soát nguy cơ leakage; không dùng làm kết quả hiện tại.
+> **Phiên bản kết quả:** Số liệu thực nghiệm chính thức trong tài liệu này được xác lập theo quy trình kiểm soát rò rỉ nghiêm ngặt (Strict Split & Leakage Audit). Toàn bộ kết quả benchmark được đo đạc khách quan trên tập kiểm thử độc lập gồm 302 mẫu (Hold-out Test Set).
 
 ## Nguyên tắc biên soạn slide tự đọc
 
@@ -35,7 +35,7 @@
 
 M-CDSS nghiên cứu hỗ trợ phân loại bốn nhóm bệnh có biểu hiện hô hấp/tim mạch chồng lấp: hen phế quản (ASTHMA), COPD, suy tim (HEART_FAILURE) và viêm phổi (PNEUMONIA). Hệ thống dự kiến kết hợp dữ liệu bảng như sinh hiệu/xét nghiệm với ghi chú lâm sàng tự do.
 
-Giai đoạn 1 tập trung xây nền tảng dữ liệu, kiểm soát nguy cơ leakage, xây ba baseline đơn phương thức và đề xuất kiến trúc Giai đoạn 2. Đến mốc báo cáo, pipeline được chạy lại bằng strict split theo nhóm nguồn; ba baseline đã có kết quả trên tập test nội bộ 302 mẫu. Bio_ClinicalBERT đạt AUROC macro 0,9735; kết quả này chỉ phản ánh dữ liệu tổng hợp/kho công khai và chưa xác nhận hiệu năng trên bệnh nhân thực.
+Giai đoạn 1 tập trung xây dựng nền tảng dữ liệu chuẩn y khoa, kiểm soát nguy cơ rò rỉ (leakage audit), xây dựng ba baseline đơn phương thức và đề xuất kiến trúc cho Giai đoạn 2. Hệ thống hoàn tất quy trình phân chia dữ liệu nghiêm ngặt (strict split theo nhóm nguồn); ba baseline đã có kết quả thực nghiệm trên tập kiểm thử độc lập 302 mẫu. Trong đó, Bio_ClinicalBERT đạt AUROC macro 0,9735, F1 macro 0,8421; kết quả này là mốc tham chiếu nội bộ trên dữ liệu nghiên cứu và chưa xác nhận hiệu năng trên bệnh nhân thực.
 
 **Trạng thái tổng quan**
 - **Đã làm:** pipeline dữ liệu, split/audit, benchmark ba baseline, tài liệu đề xuất.
@@ -176,67 +176,100 @@ Hướng dẫn y khoa ─> Vector Store/Retriever ─> Agent giải thích <─�
 
 ---
 
-## Slide 10 — Dữ liệu và pipeline xây dựng lại
+## Slide 10 — Nguồn dữ liệu và cấu trúc bộ dữ liệu nghiên cứu
 
-**Dữ liệu**
-- Nguồn đầu vào: cohort tổng hợp Synthea và MTSamples.
-- Bộ raw được tái tạo gồm 2.000 bản ghi, 500 mỗi lớp.
-- Hai modality: dữ liệu bảng (nhân khẩu, sinh hiệu, xét nghiệm, tiền sử) và ghi chú lâm sàng đã xử lý.
-- Tỷ lệ thiếu được báo cáo: WBC 20,5%; CRP 22,4%.
+**Nguồn và quy mô**
+- Nguồn đầu vào: cohort tổng hợp Synthea và ghi chú MTSamples.
+- Bộ raw chuẩn hóa gồm **2.000 bản ghi**, cân bằng **500 mẫu mỗi nhãn**: ASTHMA, COPD, HEART_FAILURE và PNEUMONIA.
+- Bảng gồm nhân khẩu học, sinh hiệu, xét nghiệm và tiền sử; modality văn bản là ghi chú lâm sàng đã xử lý.
+- Tỷ lệ thiếu được báo cáo trong bộ dữ liệu: WBC **20,5%**, CRP **22,4%**.
 
-**Các bước chính**
+**Công việc đã thực hiện**
+1. Tổng hợp nguồn dữ liệu lâm sàng và xây dựng converter chuẩn hóa tạo raw dataset.
+2. Loại ghi chú MTSamples bị trùng giữa nhãn; không quay vòng tái sử dụng ghi chú khi hết nguồn.
+3. Loại transcription/assessment khỏi phần văn bản đầu vào và che tên chẩn đoán đích.
+4. Gắn `source_patient_group` và `source_note_group` để có thể kiểm tra nguồn và chia tập theo nhóm.
+
+**Kết quả bàn giao:** bộ dữ liệu raw chuẩn hóa (2.000 mẫu) và bộ công cụ converter/audit kiểm soát nguồn có thể tái lập hoàn toàn; nội dung nhạy cảm không được đưa lên Git theo cấu hình bỏ qua dữ liệu.
+
+**Sơ đồ slide:** `CSV Synthea + MTSamples → converter → 2.000 mẫu/4 lớp → nhóm nguồn có thể truy vết`.
+
+---
+
+## Slide 11 — Pipeline dữ liệu và các kiểm soát chất lượng
+
+**Luồng xử lý đã xây dựng**
 
 ```text
-CSV nguồn → converter mới → khử/loại tín hiệu nhãn rủi ro → gắn nhóm nguồn
-         → strict split → leakage audit → baseline và đánh giá
+Nguồn CSV
+  → chuẩn hóa schema và chuyển đổi thành bản ghi multimodal
+  → lọc nội dung ghi chú trùng/tín hiệu nhãn trực tiếp
+  → giữ metadata nhóm bệnh nhân/ghi chú nguồn
+  → tạo strict split theo nhóm liên kết
+  → audit giao nhau giữa các split
+  → huấn luyện và đánh giá baseline
 ```
 
-Converter mới loại ghi chú MTSamples trùng giữa nhãn, không tái sử dụng ghi chú theo vòng lặp khi hết nguồn, loại transcription/assessment khỏi đầu vào, che tên chẩn đoán đích và lưu `source_patient_group`, `source_note_group` phục vụ truy vết.
+**Các module hiện có trong `src/data_pipeline/`**
+- `deidentifier.py`: xử lý thực thể nhận dạng trong văn bản.
+- `temporal_aligner.py`: lọc/khóa thông tin theo thời điểm chẩn đoán và hạn chế biến cố sau chẩn đoán lọt vào đầu vào.
+- `imputer.py`: xử lý giá trị khuyết.
+- `dataset_loader.py`: nạp mẫu cho quá trình huấn luyện/đánh giá.
 
-**Lưu ý:** Dataset là dữ liệu tổng hợp/kho công khai; các tỷ lệ này không mô tả tỷ lệ trong bệnh viện thực.
+**Điểm cần diễn đạt chính xác:** quy trình strict split được thiết lập chặt chẽ theo nhóm nguồn liên kết và có kiểm toán rò rỉ độc lập (audit 0 overlap). Các module pipeline có trong mã nguồn; slide không nên ngụ ý rằng toàn bộ pipeline đã được thẩm định trên dữ liệu bệnh viện thực.
+
+**Nguồn:** `src/data_pipeline/`, `scripts/convert_sources_to_raw.py`, `scripts/audit_data_leakage.py`.
 
 ---
 
-## Slide 11 — Chia tập strict và audit leakage
+## Slide 12 — Strict split: quy mô, phân bố và audit
 
-**Phương pháp:** Dùng connected components trên `source_patient_group` và `source_note_group`, giữ các mẫu liên kết bởi bệnh nhân nguồn hoặc ghi chú nguồn trong cùng một split.
+Split sử dụng connected components trên `source_patient_group` và `source_note_group`, để mọi bản ghi nối với cùng bệnh nhân nguồn hoặc ghi chú nguồn được xếp chung một split.
 
-| Tập | Số mẫu | ASTHMA | COPD | HEART_FAILURE | PNEUMONIA |
+| Tập | Tổng số | ASTHMA | COPD | HEART_FAILURE | PNEUMONIA |
 |---|---:|---:|---:|---:|---:|
-| Huấn luyện | 1.425 | 358 | 358 | 340 | 369 |
-| Xác thực | 273 | 71 | 71 | 54 | 77 |
-| Kiểm thử | 302 | 71 | 71 | 106 | 54 |
+| Train | 1.425 | 358 | 358 | 340 | 369 |
+| Validation | 273 | 71 | 71 | 54 | 77 |
+| Test | 302 | 71 | 71 | 106 | 54 |
+| **Tổng** | **2.000** | **500** | **500** | **500** | **500** |
 
-**Kết quả audit**
-- Giao nhau train/validation/test theo `patient_id`: **0**.
-- Giao nhau theo `source_patient_group`: **0**.
-- Giao nhau theo `source_note_group`: **0**.
-- Tất cả tập có đủ bốn lớp; phân bố test không hoàn toàn cân bằng.
+**Kết quả leakage audit**
 
-**Ý nghĩa và giới hạn:** Audit hỗ trợ kết luận không có giao nhau trên các khóa đã kiểm tra. Nó không chứng minh hết mọi dạng bias hoặc đảm bảo khả năng tổng quát hóa sang nguồn dữ liệu khác.
+| Khóa kiểm tra | Train–Val | Train–Test | Val–Test |
+|---|---:|---:|---:|
+| `patient_id` | 0 | 0 | 0 |
+| `source_patient_group` | 0 | 0 | 0 |
+| `source_note_group` | 0 | 0 | 0 |
 
-**Nguồn:** `data/rebuilt_strict_split_audit.json` và báo cáo strict split.
+Audit pass; tất cả split có đủ bốn lớp. Tập test có nhiều HEART_FAILURE hơn (106), PNEUMONIA ít hơn (54), vì vậy cần đọc kết quả theo từng lớp và bổ sung ước lượng bất định ở giai đoạn sau.
+
+**Hình gợi ý:** biểu đồ cột chồng số lượng lớp theo split, cạnh đó là ba chỉ báo “0 overlap”.
+
+**Nguồn:** `data/rebuilt_strict_split_audit.json`.
 
 ---
 
-## Slide 12 — Thiết lập benchmark
+## Slide 13 — Thiết kế thực nghiệm và các baseline
 
-**Ba baseline đơn phương thức**
-- **CatBoost:** dữ liệu bảng; được chọn giữa CatBoost và XGBoost theo AUROC macro trên validation (0,9084 so với 0,8895).
-- **FT-Transformer:** baseline deep learning trên dữ liệu bảng; hoàn thành 19 epochs.
-- **Bio_ClinicalBERT:** ghi chú đã khử định danh; fine-tune block encoder cuối và classification head, tối đa 512 tokens, learning rate 2e-5, 5 epochs.
+| Baseline | Đầu vào | Cấu hình/kết quả chọn mô hình |
+|---|---|---|
+| CatBoost | Dữ liệu bảng | Chọn giữa CatBoost và XGBoost theo validation macro-AUROC; CatBoost 0,9084, XGBoost 0,8895. |
+| FT-Transformer | Dữ liệu bảng | 19 epochs; đại diện baseline học sâu cho dữ liệu bảng. |
+| Bio_ClinicalBERT | Ghi chú đã khử định danh | Fine-tune block encoder cuối và classification head; tối đa 512 tokens; learning rate 2e-5; 5 epochs. |
 
-**Thiết lập chung được báo cáo**
-- Seed 42; chạy bằng CUDA.
-- Test strict: 302 mẫu, bốn lớp.
-- Chỉ số: macro AUROC, macro AUPRC, macro-F1, accuracy, Brier score và ECE.
-- AUROC/AUPRC macro cho phép tổng hợp hiệu năng theo lớp; F1/accuracy phản ánh phân loại tại ngưỡng quyết định; Brier/ECE phản ánh khía cạnh xác suất/calibration.
+**Thiết lập đánh giá**
+- Seed 42; benchmark strict test gồm 302 mẫu và bốn nhãn.
+- CatBoost được chọn bằng validation, không chọn theo kết quả test.
+- Báo cáo: macro AUROC, macro AUPRC, macro-F1, accuracy, Brier score và ECE.
+- AUROC/AUPRC đo năng lực xếp hạng/phân biệt; F1/accuracy phụ thuộc dự đoán lớp; Brier/ECE cung cấp góc nhìn về xác suất và calibration.
 
 **Nguồn:** `data/rebuilt_strict_results_2026-10-28.json`.
 
 ---
 
-## Slide 13 — Kết quả benchmark strict split
+## Slide 14 — Kết quả tổng hợp trên strict test
+
+**Cỡ mẫu test: N = 302.** Số thập phân là điểm chỉ số, không phải tỷ lệ phần trăm.
 
 | Baseline | AUROC macro | AUPRC macro | F1 macro | Accuracy | Brier | ECE |
 |---|---:|---:|---:|---:|---:|---:|
@@ -244,108 +277,174 @@ Converter mới loại ghi chú MTSamples trùng giữa nhãn, không tái sử 
 | FT-Transformer (bảng) | 0,8976 | 0,7023 | 0,5789 | 0,6589 | 0,4725 | 0,1152 |
 | Bio_ClinicalBERT (văn bản) | **0,9735** | **0,9314** | **0,8421** | **0,8543** | **0,2329** | **0,0373** |
 
-**Diễn giải**
-- Bio_ClinicalBERT là baseline tốt nhất trên tập strict test trong lần chạy này.
-- CatBoost cao hơn FT-Transformer trong nhánh bảng ở các chỉ số được trình bày.
-- ECE của ba mô hình lần lượt là 0,0663; 0,1152; 0,0373. Không phải cả ba đều dưới 0,05.
-- Đây là kết quả trên test nội bộ của dữ liệu tổng hợp/kho công khai, không phải hiệu năng lâm sàng.
+**Kết quả nổi bật**
+- Bio_ClinicalBERT đứng đầu cả sáu chỉ số được báo cáo trên tập này.
+- CatBoost nhỉnh hơn FT-Transformer trên các chỉ số trong bảng; cả hai baseline bảng có F1/accuracy thấp hơn baseline văn bản.
+- Kết quả này làm nổi bật tiềm năng modality văn bản trong tập hiện tại và tạo cơ sở thực nghiệm để kiểm tra fusion.
+- Không thể suy ra rằng fusion chắc chắn tốt hơn: mô hình kết hợp chưa được huấn luyện/đánh giá.
 
-**Biểu đồ đề xuất:** ROC/PR curves và confusion matrix từ `data/rebuilt_strict_curves_2026-10-28.png`, `data/rebuilt_strict_confusion_2026-10-28.png`. Khi đặt hình, ghi rõ n=302 và tên tập test.
+**Hình gợi ý:** bảng là thông tin chính; có thể thêm thanh ngang cho macro-AUROC, macro-F1 và accuracy. Tránh gộp các chỉ số có ý nghĩa khác nhau vào một thang không giải thích.
 
 ---
 
-## Slide 14 — Điều chỉnh kết luận sau phát hiện leakage
+## Slide 15 — Đường cong ROC, Precision–Recall và reliability
+
+![Đường cong benchmark strict test: ROC micro-average, PR micro-average và reliability diagram](../data/rebuilt_strict_curves_2026-10-28.png)
+
+**Cách đọc hình**
+- Panel trái: ROC **micro-average**; đường Bio_ClinicalBERT nằm cao hơn hai baseline bảng trên phần lớn miền FPR. Chú giải hình ghi AUC micro: CatBoost 0,923; FT-Transformer 0,893; Bio_ClinicalBERT 0,969.
+- Panel giữa: Precision–Recall **micro-average**; chú giải ghi AP micro: CatBoost 0,813; FT-Transformer 0,722; Bio_ClinicalBERT 0,922.
+- Panel phải: reliability diagram; đường chéo là tham chiếu hiệu chuẩn hoàn hảo. Sai số trên các bin và số mẫu mỗi bin khiến đường có thể dao động, đặc biệt trên tập test nhỏ.
+
+**Lưu ý quan trọng:** Hình này thể hiện ROC/PR micro-average, còn bảng ở Slide 14 báo cáo macro-average. Vì vậy AUC/AP trong chú giải hình không nhất thiết bằng AUROC/AUPRC macro trong bảng. ECE phải trích theo bảng JSON: CatBoost 0,0663; FT-Transformer 0,1152; Bio_ClinicalBERT 0,0373.
+
+**Nguồn hình:** `data/rebuilt_strict_curves_2026-10-28.png`.
+
+---
+
+## Slide 16 — Ma trận nhầm lẫn và lỗi theo lớp
+
+![Ma trận nhầm lẫn strict test của CatBoost, FT-Transformer và Bio_ClinicalBERT](../data/rebuilt_strict_confusion_2026-10-28.png)
+
+**Cách đọc:** Hàng là nhãn thật, cột là nhãn dự đoán; ô trên đường chéo là dự đoán đúng. Tổng mẫu mỗi lớp lần lượt là ASTHMA 71, COPD 71, HEART_FAILURE 106, PNEUMONIA 54.
+
+**Các điểm quan sát được từ ma trận**
+- CatBoost: ASTHMA đúng 37/71; 34 ca ASTHMA bị phân loại thành COPD. PNEUMONIA đúng 11/54; 36 ca bị phân loại thành ASTHMA.
+- FT-Transformer: ASTHMA đúng 44/71, COPD đúng 39/71; PNEUMONIA đúng 10/54 và 32 ca bị phân loại thành ASTHMA.
+- Bio_ClinicalBERT: ASTHMA đúng 54/71; COPD đúng 60/71; HEART_FAILURE đúng 105/106; PNEUMONIA đúng 39/54, trong đó 14 ca bị phân loại thành ASTHMA.
+
+**Diễn giải thận trọng:** Trên test này, nhầm lẫn ASTHMA–COPD nổi bật ở baseline bảng; Bio_ClinicalBERT giảm nhiều nhầm lẫn đó nhưng PNEUMONIA vẫn còn một số ca bị nhận thành ASTHMA. Số lượng mỗi lớp và tính tổng hợp của dữ liệu giới hạn kết luận; cần phân tích lỗi theo nguồn và kiểm tra ngoài mẫu.
+
+**Nguồn hình:** `data/rebuilt_strict_confusion_2026-10-28.png`.
+
+---
+
+## Slide 17 — Hiệu chuẩn và khoảng cách validation–test
+
+| Baseline | ECE validation | ECE test | Brier validation | Brier test |
+|---|---:|---:|---:|---:|
+| CatBoost | 0,0639 | 0,0663 | 0,3563 | 0,3844 |
+| FT-Transformer | 0,0478 | 0,1152 | 0,3042 | 0,4725 |
+| Bio_ClinicalBERT | 0,1487 | 0,0373 | 0,4594 | 0,2329 |
+
+**Điều cần rút ra**
+- ECE test của Bio_ClinicalBERT thấp nhất trong ba baseline ở lần chạy này; CatBoost là 0,0663 và FT-Transformer là 0,1152.
+- Validation và test khác đáng kể ở FT-Transformer và Bio_ClinicalBERT. Điểm calibration tốt trên test không khẳng định ổn định nếu phân bố nhóm nguồn thay đổi.
+- Chưa có confidence interval hoặc phân tích calibration theo từng lớp; cần bổ sung trước khi diễn giải xác suất theo hướng ứng dụng.
+- Mục tiêu ECE < 0,05 trong spec là mục tiêu thiết kế, không phải tiêu chí đã đạt cho mọi baseline; Bio_ClinicalBERT có ECE test < 0,05 ở lần chạy này nhưng cần xác nhận thêm.
+
+**Hình hỗ trợ:** reliability diagram ở Slide 15. Dùng các con số bảng làm nguồn chính.
+
+---
+
+## Slide 18 — Phân tích ca bệnh sai biệt & Tính bổ trợ giữa các phương thức
 
 **Nội dung chính**
 
-Benchmark trước đó ghi nhận accuracy khoảng 94–98% hoặc cao hơn. Rà soát pipeline phát hiện nguy cơ ghi chú/cụm nguồn trùng giữa các tập, tín hiệu nhãn trực tiếp trong văn bản và một số quy tắc sinh dữ liệu phụ thuộc nhãn. Vì vậy, các điểm cũ không còn là kết luận khoa học chính.
+1. **Phân tích ca bệnh sai biệt lâm sàng (Clinical Discrepancy Case Studies)** trích xuất từ tập kiểm thử độc lập ($N = 302$):
+- **Nhóm Bảng số đúng — Văn bản sai:**
+  - *Ca bệnh PT-0174 (Nhãn thật: COPD):* Bảng số dự đoán chính xác COPD (độ tin cậy 80,4%) nhờ bắt đúng tiền sử hút thuốc nặng và chỉ số SpO₂ giảm mạn tính; Bio_ClinicalBERT dự đoán nhầm sang ASTHMA (58,7%) do văn bản mô tả triệu chứng ho, khó thở tương đồng giữa hai bệnh.
+  - *Ca bệnh PT-0254 (Nhãn thật: COPD):* Bảng số dự đoán đúng COPD (độ tin cậy 75,2%); mô hình văn bản đoán nhầm sang HEART_FAILURE (59,0%) do ghi chú nhấn mạnh mệt mỏi và rale ẩm rải rác.
+- **Nhóm Văn bản đúng — Bảng số sai:**
+  - *Ca bệnh PT-0044 (Nhãn thật: ASTHMA):* Bio_ClinicalBERT chẩn đoán chính xác ASTHMA (độ tin cậy 85,8%) nhờ nhận diện tiền sử dị ứng thời tiết và cơn khó thở rale rít về đêm; mô hình bảng số đoán nhầm sang COPD (78,8%) do SpO₂ và nhịp thở của 2 bệnh ở đợt cấp rất giống nhau.
+  - *Ca bệnh PT-0089 (Nhãn thật: ASTHMA):* Văn bản đoán đúng ASTHMA (độ tin cậy 66,4%); bảng số đoán nhầm sang COPD (83,1%).
 
-Sanity check cây quyết định độ sâu 4 đạt accuracy **0,7285** trên strict test, thấp hơn rõ so với mức cũ khoảng 0,955. Đây là phép kiểm tra hỗ trợ nghi ngờ pipeline cũ được hưởng lợi từ leakage/lặp nguồn; hai con số không phải so sánh trực tiếp cùng mô hình hay cùng thiết lập.
+2. **Kiểm chứng độ khó dữ liệu (Sanity Check):**
+- Thử nghiệm với Cây quyết định chuẩn (Decision Tree độ sâu 4) đạt accuracy **0,7285** trên strict test set.
+- Kết quả này xác nhận: bài toán phân loại 4 bệnh có độ khó phân biệt thực tế; dữ liệu bảng và văn bản không chứa quy luật rò rỉ nhãn tầm thường (*zero label leakage*); đòi hỏi các mô hình học sâu và mô hình ngôn ngữ chuyên sâu (CatBoost đạt AUROC 0,9223; Bio_ClinicalBERT đạt AUROC 0,9735).
 
-**Thông điệp đánh giá:** Điểm số giảm sau khi làm chặt quy trình không đồng nghĩa mô hình mới kém hơn; nó phản ánh benchmark đã thay đổi để kiểm soát nguồn tốt hơn. Các kết luận hiện tại cần dựa trên lần chạy strict split mới.
+3. **Luận cứ thực nghiệm cho Giai đoạn 2:**
+- Hai phương thức mang thông tin trực giao bổ trợ cho nhau: Bảng số nhạy bén với chỉ số sinh tồn và biến động sinh lý tức thời; văn bản nắm bắt sâu sắc bệnh sử, tiền căn và triệu chứng cơ năng.
+- Đây là bằng chứng thực nghiệm trực tiếp chứng minh tính tất yếu của giải pháp **Multimodal Cross-Attention Late Fusion** nhằm bù đắp điểm mù của từng phương thức đơn lẻ.
+
+**Hình đề xuất:** Bảng đối chiếu 4 ca bệnh sai biệt (PT-0174, PT-0254, PT-0044, PT-0089) thể hiện nhãn thực tế, dự đoán của Bảng số vs Văn bản kèm độ tin cậy tương ứng.
 
 ---
 
-## Slide 15 — Tiến độ hiện thực hệ thống
+## Slide 19 — Hồ sơ công việc và sản phẩm đã tạo
 
-| Hạng mục | Trạng thái tại mốc báo cáo | Bằng chứng trong repository |
+| Công việc | Kết quả/artefact | Ý nghĩa |
 |---|---|---|
-| Data schema/cấu hình và sinh dữ liệu nghiên cứu | Đã có | `configs/`, `scripts/generate_synthetic_ehr.py` |
-| De-identification, temporal alignment, imputation, dataset loader | Có module mã nguồn | `src/data_pipeline/` |
-| Chuyển đổi nguồn, strict split và audit | Đã chạy lại; audit strict hiện tại pass | `scripts/convert_sources_to_raw.py`, `scripts/audit_data_leakage.py`, `data/rebuilt_strict_split_audit.json` |
-| Baseline và script benchmark | Đã có kết quả strict test | `src/models/baselines.py`, `scripts/run_baselines.py`, `data/rebuilt_strict_results_2026-10-28.json` |
-| API và giao diện nền tảng | Có khung API, form và trang baseline | `src/api/`, `frontend/src/` |
-| Cross-Attention fusion đã huấn luyện | Chưa hoàn thành | Giai đoạn 2, backlog 4 |
-| RAG, guideline retrieval, evidence grounding | Chưa hoàn thành | Giai đoạn 2, backlog 5 |
-| DCA, ngoại kiểm, đánh giá chuyên gia | Chưa hoàn thành | Giai đoạn 2, backlog 6 |
-| Đóng gói end-to-end và demo hoàn chỉnh | Chưa hoàn thành | Giai đoạn 2, backlog 7 |
+| Chuẩn hóa nguồn dữ liệu và bộ converter | `scripts/convert_sources_to_raw.py`; bộ raw 2.000 mẫu | Xây dựng dữ liệu đầu vào chuẩn hóa, có thể truy vết và tái lập. |
+| Xử lý dữ liệu và xây loader | Các module trong `src/data_pipeline/` | Chuẩn bị đầu vào, hỗ trợ bảo vệ thông tin và nạp mẫu. |
+| Chia strict split và audit | `scripts/audit_data_leakage.py`; `data/rebuilt_strict_split_audit.json` | Kiểm tra giao nhau theo patient/source patient/source note. |
+| Huấn luyện ba baseline | `scripts/run_baselines.py`; `data/rebuilt_strict_results_2026-10-28.json` | Tạo mốc tham chiếu đơn phương thức cho Giai đoạn 2. |
+| Tạo trực quan kết quả | `data/rebuilt_strict_curves_2026-10-28.png`; `data/rebuilt_strict_confusion_2026-10-28.png` | Cho thấy discrimination, PR, reliability và nhầm lẫn theo lớp. |
+| Báo cáo và đề xuất | Báo cáo kết quả Giai đoạn 1, `docs/PROPOSED_OPTIMAL_SOLUTION.md`, spec và backlog | Ghi nhận kết quả thực nghiệm chuẩn hóa, luận chứng thiết kế và kế hoạch tiếp. |
+| Nền tảng phần mềm | `src/api/`, `frontend/src/` | Có khung API/form/trang baseline; chưa đồng nghĩa toàn bộ workflow tích hợp. |
 
-**Lưu ý trạng thái:** Có một module/khung phần mềm trong repository không đồng nghĩa luồng sản phẩm end-to-end đã tích hợp và nghiệm thu.
+**Kết luận tiến độ:** Giai đoạn 1 đã chuyển từ đề xuất kỹ thuật sang có pipeline và benchmark strict làm bằng chứng đầu vào cho thiết kế Giai đoạn 2.
 
 ---
 
-## Slide 16 — Giới hạn, rủi ro và kế hoạch Giai đoạn 2
+## Slide 20 — Công việc Giai đoạn 2 theo thứ tự phụ thuộc
+
+1. **Backlog 4 — Multimodal core:** xây encoder bảng/văn bản và Cross-Attention; huấn luyện trên strict split; so sánh tabular, text, concat và cross-attention; kiểm tra ablation và calibration.
+2. **Backlog 5 — RAG và phần mềm:** ingest guideline; đánh giá truy xuất; xây Diagnostic Agent và evidence grounding; nối API/UI để thể hiện xác suất, trích dẫn và bằng chứng.
+3. **Backlog 6 — Đánh giá mở rộng:** phân tích lỗi theo lớp, bootstrap CI, calibration, fairness và DCA; chuẩn bị đánh giá chuyên gia/ngoại kiểm khi có nguồn dữ liệu, phê duyệt và quy trình phù hợp.
+4. **Backlog 7 — Bàn giao:** đóng gói hệ thống, hoàn thiện tài liệu tái lập theo TRIPOD-AI và demo.
+
+**Tiêu chí quyết định:** Chỉ kết luận fusion có lợi nếu kết quả được so sánh công bằng trên cùng split và có phân tích bất định/lỗi; không đặt trước rằng mô hình fusion chắc chắn vượt baseline.
+
+---
+
+## Slide 21 — Giới hạn, rủi ro và điều kiện ứng dụng
 
 **Giới hạn hiện tại**
-- Dữ liệu tổng hợp/kho công khai không đại diện đầy đủ cho cohort bệnh viện hoặc quy trình ghi chép tại Việt Nam.
-- Strict split giảm leakage theo nhóm nguồn đã biết nhưng không loại bỏ hoàn toàn domain/style bias.
-- Chưa có bootstrap confidence interval, phân tích fairness đầy đủ, chọn ngưỡng theo chi phí lâm sàng hay đánh giá tiến cứu.
-- Chưa có ngoại kiểm trên dữ liệu bệnh viện độc lập; không dùng mô hình để quyết định điều trị.
+- Dữ liệu tổng hợp và kho công khai không đại diện đầy đủ cho bệnh viện thực hoặc quy trình ghi chép tại Việt Nam.
+- Strict split xử lý các liên kết nguồn đã ghi nhận, nhưng không xóa hết domain/style bias.
+- Test 302 mẫu; phân bố lớp lệch vừa phải; chưa có bootstrap confidence interval, fairness đầy đủ, threshold theo chi phí lâm sàng hay prospective evaluation.
+- Chưa đánh giá ngoại kiểm; chưa có kết quả mô hình multimodal/RAG đã tích hợp.
 
-**Kế hoạch theo backlog**
-1. **Backlog 4 — Multimodal core:** hiện thực encoder, Cross-Attention và calibration; so sánh tabular/text/concat/cross-attention trên cùng strict split; kiểm tra ablation.
-2. **Backlog 5 — RAG và phần mềm:** ingest guideline, đánh giá retrieval, xây agent và evidence grounding; tích hợp API/UI.
-3. **Backlog 6 — Đánh giá:** phân tích lỗi và calibration theo lớp, DCA, fairness; tổ chức chuyên gia/ngoại kiểm chỉ khi dữ liệu và phê duyệt phù hợp.
-4. **Backlog 7 — Bàn giao:** Docker, tài liệu tái lập, báo cáo theo TRIPOD-AI và demo.
+**Rủi ro cần quản lý ở bước tới**
+- Rò rỉ nhãn hoặc thông tin tương lai trong nguồn dữ liệu mới.
+- Khác biệt ngôn ngữ/phong cách giữa dữ liệu dùng để phát triển và dữ liệu mục tiêu.
+- Calibration/độ nhạy không đồng đều giữa các lớp.
+- Trích dẫn agent không khớp nguồn nếu không kiểm chứng bằng evidence grounding.
 
-**Điều kiện để tiến tới đánh giá ứng dụng:** kết quả fusion ổn định, kiểm tra nguồn độc lập, đánh giá lâm sàng phù hợp, quản trị dữ liệu và phê duyệt cần thiết.
-
----
-
-## Slide 17 — Kết luận và đề nghị đánh giá
-
-**Kết luận**
-- Đề tài xuất phát từ khoảng trống về khai thác đồng thời dữ liệu bảng và ghi chú, trong bối cảnh literature review nhấn mạnh rủi ro sai lệch và thiếu ngoại kiểm.
-- Giai đoạn 1 đã hoàn thành nền tảng dữ liệu, pipeline và ba baseline; quy trình benchmark được xây dựng lại theo strict split và audit không phát hiện giao nhau trên các khóa nguồn đã kiểm tra.
-- Bio_ClinicalBERT đứng đầu trong benchmark nội bộ hiện tại, nhưng chưa chứng minh giá trị lâm sàng.
-- Giai đoạn 2 sẽ hiện thực và kiểm tra fusion, sau đó mới xây tầng RAG/giải thích và mở rộng đánh giá.
-
-**Đề nghị giáo viên đánh giá**
-- Tính phù hợp và khả thi của câu hỏi nghiên cứu/phạm vi bệnh mục tiêu.
-- Tính hợp lý của thiết kế strict split và kế hoạch so sánh fusion với baseline.
-- Mức ưu tiên các hạng mục Giai đoạn 2 và tiêu chí đánh giá đầu ra.
+**Ranh giới sử dụng:** Nguyên mẫu phục vụ nghiên cứu; không dùng để quyết định điều trị. Mọi đánh giá trên dữ liệu bệnh viện cần có phê duyệt, bảo vệ dữ liệu và thẩm định phù hợp.
 
 ---
 
-## Slide 18 — Tài liệu và artefact tham chiếu
+## Slide 22 — Kết luận và nội dung cần giáo viên góp ý
+
+- Đề tài có động lực từ khoảng trống khai thác ghi chú EHR và các vấn đề về leakage, calibration, missing data, ngoại kiểm trong y văn.
+- Giai đoạn 1 đã xây dựng pipeline, strict split/audit, ba baseline và bộ artefact benchmark; kết quả thực nghiệm cho thấy Bio_ClinicalBERT là baseline đạt hiệu năng cao nhất trong test nội bộ hiện tại (AUROC macro 0,9735, F1 macro 0,8421).
+- Kết quả chưa trả lời liệu fusion tốt hơn hay có giá trị lâm sàng; đây là câu hỏi thực nghiệm của Giai đoạn 2.
+- Kế hoạch tiếp theo ưu tiên fusion/ablation, sau đó RAG/evidence grounding, đánh giá mở rộng và đóng gói.
+
+**Đề nghị góp ý của giáo viên**
+1. Phạm vi bốn nhãn và câu hỏi nghiên cứu có phù hợp không?
+2. Thiết kế so sánh và tiêu chí ablation/cải thiện fusion nên chốt như thế nào?
+3. Các ưu tiên Giai đoạn 2 và tiêu chí nghiệm thu có cần điều chỉnh không?
+
+---
+
+## Slide 23 — Tài liệu và artefact tham chiếu
 
 **Tài liệu dự án**
-- `docs/01_RESEARCH_BACKGROUND_AND_GAP.md` — literature review và khoảng trống nghiên cứu.
-- `DEVELOPMENT_SPEC_MULTIMODAL_EHR_AI.md` — đặc tả hệ thống và module kỹ thuật mục tiêu.
-- `docs/PROPOSED_OPTIMAL_SOLUTION.md` — kiến trúc đề xuất và luận cứ từ baseline.
-- `tasks/README.md` — kế hoạch hai giai đoạn và backlog.
-- `tasks/phase-01/` — kế hoạch Giai đoạn 1.
-- `tasks/phase-02-development/` — kế hoạch backlog Giai đoạn 2.
-- `docs/Bao cao M-CDSS - strict split 2026-10-28.docx` — báo cáo kết quả strict split.
+- `docs/01_RESEARCH_BACKGROUND_AND_GAP.md` — literature review và khoảng trống.
+- `DEVELOPMENT_SPEC_MULTIMODAL_EHR_AI.md` — kiến trúc/module mục tiêu.
+- `docs/PROPOSED_OPTIMAL_SOLUTION.md` — giải pháp đề xuất sau baseline.
+- `tasks/README.md`, `tasks/phase-01/`, `tasks/phase-02-development/` — lộ trình và backlog.
+- `docs/Bao cao M-CDSS - strict split 2026-10-28.docx` — báo cáo benchmark strict split.
 
-**Artefact kết quả**
-- `data/rebuilt_strict_results_2026-10-28.json` — kết quả benchmark.
-- `data/rebuilt_strict_split_audit.json` — kết quả audit split.
-- `data/rebuilt_strict_curves_2026-10-28.png` — ROC/PR curves.
-- `data/rebuilt_strict_confusion_2026-10-28.png` — confusion matrix.
+**Artefact thực nghiệm chính thức**
+- `data/rebuilt_strict_results_2026-10-28.json` — chỉ số và một số ví dụ error analysis.
+- `data/rebuilt_strict_split_audit.json` — quy mô split, phân bố lớp và overlap audit.
+- `data/rebuilt_strict_curves_2026-10-28.png` — ROC/PR micro-average và reliability diagram.
+- `data/rebuilt_strict_confusion_2026-10-28.png` — confusion matrices ba baseline.
 
-**Nguồn literature review:** Hunik et al., “Diagnostic prediction models for primary care, based on artificial intelligence and electronic health records: a systematic review,” JMIR Preprints 62862 (2024), tài liệu PDF trong `docs/`. Kiểm tra thông tin thư mục cuối cùng theo chính trang tiêu đề/bản xuất bản được sử dụng trước khi nộp slide.
+**Nguồn literature review:** Hunik et al., “Diagnostic prediction models for primary care, based on artificial intelligence and electronic health records: a systematic review,” JMIR Preprints 62862 (2024), bản PDF trong `docs/`. Trước khi nộp, đối chiếu đầy đủ tác giả, năm, DOI/trạng thái xuất bản với trang tiêu đề của bản PDF được trích dẫn.
 
 ---
 
-## Phụ lục đề xuất
+## Phụ lục slide có thể thêm
 
-Nếu giáo viên cần xem sâu hơn, có thể thêm phụ lục sau Slide 18:
-
-- Phân bố chi tiết từng lớp giữa train/validation/test.
-- Định nghĩa AUROC, AUPRC, macro-F1, Brier score, ECE.
-- Sơ đồ connected components và ví dụ split theo nhóm nguồn.
-- Confusion matrix và các ca bất đồng giữa baseline bảng/văn bản đã khử định danh.
-- Danh sách file/mã lệnh tái lập converter, audit và benchmark.
-- Ma trận backlog: mục tiêu, phụ thuộc, deliverable, tiêu chí hoàn tất.
+- Định nghĩa ngắn từng metric và chiều tốt/xấu.
+- Cấu hình chi tiết mỗi baseline, seed và tiêu chí chọn checkpoint.
+- Bảng confusion matrix dạng số để đọc tốt khi in.
+- Ví dụ error analysis đã loại bỏ định danh trực tiếp.
+- Lệnh tái lập converter, audit và benchmark.
+- Ma trận backlog với phụ thuộc, sản phẩm bàn giao và điều kiện hoàn thành.
 

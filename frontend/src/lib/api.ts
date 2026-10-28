@@ -165,8 +165,8 @@ export interface BenchmarkResultsResponse {
 
 export const FALLBACK_BENCHMARK_RESULTS: BenchmarkResultsResponse = {
   benchmark_metadata: {
-    evaluation_date: '2026-10-20T14:25:12Z',
-    test_samples: 286,
+    evaluation_date: '2026-10-28T03:39:58Z',
+    test_samples: 302,
     num_classes: 4,
     classes: [
       'ASTHMA',
@@ -179,40 +179,40 @@ export const FALLBACK_BENCHMARK_RESULTS: BenchmarkResultsResponse = {
     baseline_1_classical_tabular: {
       model_type: 'CatBoost',
       data_modality: 'Structured Tabular Only',
-      macro_auroc: 0.998766,
-      macro_auprc: 0.996335,
-      macro_f1: 0.975568,
-      accuracy: 0.975524,
-      brier_score: 0.044971,
-      ece: 0.026451
+      macro_auroc: 0.922315,
+      macro_auprc: 0.787219,
+      macro_f1: 0.608266,
+      accuracy: 0.685430,
+      brier_score: 0.384386,
+      ece: 0.066278
     },
     baseline_2_tabular_deep: {
       model_type: 'FT-Transformer (Tabular DL)',
       data_modality: 'Structured Tabular Only',
-      macro_auroc: 0.990263,
-      macro_auprc: 0.972376,
-      macro_f1: 0.943586,
-      accuracy: 0.944056,
-      brier_score: 0.087843,
-      ece: 0.022285
+      macro_auroc: 0.897621,
+      macro_auprc: 0.702308,
+      macro_f1: 0.578943,
+      accuracy: 0.658940,
+      brier_score: 0.472502,
+      ece: 0.115186
     },
     baseline_3_text_only: {
       model_type: 'Bio_ClinicalBERT',
       data_modality: 'Unstructured Clinical Notes Only',
-      macro_auroc: 0.996036,
-      macro_auprc: 0.989071,
-      macro_f1: 0.936311,
-      accuracy: 0.937063,
-      brier_score: 0.078930,
-      ece: 0.018085
+      macro_auroc: 0.973453,
+      macro_auprc: 0.931369,
+      macro_f1: 0.842071,
+      accuracy: 0.854305,
+      brier_score: 0.232878,
+      ece: 0.037293
     }
   },
   summary_findings: {
-    highest_auroc_model: 'CatBoost',
-    highest_macro_auroc: 0.998766,
-    calibration_finding: 'Cả ba ECE đều dưới 0.05 trên tập hold-out tổng hợp.',
-    clinical_blindspot: 'Mô hình bảng và văn bản quan sát các nguồn bằng chứng bổ sung cho nhau.',
-    external_validity_warning: 'Cần thẩm định trên dữ liệu bệnh viện độc lập.'
+    highest_auroc_model: 'Bio_ClinicalBERT',
+    highest_macro_auroc: 0.973453,
+    calibration_finding: 'Bio_ClinicalBERT đạt ECE 0.0373 (< 0.05). CatBoost đạt ECE 0.0663, FT-Transformer đạt ECE 0.1152.',
+    clinical_blindspot: 'Mô hình bảng và văn bản quan sát các nguồn bằng chứng bổ trợ cho nhau; giai đoạn 2 triển khai Multimodal Late Fusion.',
+    external_validity_warning: 'Cần thẩm định ngoại kiểm trên dữ liệu bệnh viện độc lập.'
   }
 };
 
