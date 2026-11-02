@@ -204,7 +204,7 @@ ${ansiToHtml(content)}
   const fullHtml = createTerminalPage(rawOutput);
   const p1 = path.resolve(__dirname, 'temp_term1.html');
   fs.writeFileSync(p1, fullHtml, 'utf-8');
-  let page = await browser.newPage({ viewport: { width: 1450, height: 2100 }, deviceScaleFactor: 2 });
+  let page = await browser.newPage({ viewport: { width: 1450, height: 2500 }, deviceScaleFactor: 2 });
   await page.goto('file:///' + p1.replace(/\\/g, '/'), { waitUntil: 'load' });
   const el1 = await page.$('#terminal-capture-area');
   await el1.screenshot({ path: path.join(imagesDir, 'terminal_01_full_evaluation.png') });
@@ -230,7 +230,7 @@ ${ansiToHtml(content)}
   const caseHtml = createTerminalPage(part2 + part3);
   const p3 = path.resolve(__dirname, 'temp_term3.html');
   fs.writeFileSync(p3, caseHtml, 'utf-8');
-  page = await browser.newPage({ viewport: { width: 1450, height: 1350 }, deviceScaleFactor: 2 });
+  page = await browser.newPage({ viewport: { width: 1450, height: 1600 }, deviceScaleFactor: 2 });
   await page.goto('file:///' + p3.replace(/\\/g, '/'), { waitUntil: 'load' });
   const el3 = await page.$('#terminal-capture-area');
   await el3.screenshot({ path: path.join(imagesDir, 'terminal_03_case_studies.png') });
