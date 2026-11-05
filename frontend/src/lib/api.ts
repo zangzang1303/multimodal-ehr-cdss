@@ -488,3 +488,66 @@ export async function explainClinicalCase(
 
   return response.json();
 }
+
+
+export interface DCAPoint {
+  threshold: number;
+  net_benefit_mcdss: number;
+  net_benefit_tabular: number;
+  net_benefit_text: number;
+  net_benefit_treat_all: number;
+  net_benefit_treat_none: number;
+  net_tp_gained_per_100?: number;
+}
+
+export interface EvaluationBenchmarkResponse {
+  evaluation_metadata: {
+    evaluation_cohort: string;
+    test_samples: number;
+    classes: string[];
+    prevalence_per_class: number;
+    validation_standard: string;
+  };
+  model_benchmarks: Record<
+    string,
+    {
+      name: string;
+      modality: string;
+      macro_auroc: number;
+      macro_auprc: number;
+      macro_f1: number;
+      accuracy: number;
+      brier_score: number;
+      ece: number;
+      net_gain_auroc_over_tabular?: number;
+    }
+  >;
+  decision_curve_analysis: {
+    threshold_points: DCAPoint[];
+    optimal_clinical_threshold_range: [number, number];
+    dca_conclusion: string;
+  };
+  probast_compliance_summary: {
+    participants_risk: string;
+    predictors_risk: string;
+    outcome_risk: string;
+    analysis_risk: string;
+    overall_bias_risk: string;
+  };
+}
+
+export async function getClinicalEvaluationBenchmark(): Promise<EvaluationBenchmarkResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/evaluation/benchmark`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch evaluation benchmark: ${response.status}`);
+  }
+
+  return response.json();
+}

@@ -1,5 +1,7 @@
 "use client";
 
+import DCACurveChart from "@/components/DCACurveChart";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -45,6 +47,7 @@ export default function AblationEvaluationPage() {
   const [isDark, setIsDark] = useState<boolean>(true);
   const [mounted, setMounted] = useState<boolean>(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [activeTab, setActiveTab] = useState<"ablation" | "dca">("ablation");
 
   useEffect(() => {
     setMounted(true);
@@ -239,7 +242,103 @@ export default function AblationEvaluationPage() {
           </div>
         </div>
 
-        {/* 4 Summary Stat Cards */}
+        {/* Evaluation View Mode Tabs: Ablation Benchmarks vs Clinical DCA & PROBAST */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+          <button
+            type="button"
+            onClick={() => setActiveTab("ablation")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === "ablation"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>1. Thử Nghiệm Ablation &amp; Hiệu Chuẩn ECE</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("dca")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === "dca"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
+            }`}
+          >
+            <Scale className="w-4 h-4" />
+            <span>2. Lợi Ích Lâm Sàng DCA &amp; PROBAST (Backlog 06)</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-normal">
+              Mới
+            </span>
+          </button>
+        </div>
+
+        {activeTab === "dca" ? (
+          <div className="space-y-8 animate-in fade-in duration-200">
+            {/* Interactive DCA Curve Component */}
+            <DCACurveChart isDark={isDark} />
+
+            {/* PROBAST 4 Domains Compliance Matrix */}
+            <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Bảng Thẩm Định 20 Tiêu Chí PROBAST (Prediction Model Risk of Bias Assessment)
+                  </h3>
+                </div>
+                <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+                  Đánh giá tổng thể: Low Risk of Bias
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>Miền 1: Người Tham Gia (Participants)</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+                    Thu nhận bệnh nhân ngoại trú người lớn (≥18 tuổi) có triệu chứng hô hấp/tuần hoàn. Không loại trừ tùy tiện nhóm bệnh nặng hay có bệnh nền phức tạp.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>Miền 2: Biến Dự Đoán (Predictors)</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+                    Khóa mốc thời gian (Temporal Alignment) trước khi xác lập chẩn đoán; cấm tuyệt đối đưa các tiêu chuẩn vàng (Hô hấp ký FEV1/FVC, Siêu âm tim EF) vào biến đầu vào.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>Miền 3: Kết Cục Chẩn Đoán (Outcome)</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+                    Nhãn bệnh được xác lập khách quan theo mã chuẩn ICD-10 và đối chiếu phác đồ quốc tế (GINA, GOLD, ESC); người gán nhãn độc lập với mô hình.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>Miền 4: Phân Tích Số Liệu (Analysis)</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+                    Kiểm soát 0% rò rỉ qua Patient Group Splitting; gán đa biến MICE bảo tồn mẫu; hiệu chuẩn Temperature Scaling (ECE &lt; 0.05); kiểm tra độ công bằng phân nhóm.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-8 animate-in fade-in duration-200">
+            {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-5 rounded-2xl border border-indigo-200 dark:border-indigo-900/50 bg-white dark:bg-slate-900 shadow-sm space-y-1.5">
             <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
@@ -486,6 +585,8 @@ export default function AblationEvaluationPage() {
             </p>
           </div>
         </div>
+          </div>
+        )}
       </main>
 
       {/* Footer */}
@@ -493,7 +594,7 @@ export default function AblationEvaluationPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-            <span>M-CDSS Backlog 04 — Multimodal Core &amp; Ablation Study</span>
+            <span>M-CDSS Backlog 04 &amp; 06 — Multimodal Core, Ablation Study &amp; Clinical DCA</span>
           </div>
           <div>M-CDSS Research Consortium © 2026. Next.js 14 &amp; FastAPI.</div>
         </div>

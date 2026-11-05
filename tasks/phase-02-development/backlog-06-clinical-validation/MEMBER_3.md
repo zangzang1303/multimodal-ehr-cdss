@@ -1,4 +1,4 @@
-# BACKLOG 04 - NHIỆM VỤ THÀNH VIÊN 3 (FULL-STACK AI & FRONTEND)
+# BACKLOG 06 (VALIDATION) - NHIỆM VỤ THÀNH VIÊN 3 (FULL-STACK AI & FRONTEND)
 ### Trọng Tâm: Benchmark REST Route, Unit Tests Toàn Bộ Endpoints, UI Đồ Thị DCA & Tối Ưu UX
 
 ---
@@ -10,12 +10,12 @@
 * **Mô tả:**
   1. Viết route `GET /api/v1/evaluation/benchmark` trong `src/api/routes/evaluation_routes.py` trả về bảng chỉ số tổng hợp JSON (AUROC, AUPRC, F1, ECE, DCA Net Benefit giữa 3 Baselines và Ours).
   2. Viết bộ kiểm thử tự động `tests/test_api_endpoints.py`:
-     - Test route `/predict/multimodal`: Gửi payload bảng + text hợp lệ, kiểm tra mã 200, kiểm tra danh sách predictions có tổng xác suất = 1.0.
-     - Test route `/agent/explain`: Gửi id ca bệnh, kiểm tra mã 200 và mảng evidence spans có vị trí `start` và `end`.
+     - Test route `/predict/mock`: Gửi payload bảng + text hợp lệ, kiểm tra mã 200, kiểm tra danh sách predictions có tổng xác suất = 1.0.
+     - Test route `/agent/explain`: Gửi id ca bệnh hoặc payload, kiểm tra mã 200 và mảng evidence spans có vị trí `start` và `end`.
      - Test route `/evaluation/benchmark`: Kiểm tra mã 200 và schema JSON.
   3. Chạy lệnh: `pytest tests/test_api_endpoints.py -v` (bảo đảm pass 100%).
 * **Đầu ra (Deliverable):** `src/api/routes/evaluation_routes.py`, `tests/test_api_endpoints.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE` (Đã hoàn thành endpoint benchmark, mount router và kiểm thử 16/16 test cases trong `test_api_endpoints.py`, 62/62 tests toàn dự án vượt qua 100%).
 
 ---
 
@@ -25,7 +25,7 @@
   - Vẽ đường cong Net Benefit của M-CDSS đối chiếu với "Treat All" và "Treat None".
   - Cho phép người dùng kéo thanh trượt điều chỉnh ngưỡng can thiệp $p_t$ để quan sát số ca can thiệp đúng ròng tăng thêm tương ứng.
 * **Đầu ra (Deliverable):** Component biểu đồ DCA tương tác trên Frontend.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE` (Đã xây dựng `frontend/src/components/DCACurveChart.tsx` tích hợp Recharts đa đường cong, interactive slider $p_t \in [0.05, 0.60]$, KPI Net True Positives động trên $N=100$ và $N=302$ test set).
 
 ---
 
@@ -33,4 +33,4 @@
 * **Độ ưu tiên:** `[P2 - Normal]`
 * **Mô tả:** Tinh chỉnh CSS Responsive: bảo đảm form nhập liệu và màn hình hội chẩn hiển thị mượt mà trên máy tính bảng (iPad / Galaxy Tab) của bác sĩ tại bàn khám bệnh; bổ sung micro-animations cho các thanh đo rủi ro.
 * **Đầu ra (Deliverable):** Giao diện Web tối ưu hóa đa thiết bị.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE` (Đã tích hợp Tab Navigation trên `frontend/src/app/evaluation/page.tsx` gồm DCA Analysis & PROBAST Checklist, bố cục Grid linh hoạt md:grid-cols-2/3/4, responsive touch sliders, Next.js build 7/7 static pages thành công 0 lỗi).

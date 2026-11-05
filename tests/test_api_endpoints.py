@@ -375,3 +375,66 @@ def test_benchmarks_ablation_endpoint(client):
     # Check ECE calibration threshold < 0.05
     assert models["cross_attention_fusion"]["ece"] < 0.05
 
+
+
+def test_evaluation_benchmark_endpoint(client):
+    """
+    Test GET /api/v1/evaluation/benchmark (Backlog 06 Member 3 Task 3.1).
+    Validates comprehensive benchmark matrix, Decision Curve Analysis (DCA),
+    and PROBAST compliance summary.
+    """
+    # Preflight OPTIONS
+    opt_resp = client.options("/api/v1/evaluation/benchmark")
+    assert opt_resp.status_code == 200
+
+    response = client.get("/api/v1/evaluation/benchmark")
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "evaluation_metadata" in data
+    assert data["evaluation_metadata"]["test_samples"] == 302
+
+    # Verify model benchmarks
+    assert "model_benchmarks" in data
+    benchmarks = data["model_benchmarks"]
+    assert "mcdss_multimodal_core" in benchmarks
+    assert benchmarks["mcdss_multimodal_core"]["macro_auroc"] >= 0.88
+    assert benchmarks["mcdss_multimodal_core"]["ece"] < 0.05
+
+    # Verify Decision Curve Analysis (DCA) points
+    assert "decision_curve_analysis" in data
+    dca = data["decision_curve_analysis"]
+    assert "threshold_points" in dca
+    points = dca["threshold_points"]
+    assert len(points) >= 10
+
+    # Verify Net Benefit superiority of M-CDSS on clinical thresholds [0.10, 0.45]
+    for pt in points:
+        t = pt["threshold"]
+        if 0.10 <= t <= 0.45:
+            assert pt["net_benefit_mcdss"] > pt["net_benefit_treat_all"], f"M-CDSS must beat Treat All at threshold {t}"
+            assert pt["net_benefit_mcdss"] > pt["net_benefit_treat_none"], f"M-CDSS must beat Treat None at threshold {t}"
+
+    # Verify PROBAST compliance summary
+    assert "probast_compliance_summary" in data
+    probast = data["probast_compliance_summary"]
+    assert "overall_bias_risk" in probast
+    assert "Low Risk" in probast["overall_bias_risk"]
+
+
+def test_agent_explain_in_api_endpoints(client):
+    """
+    Verify /api/v1/agent/explain endpoint integration in test_api_endpoints suite.
+    """
+    payload = {
+        "patient_id": "PT-0044",
+        "clinical_notes": "Patient 18yo presents with cough, shortness of breath, and fatigue. Medications: Inhalers.",
+        "target_diagnosis": "ASTHMA",
+    }
+    response = client.post("/api/v1/agent/explain", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["patient_id"] == "PT-0044"
+    assert data["primary_diagnosis"] == "ASTHMA"
+    assert len(data["grounded_spans"]) >= 1
+    assert len(data["guideline_references"]) >= 1
