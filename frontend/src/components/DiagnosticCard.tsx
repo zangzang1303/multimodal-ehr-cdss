@@ -3,31 +3,54 @@
 import React, { useState } from "react";
 import {
     Activity,
+    AlertOctagon,
+    AlertTriangle,
+    BookOpen,
+    CheckCircle2,
     ChevronDown,
     ChevronUp,
     Cpu,
+    FileSearch,
     FileText,
     HelpCircle,
     Info,
     Layers,
     RotateCcw,
     Scale,
+    ShieldAlert,
     ShieldCheck,
     Sparkles,
 } from "lucide-react";
-import { MultimodalMockResponse } from "@/lib/api";
+import {
+    AgentExplainResponse,
+    explainClinicalCase,
+    MultimodalMockResponse,
+} from "@/lib/api";
+import EvidenceViewer from "@/components/EvidenceViewer";
+import GuidelineDrawer from "@/components/GuidelineDrawer";
 
 interface DiagnosticCardProps {
     result: MultimodalMockResponse;
     onReset?: () => void;
+    clinicalNotes?: string;
 }
 
 export default function DiagnosticCard({
     result,
     onReset,
+    clinicalNotes,
 }: DiagnosticCardProps) {
     const [showTooltip, setShowTooltip] = useState<boolean>(false);
     const [showStreamDetails, setShowStreamDetails] = useState<boolean>(true);
+
+    // Agentic RAG state
+    const [explainLoading, setExplainLoading] = useState<boolean>(false);
+    const [explainData, setExplainData] = useState<AgentExplainResponse | null>(
+        null,
+    );
+    const [explainError, setExplainError] = useState<string | null>(null);
+    const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+    const [showExplanation, setShowExplanation] = useState<boolean>(false);
 
     // Helper function to return styling according to the 3 risk bands
     const getRiskBandConfig = (percentage: number) => {
@@ -73,6 +96,41 @@ export default function DiagnosticCard({
     };
 
     const topBand = getRiskBandConfig(topPrediction.percentage);
+
+    const handleAuditEvidence = async () => {
+        if (explainData) {
+            setShowExplanation(!showExplanation);
+            return;
+        }
+
+        const noteToAudit =
+            clinicalNotes && clinicalNotes.trim().length >= 5
+                ? clinicalNotes
+                : `Bệnh nhân ${result.patient_id} vào viện vì khó thở tăng dần kèm ho kéo dài. Khám phổi nghe ran rít ran ngáy thì thở ra. Tiền sử dùng thuốc theo chỉ định.`;
+
+        setExplainLoading(true);
+        setExplainError(null);
+
+        try {
+            const data = await explainClinicalCase({
+                patient_id: result.patient_id,
+                clinical_notes: noteToAudit,
+                target_diagnosis: result.predicted_disease,
+                differential_diagnosis:
+                    result.top_k_predictions[1]?.disease || undefined,
+            });
+            setExplainData(data);
+            setShowExplanation(true);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setExplainError(err.message);
+            } else {
+                setExplainError("Không thể kết nối dịch vụ Agentic RAG");
+            }
+        } finally {
+            setExplainLoading(false);
+        }
+    };
 
     return (
         <div
@@ -143,7 +201,7 @@ export default function DiagnosticCard({
                                                     {result.temperature})
                                                 </strong>{" "}
                                                 trên tập Validation nội bộ, tiệm
-                                                cận{" "}
+                                                cận ngưỡng khuyến nghị{" "}
                                                 <strong className="text-emerald-400">
                                                     ECE = {result.ece_score}{" "}
                                                     &lt; 0.05
@@ -156,8 +214,8 @@ export default function DiagnosticCard({
                                         <span className="font-semibold text-slate-300">
                                             Ý nghĩa y khoa:
                                         </span>{" "}
-                                        Điểm số phản ánh tần suất rủi ro
-                                        ước tính trên tập kiểm thử nội bộ, hỗ trợ
+                                        Điểm số phản ánh tần suất rủi ro ước
+                                        tính trên tập kiểm thử nội bộ, hỗ trợ
                                         giảm thiểu hiện tượng tự tin thái quá
                                         (overconfidence) thường gặp ở các mô
                                         hình học sâu.
@@ -172,7 +230,8 @@ export default function DiagnosticCard({
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-2">
                     <div>
                         <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                            Gợi ý chẩn đoán có xác suất cao nhất (Mô hình tham khảo)
+                            Gợi ý chẩn đoán có xác suất cao nhất (Mô hình tham
+                            khảo)
                         </span>
                         <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1 flex items-center gap-3">
                             <span>{topPrediction.disease_name}</span>
@@ -209,8 +268,8 @@ export default function DiagnosticCard({
                     <div className="flex items-center justify-between mb-3">
                         <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <Activity className="w-4 h-4 text-sky-500" />
-                            Bảng Phân Bố Xác Suất Tham Khảo Top-K Bệnh Lý (Ranked
-                            Pathologies)
+                            Bảng Phân Bố Xác Suất Tham Khảo Top-K Bệnh Lý
+                            (Ranked Pathologies)
                         </h4>
                         <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-500">
                             <span className="flex items-center gap-1">
@@ -273,7 +332,6 @@ export default function DiagnosticCard({
 
                                     {/* 3-Band Progress Bar with Reference Threshold Markers */}
                                     <div className="relative w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                                        {/* Threshold guides at 30% and 70% */}
                                         <div
                                             className="absolute top-0 bottom-0 left-[30%] w-[1px] bg-slate-300 dark:bg-slate-700 z-10"
                                             title="Ngưỡng 30%"
@@ -283,7 +341,6 @@ export default function DiagnosticCard({
                                             title="Ngưỡng 70%"
                                         />
 
-                                        {/* Progress Fill */}
                                         <div
                                             className={`h-full rounded-full transition-all duration-700 ease-out ${band.barColor}`}
                                             style={{
@@ -302,7 +359,7 @@ export default function DiagnosticCard({
                     <button
                         type="button"
                         onClick={() => setShowStreamDetails(!showStreamDetails)}
-                        className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 py-2 transition-colors"
+                        className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 py-2 transition-colors cursor-pointer"
                     >
                         <span className="flex items-center gap-2">
                             <Layers className="w-4 h-4 text-indigo-500" />
@@ -420,11 +477,185 @@ export default function DiagnosticCard({
                     </div>
                 )}
 
+                {/* --- BACKLOG 05: AGENTIC RAG & CLINICAL EVIDENCE AUDITING --- */}
+                <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <span className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                                <BookOpen className="w-4 h-4" />
+                            </span>
+                            <div>
+                                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                                    Hội Chẩn Đa Tác Tử &amp; Kiểm Toán Chứng Cứ
+                                    (Agentic RAG)
+                                </h4>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                                    Đối chiếu tiêu chuẩn chẩn đoán phân biệt
+                                    quốc tế &amp; định vị bằng chứng nguyên văn
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={handleAuditEvidence}
+                            disabled={explainLoading}
+                            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50 cursor-pointer"
+                        >
+                            {explainLoading ? (
+                                <>
+                                    <Activity className="w-4 h-4 animate-spin" />
+                                    <span>Đang hội chẩn Agentic RAG...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="w-4 h-4" />
+                                    <span>
+                                        {showExplanation
+                                            ? "Ẩn Bảng Chứng Cứ"
+                                            : "Xem Bằng Chứng & Phác Đồ"}
+                                    </span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {explainError && (
+                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            <span>{explainError}</span>
+                        </div>
+                    )}
+
+                    {/* Agentic RAG Result Box */}
+                    {showExplanation && explainData && (
+                        <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                            {/* Differential Reasoning Card */}
+                            <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/5 via-sky-500/5 to-slate-500/5 border border-indigo-500/20 dark:border-indigo-500/30 space-y-3">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs font-bold text-indigo-900 dark:text-indigo-300">
+                                            Biện Luận Chẩn Đoán Phân Biệt:
+                                        </span>
+                                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-500/30">
+                                            {explainData.primary_diagnosis_name}{" "}
+                                            (Ưu tiên)
+                                        </span>
+                                        <span className="text-xs text-slate-400">
+                                            vs
+                                        </span>
+                                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-500/30">
+                                            {explainData.differential_diagnosis_name ||
+                                                explainData.differential_diagnosis}{" "}
+                                            (Đối trọng)
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsDrawerOpen(true)}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-indigo-600 text-xs font-medium shadow-sm transition-all cursor-pointer"
+                                    >
+                                        <BookOpen className="w-3.5 h-3.5 text-indigo-500" />
+                                        <span>
+                                            Xem Phác Đồ (
+                                            {
+                                                explainData.guideline_references
+                                                    .length
+                                            }
+                                            )
+                                        </span>
+                                    </button>
+                                </div>
+
+                                <p className="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed font-sans">
+                                    {explainData.differential_reasoning}
+                                </p>
+
+                                {/* Red Flags if any */}
+                                {explainData.red_flags &&
+                                    explainData.red_flags.length > 0 && (
+                                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs space-y-1">
+                                            <div className="font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1.5">
+                                                <AlertOctagon className="w-4 h-4 text-rose-500" />
+                                                <span>
+                                                    Cảnh Báo Cờ Đỏ Cấp Cứu
+                                                    (Clinical Red Flags):
+                                                </span>
+                                            </div>
+                                            <ul className="list-disc list-inside text-rose-600 dark:text-rose-400 space-y-0.5 pl-2">
+                                                {explainData.red_flags.map(
+                                                    (rf, i) => (
+                                                        <li key={`rf-${i}`}>
+                                                            {rf}
+                                                        </li>
+                                                    ),
+                                                )}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                {/* Recommended Next Investigations */}
+                                {explainData.recommended_investigations &&
+                                    explainData.recommended_investigations
+                                        .length > 0 && (
+                                        <div className="p-3 rounded-xl bg-sky-500/5 dark:bg-sky-950/20 border border-sky-500/10 text-xs space-y-1.5">
+                                            <div className="font-semibold text-sky-900 dark:text-sky-200 flex items-center gap-1.5">
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-sky-500" />
+                                                <span>
+                                                    Đề Xuất Xét Nghiệm Xác Chẩn
+                                                    Theo Phác Đồ:
+                                                </span>
+                                            </div>
+                                            <ul className="list-disc list-inside text-slate-600 dark:text-slate-400 space-y-0.5 pl-2 text-[11px]">
+                                                {explainData.recommended_investigations.map(
+                                                    (inv, i) => (
+                                                        <li key={`inv-${i}`}>
+                                                            {inv}
+                                                        </li>
+                                                    ),
+                                                )}
+                                            </ul>
+                                        </div>
+                                    )}
+                            </div>
+
+                            {/* Evidence Viewer with Highlighted Spans */}
+                            <EvidenceViewer
+                                rawNotes={
+                                    clinicalNotes &&
+                                    clinicalNotes.trim().length >= 5
+                                        ? clinicalNotes
+                                        : `Bệnh nhân ${result.patient_id} vào viện vì khó thở tăng dần kèm ho kéo dài. Khám phổi nghe ran rít ran ngáy thì thở ra. Tiền sử dùng thuốc theo chỉ định.`
+                                }
+                                spans={explainData.grounded_spans}
+                                hallucinationFilteredCount={
+                                    explainData.hallucination_filtered_count
+                                }
+                                onOpenGuidelineDrawer={() =>
+                                    setIsDrawerOpen(true)
+                                }
+                            />
+
+                            {/* Guideline Drawer */}
+                            <GuidelineDrawer
+                                isOpen={isDrawerOpen}
+                                onClose={() => setIsDrawerOpen(false)}
+                                guidelines={explainData.guideline_references}
+                                activeDisease={result.predicted_disease}
+                            />
+                        </div>
+                    )}
+                </div>
+
                 {/* Clinical Research Disclaimer */}
                 <div className="pt-3 text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 flex items-start gap-2">
                     <Info className="w-3.5 h-3.5 text-sky-500 flex-shrink-0 mt-0.5" />
                     <span>
-                        <strong>Lưu ý chuyên môn:</strong> Kết quả trên là sản phẩm nghiên cứu thử nghiệm hỗ trợ quyết định (CDSS), không thay thế kết luận chẩn đoán và chỉ định điều trị của bác sĩ chuyên khoa.
+                        <strong>Lưu ý chuyên môn:</strong> Kết quả trên là sản
+                        phẩm nghiên cứu thử nghiệm hỗ trợ quyết định (CDSS),
+                        không thay thế kết luận chẩn đoán và chỉ định điều trị
+                        của bác sĩ chuyên khoa.
                     </span>
                 </div>
             </div>

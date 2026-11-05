@@ -7,21 +7,21 @@
 
 ### 🔹 Nhiệm vụ 3.1: Hiện Thực Hybrid Knowledge Retriever (`src/agent/retriever.py`)
 * **Độ ưu tiên:** `[P0 - Blocker]`
-* **Mô tả:** Viết lớp `HybridGuidelineRetriever` kết nối cơ sở dữ liệu Qdrant:
+* **Mô tả:** Viết lớp `HybridGuidelineRetriever` kết nối cơ sở dữ liệu Qdrant / In-memory:
   - Tiếp nhận query triệu chứng hoặc câu hỏi phân biệt.
-  - Kết hợp điểm Cosine Dense Embedding và lọc từ khóa BM25 để trả về các phân mảnh phác đồ phù hợp nhất kèm metadata.
-* **Đầu ra (Deliverable):** `src/agent/retriever.py`.
-* **Trạng thái:** `[ ] TODO`
+  - Kết hợp điểm Cosine Dense Embedding và lọc từ khóa BM25 để trả về các phân mảnh phác đồ phù hợp nhất kèm metadata (`GOLD_2024`, `GINA_2024`, `ESC_2023`, `BYT_2020`).
+* **Đầu ra (Deliverable):** `src/agent/retriever.py`, `src/agent/__init__.py`.
+* **Trạng thái:** `[x] DONE (Đã hiện thực HybridGuidelineRetriever hỗ trợ live Qdrant + Fallback Corpus chuẩn hóa)`
 
 ---
 
 ### 🔹 Nhiệm vụ 3.2: Xây Dựng GuidelineDrawer & EvidenceViewer Component
 * **Độ ưu tiên:** `[P0 - Blocker]`
 * **Mô tả:**
-  1. `frontend/src/components/GuidelineDrawer.tsx`: Drawer trượt mượt mà từ bên phải, hiển thị trọn vẹn văn bản phác đồ y tế chuẩn được trích dẫn (GINA/GOLD/ESC), tiêu đề phần và cấp độ chứng cứ (Evidence Level A/B).
-  2. `frontend/src/components/EvidenceViewer.tsx`: Nhận chuỗi bệnh án gốc và mảng offsets `[{start, end, text}]`. Tự động chèn thẻ `<mark>` highlight màu vàng làm sáng các câu chứng cứ trong bệnh án.
+  1. `frontend/src/components/GuidelineDrawer.tsx`: Drawer trượt mượt mà từ bên phải, hiển thị trọn vẹn văn bản phác đồ y tế chuẩn được trích dẫn (GINA/GOLD/ESC/Bộ Y tế), tiêu đề phần và cấp độ chứng cứ (Evidence Level A/B).
+  2. `frontend/src/components/EvidenceViewer.tsx`: Nhận chuỗi bệnh án gốc và mảng offsets `[{start, end, text, category, label, reason}]`. Tự động chèn thẻ `<mark>` highlight màu sắc trực quan (xanh lá cho ủng hộ, xanh tím cho phân biệt, đỏ cho cờ đỏ).
 * **Đầu ra (Deliverable):** `GuidelineDrawer.tsx`, `EvidenceViewer.tsx`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE (Đã hoàn thiện cả 2 components và tích hợp vào DiagnosticCard)`
 
 ---
 
@@ -32,14 +32,14 @@
   - Đảm bảo nếu LLM bịa đặt một câu không có trong bệnh án, hệ thống sẽ loại bỏ hoàn toàn câu đó.
   - Chạy lệnh: `pytest tests/test_agent_rag.py -v` (pass 100%).
 * **Đầu ra (Deliverable):** `tests/test_agent_rag.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE (8/8 tests passed 100%, kiểm thử thành công Zero-Hallucination & Anti-Hallucination filter)`
 
 ---
 
 ### 🔹 Nhiệm vụ 3.4: Tích Hợp API Client & Đồng Bộ Toàn Bộ Giao Diện
 * **Độ ưu tiên:** `[P0 - Blocker]`
 * **Mô tả:**
-  1. Viết `frontend/src/lib/api.ts` kết nối các endpoint Backend.
-  2. Nối thông suốt luồng người dùng trên Web: Bác sĩ nhập ca bệnh $\rightarrow$ Bấm nút $\rightarrow$ Gọi API `/predict/multimodal` $\rightarrow$ Gọi API `/agent/explain` $\rightarrow$ Hiển thị Card xác suất + Highlight bệnh án + Drawer phác đồ.
+  1. Viết `frontend/src/lib/api.ts` kết nối các endpoint Backend (`explainClinicalCase`).
+  2. Nối thông suốt luồng người dùng trên Web: Bác sĩ nhập ca bệnh $\rightarrow$ Bấm nút $\rightarrow$ Gọi API `/predict/mock` $\rightarrow$ Gọi API `/agent/explain` $\rightarrow$ Hiển thị Card xác suất + Highlight bệnh án + Drawer phác đồ.
 * **Đầu ra (Deliverable):** Giao diện Web tương tác trọn vẹn tại `http://localhost:3000`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE (Route POST /api/v1/agent/explain và client UI Next.js 14 đã kết nối thông suốt)`

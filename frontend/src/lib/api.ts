@@ -420,3 +420,71 @@ export async function getAblationBenchmarks(): Promise<AblationStudyResponse> {
   }
 }
 
+
+
+export interface EvidenceSpan {
+  start_char: number;
+  end_char: number;
+  text: string;
+  category: "supporting" | "counter" | "red_flag" | string;
+  label: string;
+  reason?: string;
+  confidence?: number;
+  is_exact?: boolean;
+}
+
+export interface GuidelineReference {
+  chunk_id: string;
+  guideline_source: string;
+  disease_entity: string;
+  section_title: string;
+  clinical_category: string;
+  evidence_level: string;
+  text_content: string;
+  relevance_score?: number;
+}
+
+export interface AgentExplainRequest {
+  patient_id?: string;
+  clinical_notes: string;
+  target_diagnosis?: string;
+  differential_diagnosis?: string;
+  calibrated_probabilities?: Record<string, number>;
+}
+
+export interface AgentExplainResponse {
+  patient_id: string;
+  primary_diagnosis: string;
+  primary_diagnosis_name: string;
+  differential_diagnosis?: string;
+  differential_diagnosis_name?: string;
+  differential_reasoning: string;
+  grounded_spans: EvidenceSpan[];
+  guideline_references: GuidelineReference[];
+  red_flags: string[];
+  recommended_investigations: string[];
+  hallucination_filtered_count: number;
+  execution_time_ms: number;
+}
+
+/**
+ * Call backend to trigger Agentic RAG clinical differential explanation and evidence grounding
+ */
+export async function explainClinicalCase(
+  payload: AgentExplainRequest
+): Promise<AgentExplainResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/agent/explain`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Agent explain failed (${response.status}): ${errorText}`);
+  }
+
+  return response.json();
+}

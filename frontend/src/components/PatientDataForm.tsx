@@ -645,7 +645,7 @@ export default function PatientDataForm() {
 
       {/* Hiển Thị Kết Quả DiagnosticCard (Multimodal Core) */}
       {multimodalResponse && (
-        <DiagnosticCard result={multimodalResponse} onReset={handleReset} />
+        <DiagnosticCard result={multimodalResponse} onReset={handleReset} clinicalNotes={clinicalNotes} />
       )}
 
       {/* Hiển Thị Kết Quả 3 Baselines */}
