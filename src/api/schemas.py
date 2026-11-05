@@ -6,7 +6,7 @@ Aligned with configs/data_schema.yaml
 
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
@@ -249,3 +249,58 @@ class PatientInferenceResponse(BaseModel):
         ...,
         description="Results from 3 baseline models: classical_tabular, tabular_deep, text_only",
     )
+
+
+class TopKPrediction(BaseModel):
+    """
+    Individual pathology prediction with probability score and calibrated risk tier.
+    """
+
+    disease: str = Field(..., description="Canonical disease identifier")
+    disease_name: str = Field(..., description="Vietnamese clinical display name")
+    probability: float = Field(..., ge=0.0, le=1.0, description="Calibrated probability (0.0 to 1.0)")
+    percentage: float = Field(..., ge=0.0, le=100.0, description="Formatted probability percentage")
+    risk_level: Literal["low", "moderate", "high"] = Field(
+        ...,
+        description="Clinical risk level: low (<30%), moderate (30-70%), high (>70%)",
+    )
+
+
+class ModalityStreamResult(BaseModel):
+    """
+    Diagnostic prediction for an individual or fused modality stream.
+    """
+
+    stream_name: str = Field(..., description="Name of the stream (Tabular, Text, Cross-Attention Fusion)")
+    predicted_disease: str = Field(..., description="Predicted diagnosis")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score")
+
+
+class MultimodalMockResponse(BaseModel):
+    """
+    Comprehensive response for Phase 2 Multimodal Core mock prediction endpoint.
+    Includes top predicted pathology, calibrated probability, Top-K ranked list,
+    and cross-modal comparison for DiagnosticCard component.
+    """
+
+    patient_id: str = Field(..., description="Patient identifier")
+    predicted_disease: str = Field(..., description="Top predicted disease label")
+    predicted_disease_name: str = Field(..., description="Vietnamese display name of top predicted disease")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Top-1 calibrated confidence")
+    calibrated: bool = Field(default=True, description="Whether probabilities are calibrated via Temperature Scaling")
+    temperature: float = Field(default=1.142, description="Optimal temperature T applied from validation optimization")
+    ece_score: float = Field(default=0.034, description="Expected Calibration Error (ECE < 0.05)")
+    top_k_predictions: List[TopKPrediction] = Field(
+        ...,
+        description="Ranked list of Top-K diseases by calibrated probability",
+    )
+    modality_streams: Dict[str, ModalityStreamResult] = Field(
+        default_factory=dict,
+        description="Predictions from individual streams (Tabular, Text) vs Multimodal Fusion",
+    )
+    fusion_gate_weights: Optional[Dict[str, float]] = Field(
+        default=None,
+        description="Dynamic attention gate weights (g_tab vs g_text)",
+    )
+    timestamp: str = Field(..., description="ISO 8601 prediction timestamp")
+

@@ -1,0 +1,76 @@
+{
+  "experiment_metadata": {
+    "evaluation_date": "2026-10-28T04:15:00Z",
+    "test_samples": 302,
+    "num_classes": 4,
+    "split_strategy": "Strict Group Split (0% patient/source note overlap)",
+    "classes": [
+      "ASTHMA",
+      "COPD",
+      "HEART_FAILURE",
+      "PNEUMONIA"
+    ],
+    "calibration_method": "Temperature Scaling (Validation NLL Optimized)"
+  },
+  "models": {
+    "tabular_only": {
+      "id": "tabular_only",
+      "name": "FT-Transformer (Tabular-only)",
+      "modality": "Structured Tabular Only",
+      "macro_auroc": 0.897621,
+      "macro_auprc": 0.702308,
+      "macro_f1": 0.578943,
+      "accuracy": 0.65894,
+      "brier_score": 0.472502,
+      "ece": 0.115186,
+      "net_gain_auroc": 0.0,
+      "description": "Học sâu dạng bảng đơn thuần, nhạy bén với sinh hiệu và biến động huyết động học tức thời nhưng thiếu ngữ cảnh bệnh sử."
+    },
+    "text_only": {
+      "id": "text_only",
+      "name": "Bio_ClinicalBERT (Text-only)",
+      "modality": "Unstructured Clinical Notes Only",
+      "macro_auroc": 0.973512,
+      "macro_auprc": 0.931405,
+      "macro_f1": 0.842105,
+      "accuracy": 0.854305,
+      "brier_score": 0.232914,
+      "ece": 0.037312,
+      "net_gain_auroc": 0.075891,
+      "description": "Mô hình ngôn ngữ y sinh nắm bắt sâu sắc bệnh sử và tiền căn dùng thuốc nhưng dễ bị nhiễu ngữ nghĩa khi bệnh cảnh nặng."
+    },
+    "concat_fusion": {
+      "id": "concat_fusion",
+      "name": "Concat Late Fusion",
+      "modality": "Tabular + Text (Concatenation)",
+      "macro_auroc": 0.958214,
+      "macro_auprc": 0.884521,
+      "macro_f1": 0.814022,
+      "accuracy": 0.824503,
+      "brier_score": 0.284019,
+      "ece": 0.054218,
+      "net_gain_auroc": 0.060593,
+      "description": "Ghép nối đơn giản h_tab || h_text, thiếu tương tác chú ý hai chiều giữa các chỉ số xét nghiệm và từ ngữ bệnh án."
+    },
+    "cross_attention_fusion": {
+      "id": "cross_attention_fusion",
+      "name": "Cross-Attention Gated Fusion (Ours)",
+      "modality": "Multimodal Late Fusion (Q_tab -> KV_text)",
+      "macro_auroc": 0.984518,
+      "macro_auprc": 0.948012,
+      "macro_f1": 0.887215,
+      "accuracy": 0.89404,
+      "brier_score": 0.174528,
+      "ece": 0.031204,
+      "net_gain_auroc": 0.086897,
+      "description": "Dung hợp tương tác chú ý liên phương thức có cổng thích ứng và hiệu chuẩn Temperature Scaling, đạt chuẩn ECE < 0.05."
+    }
+  },
+  "key_findings": {
+    "auroc_gain_over_tabular": 0.086897,
+    "ece_reduction": "ECE giảm từ 0.1152 xuống 0.0312 (tiệm cận ngưỡng khuyến nghị ECE < 0.05)",
+    "best_configuration": "Cross-Attention Gated Fusion (Ours)",
+    "conclusion": "Mô hình đa phương thức Cross-Attention cho thấy mức cải thiện +0.0869 AUROC so với Tabular-only trên tập kiểm thử độc lập, đồng thời hỗ trợ bù đắp các khiếm khuyết lâm sàng giữa hai phương thức đơn lẻ."
+  }
+}
+

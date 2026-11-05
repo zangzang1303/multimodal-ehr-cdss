@@ -12,6 +12,7 @@ router = APIRouter(prefix="/benchmarks")
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 STRICT_JSON_PATH = PROJECT_ROOT / "data" / "rebuilt_strict_results_2026-10-28.json"
 BASELINE_JSON_PATH = PROJECT_ROOT / "data" / "baseline_results.json"
+ABLATION_JSON_PATH = PROJECT_ROOT / "data" / "ablation_results.json"
 
 
 @router.options("/baselines")
@@ -42,3 +43,33 @@ async def get_baseline_benchmarks():
         status_code=503,
         detail="Baseline results are unavailable. Run scripts/run_baselines.py first.",
     )
+
+
+@router.options("/ablation")
+async def options_ablation():
+    """Direct OPTIONS handler for ablation benchmarks endpoint."""
+    return {"status": "ok"}
+
+
+@router.get("/ablation")
+async def get_ablation_benchmarks():
+    """
+    Returns ablation study benchmark results comparing Tabular-only, Text-only,
+    Concat Fusion, and Cross-Attention Fusion from data/ablation_results.json.
+    """
+    if ABLATION_JSON_PATH.exists():
+        try:
+            with open(ABLATION_JSON_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error reading ablation_results.json: {str(e)}",
+            )
+
+    raise HTTPException(
+        status_code=503,
+        detail="Ablation results are unavailable. data/ablation_results.json not found.",
+    )
+
