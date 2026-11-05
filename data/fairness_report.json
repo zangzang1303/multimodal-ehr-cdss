@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "total_test_samples": 286,
+    "n_bootstrap": 500,
+    "seed": 42,
+    "disclaimer": "Phân tích công bằng phân nhóm trên dữ liệu tổng hợp (Synthea/MTSamples) không chứng minh hoặc đảm bảo tính công bằng trên bệnh nhân lâm sàng thực tế."
+  },
+  "disparities": {
+    "gender_max_f1_disparity": 0.006640086130025147,
+    "age_senior_f1_disparity": 0.24580597962988954
+  },
+  "subgroups": {
+    "gender_F": {
+      "sample_size": 123,
+      "sample_ratio": 0.43006993006993005,
+      "accuracy": 0.3983739837398374,
+      "accuracy_ci95": [
+        0.3128048780487805,
+        0.4796747967479675
+      ],
+      "macro_f1": 0.33808634762079887,
+      "macro_f1_ci95": [
+        0.24822181919998493,
+        0.4226058639159947
+      ],
+      "macro_auroc": 0.6222698259936711,
+      "macro_auroc_ci95": [
+        0.556113463684399,
+        0.6866309407631381
+      ]
+    },
+    "gender_M": {
+      "sample_size": 163,
+      "sample_ratio": 0.5699300699300699,
+      "accuracy": 0.3619631901840491,
+      "accuracy_ci95": [
+        0.294478527607362,
+        0.44785276073619634
+      ],
+      "macro_f1": 0.344726433750824,
+      "macro_f1_ci95": [
+        0.27641720721827123,
+        0.4262680205781401
+      ],
+      "macro_auroc": 0.547032806889935,
+      "macro_auroc_ci95": [
+        0.483065902327698,
+        0.613139927608727
+      ]
+    },
+    "age_under_65": {
+      "sample_size": 191,
+      "sample_ratio": 0.6678321678321678,
+      "accuracy": 0.42408376963350786,
+      "accuracy_ci95": [
+        0.3612565445026178,
+        0.4973821989528796
+      ],
+      "macro_f1": 0.37933781655155696,
+      "macro_f1_ci95": [
+        0.3207677343557003,
+        0.4328641014420271
+      ],
+      "macro_auroc": 0.6359771419802038,
+      "macro_auroc_ci95": [
+        0.5943965729495456,
+        0.6798192558930495
+      ]
+    },
+    "age_65_and_above": {
+      "sample_size": 95,
+      "sample_ratio": 0.3321678321678322,
+      "accuracy": 0.28421052631578947,
+      "accuracy_ci95": [
+        0.2,
+        0.37894736842105264
+      ],
+      "macro_f1": 0.13353183692166742,
+      "macro_f1_ci95": [
+        0.09760992498305827,
+        0.177197443563969
+      ],
+      "macro_auroc": 0.39098226601123603,
+      "macro_auroc_ci95": [
+        0.2887293773846802,
+        0.5044983335325118
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "generated_at": "2026-11-05T15:46:55.096804+00:00",
+    "data_dir": "data\\processed_rebuilt_strict",
+    "device": "cpu",
+    "seed": 42,
+    "temperature": 1.3541077375411987,
+    "best_epoch": 0
+  },
+  "test_metrics_uncalibrated": {
+    "macro_auroc": 0.5527065861201161,
+    "macro_auprc": 0.3594103452627987,
+    "macro_f1": 0.37855123356245496,
+    "accuracy": 0.3776223776223776,
+    "brier_score": 1.0065788558306963,
+    "ece": 0.38346428616897205,
+    "mce": 0.6393914589515098
+  },
+  "test_metrics_calibrated": {
+    "macro_auroc": 0.5523956070395665,
+    "macro_auprc": 0.36103028871215326,
+    "macro_f1": 0.37855123356245496,
+    "accuracy": 0.3776223776223776,
+    "brier_score": 0.9634936489534492,
+    "ece": 0.33435628328706835,
+    "mce": 0.6616705294166293
+  }
+}
