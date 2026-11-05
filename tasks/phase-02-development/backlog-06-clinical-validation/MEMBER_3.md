@@ -1,4 +1,4 @@
-# BACKLOG 04 - NHIỆM VỤ THÀNH VIÊN 3 (FULL-STACK AI & FRONTEND)
+# BACKLOG 06 - NHIỆM VỤ THÀNH VIÊN 3 (FULL-STACK AI & FRONTEND)
 ### Trọng Tâm: Benchmark REST Route, Unit Tests Toàn Bộ Endpoints, UI Đồ Thị DCA & Tối Ưu UX
 
 ---
@@ -9,10 +9,11 @@
 * **Độ ưu tiên:** `[P0 - Blocker]`
 * **Mô tả:**
   1. Viết route `GET /api/v1/evaluation/benchmark` trong `src/api/routes/evaluation_routes.py` trả về bảng chỉ số tổng hợp JSON (AUROC, AUPRC, F1, ECE, DCA Net Benefit giữa 3 Baselines và Ours).
-  2. Viết bộ kiểm thử tự động `tests/test_api_endpoints.py`:
+  2. Mở rộng `tests/test_api_endpoints.py` hiện có của Phase 1 bằng ca kiểm thử mới:
      - Test route `/predict/multimodal`: Gửi payload bảng + text hợp lệ, kiểm tra mã 200, kiểm tra danh sách predictions có tổng xác suất = 1.0.
      - Test route `/agent/explain`: Gửi id ca bệnh, kiểm tra mã 200 và mảng evidence spans có vị trí `start` và `end`.
-     - Test route `/evaluation/benchmark`: Kiểm tra mã 200 và schema JSON.
+     - Test route `/evaluation/benchmark`: Kiểm tra mã 200, schema JSON, tên split/phiên bản benchmark và trường hợp artifact thiếu.
+     - Test payload sai, ghi chú rỗng, checkpoint/RAG không sẵn sàng; không yêu cầu HTTP 200 cho lỗi.
   3. Chạy lệnh: `pytest tests/test_api_endpoints.py -v` (bảo đảm pass 100%).
 * **Đầu ra (Deliverable):** `src/api/routes/evaluation_routes.py`, `tests/test_api_endpoints.py`.
 * **Trạng thái:** `[ ] TODO`
@@ -23,7 +24,7 @@
 * **Độ ưu tiên:** `[P1 - Critical]`
 * **Mô tả:** Xây dựng component trực quan hóa đường cong DCA trên Frontend (`recharts` hoặc `chart.js`):
   - Vẽ đường cong Net Benefit của M-CDSS đối chiếu với "Treat All" và "Treat None".
-  - Cho phép người dùng kéo thanh trượt điều chỉnh ngưỡng can thiệp $p_t$ để quan sát số ca can thiệp đúng ròng tăng thêm tương ứng.
+  - Hiển thị rõ bệnh đích one-vs-rest, hành động giả định, tỷ lệ hiện mắc, dải ngưỡng hợp lệ và cảnh báo “phân tích minh họa trên dữ liệu nghiên cứu”; chỉ cho kéo thanh trượt trong dải đã định trước.
 * **Đầu ra (Deliverable):** Component biểu đồ DCA tương tác trên Frontend.
 * **Trạng thái:** `[ ] TODO`
 

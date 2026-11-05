@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "generated_at": "2026-11-05T08:28:03.150032+00:00",
+    "split": "data\\processed_rebuilt_strict",
+    "split_rows": {
+      "train": 1425,
+      "val": 273,
+      "test": 302
+    },
+    "audit_file": "data\\rebuilt_strict_split_audit.json",
+    "baseline_file": "data\\rebuilt_strict_results_2026-10-28.json",
+    "seed": 42,
+    "device": "cuda",
+    "text_model": "emilyalsentzer/Bio_ClinicalBERT",
+    "text_backbone_frozen": true,
+    "max_length": 512,
+    "epochs_max": 12,
+    "batch_size": 16,
+    "note": "Frozen text backbone; not directly equivalent to Phase 1 fine-tuned text baseline."
+  },
+  "strict_baseline_auroc": {
+    "baseline_1_classical_tabular": 0.922315,
+    "baseline_2_tabular_deep": 0.897621,
+    "baseline_3_text_only": 0.973453
+  },
+  "variants": {
+    "tabular": {
+      "selected_epoch": 3,
+      "validation_nll": 0.5569965243339539,
+      "temperature": 1.2365299463272095,
+      "test": {
+        "macro_auroc": 0.8987648505679356,
+        "macro_auprc": 0.699662654972183,
+        "macro_f1": 0.5386303167338636,
+        "accuracy": 0.6556291390728477,
+        "brier_score": 0.47632452825211136,
+        "ece": 0.10129639901072772
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": -0.02355014943206435,
+        "baseline_2_tabular_deep": 0.0011438505679356448,
+        "baseline_3_text_only": -0.07468814943206437
+      }
+    },
+    "text": {
+      "selected_epoch": 1,
+      "validation_nll": 1.3727705478668213,
+      "temperature": 1.0,
+      "test": {
+        "macro_auroc": 0.6605452038124725,
+        "macro_auprc": 0.40144397350597044,
+        "macro_f1": 0.1483843537414966,
+        "accuracy": 0.2152317880794702,
+        "brier_score": 0.7674891804251837,
+        "ece": 0.07728824621399505
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": -0.2617697961875275,
+        "baseline_2_tabular_deep": -0.2370757961875275,
+        "baseline_3_text_only": -0.3129077961875275
+      }
+    },
+    "concat": {
+      "selected_epoch": 2,
+      "validation_nll": 0.6157954931259155,
+      "temperature": 1.3245905637741089,
+      "test": {
+        "macro_auroc": 0.9119578375795265,
+        "macro_auprc": 0.7416809525442074,
+        "macro_f1": 0.6379864068410037,
+        "accuracy": 0.7152317880794702,
+        "brier_score": 0.41475167988102635,
+        "ece": 0.10494911463450121
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": -0.010357162420473465,
+        "baseline_2_tabular_deep": 0.014336837579526529,
+        "baseline_3_text_only": -0.06149516242047348
+      }
+    },
+    "cross_attention": {
+      "selected_epoch": 3,
+      "validation_nll": 0.44421452283859253,
+      "temperature": 1.3541077375411987,
+      "test": {
+        "macro_auroc": 0.9594141527959706,
+        "macro_auprc": 0.8536225677057602,
+        "macro_f1": 0.6503384600981267,
+        "accuracy": 0.7748344370860927,
+        "brier_score": 0.34959917250530276,
+        "ece": 0.097339602594344
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": 0.03709915279597065,
+        "baseline_2_tabular_deep": 0.06179315279597064,
+        "baseline_3_text_only": -0.01403884720402937
+      }
+    }
+  }
+}
