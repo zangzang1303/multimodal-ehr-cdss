@@ -1,0 +1,72 @@
+# CLINICAL GUIDELINES CATALOG & COMPLIANCE REGISTRY
+# M-CDSS Backlog 05 - Digitalized Evidence-Based Guidelines
+catalog_version: "2026.1"
+last_audit_date: "2026-11-09"
+
+guidelines:
+  - source_id: "GINA_2024"
+    title: "Global Strategy for Asthma Management and Prevention"
+    authority: "Global Initiative for Asthma (GINA)"
+    version: "2024"
+    publication_year: 2024
+    access_date: "2024-05-15"
+    official_url: "https://ginasthma.org/gina-reports/"
+    license_and_usage: "Non-commercial clinical decision support and educational research use permitted under FAIR guidelines"
+    target_disease: "ASTHMA"
+    evidence_grading_system: "GINA Evidence Categories (A, B, C, D)"
+
+  - source_id: "GOLD_2024"
+    title: "Global Strategy for the Diagnosis, Management, and Prevention of COPD"
+    authority: "Global Initiative for Chronic Obstructive Lung Disease (GOLD)"
+    version: "2024"
+    publication_year: 2024
+    access_date: "2024-04-10"
+    official_url: "https://goldcopd.org/2024-gold-report/"
+    license_and_usage: "Academic clinical research and clinical decision support reference use"
+    target_disease: "COPD"
+    evidence_grading_system: "Evidence Levels (Evidence A, Evidence B, Evidence C, Evidence D)"
+
+  - source_id: "ESC_2023"
+    title: "ESC Guidelines for the Diagnosis and Treatment of Acute and Chronic Heart Failure"
+    authority: "European Society of Cardiology (ESC)"
+    version: "2023 / Focused Update"
+    publication_year: 2023
+    access_date: "2024-03-20"
+    official_url: "https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/Acute-and-Chronic-Heart-Failure"
+    license_and_usage: "Clinical practice guidelines standard reference for non-profit research"
+    target_disease: "CONGESTIVE_HEART_FAILURE"
+    evidence_grading_system: "Classes of Recommendations and Levels of Evidence (Class I/IIa/IIb/III, Level A/B/C)"
+
+  - source_id: "BYT_VN_CAP_2020"
+    title: "Hướng dẫn chẩn đoán và điều trị viêm phổi mắc phải cộng đồng ở người lớn"
+    authority: "Bộ Y tế Việt Nam (Quyết định số 4815/QĐ-BYT)"
+    version: "2020"
+    publication_year: 2020
+    access_date: "2024-06-01"
+    official_url: "https://kcb.vn/van-ban/quyet-dinh-so-4815-qd-byt.html"
+    license_and_usage: "Tài liệu chuyên môn chính thức của Bộ Y tế Việt Nam phục vụ khám chữa bệnh và đào tạo y khoa"
+    target_disease: "COMMUNITY_ACQUIRED_PNEUMONIA"
+    evidence_grading_system: "Quy chuẩn chuyên môn Bộ Y tế"
+
+  - source_id: "BYT_VN_COPD_2020"
+    title: "Hướng dẫn chẩn đoán và điều trị Bệnh phổi tắc nghẽn mạn tính (COPD)"
+    authority: "Bộ Y tế Việt Nam (Quyết định số 1856/QĐ-BYT)"
+    version: "2020"
+    publication_year: 2020
+    access_date: "2024-06-01"
+    official_url: "https://kcb.vn/van-ban/quyet-dinh-so-1856-qd-byt.html"
+    license_and_usage: "Tài liệu chuyên môn chính thức của Bộ Y tế Việt Nam"
+    target_disease: "COPD"
+    evidence_grading_system: "Quy chuẩn chuyên môn Bộ Y tế"
+
+  - source_id: "BYT_VN_ASTHMA_2020"
+    title: "Hướng dẫn chẩn đoán và điều trị Hen phế quản người lớn"
+    authority: "Bộ Y tế Việt Nam (Quyết định số 1851/QĐ-BYT)"
+    version: "2020"
+    publication_year: 2020
+    access_date: "2024-06-01"
+    official_url: "https://kcb.vn/van-ban/quyet-dinh-so-1851-qd-byt.html"
+    license_and_usage: "Tài liệu chuyên môn chính thức của Bộ Y tế Việt Nam"
+    target_disease: "ASTHMA"
+    evidence_grading_system: "Quy chuẩn chuyên môn Bộ Y tế"
+

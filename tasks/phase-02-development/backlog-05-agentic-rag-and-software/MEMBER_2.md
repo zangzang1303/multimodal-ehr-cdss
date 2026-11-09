@@ -13,8 +13,8 @@
      - Phân mảnh theo cấu trúc lâm sàng (*Hierarchical Clinical Chunking*): Tiêu chuẩn chẩn đoán, Tiêu chuẩn loại trừ, Yếu tố nguy cơ, Triệu chứng cờ đỏ.
      - Sinh vector nhúng qua `sentence-transformers`.
      - Nạp vào collection `clinical_guidelines` trên Qdrant kèm `source_id`, phiên bản, mục/trang, nội dung gốc và các metadata lâm sàng có trong tài liệu; không tự gán `evidence_level` nếu nguồn không nêu.
-* **Đầu ra (Deliverable):** `src/agent/knowledge_ingest.py`, Qdrant Vector Store có sẵn dữ liệu.
-* **Trạng thái:** `[ ] TODO`
+* **Đầu ra (Deliverable):** `src/agent/knowledge_ingest.py`, Qdrant Vector Store có sẵn dữ liệu (`data/vector_store/qdrant`, 14 chunks chuẩn hóa từ GINA, GOLD, ESC, BYT).
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -26,7 +26,7 @@
   3. Trả về mảng tọa độ `[{ "text": "...", "start": 142, "end": 215, "confidence": 1.0 }]`.
   4. Gắn cờ/từ chối claim thiếu đoạn nguồn. Tách kiểm tra vị trí trích dẫn khỏi kiểm tra ý nghĩa lâm sàng; claim đúng vị trí vẫn có thể diễn giải sai.
 * **Đầu ra (Deliverable):** `src/agent/evidence_grounder.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`
 
 ---
 
@@ -37,4 +37,4 @@
   - Gọi `DiagnosticAgent` suy luận và `EvidenceGrounder` lấy vị trí spans.
   - Trả về JSON gồm claims, trạng thái kiểm chứng, spans trên đúng văn bản hiển thị và trích dẫn phác đồ có ID/phiên bản/mục; trả trạng thái thiếu bằng chứng khi không truy hồi được nguồn.
 * **Đầu ra (Deliverable):** `src/api/routes/agent_chat.py`.
-* **Trạng thái:** `[ ] TODO`
+* **Trạng thái:** `[x] DONE`

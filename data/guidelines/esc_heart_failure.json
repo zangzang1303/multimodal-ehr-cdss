@@ -1,0 +1,36 @@
+[
+  {
+    "chunk_id": "ESC_2023_DIAG_01",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "CONGESTIVE_HEART_FAILURE",
+    "section_title": "Tiêu chuẩn chẩn đoán Suy tim cấp và mạn tính",
+    "page_or_section": "Section 4.1, Table 4, Trang 11-13",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Level_A",
+    "text_content": "Chẩn đoán Suy tim (HF) đòi hỏi: (1) Triệu chứng cơ năng điển hình của suy tim: khó thở khi gắng sức, khó thở khi nằm đầu thấp (orthopnea), khó thở kịch phát về đêm (paroxysmal nocturnal dyspnea), mệt mỏi, phù mắt cá chân. (2) Dấu hiệu thực thể ứ dịch: tĩnh mạch cổ nổi tư thế 45 độ, phản hồi gan - tĩnh mạch cổ dương tính, tiếng tim thứ 3 (T3 gallop), mỏm tim lệch trái, ran ẩm ở đáy phổi hai bên. (3) Bằng chứng cận lâm sàng: peptide lợi niệu tăng cao (BNP >= 35 pg/mL hoặc NT-proBNP >= 125 pg/mL đối với suy tim không cấp tính; BNP >= 100 pg/mL hoặc NT-proBNP >= 300 pg/mL đối với khó thở cấp tính) kết hợp siêu âm tim có bất thường cấu trúc hoặc suy giảm chức năng tâm thu/tâm trương thất trái."
+  },
+  {
+    "chunk_id": "ESC_2023_DIFF_02",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "CONGESTIVE_HEART_FAILURE",
+    "section_title": "Chẩn đoán phân biệt Suy tim khó thở với bệnh lý phổi tắc nghẽn",
+    "page_or_section": "Section 5.3, Trang 28-30",
+    "clinical_category": "DIFFERENTIAL",
+    "evidence_level": "Level_B",
+    "text_content": "Phân biệt khó thở do tim và do phổi (COPD/Hen): Khó thở kịch phát về đêm và khó thở phải ngồi dậy để thở là dấu hiệu có độ đặc hiệu cao cho suy tim ứ huyết. Nồng độ NT-proBNP bình thường (< 125 pg/mL ở bệnh nhân ngoại trú hoặc < 300 pg/mL ở cấp cứu) có giá trị dự đoán âm tính > 95-98% giúp loại trừ chắc chắn nguyên nhân suy tim. X-quang ngực trong suy tim cho thấy tái phân bố tuần hoàn phổi đỉnh, đường Kerley B, phù mô kẽ quanh rốn phổi và bóng tim to, khác với hình ảnh căng giãn phổi và vòm hoành dẹt của COPD."
+  },
+  {
+    "chunk_id": "ESC_2023_REDFLAGS_03",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "CONGESTIVE_HEART_FAILURE",
+    "section_title": "Dấu hiệu Cờ đỏ Phù phổi cấp do tim và Choáng tim",
+    "page_or_section": "Section 11, Acute Heart Failure Management, Trang 62-66",
+    "clinical_category": "RED_FLAGS",
+    "evidence_level": "Level_A",
+    "text_content": "Dấu hiệu nguy kịch báo động đỏ trong suy tim cấp: (1) Phù phổi cấp: Khó thở dữ dội, vã mồ hôi, da tái lạnh, khạc bọt hồng, SpO2 < 85%, ran ẩm dâng nhanh như nước thủy triều hai phế trường. (2) Choáng tim (Cardiogenic Shock): Huyết áp tâm thu < 90 mmHg kéo dài, tưới máu ngoại vi kém (chi lạnh ẩm, thiểu niệu nước tiểu < 0.5 mL/kg/h, rối loạn ý thức, lactate máu > 2 mmol/L). Đây là cấp cứu khẩn cấp cần can thiệp tim mạch hỗ trợ tuần hoàn."
+  }
+]
+

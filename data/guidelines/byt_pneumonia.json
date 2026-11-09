@@ -1,0 +1,36 @@
+[
+  {
+    "chunk_id": "BYT_VN_CAP_DIAG_01",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Tiêu chuẩn chẩn đoán Viêm phổi mắc phải cộng đồng (Bộ Y tế)",
+    "page_or_section": "Phần I, Mục 2, Quyết định số 4815/QĐ-BYT, Trang 4-7",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": null,
+    "text_content": "Chẩn đoán Viêm phổi mắc phải cộng đồng (CAP) dựa vào: (1) Hội chứng nhiễm trùng cấp tính: sốt cao đột ngột (thường > 38.5 độ C), rét run, môi khô lưỡi bẩn, bạch cầu máu tăng > 10.000/mm3 hoặc tỷ lệ bạch cầu đa nhân trung tính > 75%, CRP tăng cao hoặc Procalcitonin tăng. (2) Hội chứng tổn thương phế nang phế quản: ho có đờm mủ đục (vàng hoặc xanh), đau ngực kiểu màng phổi tại vị trí tổn thương, khó thở. Khám thực thể có hội chứng đông đặc phổi: rung thanh tăng, gõ đục, rì rào phế nang giảm, ran nổ, ran ẩm nhỏ hạt khu trú. (3) Tiêu chuẩn vàng xác định: X-quang hoặc CT phổi có hình ảnh thâm nhiễm phế nang mới xuất hiện, đám mờ đông đặc có hình ảnh phế quản hơi."
+  },
+  {
+    "chunk_id": "BYT_VN_CAP_DIFF_02",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Chẩn đoán phân biệt Viêm phổi với Đợt cấp COPD và Hen phế quản",
+    "page_or_section": "Phần I, Mục 4, Quyết định số 4815/QĐ-BYT, Trang 8-10",
+    "clinical_category": "DIFFERENTIAL",
+    "evidence_level": null,
+    "text_content": "Phân biệt Viêm phổi và Đợt cấp COPD: Đợt cấp COPD thường khởi phát trên nền bệnh nhân có tiền sử COPD nhiều năm, biểu hiện tắc nghẽn đường thở lan tỏa hai bên phổi (ran rít, ran ngáy khắp hai phế trường) hơn là tổn thương đông đặc khu trú. X-quang trong đợt cấp COPD đơn thuần không có đám mờ đông đặc mới; nếu xuất hiện đám mờ thâm nhiễm mới cần chẩn đoán là Viêm phổi biến chứng trên nền COPD. Viêm phổi cũng cần phân biệt với nhồi máu phổi, lao phổi và ung thư phổi."
+  },
+  {
+    "chunk_id": "BYT_VN_CAP_REDFLAGS_03",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Dấu hiệu Cờ đỏ và Tiêu chuẩn đánh giá mức độ nặng theo CURB-65",
+    "page_or_section": "Phần II, Mục 1, Quyết định số 4815/QĐ-BYT, Trang 11-13",
+    "clinical_category": "RED_FLAGS",
+    "evidence_level": null,
+    "text_content": "Dấu hiệu cờ đỏ và đánh giá độ nặng Viêm phổi: Bệnh nhân có nguy cơ tử vong cao cần nhập ICU hoặc khoa Hồi sức cấp cứu khi có từ 3 điểm CURB-65 trở lên hoặc có các dấu hiệu: Rối loạn ý thức (Confusion); Ure máu > 7 mmol/L; Nhịp thở >= 30 lần/phút; Huyết áp tụt (Huyết áp tâm thu < 90 mmHg hoặc tâm trương <= 60 mmHg); Tuổi >= 65. Các dấu hiệu suy hô hấp nặng: SpO2 < 90% khi thở oxy, PaO2/FiO2 <= 250, sốc nhiễm khuẩn cần dùng vận mạch."
+  }
+]
+

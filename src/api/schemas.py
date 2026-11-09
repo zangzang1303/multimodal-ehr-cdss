@@ -6,7 +6,7 @@ Aligned with configs/data_schema.yaml
 
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 
@@ -249,3 +249,122 @@ class PatientInferenceResponse(BaseModel):
         ...,
         description="Results from 3 baseline models: classical_tabular, tabular_deep, text_only",
     )
+
+
+# ---------------------------------------------------------
+# Agentic RAG & Explainability Schemas (Backlog 05 - Member 2)
+# ---------------------------------------------------------
+
+class EvidenceSpan(BaseModel):
+    """
+    Character offset span mapped onto the active de-identified clinical note.
+    Guarantees note[start:end] == text.
+    """
+    text: str = Field(..., description="Exact substring slice from clinical note")
+    start: int = Field(..., ge=0, description="Start character offset index")
+    end: int = Field(..., ge=0, description="End character offset index")
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Span confidence score")
+    match_type: str = Field(default="exact", description="Match type: exact, case_insensitive, normalized, fuzzy_candidate")
+
+
+class ClaimAudit(BaseModel):
+    """
+    Validation audit of a clinical claim produced by the agent.
+    """
+    claim: str = Field(..., description="Clinical claim or assertion text")
+    status: Literal["verified", "candidate", "unverified"] = Field(
+        default="unverified",
+        description="Claim grounding verification status",
+    )
+    spans: list[EvidenceSpan] = Field(default_factory=list, description="Grounding spans in note")
+    confidence: float = Field(default=0.0, description="Overall verification confidence")
+    match_type: str = Field(default="none", description="Resolution strategy")
+    clinical_interpretation_note: Optional[str] = Field(
+        default=None,
+        description="Explicit note separating character offset tracking from clinical interpretation",
+    )
+    reason: Optional[str] = Field(default=None, description="Rejection reason if unverified")
+
+
+class GuidelineCitation(BaseModel):
+    """
+    Digitalized clinical practice guideline excerpt cited by the RAG system.
+    """
+    chunk_id: str = Field(..., description="Unique chunk identifier")
+    source_id: str = Field(..., description="Guideline source authority: GINA_2024, GOLD_2024, ESC_2023, BYT_VN_CAP_2020")
+    version: str = Field(..., description="Guideline official version/year")
+    target_disease: str = Field(..., description="Target disease entity")
+    section_title: str = Field(..., description="Guideline section or table header")
+    page_or_section: str = Field(..., description="Page or chapter reference")
+    clinical_category: str = Field(..., description="Category: DIAGNOSTIC_CRITERIA, DIFFERENTIAL, RED_FLAGS, etc.")
+    evidence_level: Optional[str] = Field(default=None, description="Evidence grade (e.g. Evidence A/Level_A) if stated")
+    text_content: str = Field(..., description="Full text excerpt from official guideline")
+
+
+class AgentExplainRequest(BaseModel):
+    """
+    Payload for POST /api/v1/agent/explain.
+    Accepts de-identified clinical note (S) and optional model probabilities.
+    Treats client-supplied patient_id and target_diagnosis as untrusted.
+    """
+    clinical_note: str = Field(
+        ...,
+        min_length=10,
+        description="De-identified clinical note (S) displayed to the clinician",
+        examples=["Bệnh nhân khó thở tăng dần, tiền sử hút thuốc lá 35 bao-năm, FEV1/FVC = 0.58..."],
+    )
+    patient_id: Optional[str] = Field(
+        default="ANON_PATIENT",
+        description="Untrusted client identifier",
+    )
+    target_diagnosis: Optional[str] = Field(
+        default=None,
+        description="Client-suggested diagnosis label (treated as unverified input, not ground truth)",
+    )
+    calibrated_probabilities: Optional[Dict[str, float]] = Field(
+        default=None,
+        description="Calibrated probability distribution from multimodal model",
+    )
+    tabular_features: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Optional physiological vitals and lab measurements",
+    )
+
+
+class AgentExplainResponse(BaseModel):
+    """
+    Output payload for POST /api/v1/agent/explain.
+    Contains grounded claims, character spans, and guideline citations.
+    """
+    status: Literal["success", "insufficient_evidence", "error"] = Field(
+        default="success",
+        description="Overall endpoint execution status",
+    )
+    patient_id: str = Field(..., description="Echoed patient identifier")
+    top1_diagnosis: str = Field(..., description="Primary hypothesis H1")
+    top2_diagnosis: Optional[str] = Field(default=None, description="Differential hypothesis H2")
+    differential_reasoning: str = Field(..., description="Structured clinical differential rationale")
+    pro_evidence_claims: list[str] = Field(default_factory=list, description="Claims supporting H1")
+    counter_evidence_claims: list[str] = Field(default_factory=list, description="Claims supporting H2 or refuting H1")
+    red_flags: list[str] = Field(default_factory=list, description="Emergency red flags detected")
+    verified_spans: list[EvidenceSpan] = Field(
+        default_factory=list,
+        description="Offset spans mapped onto clinical_note for UI highlighting",
+    )
+    claim_audits: list[ClaimAudit] = Field(
+        default_factory=list,
+        description="Complete verification audit for each claim",
+    )
+    guideline_citations: list[GuidelineCitation] = Field(
+        default_factory=list,
+        description="Verifiable clinical guidelines with official IDs and sections",
+    )
+    has_insufficient_evidence: bool = Field(
+        default=False,
+        description="Flag set when guideline sources cannot be retrieved or claims lack grounding",
+    )
+    warning: Optional[str] = Field(
+        default=None,
+        description="Clinical cautionary warning (e.g., untrusted client label ignored or missing guideline chunks)",
+    )
+

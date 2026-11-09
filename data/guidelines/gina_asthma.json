@@ -1,0 +1,47 @@
+[
+  {
+    "chunk_id": "GINA_2024_DIAG_01",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Tiêu chuẩn chẩn đoán Hen phế quản ở người lớn",
+    "page_or_section": "Box 1-2, Trang 26",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Chẩn đoán Hen phế quản yêu cầu: (1) Tiền sử có các triệu chứng hô hấp thay đổi theo thời gian và cường độ: thở khò khè, khó thở, nặng ngực và ho; các triệu chứng thường nặng hơn vào ban đêm hoặc sáng sớm, khởi phát do tập thể dục, cười, dị nguyên hoặc không khí lạnh. (2) Bằng chứng về giới hạn luồng khí thở ra dao động: dao động FEV1 > 12% và > 200 mL sau khi dùng thuốc giãn phế quản (nghiệm pháp hồi phục phế quản dương tính), hoặc dao động lưu lượng đỉnh PEF trung bình ngày > 10%."
+  },
+  {
+    "chunk_id": "GINA_2024_DIFF_02",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Chẩn đoán phân biệt Hen phế quản và COPD (Chồng lấp Hen - COPD)",
+    "page_or_section": "Chapter 5, Trang 118-121",
+    "clinical_category": "DIFFERENTIAL",
+    "evidence_level": "Evidence B",
+    "text_content": "Phân biệt Hen và COPD: Khởi phát trước 20 tuổi gợi ý nhiều đến Hen; khởi phát sau 40 tuổi thường gặp trong COPD hoặc Hen khởi phát muộn. Triệu chứng trong Hen thay đổi rõ rệt từng ngày, thường về đêm hoặc sáng sớm; trong khi COPD triệu chứng khó thở tiến triển dai dẳng và nặng hơn khi gắng sức. Tiền sử hút thuốc lá (> 10 bao-năm) hoặc phơi nhiễm khói bụi sinh hoạt ủng hộ mạnh COPD. Đo chức năng hô hấp ngoài cơn hen có thể hoàn toàn bình thường, trong khi COPD có FEV1/FVC < 0.70 dai dẳng sau dùng thuốc giãn phế quản."
+  },
+  {
+    "chunk_id": "GINA_2024_REDFLAGS_03",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Dấu hiệu Cờ đỏ đe dọa tính mạng trong cơn hen cấp nặng",
+    "page_or_section": "Box 4-3, Trang 88",
+    "clinical_category": "RED_FLAGS",
+    "evidence_level": "Evidence A",
+    "text_content": "Các dấu hiệu cờ đỏ nguy kịch trong cơn hen phế quản cấp cần cấp cứu khẩn cấp: Bệnh nhân ngồi cúi người ra trước, nói từng từ ngắt quãng; kích động, lú lẫn hoặc li bì; thở nhanh > 30 lần/phút, co kéo mạnh cơ hô hấp phụ và hõm ức; mạch nhanh > 120 lần/phút; SpO2 < 90% khi thở khí phòng; lồng ngực im lặng (silent chest) - mất tiếng rì rào phế nang do co thắt phế quản cực nặng."
+  },
+  {
+    "chunk_id": "GINA_2024_RISK_04",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Yếu tố nguy cơ và yếu tố khởi phát cơn hen",
+    "page_or_section": "Chapter 2, Trang 42",
+    "clinical_category": "RISK_FACTORS",
+    "evidence_level": null,
+    "text_content": "Các yếu tố nguy cơ và thúc đẩy cơn hen phế quản: Tiền sử bản thân hoặc gia đình có cơ địa dị ứng (viêm mũi dị ứng, chàm atopy); phơi nhiễm dị nguyên đường thở (mạt bụi nhà, lông súc vật, phấn hoa, nấm mốc); nhiễm virus đường hô hấp trên; gắng sức thể lực; thay đổi thời tiết hoặc không khí lạnh; phơi nhiễm khói thuốc lá thụ động."
+  }
+]
+
