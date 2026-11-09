@@ -66,6 +66,7 @@ def test_compute_multiclass_metrics_contract():
         "accuracy",
         "brier_score",
         "ece",
+        "mce",
     }
     assert all(np.isfinite(value) for value in metrics.values())
     assert metrics["accuracy"] == 1.0

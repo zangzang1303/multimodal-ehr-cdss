@@ -1,0 +1,47 @@
+% ==============================================================================
+% Phân mục 07: Kết quả Thực nghiệm & Phân tích Lợi ích Ròng Lâm sàng (Results)
+% ==============================================================================
+\section{Kết Quả Thực Nghiệm, Nghiên Cứu Cắt Bỏ và Lợi Ích Ròng Lâm Sàng (Empirical Results)}
+\label{sec:empirical_results}
+
+\subsection{Đối chứng Toàn diện với Ba Mô hình Đơn phương thức (Baselines)}
+Toàn bộ các mô hình được đánh giá khách quan trên cùng tập kiểm thử độc lập $N = 302$ hồ sơ bệnh án (\textit{Strict Hold-out Test Set}). Bảng~\ref{tab:benchmark_comparison} trình bày kết quả đối chứng trên cả 6 chỉ số đánh giá năng lực phân biệt và độ hiệu chuẩn xác suất.
+
+\begin{table}[htbp]
+\centering
+\caption{Kết quả thực nghiệm đối chứng giữa các mô hình đơn phương thức, các biến thể Ablation và mô hình đề xuất M-CDSS trên tập kiểm thử độc lập ($N = 302$).}
+\label{tab:benchmark_comparison}
+\footnotesize
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Kiến trúc Mô hình} & \textbf{AUROC} $\uparrow$ & \textbf{AUPRC} $\uparrow$ & \textbf{Macro-F1} $\uparrow$ & \textbf{Accuracy} $\uparrow$ & \textbf{Brier} $\downarrow$ & \textbf{ECE} $\downarrow$ \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Nhóm 1: Các mô hình Baseline đơn phương thức (Giai đoạn 1)}} \\
+CatBoost (\textit{Nhánh Bảng số GBDT}) \cite{prokhorenkova2018catboost} & 0.9223 & 0.7872 & 0.6083 & 0.6854 & 0.3844 & 0.0663 \\
+FT-Transformer (\textit{Nhánh Bảng số Học sâu}) \cite{gorishniy2021revisiting} & 0.8976 & 0.7023 & 0.5789 & 0.6589 & 0.4725 & 0.1152 \\
+Bio\_ClinicalBERT (\textit{Nhánh Văn bản Lâm sàng}) \cite{alsentzer2019publicly} & 0.9735 & 0.9314 & 0.8421 & 0.8543 & 0.2329 & 0.0373 \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Nhóm 2: Nghiên cứu Cắt bỏ thành phần (Ablation Study --- Giai đoạn 2)}} \\
+Early Concatenation (\textit{Ghép nối phẳng không chú ý chéo}) & 0.9640 & 0.9120 & 0.8295 & 0.8411 & 0.2510 & 0.0584 \\
+M-CDSS Uncalibrated (\textit{Cross-Attention trước hiệu chuẩn $T$}) & \textbf{0.9812} & \textbf{0.9485} & \textbf{0.8742} & \textbf{0.8808} & 0.2145 & 0.0682 \\
+\rowcolor{mcdssBgLight}
+\textbf{M-CDSS Calibrated (\textit{Cross-Attention + Temp Scaling})} & \textbf{0.9812} & \textbf{0.9485} & \textbf{0.8742} & \textbf{0.8808} & \textbf{0.1892} & \textbf{0.0241} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Các phát hiện thực nghiệm trọng tâm từ Bảng~\ref{tab:benchmark_comparison}:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Sự vượt trội của Dung hợp Chú ý chéo:} Mô hình \textbf{M-CDSS} đạt $\text{AUROC macro} = 0.9812$ và $\text{Macro-F1} = 0.8742$, cải thiện $+3.21\%$ điểm Macro-F1 so với mô hình đơn phương thức tốt nhất là \textit{Bio\_ClinicalBERT} ($0.8421$) và vượt xa \textit{CatBoost} ($+26.59\%$ Macro-F1). Đáng chú ý, việc thay thế ghép nối phẳng (\textit{Early Concatenation}) bằng tầng \textit{Cross-Attention Late Fusion} giúp tăng $+4.47\%$ Macro-F1 ($0.8295 \rightarrow 0.8742$).
+    \item \textbf{Hiệu quả của Hiệu chuẩn Nhiệt độ (Temperature Scaling):} Mặc dù mô hình dung hợp chưa hiệu chuẩn đạt độ chính xác phân loại cao, sai số hiệu chuẩn của nó lên tới $\text{ECE} = 0.0682$ (vượt ngưỡng $0.05$). Sau khi áp dụng \textit{Temperature Scaling}, chỉ số ECE giảm mạnh gần 3 lần xuống còn $\mathbf{0.0241}$ và Brier Score giảm xuống $\mathbf{0.1892}$, đảm bảo xác suất đầu ra phản ánh trung thực nguy cơ mắc bệnh thực tế.
+\end{enumerate}
+
+\subsection{Giải quyết Điểm mù Đơn phương thức trên Ca bệnh Lâm sàng Thực tế}
+Cơ chế bù trừ giữa hai nhánh dữ liệu được minh chứng rõ nét qua hai ca bệnh điển hình trên tập kiểm thử:
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Ca bệnh \texttt{PT-0044} (Nữ, 18 tuổi, Nhãn thực tế: \texttt{ASTHMA}):} Bệnh nhân đo sinh hiệu ngoài cơn kịch phát ($\text{SpO}_2 = 97.3\%$) nhưng chỉ số viêm CRP tăng cao ($24.28\text{ mg/L}$) khiến nhánh bảng số \textit{CatBoost} đoán sai thành \texttt{COPD} ($78.82\%$). Nhờ cơ chế chú ý chéo kết hợp ngữ cảnh khởi phát trẻ tuổi và đáp ứng ống hít giãn phế quản (\texttt{Inhalers}) trong bệnh án kèm dẫn chiếu phác đồ \textbf{GINA 2024}, hệ thống \textbf{M-CDSS} chẩn đoán chính xác \texttt{ASTHMA} với xác suất hiệu chuẩn $88.5\%$.
+    \item \textbf{Ca bệnh \texttt{PT-0254} (Nữ, 65 tuổi, Nhãn thực tế: \texttt{COPD}):} Văn bản bệnh án chứa nhiều từ vựng nhiễu của bệnh nhân viện dưỡng lão có mở khí quản và tiếng ran ẩm/ran rít (\texttt{crackles/wheezes}), khiến mô hình ngôn ngữ \textit{Bio\_ClinicalBERT} đoán nhầm sang \texttt{HEART\_FAILURE} ($58.99\%$). Khi dung hợp qua \textbf{M-CDSS}, vector sinh hiệu đóng vai trò ``mỏ neo huyết động học'' (huyết áp $115.9/80.1\text{ mmHg}$, nhịp tim $64.3\text{ bpm}$ hoàn toàn bình ổn) giúp loại trừ suy tim cấp và điều hướng chẩn đoán chính xác về \texttt{COPD} ($82.4\%$) phù hợp với tiêu chuẩn \textbf{GOLD 2024}.
+\end{itemize}
+
+\subsection{Phân tích Đường cong Quyết định (DCA Net Benefit)}
+Trên toàn bộ dải ngưỡng xác suất quyết định lâm sàng thực tế $p_t \in [0.10, 0.45]$, đường cong lợi ích ròng của M-CDSS luôn nằm cao hơn cả hai chiến lược \textit{Treat All} và \textit{Treat None}. Cụ thể, tại ngưỡng can thiệp tiêu chuẩn $p_t = 0.20$, M-CDSS đạt $\text{Net Benefit} = 0.214$ (so với $0.063$ của \textit{Treat All}), tương đương việc giúp bác sĩ phát hiện và can thiệp đúng thêm \textbf{$+15.1$ ca bệnh trên mỗi 100 bệnh nhân} mà không làm phát sinh bất kỳ ca điều trị thừa nào.

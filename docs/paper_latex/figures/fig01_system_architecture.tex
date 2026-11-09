@@ -1,0 +1,94 @@
+% ==============================================================================
+% Hình 1: Sơ đồ Kiến trúc Phần mềm Đa tầng M-CDSS (Vector TikZ)
+% ==============================================================================
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[node distance=1.2cm and 1.6cm]
+
+    % --- TẦNG 1: PRESENTATION TIER (NEXT.JS 14 FRONTEND - PORT 3000) ---
+    \node[mcdssBox] (ui_form) {
+        \textbf{PatientDataForm.tsx}\\
+        \scriptsize Nhập 12 sinh hiệu \& bệnh án
+    };
+    \node[mcdssBox, below=0.7cm of ui_form] (ui_card) {
+        \textbf{DiagnosticCard.tsx}\\
+        \scriptsize Thanh xác suất hiệu chuẩn ($\text{ECE}<0.05$)
+    };
+    \node[mcdssBox, below=0.7cm of ui_card] (ui_ev) {
+        \textbf{EvidenceViewer \& Drawer}\\
+        \scriptsize Highlight $[start, end]$ \& CPGs
+    };
+    \node[mcdssBox, below=0.7cm of ui_ev] (ui_dca) {
+        \textbf{DCACurveChart.tsx}\\
+        \scriptsize Đồ thị Net Benefit ($p_t \in [0.05, 0.60]$)
+    };
+
+    \begin{scope}[on background layer]
+        \node[mcdssGroup, fill=blue!3, fit=(ui_form) (ui_dca), label={[font=\footnotesize\bfseries\sffamily, text=mcdssPrimary]above:Tầng Giao Diện (Next.js 14 :3000)}] (tier_frontend) {};
+    \end{scope}
+
+    % --- TẦNG 2: APPLICATION & API GATEWAY TIER (FASTAPI - PORT 8000) ---
+    \node[mcdssService, right=2.4cm of ui_form] (api_pred) {
+        POST /api/v1/predict/mock\\
+        \normalfont\scriptsize Multimodal \& Baseline Inference
+    };
+    \node[mcdssService, right=2.4cm of ui_card] (api_agent) {
+        POST /api/v1/agent/explain\\
+        \normalfont\scriptsize Multi-Agent RAG \& Grounding
+    };
+    \node[mcdssService, right=2.4cm of ui_ev] (api_eval) {
+        GET /api/v1/evaluation/benchmark\\
+        \normalfont\scriptsize Metrics, DCA Points \& PROBAST
+    };
+    \node[mcdssService, right=2.4cm of ui_dca] (api_health) {
+        GET /health \& Pydantic V2\\
+        \normalfont\scriptsize Kiểm soát biên sinh lý \& CORS
+    };
+
+    \begin{scope}[on background layer]
+        \node[mcdssGroup, fill=teal!3, fit=(api_pred) (api_health), label={[font=\footnotesize\bfseries\sffamily, text=mcdssSecondary]above:Tầng Điều Phối RESTful (FastAPI :8000)}] (tier_api) {};
+    \end{scope}
+
+    % --- TẦNG 3: AI CORE & DATA PERSISTENCE TIER ---
+    \node[mcdssBox, right=2.4cm of api_pred, text width=3.9cm] (core_fusion) {
+        \textbf{Multimodal Fusion Engine}\\
+        \scriptsize FT-Transformer + Bio\_ClinicalBERT\\
+        Cross-Attention + Temp Scaling ($T$)
+    };
+    \node[mcdssAgent, right=2.4cm of api_agent, text width=3.9cm] (core_agent) {
+        \textbf{Agentic RAG \& Grounder}\\
+        \scriptsize LangGraph Orchestrator +\\
+        Kiểm chứng vị trí ký tự $\mathcal{O}(N)$
+    };
+    \node[mcdssBox, right=2.4cm of api_eval, text width=3.9cm] (core_qdrant) {
+        \textbf{Qdrant Vector DB (:6333)}\\
+        \scriptsize Kho phác đồ GINA, GOLD, ESC\\
+        Hybrid Search (Dense + BM25)
+    };
+    \node[mcdssBox, right=2.4cm of api_health, text width=3.9cm] (core_store) {
+        \textbf{Strict Split Benchmarks}\\
+        \scriptsize Tập kiểm thử độc lập ($N=302$)\\
+        0\% Patient-level Leakage
+    };
+
+    \begin{scope}[on background layer]
+        \node[mcdssGroup, fill=orange!3, fit=(core_fusion) (core_store), label={[font=\footnotesize\bfseries\sffamily, text=mcdssAccent]above:Tầng Lõi AI \& Lưu Trữ Tri Thức}] (tier_core) {};
+    \end{scope}
+
+    % --- KẾT NỐI MŨI TÊN (REST JSON & INTERNAL CALLS) ---
+    \draw[mcdssArrow, <->] (ui_form.east) -- node[above, font=\tiny\sffamily] {JSON Payload} (api_pred.west);
+    \draw[mcdssArrow, <->] (ui_card.east) -- node[above, font=\tiny\sffamily] {Calibrated $P(y|x)$} (api_pred.west);
+    \draw[mcdssArrow, <->] (ui_ev.east) -- node[above, font=\tiny\sffamily] {Spans + CPGs} (api_agent.west);
+    \draw[mcdssArrow, <->] (ui_dca.east) -- node[above, font=\tiny\sffamily] {DCA \& PROBAST} (api_eval.west);
+
+    \draw[mcdssArrow] (api_pred.east) -- (core_fusion.west);
+    \draw[mcdssArrow] (api_agent.east) -- (core_agent.west);
+    \draw[mcdssDashedArrow, <->] (core_agent.south) -- node[right, font=\tiny\sffamily] {Top-$k$ Chunks} (core_qdrant.north);
+    \draw[mcdssArrow] (api_eval.east) -- (core_store.west);
+
+\end{tikzpicture}%
+}
+\caption{Kiến trúc phần mềm 3 tầng đóng gói trong mạng nội bộ Docker (\texttt{mcdss-internal-net}), kết nối giao diện bác sĩ (Next.js 14), cổng điều phối hợp đồng dữ liệu (FastAPI) và lõi suy luận đa phương thức cùng kho vector y văn (Qdrant).}
+\label{fig:system_architecture}
+\end{figure}

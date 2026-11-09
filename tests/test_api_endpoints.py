@@ -250,3 +250,196 @@ def test_benchmarks_baselines_endpoint(client):
     assert "baseline_1_classical_tabular" in results
     assert "baseline_2_tabular_deep" in results
     assert "baseline_3_text_only" in results
+
+
+def test_predict_mock_endpoint(client):
+    """
+    Test POST /api/v1/predict/mock (Backlog 04 Member 3 Task 3.1).
+    Verifies that the mock endpoint returns calibrated Top-K predictions and modality streams.
+    """
+    # Preflight check
+    opt_resp = client.options("/api/v1/predict/mock")
+    assert opt_resp.status_code == 200
+
+    payload = {
+        "patient_id": "PT-TEST-01",
+        "tabular_features": {
+            "age": 60,
+            "systolic_bp": 130.0,
+            "diastolic_bp": 80.0,
+            "heart_rate": 75.0,
+            "respiratory_rate": 18.0,
+            "spo2": 96.0,
+            "temperature": 37.0,
+            "wbc_count": 6.5,
+            "crp": 5.0,
+            "gender": "M",
+            "smoking_status": "NEVER",
+            "history_hypertension": 0,
+            "history_diabetes": 0,
+        },
+        "clinical_notes": "Patient presents for routine follow-up with mild intermittent wheezing.",
+    }
+
+    response = client.post("/api/v1/predict/mock", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["patient_id"] == "PT-TEST-01"
+    assert "predicted_disease" in data
+    assert "confidence" in data
+    assert 0.0 <= data["confidence"] <= 1.0
+    assert data["calibrated"] is False
+    assert data["temperature"] is None
+    assert data["ece_score"] is None
+    assert "top_k_predictions" in data
+    assert len(data["top_k_predictions"]) == 4
+
+    # Verify probability ordering and fields
+    probs = [item["probability"] for item in data["top_k_predictions"]]
+    assert probs == sorted(probs, reverse=True)
+    assert sum(probs) == pytest.approx(1.0, abs=1e-3)
+
+    for item in data["top_k_predictions"]:
+        assert "disease" in item
+        assert "disease_name" in item
+        assert "risk_level" in item
+        assert item["risk_level"] in ("low", "moderate", "high")
+
+    # Verify modality streams
+    assert "modality_streams" in data
+    assert "tabular_stream" in data["modality_streams"]
+    assert "text_stream" in data["modality_streams"]
+    assert "multimodal_fusion" in data["modality_streams"]
+
+
+def test_predict_mock_case_study_pt0044(client):
+    """
+    Verify exact case study mapping for PT-0044 (ASTHMA) where text resolves tabular error.
+    """
+    payload = {
+        "patient_id": "PT-0044",
+        "tabular_features": {
+            "age": 18,
+            "systolic_bp": 106.2,
+            "diastolic_bp": 78.0,
+            "heart_rate": 70.6,
+            "respiratory_rate": 12.8,
+            "spo2": 97.3,
+            "temperature": 37.7,
+            "wbc_count": 4.78,
+            "crp": 24.28,
+            "gender": "F",
+            "smoking_status": "NEVER",
+            "history_hypertension": 1,
+            "history_diabetes": 0,
+        },
+        "clinical_notes": "Patient 18yo presents with cough, shortness of breath. Medications: Inhalers.",
+    }
+
+    response = client.post("/api/v1/predict/mock", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["predicted_disease"] == "ASTHMA"
+    assert data["confidence"] > 0.80
+    assert data["top_k_predictions"][0]["disease"] == "ASTHMA"
+    assert data["modality_streams"]["tabular_stream"]["predicted_disease"] == "COPD"
+    assert data["modality_streams"]["text_stream"]["predicted_disease"] == "ASTHMA"
+    assert data["modality_streams"]["multimodal_fusion"]["predicted_disease"] == "ASTHMA"
+
+
+def test_benchmarks_ablation_endpoint(client):
+    """
+    Test GET /api/v1/benchmarks/ablation (Backlog 04 Member 3 Task 3.3).
+    """
+    opt_resp = client.options("/api/v1/benchmarks/ablation")
+    assert opt_resp.status_code == 200
+
+    response = client.get("/api/v1/benchmarks/ablation")
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "experiment_metadata" in data
+    assert "models" in data
+    models = data["models"]
+    assert "tabular_only" in models
+    assert "text_only" in models
+    assert "concat_fusion" in models
+    assert "cross_attention_fusion" in models
+
+    # The dashboard must report the canonical training artifact, not fixture values.
+    import json
+    from pathlib import Path
+
+    artifact = json.loads((Path(__file__).resolve().parents[1] / "data" / "ablation_results.json").read_text(encoding="utf-8"))
+    tab_auroc = models["tabular_only"]["macro_auroc"]
+    ca_auroc = models["cross_attention_fusion"]["macro_auroc"]
+    assert tab_auroc == artifact["variants"]["tabular"]["test"]["macro_auroc"]
+    assert ca_auroc == artifact["variants"]["cross_attention"]["test"]["macro_auroc"]
+    assert models["cross_attention_fusion"]["ece"] == artifact["variants"]["cross_attention"]["test"]["ece"]
+
+
+
+def test_evaluation_benchmark_endpoint(client):
+    """
+    Test GET /api/v1/evaluation/benchmark (Backlog 06 Member 3 Task 3.1).
+    Validates comprehensive benchmark matrix, Decision Curve Analysis (DCA),
+    and PROBAST compliance summary.
+    """
+    # Preflight OPTIONS
+    opt_resp = client.options("/api/v1/evaluation/benchmark")
+    assert opt_resp.status_code == 200
+
+    response = client.get("/api/v1/evaluation/benchmark")
+    assert response.status_code == 200
+    data = response.json()
+
+    assert "evaluation_metadata" in data
+    assert data["evaluation_metadata"]["test_samples"] == 302
+
+    # Verify model benchmarks
+    assert "model_benchmarks" in data
+    benchmarks = data["model_benchmarks"]
+    assert "mcdss_multimodal_core" in benchmarks
+    assert benchmarks["mcdss_multimodal_core"]["macro_auroc"] == pytest.approx(0.9594141527959706)
+    assert benchmarks["mcdss_multimodal_core"]["ece"] == pytest.approx(0.097339602594344)
+    assert data["evaluation_metadata"]["dca_status"] == "illustrative_points_not_patient_level_validation"
+
+    # Verify Decision Curve Analysis (DCA) points
+    assert "decision_curve_analysis" in data
+    dca = data["decision_curve_analysis"]
+    assert "threshold_points" in dca
+    points = dca["threshold_points"]
+    assert len(points) >= 10
+
+    # Verify Net Benefit superiority of M-CDSS on clinical thresholds [0.10, 0.45]
+    for pt in points:
+        t = pt["threshold"]
+        if 0.10 <= t <= 0.45:
+            assert pt["net_benefit_mcdss"] > pt["net_benefit_treat_all"], f"M-CDSS must beat Treat All at threshold {t}"
+            assert pt["net_benefit_mcdss"] > pt["net_benefit_treat_none"], f"M-CDSS must beat Treat None at threshold {t}"
+
+    # Verify PROBAST compliance summary
+    assert "probast_compliance_summary" in data
+    probast = data["probast_compliance_summary"]
+    assert "overall_bias_risk" in probast
+    assert probast["overall_bias_risk"] == "Not independently assessed"
+
+
+def test_agent_explain_in_api_endpoints(client):
+    """
+    Verify /api/v1/agent/explain endpoint integration in test_api_endpoints suite.
+    """
+    payload = {
+        "patient_id": "PT-0044",
+        "clinical_notes": "Patient 18yo presents with cough, shortness of breath, and fatigue. Medications: Inhalers.",
+        "target_diagnosis": "ASTHMA",
+    }
+    response = client.post("/api/v1/agent/explain", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["patient_id"] == "PT-0044"
+    assert data["primary_diagnosis"] == "ASTHMA"
+    assert len(data["grounded_spans"]) >= 1
+    assert len(data["guideline_references"]) >= 1

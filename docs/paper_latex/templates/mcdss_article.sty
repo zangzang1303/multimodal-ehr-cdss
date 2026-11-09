@@ -1,0 +1,202 @@
+% ==============================================================================
+% Template Học Thuật M-CDSS (mcdss_article.sty)
+% Thiết kế theo chuẩn bài báo Y sinh & Trí tuệ nhân tạo (TRIPOD-AI / JMIR style)
+% Hỗ trợ Tiếng Việt UTF-8, Sơ đồ Vector TikZ, Bảng Booktabs & Hộp Định Lý
+% ==============================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{templates/mcdss_article}[2026/11/09 v1.0 M-CDSS Academic Paper Template]
+
+% --- 1. Ngôn ngữ & Mã hóa Font chữ ---
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T5]{fontenc}
+\RequirePackage[vietnamese,english]{babel}
+\selectlanguage{vietnamese}
+
+% --- 2. Bố cục Trang & Lề giấy (Chuẩn A4 Học thuật) ---
+\RequirePackage[
+    a4paper,
+    top=2.5cm,
+    bottom=2.5cm,
+    left=2.5cm,
+    right=2.5cm,
+    headheight=15pt
+]{geometry}
+\RequirePackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.2em}
+
+% --- 3. Toán học & Ký hiệu Khoa học ---
+\RequirePackage{amsmath,amssymb,amsfonts,amsthm}
+\RequirePackage{bm}
+\RequirePackage{mathtools}
+
+% --- 4. Bảng biểu, Danh sách & Định dạng ---
+\RequirePackage{booktabs}
+\RequirePackage{multirow}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+\RequirePackage{enumitem}
+\RequirePackage{float}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+
+\captionsetup{
+    font=small,
+    labelfont={bf,color=mcdssPrimary},
+    labelsep=period,
+    skip=6pt
+}
+
+% --- 5. Màu sắc Chuẩn Y sinh (Biomedical Color Palette) ---
+\RequirePackage[dvipsnames,table]{xcolor}
+\definecolor{mcdssPrimary}{HTML}{0F4C81}    % Deep Clinical Blue
+\definecolor{mcdssSecondary}{HTML}{0D9488}  % Medical Teal
+\definecolor{mcdssAccent}{HTML}{D97706}     % Amber Alert / Highlight
+\definecolor{mcdssDanger}{HTML}{DC2626}     % High Risk Red
+\definecolor{mcdssBgLight}{HTML}{F8FAFC}    % Slate 50 Background
+\definecolor{mcdssBorder}{HTML}{CBD5E1}     % Slate 300 Border
+\definecolor{mcdssTextDark}{HTML}{1E293B}   % Slate 800 Text
+
+% --- 6. Đồ họa Vector TikZ & PGFPlots ---
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{
+    shapes.geometric,
+    shapes.multipart,
+    arrows.meta,
+    positioning,
+    calc,
+    fit,
+    backgrounds,
+    shadows.blur
+}
+
+% Định nghĩa các TikZ styles dùng chung cho toàn bộ sơ đồ kiến trúc
+\tikzset{
+    >=Stealth,
+    mcdssBox/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=mcdssPrimary,
+        line width=0.9pt,
+        fill=white,
+        text width=3.4cm,
+        minimum height=1.1cm,
+        align=center,
+        font=\footnotesize\sffamily
+    },
+    mcdssService/.style={
+        rectangle,
+        rounded corners=5pt,
+        draw=mcdssSecondary,
+        line width=1pt,
+        fill=mcdssBgLight,
+        text width=3.8cm,
+        minimum height=1.3cm,
+        align=center,
+        font=\footnotesize\sffamily\bfseries
+    },
+    mcdssAgent/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=mcdssAccent,
+        line width=0.9pt,
+        fill=orange!6,
+        text width=3.2cm,
+        minimum height=1.1cm,
+        align=center,
+        font=\footnotesize\sffamily
+    },
+    mcdssGroup/.style={
+        rectangle,
+        rounded corners=6pt,
+        draw=mcdssBorder,
+        dashed,
+        line width=1pt,
+        inner sep=8pt
+    },
+    mcdssArrow/.style={
+        ->,
+        line width=0.9pt,
+        draw=mcdssPrimary
+    },
+    mcdssDashedArrow/.style={
+        ->,
+        dashed,
+        line width=0.8pt,
+        draw=mcdssSecondary
+    }
+}
+
+% --- 7. Hộp Thông tin Học thuật & Mã nguồn ---
+\RequirePackage{listings}
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{mcdssBgLight},
+    frame=single,
+    rulecolor=\color{mcdssBorder},
+    breaklines=true,
+    captionpos=b,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{mcdssPrimary}\bfseries,
+    commentstyle=\color{mcdssSecondary}\itshape,
+    stringstyle=\color{mcdssAccent}
+}
+
+% Môi trường hộp điểm nhấn (Clinical Box)
+\newenvironment{clinicalbox}[1]{%
+    \par\vspace{0.5em}\noindent
+    \begin{tabular}{|p{0.95\textwidth}|}
+    \hline
+    \rowcolor{mcdssBgLight}
+    \textbf{\textcolor{mcdssPrimary}{#1}} \\[0.3ex]
+}{%
+    \\ \hline
+    \end{tabular}\par\vspace{0.5em}
+}
+
+% --- 8. Tiêu đề Phân mục, Header/Footer & Siêu liên kết ---
+\RequirePackage{titlesec}
+\titleformat{\section}
+    {\normalfont\Large\bfseries\color{mcdssPrimary}}
+    {\thesection.}{0.5em}{}
+\titleformat{\subsection}
+    {\normalfont\large\bfseries\color{mcdssTextDark}}
+    {\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}
+    {\normalfont\normalsize\bfseries\color{mcdssSecondary}}
+    {\thesubsubsection}{0.5em}{}
+
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\textcolor{gray}{M-CDSS: Hệ Thống Hỗ Trợ Chẩn Đoán Lâm Sàng Đa Phương Thức (Chuẩn TRIPOD-AI)}}
+\fancyhead[R]{\footnotesize\textcolor{gray}{Báo Cáo Khoa Học Giai Đoạn 2}}
+\fancyfoot[C]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\RequirePackage[
+    colorlinks=true,
+    linkcolor=mcdssPrimary,
+    citecolor=mcdssSecondary,
+    urlcolor=mcdssPrimary
+]{hyperref}
+
+% --- 9. Lệnh tạo Khung Tiêu đề Bài báo (Custom Title Block) ---
+\newcommand{\mcdsstitle}[4]{%
+    \begin{center}
+        {\LARGE\bfseries\color{mcdssPrimary} #1 \par}
+        \vspace{0.8em}
+        {\large #2 \par}
+        \vspace{0.4em}
+        {\small\itshape\color{gray} #3 \par}
+        \vspace{0.4em}
+        {\footnotesize\textbf{Từ khóa:} #4 \par}
+        \vspace{0.6em}
+        \textcolor{mcdssBorder}{\rule{\textwidth}{0.8pt}}
+    \end{center}
+}
+
+\endinput
