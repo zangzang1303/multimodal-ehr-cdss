@@ -1,3 +1,10 @@
+# ==============================================================================
+# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
+# File này được tạo tạm thời bởi Thành viên 3 để phục vụ chạy bộ Unit Tests
+# tests/test_multimodal_model.py (Backlog 04 - Nhiệm vụ 3.2) khi chưa có code
+# chính thức từ Thành viên 1 (Backlog 04 - Nhiệm vụ 1.1: FT-Transformer Encoder).
+# Sẽ được thay thế/đồng bộ khi Thành viên 1 bàn giao mô hình huấn luyện thực tế.
+# ==============================================================================
 """
 FT-Transformer Tabular Encoder Module
 Multimodal EHR CDSS - Phase 2 / Backlog 04 (Member 1 / Member 3 Deliverable)
@@ -54,10 +61,10 @@ DEFAULT_CATEGORICAL_CARDINALITIES: Dict[str, int] = {
 class TabularTokenizer(nn.Module):
     """
     Feature Tokenizer Layer for Tabular EHR Data.
-    
+
     Transforms M_num continuous features and M_cat categorical features
     into continuous embedding vectors of dimension d, prepended with a learnable [CLS] token.
-    
+
     Output Tensor shape: [Batch, M + 1, d] where M = M_num + M_cat.
     """
 
@@ -208,4 +215,3 @@ class FTTransformerEncoder(nn.Module):
         e_0 = self.tokenizer(x_num, x_cat)
         h_tab = self.transformer_encoder(e_0)
         return self.norm(h_tab)
-

@@ -1,3 +1,10 @@
+# ==============================================================================
+# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
+# File này (bao gồm DummyClinicalBackbone mock offline) được tạo tạm thời bởi
+# Thành viên 3 để chạy tests/test_multimodal_model.py (Backlog 04 - Nhiệm vụ 3.2)
+# trong lúc chờ Thành viên 2 hoàn thiện ClinicalTextEncoder nạp Bio_ClinicalBERT
+# thực tế (Backlog 04 - Nhiệm vụ 2.1).
+# ==============================================================================
 """
 Clinical Text Encoder Module
 Multimodal EHR CDSS - Phase 2 / Backlog 04 (Member 2 / Member 3 Deliverable)
@@ -44,7 +51,7 @@ class DummyClinicalBackbone(nn.Module):
 class ClinicalTextEncoder(nn.Module):
     """
     Biomedical Clinical Text Encoder.
-    
+
     Extracts contextual subword embeddings T_text in R^[Batch, S+2, 768]
     and projects them via W_proj to multimodal embedding space H_text in R^[Batch, S+2, 128].
     """
@@ -117,4 +124,3 @@ class ClinicalTextEncoder(nn.Module):
             h_text = h_text * attention_mask.unsqueeze(-1).float()
 
         return h_text
-

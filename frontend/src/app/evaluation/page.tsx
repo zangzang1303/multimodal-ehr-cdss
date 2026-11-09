@@ -1,6 +1,6 @@
 "use client";
 
-import DCACurveChart from "@/components/DCACurveChart";
+import DCACurveChart, { DEFAULT_DCA_POINTS } from "@/components/DCACurveChart";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -35,14 +35,17 @@ import {
 } from "recharts";
 import {
   AblationStudyResponse,
+  DCAPoint,
   FALLBACK_ABLATION_RESULTS,
   getAblationBenchmarks,
+  getClinicalEvaluationBenchmark,
 } from "@/lib/api";
 
 export default function AblationEvaluationPage() {
   const [data, setData] = useState<AblationStudyResponse>(
     FALLBACK_ABLATION_RESULTS
   );
+  const [dcaPoints, setDcaPoints] = useState<DCAPoint[]>(DEFAULT_DCA_POINTS);
   const [loading, setLoading] = useState<boolean>(true);
   const [isDark, setIsDark] = useState<boolean>(true);
   const [mounted, setMounted] = useState<boolean>(false);
@@ -69,10 +72,17 @@ export default function AblationEvaluationPage() {
   const loadAblationData = async () => {
     setLoading(true);
     try {
-      const result = await getAblationBenchmarks();
-      setData(result);
+      const [ablationRes, evalRes] = await Promise.all([
+        getAblationBenchmarks(),
+        getClinicalEvaluationBenchmark().catch(() => null),
+      ]);
+      setData(ablationRes);
+      if (evalRes?.decision_curve_analysis?.threshold_points?.length) {
+        setDcaPoints(evalRes.decision_curve_analysis.threshold_points);
+      }
     } catch {
       setData(FALLBACK_ABLATION_RESULTS);
+      setDcaPoints(DEFAULT_DCA_POINTS);
     } finally {
       setLastRefreshed(new Date());
       setLoading(false);
@@ -277,7 +287,7 @@ export default function AblationEvaluationPage() {
         {activeTab === "dca" ? (
           <div className="space-y-8 animate-in fade-in duration-200">
             {/* Interactive DCA Curve Component */}
-            <DCACurveChart isDark={isDark} />
+            <DCACurveChart points={dcaPoints} isDark={isDark} />
 
             {/* PROBAST 4 Domains Compliance Matrix */}
             <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">

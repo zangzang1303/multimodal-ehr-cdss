@@ -16,35 +16,35 @@
     % Node 1: Triage & Query Formulation
     \node[mcdssAgent, right=1.2cm of input, text width=3.3cm] (triage) {
         \textbf{1. Tác tử Phân loại}\\
-        \scriptsize (\textit{Triage \& Query Node})\\
-        Trích xuất hội chứng \& tạo truy vấn y khoa
+        \scriptsize (\texttt{triage\_and\_query\_node})\\
+        Ẩn danh PHI \& tạo truy vấn y khoa
     };
 
     % Node 2: Hybrid Retriever
     \node[mcdssService, right=1.2cm of triage, text width=3.5cm] (retriever) {
         \textbf{2. Truy xuất Lai}\\
-        \normalfont\scriptsize (\textit{HybridGuidelineRetriever})\\
-        0.65 Từ khóa Y khoa + 0.35 Vector Ngữ nghĩa
+        \normalfont\scriptsize (\texttt{HybridGuidelineRetriever})\\
+        0.65 Okapi BM25 + 0.35 Qdrant Cosine
     };
 
     % Node 3: Diagnostic Synthesis
     \node[mcdssAgent, below=1.2cm of retriever, text width=3.5cm] (synthesis) {
         \textbf{3. Tác tử Tổng hợp}\\
-        \scriptsize (\textit{Clinical Reasoning Node})\\
+        \scriptsize (\texttt{clinical\_reasoning\_node})\\
         Đối chiếu chẩn đoán phân biệt \& trích dẫn CPG
     };
 
     % Node 4: Evidence Grounder
     \node[mcdssService, left=1.2cm of synthesis, text width=3.3cm, draw=mcdssDanger] (grounder) {
         \textbf{4. Bộ Kiểm Chứng}\\
-        \normalfont\scriptsize (\textit{EvidenceGrounder} $\mathcal{O}(N)$)\\
+        \normalfont\scriptsize (\texttt{EvidenceGrounder} $\mathcal{O}(N)$)\\
         Đối sánh chuỗi con \& tính tọa độ $[start, end]$
     };
 
     % Output Verified
     \node[mcdssBox, left=1.2cm of grounder, fill=teal!8, text width=3.1cm] (output) {
         \textbf{Báo cáo Đã Xác thực}\\
-        \scriptsize \texttt{hallucination\_free: true}\\
+        \scriptsize \texttt{hallucination\_filtered}\\
         Highlight câu bệnh án \& điều khoản GINA/GOLD
     };
 
@@ -60,7 +60,6 @@
 
 \end{tikzpicture}%
 }
-\caption{Đồ thị trạng thái hội chẩn đa tác tử (\textit{Multi-Agent Diagnostic StateGraph}). Mọi câu trích dẫn chứng cứ do tác tử sinh ra đều phải đi qua cổng kiểm chứng tất định \texttt{EvidenceGrounder} trước khi hiển thị cho bác sĩ.}
+\caption{Đồ thị trạng thái hội chẩn đa tác tử (\texttt{DiagnosticStateGraph}). Mọi câu trích dẫn chứng cứ do tác tử sinh ra đều phải đi qua cổng kiểm chứng tất định \texttt{EvidenceGrounder} trước khi hiển thị cho bác sĩ.}
 \label{fig:multi_agent_rag_flow}
 \end{figure}
-

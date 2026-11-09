@@ -279,26 +279,23 @@
 
 | Mô hình / Kiến trúc | AUROC macro $\uparrow$ | AUPRC macro $\uparrow$ | F1 macro $\uparrow$ | Accuracy $\uparrow$ | Brier Score $\downarrow$ | ECE $\downarrow$ |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **CatBoost** *(Chỉ dùng Bảng số)* | 0,9223 | 0,7872 | 0,6083 | 68,54% | 0,3844 | 0,0663 |
-| **FT-Transformer** *(Chỉ dùng Bảng sâu)* | 0,8976 | 0,7023 | 0,5789 | 65,89% | 0,4725 | 0,1152 |
-| **Bio\_ClinicalBERT** *(Chỉ dùng Văn bản)* | 0,9735 | 0,9314 | 0,8421 | 85,43% | 0,2329 | 0,0373 |
-| *Ablation 1:* **Ghép nối phẳng (Early Concat)** | 0,9640 | 0,9120 | 0,8295 | 84,11% | 0,2510 | 0,0584 |
-| *Ablation 2:* **M-CDSS (Chưa hiệu chuẩn $T$)** | **0,9812** | **0,9485** | **0,8742** | **88,08%** | 0,2145 | 0,0682 |
-| **M-CDSS Đề xuất (Cross-Attn + Hiệu chuẩn $T$)** | **0,9812** | **0,9485** | **0,8742** | **88,08%** | **0,1892** | **0,0241** |
+| **CatBoost** *(Chỉ dùng Bảng số — Giai đoạn 1)* | 0,9223 | 0,7872 | 0,6083 | 68,54% | 0,3844 | 0,0663 |
+| **FT-Transformer** *(Chỉ dùng Bảng sâu — Giai đoạn 1)* | 0,8976 | 0,7023 | 0,5789 | 65,89% | 0,4725 | 0,1152 |
+| **Bio\_ClinicalBERT** *(Chỉ dùng Văn bản — Giai đoạn 1)* | 0,9735 | 0,9314 | 0,8421 | 85,43% | 0,2329 | 0,0373 |
+| *Ablation 1:* **Ghép nối phẳng (Early Concat)** | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV2]` |
+| *Ablation 2:* **M-CDSS (Chưa hiệu chuẩn $T$)** | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV1]` | `[TODO-TV2]` |
+| **M-CDSS Đề xuất (Cross-Attn + Hiệu chuẩn $T$)** | **`[TODO-TV1]`** | **`[TODO-TV1]`** | **`[TODO-TV1]`** | **`[TODO-TV1]`** | **`[TODO-TV1]`** | **`[TODO-TV2]`** |
 
-* **Ba kết luận định lượng quan trọng:**
-  1. **Vượt trội toàn diện so với đơn phương thức:** M-CDSS nâng **Macro-F1 lên 0,8742** (+3,21% so với Bio\_ClinicalBERT và +26,59% so với CatBoost); **AUROC macro đạt 0,9812** và **AUPRC macro đạt 0,9485**.
-  2. **Vai trò quyết định của Cross-Attention:** Nếu chỉ ghép nối phẳng (*Early Concatenation*), hiệu năng thậm chí giảm nhẹ xuống F1 = 0,8295 do nhiễu giữa hai nguồn. Tầng *Cross-Attention* giúp cải thiện **+4,47% Macro-F1** ($0,8295 \rightarrow 0,8742$).
-  3. **Hiệu quả của Temperature Scaling:** Giảm sai số hiệu chuẩn **ECE từ 0,0682 xuống còn 0,0241** (giảm gần 3 lần, vượt sâu dưới ngưỡng chuẩn y tế $< 0,05$).
+* **Ba kết luận định lượng cần điền sau khi có kết quả chạy thật của Thành viên 1 & 2:**
+  1. **So sánh với đơn phương thức:** `[TODO-TV1 (Backlog 04 Task 1.4 & Backlog 06 Task 1.1): Điền mức cải thiện Macro-F1, AUROC macro và AUPRC macro của M-CDSS so với Bio_ClinicalBERT và CatBoost]`.
+  2. **Vai trò của Cross-Attention:** `[TODO-TV1: Điền độ chênh lệch Macro-F1 và AUROC giữa Cross-Attention và Ghép nối phẳng (Early Concat)]`.
+  3. **Hiệu quả của Temperature Scaling:** `[TODO-TV2 (Backlog 04 Task 2.3): Điền mức giảm ECE và Brier Score trước và sau khi hiệu chuẩn nhiệt độ T*]`.
 
 ### Lời nói gợi ý
-> Bảng số liệu trên tập kiểm thử độc lập 302 ca chứng minh rõ nét đóng góp của từng thành phần trong kiến trúc M-CDSS.  
-> Thứ nhất, so với các mô hình đơn phương thức ở Giai đoạn 1, mô hình dung hợp M-CDSS nâng chỉ số AUROC lên 0,9812, AUPRC lên 0,9485 và Macro-F1 đạt 87,42%, cao hơn mô hình đơn lẻ tốt nhất là Bio_ClinicalBERT hơn 3,2% và vượt xa nhánh bảng số hơn 26%.  
-> Thứ hai, nghiên cứu cắt bỏ thành phần cho thấy nếu chỉ ghép nối phẳng hai vector mà không có cơ chế chú ý chéo, chỉ số F1 chỉ đạt 82,95%. Việc đưa tầng Cross-Attention vào đã giúp tăng vọt 4,47% điểm F1.  
-> Thứ ba, dù mô hình dung hợp trước hiệu chuẩn đoán rất đúng nhưng lại khá tự tin thái quá với ECE là 0,0682. Nhờ tầng Temperature Scaling, chỉ số ECE được kéo xuống chỉ còn 0,0241, giảm gần 3 lần và đạt chuẩn an toàn lâm sàng.
+> Bảng số liệu trên tập kiểm thử độc lập 302 ca đối chứng trực tiếp 3 mô hình đơn phương thức đã nghiệm thu ở Giai đoạn 1 với các biến thể Ablation và mô hình dung hợp M-CDSS ở Giai đoạn 2 (`[TODO-TV1/TV2: Đọc các con số thực nghiệm chính thức sau khi điền vào bảng]`).
 
 ### Câu chuyển
-> Những con số cải thiện này cụ thể đã cứu nguy cho các ca bệnh thực tế bị đoán sai ở Giai đoạn 1 như thế nào? Chúng ta cùng kiểm chứng lại hai ca bệnh điển hình PT-0044 và PT-0254.
+> Những cải thiện này cụ thể đã xử lý các ca bệnh thực tế bị đoán sai ở Giai đoạn 1 như thế nào? Chúng ta cùng kiểm chứng lại hai ca bệnh điển hình PT-0044 và PT-0254.
 
 ---
 
@@ -311,14 +308,14 @@
 ![Ghi chú Lâm sàng Ca 1](../images/03_case1_pt0044_clinical_text.png)
 
 * **Đối chiếu kết quả xử lý giữa Đơn phương thức và Đa phương thức M-CDSS:**
-  * **Nhánh Bảng số đơn lẻ (CatBoost):** Dự đoán **SAI** thành `COPD` (78,82%) vì bệnh nhân đo ngoài cơn cấp ($\text{SpO}_2 = 97,3\%$) nhưng chỉ số viêm CRP tăng cao ($24,28\text{ mg/L}$).
-  * **Hệ thống Đa phương thức M-CDSS (Giai đoạn 2):** Dự đoán **ĐÚNG `ASTHMA`** với xác suất hiệu chuẩn **88,5%**.
+  * **Nhánh Bảng số đơn lẻ (CatBoost — Giai đoạn 1):** Dự đoán **SAI** thành `COPD` (78,82%) vì bệnh nhân đo ngoài cơn cấp ($\text{SpO}_2 = 97,3\%$) nhưng chỉ số viêm CRP tăng cao ($24,28\text{ mg/L}$).
+  * **Hệ thống Đa phương thức M-CDSS (Giai đoạn 2):** Dự đoán **ĐÚNG `ASTHMA`** với xác suất hiệu chuẩn **`[TODO-TV1/TV2: Điền % xác suất thực tế từ checkpoint multimodal_best.pt]`**.
   * **Bằng chứng được hệ thống tô sáng & Dẫn chiếu y văn:**
     * *Trích dẫn nguyên văn bệnh án (Verified):* Nhận diện độ tuổi thanh thiếu niên (`18yo`), triệu chứng thở khò khè tái diễn và đáp ứng với thuốc hít giãn phế quản (`Inhalers`).
     * *Đối chiếu phác đồ:* Trích xuất tiêu chuẩn **GINA 2024** (Khởi phát sớm, triệu chứng dao động theo thời gian và đáp ứng nhanh với SABA/ICS là dấu hiệu đặc trưng phân biệt Hen với COPD).
 
 ### Lời nói gợi ý
-> Quay trở lại ca bệnh PT-0044 đã làm nhánh bảng số thất bại ở Giai đoạn 1: bệnh nhân nữ 18 tuổi mắc Hen phế quản nhưng có chỉ số CRP tăng cao và SpO2 bình thường ngoài cơn cấp, khiến mô hình bảng số đoán nhầm thành COPD tới 78,82%. Khi đưa vào hệ thống M-CDSS ở Giai đoạn 2, tầng chú ý chéo kết hợp độ tuổi 18 với các cụm từ được tô sáng nguyên văn trong bệnh án gồm cơn khò khè và tiền sử dùng ống hít Inhalers. Đồng thời hệ thống trích xuất ngay điều khoản GINA 2024 về giới hạn luồng khí hồi phục ở người trẻ, từ đó đưa ra dự đoán chính xác Hen phế quản với xác suất hiệu chuẩn 88,5%.
+> Quay trở lại ca bệnh PT-0044 đã làm nhánh bảng số thất bại ở Giai đoạn 1: bệnh nhân nữ 18 tuổi mắc Hen phế quản nhưng có chỉ số CRP tăng cao và SpO2 bình thường ngoài cơn cấp, khiến mô hình bảng số đoán nhầm thành COPD tới 78,82%. Khi đưa vào hệ thống M-CDSS ở Giai đoạn 2, tầng chú ý chéo kết hợp độ tuổi 18 với các cụm từ được tô sáng nguyên văn trong bệnh án gồm cơn khò khè và tiền sử dùng ống hít Inhalers. Đồng thời hệ thống trích xuất ngay điều khoản GINA 2024 về giới hạn luồng khí hồi phục ở người trẻ, từ đó đưa ra dự đoán chính xác Hen phế quản với xác suất hiệu chuẩn `[TODO-TV1/TV2]`.
 
 ### Câu chuyển
 > Tiếp theo, ở chiều ngược lại, với ca bệnh PT-0254 nơi mô hình văn bản từng thất bại, M-CDSS đã xử lý ra sao?
@@ -334,14 +331,14 @@
 ![Ghi chú Lâm sàng Ca 2](../images/05_case2_pt0254_clinical_text.png)
 
 * **Đối chiếu kết quả xử lý giữa Đơn phương thức và Đa phương thức M-CDSS:**
-  * **Nhánh Văn bản đơn lẻ (Bio\_ClinicalBERT):** Dự đoán **SAI** thành `HEART_FAILURE` (58,99%) do văn bản có nhiều từ vựng nhiễu của bệnh nhân cao tuổi nằm viện dưỡng lão, mở khí quản, nghe phổi có tiếng ran ẩm/ran rít (`crackles/wheezes`).
-  * **Hệ thống Đa phương thức M-CDSS (Giai đoạn 2):** Dự đoán **ĐÚNG `COPD`** với xác suất hiệu chuẩn **82,4%**.
+  * **Nhánh Văn bản đơn lẻ (Bio\_ClinicalBERT — Giai đoạn 1):** Dự đoán **SAI** thành `HEART_FAILURE` (58,99%) do văn bản có nhiều từ vựng nhiễu của bệnh nhân cao tuổi nằm viện dưỡng lão, mở khí quản, nghe phổi có tiếng ran ẩm/ran rít (`crackles/wheezes`).
+  * **Hệ thống Đa phương thức M-CDSS (Giai đoạn 2):** Dự đoán **ĐÚNG `COPD`** với xác suất hiệu chuẩn **`[TODO-TV1/TV2: Điền % xác suất thực tế từ checkpoint multimodal_best.pt]`**.
   * **Cơ chế "Mỏ neo huyết động học" & Dẫn chiếu y văn:**
     * *Định hướng từ Bảng số:* Truy vấn sinh hiệu ghi nhận Huyết áp ($115,9/80,1\text{ mmHg}$) và Nhịp tim ($64,3\text{ bpm}$) hoàn toàn bình ổn, kìm hãm trọng số chú ý vào giả thuyết suy tim sung huyết cấp.
     * *Đối chiếu phác đồ:* Trích xuất hướng dẫn **GOLD 2024** và **ESC** khẳng định tình trạng tắc nghẽn đường thở mạn tính trên nền huyết động tâm thu/tâm trương ổn định phù hợp với COPD hơn là đợt suy tim cấp.
 
 ### Lời nói gợi ý
-> Ở ca bệnh thứ hai PT-0254 của bệnh nhân nữ 65 tuổi mắc COPD, văn bản bệnh án mô tả bệnh nhân nằm viện dưỡng lão, có mở khí quản và tiếng ran ẩm ở phổi. Những từ vựng này làm mô hình ngôn ngữ đơn thuần bị nhiễu và đoán nhầm sang Suy tim. Khi đi qua hệ thống M-CDSS, chính thông số huyết áp 115/80 mmHg và nhịp tim 64 lần/phút hoàn toàn ổn định trên bảng số đã phát huy vai trò mỏ neo huyết động học, giúp tầng chú ý chéo loại trừ suy tim cấp và điều chỉnh dự đoán về đúng COPD với độ tin cậy hiệu chuẩn 82,4%, kèm dẫn chiếu tiêu chuẩn GOLD 2024.
+> Ở ca bệnh thứ hai PT-0254 của bệnh nhân nữ 65 tuổi mắc COPD, văn bản bệnh án mô tả bệnh nhân nằm viện dưỡng lão, có mở khí quản và tiếng ran ẩm ở phổi. Những từ vựng này làm mô hình ngôn ngữ đơn thuần bị nhiễu và đoán nhầm sang Suy tim (58,99%). Khi đi qua hệ thống M-CDSS, chính thông số huyết áp 115/80 mmHg và nhịp tim 64 lần/phút hoàn toàn ổn định trên bảng số đã phát huy vai trò mỏ neo huyết động học, giúp tầng chú ý chéo loại trừ suy tim cấp và điều chỉnh dự đoán về đúng COPD với độ tin cậy hiệu chuẩn `[TODO-TV1/TV2]`, kèm dẫn chiếu tiêu chuẩn GOLD 2024.
 
 ### Câu chuyển
 > Như vậy, cả hai ca bệnh khó nhất đều đã được giải quyết trọn vẹn. Tiếp theo, em xin tổng hợp cơ chế kiểm chứng không ảo giác của hệ thống trên toàn bộ tập kiểm thử.
@@ -375,21 +372,21 @@
 ## Slide 17 — Phân tích Đường cong Quyết định (Decision Curve Analysis – DCA)
 
 ### Nội dung hiển thị trên Slide
-**Bảng định lượng Lợi ích ròng lâm sàng (Net Benefit) trên tập kiểm thử độc lập ($N = 302$):**
+**Khung bảng định lượng Lợi ích ròng lâm sàng (Net Benefit) trên tập kiểm thử độc lập ($N = 302$ — Chờ điền từ tệp dự đoán hold-out của Thành viên 1 & 2):**
 
-| Ngưỡng can thiệp ($p_t$) | Chiến lược *Treat All* | Chiến lược *Treat None* | Mô hình Bảng số (*CatBoost*) | Mô hình Văn bản (*ClinicalBERT*) | **Hệ thống M-CDSS (Đề xuất)** | **Số ca can thiệp đúng tăng thêm / 100 BN** |
+| Ngưỡng can thiệp ($p_t$) | Chiến lược *Treat All* | Chiến lược *Treat None* | Mô hình Bảng số (*Tabular*) | Mô hình Văn bản (*ClinicalBERT*) | **Hệ thống M-CDSS (Đề xuất)** | **Số ca can thiệp đúng tăng thêm / 100 BN** |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **$p_t = 0,10$ (10%)** | 0,161 | 0,000 | 0,182 | 0,219 | **0,238** | **+21,2 ca / 100 BN** |
-| **$p_t = 0,20$ (20%)** | 0,063 | 0,000 | 0,145 | 0,196 | **0,214** | **+15,1 ca / 100 BN** |
-| **$p_t = 0,30$ (30%)** | -0,071 | 0,000 | 0,108 | 0,171 | **0,191** | **+11,4 ca / 100 BN** |
-| **$p_t = 0,40$ (40%)** | -0,250 | 0,000 | 0,069 | 0,142 | **0,168** | **+8,2 ca / 100 BN** |
+| **$p_t = 0,10$ (10%)** | 0,167 | 0,000 | `[TODO-TV1/2]` | `[TODO-TV1/2]` | **`[TODO-TV1/2]`** | **`[TODO-TV1/2]`** |
+| **$p_t = 0,20$ (20%)** | 0,062 | 0,000 | `[TODO-TV1/2]` | `[TODO-TV1/2]` | **`[TODO-TV1/2]`** | **`[TODO-TV1/2]`** |
+| **$p_t = 0,30$ (30%)** | -0,071 | 0,000 | `[TODO-TV1/2]` | `[TODO-TV1/2]` | **`[TODO-TV1/2]`** | **`[TODO-TV1/2]`** |
+| **$p_t = 0,40$ (40%)** | -0,250 | 0,000 | `[TODO-TV1/2]` | `[TODO-TV1/2]` | **`[TODO-TV1/2]`** | **`[TODO-TV1/2]`** |
 
-* **Ý nghĩa thực tiễn đối với bác sĩ lâm sàng:**
-  * Trên toàn bộ dải ngưỡng quyết định can thiệp thực tế $p_t \in [0,10; 0,45]$, đường cong lợi ích ròng của **M-CDSS luôn nằm cao nhất**, vượt qua cả *Treat All*, *Treat None* và các mô hình đơn phương thức.
-  * Tại ngưỡng sàng lọc tiêu chuẩn $p_t = 20\%$, việc sử dụng M-CDSS giúp bác sĩ phát hiện và can thiệp đúng thêm **15,1 bệnh nhân trên mỗi 100 lượt khám** mà không làm phát sinh thêm ca điều trị thừa nào.
+* **Ý nghĩa thực tiễn đối với bác sĩ lâm sàng (Khung chờ điền kết quả):**
+  * Trên dải ngưỡng quyết định can thiệp thực tế $p_t \in [0,10; 0,45]$: `[TODO-TV1/TV2 (Backlog 06 Task 1.2 & 2.2): Điền nhận xét so sánh đường cong Net Benefit của M-CDSS với Treat All, Treat None và các mô hình đơn phương thức]`.
+  * Tại ngưỡng sàng lọc tiêu chuẩn $p_t = 20\%$: `[TODO-TV1/TV2: Điền số ca phát hiện đúng tăng thêm / 100 bệnh nhân và số ca can thiệp thừa tránh được / 100 bệnh nhân]`.
 
 ### Lời nói gợi ý
-> Slide 17 trình bày kết quả Phân tích đường cong quyết định DCA trên tập kiểm thử 302 bệnh nhân. Như thầy cô quan sát trên bảng, khi ngưỡng xác suất quyết định can thiệp tăng từ 10% lên 40%, chiến lược điều trị tất cả (Treat All) nhanh chóng tụt xuống mức lợi ích âm do điều trị thừa quá nhiều. Ngược lại, hệ thống M-CDSS duy trì lợi ích ròng dương cao nhất ở mọi mức ngưỡng, vượt qua cả CatBoost và Bio_ClinicalBERT. Cụ thể ở ngưỡng quyết định 20%, M-CDSS đạt lợi ích ròng 0,214, tương đương việc giúp bác sĩ phát hiện và xử trí đúng thêm 15,1 ca bệnh trên mỗi 100 bệnh nhân mà không làm tăng tỷ lệ dương tính giả.
+> Slide 17 trình bày khung kết quả Phân tích đường cong quyết định DCA trên tập kiểm thử 302 bệnh nhân. Khi ngưỡng xác suất quyết định can thiệp tăng từ 10% lên 40%, chiến lược điều trị tất cả (Treat All) nhanh chóng tụt xuống mức lợi ích âm do điều trị thừa quá nhiều (`[TODO-TV1/TV2: Trình bày số liệu Net Benefit thực nghiệm của M-CDSS sau khi điền vào bảng]`).
 
 ### Câu chuyển
 > Bên cạnh lợi ích ròng DCA, quy trình nghiên cứu của đề tài đã khắc phục cảnh báo nguy cơ sai lệch PROBAST của tạp chí JMIR như thế nào?
@@ -406,7 +403,7 @@
 | **1. Đối tượng (Participants)** | Nhiều nghiên cứu chia ngẫu nhiên theo lượt khám, gây rò rỉ cùng một bệnh nhân giữa Train và Test. | Đoàn hệ 2.000 hồ sơ cân bằng 4 nhóm bệnh; phân chia nghiêm ngặt theo định danh bệnh nhân (*Strict Group Split*, 0% rò rỉ). | **Nguy cơ Thấp** (*Low Risk*) |
 | **2. Biến dự báo (Predictors)** | Sử dụng cả các xét nghiệm hoặc ghi chú phát sinh sau khi đã có kết quả chẩn đoán. | Khóa thời gian quan sát và che toàn bộ từ khóa chẩn đoán trực tiếp trong bệnh án (`[REDACTED_DIAGNOSIS]`). | **Nguy cơ Thấp** (*Low Risk*) |
 | **3. Kết cục (Outcome)** | Định nghĩa nhãn bệnh không đồng nhất giữa các cơ sở dữ liệu. | Chuẩn hóa theo mã quốc tế ICD-10 và đối chiếu nhất quán với tiêu chuẩn GINA 2024, GOLD 2024, ESC và Bộ Y tế. | **Nguy cơ Thấp** (*Low Risk*) |
-| **4. Phân tích (Analysis)** | Xóa bỏ các ca thiếu dữ liệu hoặc nội suy trên toàn tập; hầu hết bỏ qua hiệu chuẩn xác suất và DCA. | Nội suy đa biến MICE kèm biến chỉ báo khuyết thiếu chỉ khớp trên tập Train; hiệu chuẩn $\text{ECE} = 0,0241 < 0,05$; lượng hóa DCA. | **Nguy cơ Thấp** (*Low Risk*) |
+| **4. Phân tích (Analysis)** | Xóa bỏ các ca thiếu dữ liệu hoặc nội suy trên toàn tập; hầu hết bỏ qua hiệu chuẩn xác suất và DCA. | Nội suy đa biến MICE kèm biến chỉ báo khuyết thiếu chỉ khớp trên tập Train; hiệu chuẩn Temperature Scaling ($\text{ECE} = \text{[TODO-TV2]} < 0,05$); lượng hóa DCA. | **Nguy cơ Thấp** (*Low Risk*) |
 
 ### Lời nói gợi ý
 > Khi đặt hệ thống M-CDSS lên bàn cân của bộ công cụ thẩm định quốc tế PROBAST gồm 4 miền: Đối tượng, Biến dự báo, Kết cục và Phân tích thống kê, đề tài đã giải quyết có hệ thống những lỗi phương pháp luận phổ biến nhất từng khiến 15 nghiên cứu trước đó bị đánh giá nguy cơ sai lệch cao. Nhờ phân chia dữ liệu theo bệnh nhân với kiểm toán 0% rò rỉ, che nhãn chẩn đoán trong văn bản, nội suy MICE đúng chuẩn chỉ khớp trên tập huấn luyện và thực hiện hiệu chuẩn xác suất cùng phân tích DCA, đề tài đạt mức nguy cơ sai lệch thấp trên cả 4 miền tiêu chuẩn.

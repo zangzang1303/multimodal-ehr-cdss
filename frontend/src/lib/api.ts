@@ -498,6 +498,7 @@ export interface DCAPoint {
   net_benefit_treat_all: number;
   net_benefit_treat_none: number;
   net_tp_gained_per_100?: number;
+  net_interventions_avoided_per_100?: number;
 }
 
 export interface EvaluationBenchmarkResponse {

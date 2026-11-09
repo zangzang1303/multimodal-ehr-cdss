@@ -1,3 +1,12 @@
+# ==============================================================================
+# [CHÚ THÍCH MOCK ENDPOINT - DÙNG PHÁT TRIỂN GIAO DIỆN TRƯỚC KHI CÓ CHECKPOINT]
+# LƯU Ý: Endpoint POST /api/v1/predict/mock trong file này là endpoint giả lập
+# (mock) theo nhiệm vụ của Thành viên 3 (Backlog 04 - Nhiệm vụ 3.1) để phát triển
+# giao diện DiagnosticCard.tsx. Khi Thành viên 1 hoàn thành huấn luyện trọng số
+# data/checkpoints/multimodal_best.pt và viết endpoint GPU thực tế
+# POST /api/v1/predict/multimodal (Backlog 05 - Nhiệm vụ 1.3), hệ thống sẽ chuyển
+# sang dùng suy luận mô hình thật.
+# ==============================================================================
 """
 Inference API Endpoints for Baselines
 Multimodal EHR CDSS - Phase 1 / Backlog 02 (Task 3.3)
@@ -370,4 +379,3 @@ async def predict_multimodal_mock(request: PatientInferenceRequest) -> Multimoda
         fusion_gate_weights=gate_weights,
         timestamp=timestamp_str,
     )
-

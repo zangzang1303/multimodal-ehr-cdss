@@ -1,16 +1,41 @@
+# ==============================================================================
+# [CHÚ THÍCH MOCK / FALLBACK TRONG FILE - CHỜ DỮ LIỆU TỪ THÀNH VIÊN 1 & 2]
+# LƯU Ý:
+# 1. Bộ dữ liệu STANDARD_GUIDELINE_CORPUS (6 chunks mẫu) trong file này chỉ là
+#    dữ liệu mồi (seed/mock) tạm thời để Thành viên 3 kiểm thử Qdrant + BM25,
+#    chờ Thành viên 2 hoàn thiện src/agent/knowledge_ingest.py nạp >= 100 chunks
+#    phác đồ chuẩn vào Qdrant (Backlog 05 - Nhiệm vụ 2.1 & Backlog 07 - Nhiệm vụ 2.1).
+# 2. Hàm _encode_text() (vector đặc trưng 64 chiều từ cụm khái niệm + băm n-gram)
+#    là bộ mã hóa fallback tạm thời trên CPU, chờ Thành viên 1 hoàn thiện cấu hình
+#    configs/rag_config.yaml với sentence-transformers/all-mpnet-base-v2 (768 chiều)
+#    (Backlog 05 - Nhiệm vụ 1.1).
+# ==============================================================================
 """
 Hybrid Clinical Knowledge Retriever
 M-CDSS Phase 2 / Backlog 05 (Task 3.1)
 
-Combines Dense Semantic Vector retrieval with Sparse Lexical BM25 keyword filtering
-to retrieve authoritative Clinical Practice Guidelines (CPGs) from GINA 2024, GOLD 2024,
-ESC 2023, and Vietnam Ministry of Health (BYT).
-Supports both live Qdrant Vector DB connection and local In-Memory Fallback.
+Combines Dense Semantic Vector retrieval (via Qdrant Vector DB with Cosine Similarity)
+and Sparse Lexical Okapi BM25 scoring to retrieve authoritative Clinical Practice
+Guidelines (CPGs) from GINA 2024, GOLD 2024, ESC 2023, and Vietnam Ministry of Health (BYT).
 """
 
+from __future__ import annotations
+
+import hashlib
 import math
+import os
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+import numpy as np
+
+try:
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import Distance, PointStruct, VectorParams
+
+    HAS_QDRANT = True
+except ImportError:
+    HAS_QDRANT = False
 
 
 # Authoritative Clinical Practice Guideline Chunks with deep clinical metadata
@@ -110,12 +135,26 @@ STANDARD_GUIDELINE_CORPUS: List[Dict[str, Any]] = [
     },
 ]
 
+# Bilingual clinical concept clusters used for semantic dense vector construction
+CLINICAL_CONCEPT_CLUSTERS: List[List[str]] = [
+    ["asthma", "hen", "wheezing", "thở rít", "khò khè", "inhaler", "albuterol", "dị ứng", "gina", "hồi phục"],
+    ["copd", "tắc nghẽn", "hút thuốc", "smoking", "bao-năm", "fev1", "fvc", "mạn tính", "gold", "khí phế thũng"],
+    ["heart", "failure", "suy tim", "orthopnea", "pnd", "phù", "edema", "bnp", "nt-probnp", "tĩnh mạch cổ", "esc"],
+    ["pneumonia", "viêm phổi", "sốt", "fever", "đờm mủ", "bạch cầu", "wbc", "crp", "đông đặc", "ran nổ", "cap"],
+    ["khó thở", "dyspnea", "shortness", "breath", "ho", "cough", "đờm", "sputum", "ran ẩm", "crackles"],
+    ["cờ đỏ", "red flag", "cấp cứu", "emergency", "spo2", "huyết áp", "hypotension", "hôn mê", "suy hô hấp"],
+    ["phân biệt", "differential", "tuổi", "age", "biến thiên", "đêm", "gắng sức", "tiêu chuẩn", "chẩn đoán"],
+]
+
 
 class HybridGuidelineRetriever:
     """
-    Hybrid retriever that searches authoritative medical guidelines.
-    Uses BM25 keyword matching and term frequency overlap over the guideline corpus.
-    Can also connect to a live Qdrant client when host/port are provided.
+    Hybrid retriever that combines:
+      1. Dense Semantic Vector Cosine Similarity (via Qdrant Vector DB or in-memory vector index)
+      2. Sparse Lexical Okapi BM25 scoring (k1=1.5, b=0.75) with medical keyword boosting.
+
+    Final hybrid score:
+        S_hybrid(q, d) = alpha * S_bm25_norm(q, d) + (1 - alpha) * S_cosine(q, d)
     """
 
     def __init__(
@@ -123,38 +162,217 @@ class HybridGuidelineRetriever:
         corpus: Optional[List[Dict[str, Any]]] = None,
         qdrant_client: Optional[Any] = None,
         collection_name: str = "clinical_guidelines",
+        alpha: float = 0.65,
+        k1: float = 1.5,
+        b: float = 0.75,
+        vector_dim: int = 64,
+        embedding_fn: Optional[Callable[[str], np.ndarray]] = None,
     ):
         self.corpus = corpus or STANDARD_GUIDELINE_CORPUS
-        self.qdrant_client = qdrant_client
         self.collection_name = collection_name
+        self.alpha = float(np.clip(alpha, 0.0, 1.0))
+        self.k1 = k1
+        self.b = b
+        self.vector_dim = vector_dim
+        self.embedding_fn = embedding_fn
+
+        # Build BM25 inverted index & corpus statistics
+        self._doc_tokens: List[List[str]] = []
+        self._doc_freqs: Dict[str, int] = {}
+        self._avgdl: float = 1.0
+        self._build_bm25_index()
+
+        # Precompute dense embeddings for corpus
+        self._corpus_embeddings: np.ndarray = np.vstack(
+            [self._encode_text(self._chunk_full_text(c)) for c in self.corpus]
+        )
+
+        # Initialize Qdrant client (external URL if configured & reachable, else in-memory Qdrant)
+        self.qdrant_client = qdrant_client
+        self._qdrant_ready = False
+        self._init_qdrant_index()
+
+    def _chunk_full_text(self, chunk: Dict[str, Any]) -> str:
+        return (
+            f"{chunk.get('section_title', '')} "
+            f"{chunk.get('disease_entity', '')} "
+            f"{chunk.get('text_content', '')} "
+            f"{' '.join(chunk.get('keywords', []))}"
+        )
 
     def _tokenize(self, text: str) -> List[str]:
-        """Simple lower-case word tokenizer."""
-        return re.findall(r"\w+", text.lower())
+        """Lower-case word and medical symbol tokenizer."""
+        return [t for t in re.findall(r"\w+", text.lower()) if len(t) >= 2]
 
-    def _compute_keyword_score(self, query_tokens: List[str], chunk: Dict[str, Any]) -> float:
+    def _build_bm25_index(self) -> None:
+        """Precomputes document token lists, document frequencies, and average document length."""
+        self._doc_tokens = []
+        self._doc_freqs = {}
+        total_len = 0
+
+        for chunk in self.corpus:
+            tokens = self._tokenize(self._chunk_full_text(chunk))
+            self._doc_tokens.append(tokens)
+            total_len += len(tokens)
+            for unique_tok in set(tokens):
+                self._doc_freqs[unique_tok] = self._doc_freqs.get(unique_tok, 0) + 1
+
+        n_docs = max(len(self.corpus), 1)
+        self._avgdl = max(total_len / n_docs, 1.0)
+
+    def _encode_text(self, text: str) -> np.ndarray:
         """
-        Computes relevance score based on keyword overlap with query tokens.
+        Computes an L2-normalized dense semantic embedding vector for clinical text.
+        Uses custom embedding_fn if provided; otherwise combines bilingual clinical
+        concept activation dimensions with hashed character/word n-gram projections.
         """
-        chunk_text = (
-            chunk.get("text_content", "")
-            + " "
-            + chunk.get("section_title", "")
-            + " "
-            + " ".join(chunk.get("keywords", []))
-        ).lower()
+        if self.embedding_fn is not None:
+            vec = np.asarray(self.embedding_fn(text), dtype=np.float32).reshape(-1)
+            norm = float(np.linalg.norm(vec))
+            return vec / norm if norm > 1e-8 else vec
 
-        score = 0.0
-        for token in query_tokens:
-            if len(token) < 2:
-                continue
-            if token in chunk_text:
-                score += 1.0
-                # Extra boost if present in keywords list
-                if token in [k.lower() for k in chunk.get("keywords", [])]:
-                    score += 1.5
+        vec = np.zeros(self.vector_dim, dtype=np.float32)
+        text_lower = text.lower()
+        tokens = self._tokenize(text_lower)
 
-        return score
+        # 1. Clinical concept cluster activations (first len(CLINICAL_CONCEPT_CLUSTERS) dims)
+        for cluster_idx, cluster_terms in enumerate(CLINICAL_CONCEPT_CLUSTERS):
+            if cluster_idx >= self.vector_dim:
+                break
+            hits = sum(1.0 for term in cluster_terms if term in text_lower)
+            if hits > 0:
+                vec[cluster_idx] = math.log1p(hits) * 2.0
+
+        # 2. Hashed word & bigram semantic projection across remaining dimensions
+        offset = len(CLINICAL_CONCEPT_CLUSTERS)
+        rem_dim = max(self.vector_dim - offset, 1)
+        ngrams = list(tokens) + [
+            f"{tokens[i]}_{tokens[i + 1]}" for i in range(len(tokens) - 1)
+        ]
+        for ng in ngrams:
+            digest = hashlib.md5(ng.encode("utf-8")).digest()
+            idx = offset + (int.from_bytes(digest[:4], "little") % rem_dim)
+            sign = 1.0 if (digest[4] & 1) == 0 else -1.0
+            vec[idx] += sign * 0.5
+
+        norm = float(np.linalg.norm(vec))
+        if norm > 1e-8:
+            vec = vec / norm
+        else:
+            vec[0] = 1.0
+        return vec
+
+    def _init_qdrant_index(self) -> None:
+        """Initializes Qdrant collection and indexes the guideline corpus vectors."""
+        if not HAS_QDRANT:
+            return
+
+        try:
+            if self.qdrant_client is None:
+                qdrant_url = os.getenv("QDRANT_URL")
+                if qdrant_url:
+                    try:
+                        client = QdrantClient(url=qdrant_url, timeout=1.5)
+                        client.get_collections()
+                        self.qdrant_client = client
+                    except Exception:
+                        self.qdrant_client = QdrantClient(":memory:")
+                else:
+                    self.qdrant_client = QdrantClient(":memory:")
+
+            collections = [
+                c.name for c in self.qdrant_client.get_collections().collections
+            ]
+            if self.collection_name not in collections:
+                self.qdrant_client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=VectorParams(
+                        size=self.vector_dim,
+                        distance=Distance.COSINE,
+                    ),
+                )
+
+            points = [
+                PointStruct(
+                    id=idx,
+                    vector=self._corpus_embeddings[idx].tolist(),
+                    payload=dict(chunk),
+                )
+                for idx, chunk in enumerate(self.corpus)
+            ]
+            self.qdrant_client.upsert(
+                collection_name=self.collection_name,
+                points=points,
+            )
+            self._qdrant_ready = True
+        except Exception:
+            self._qdrant_ready = False
+
+    def _compute_bm25_score(
+        self, query_tokens: List[str], doc_idx: int, chunk: Dict[str, Any]
+    ) -> float:
+        """
+        Computes Okapi BM25 lexical relevance score for document doc_idx,
+        plus authoritative keyword tag bonus.
+        """
+        if not query_tokens:
+            return 0.0
+
+        doc_tokens = self._doc_tokens[doc_idx]
+        doc_len = len(doc_tokens)
+        if doc_len == 0:
+            return 0.0
+
+        n_docs = len(self.corpus)
+        tf_map: Dict[str, int] = {}
+        for t in doc_tokens:
+            tf_map[t] = tf_map.get(t, 0) + 1
+
+        bm25 = 0.0
+        chunk_keywords = [k.lower() for k in chunk.get("keywords", [])]
+        chunk_text_lower = self._chunk_full_text(chunk).lower()
+
+        for q_tok in query_tokens:
+            tf = tf_map.get(q_tok, 0)
+            if tf == 0 and q_tok in chunk_text_lower:
+                tf = 1
+            if tf > 0:
+                df = self._doc_freqs.get(q_tok, 1)
+                idf = math.log(1.0 + (n_docs - df + 0.5) / (df + 0.5))
+                denom = tf + self.k1 * (1.0 - self.b + self.b * (doc_len / self._avgdl))
+                bm25 += idf * ((tf * (self.k1 + 1.0)) / denom)
+
+                if any(q_tok in kw for kw in chunk_keywords):
+                    bm25 += 0.75
+
+        return float(bm25)
+
+    def _query_dense_cosine_scores(self, query_vec: np.ndarray) -> Dict[int, float]:
+        """
+        Queries Qdrant Vector DB (when available) or in-memory cosine matrix
+        to obtain dense semantic cosine similarity in [0, 1] for each corpus chunk.
+        """
+        cosine_map: Dict[int, float] = {}
+
+        if self._qdrant_ready and self.qdrant_client is not None:
+            try:
+                response = self.qdrant_client.query_points(
+                    collection_name=self.collection_name,
+                    query=query_vec.tolist(),
+                    limit=len(self.corpus),
+                )
+                for pt in response.points:
+                    cosine_map[int(pt.id)] = float(np.clip((pt.score + 1.0) / 2.0 if pt.score < 0 else pt.score, 0.0, 1.0))
+                if cosine_map:
+                    return cosine_map
+            except Exception:
+                pass
+
+        # Fallback: direct matrix-vector cosine similarity
+        sims = np.dot(self._corpus_embeddings, query_vec)
+        for idx, val in enumerate(sims):
+            cosine_map[idx] = float(np.clip(max(val, 0.0), 0.0, 1.0))
+        return cosine_map
 
     def retrieve(
         self,
@@ -163,47 +381,59 @@ class HybridGuidelineRetriever:
         top_k: int = 4,
     ) -> List[Dict[str, Any]]:
         """
-        Retrieves top_k most relevant guideline chunks for a clinical query.
+        Retrieves top_k most relevant guideline chunks by combining normalized
+        Okapi BM25 lexical score and Qdrant Dense Cosine Similarity score:
+            S_hybrid = alpha * S_bm25_norm + (1 - alpha) * S_cosine
         """
-        # If live Qdrant is connected, try querying it
-        if self.qdrant_client is not None:
-            try:
-                # Placeholder for live Qdrant search
-                pass
-            except Exception:
-                pass
-
-        # Fallback / In-Memory BM25 hybrid search
         query_tokens = self._tokenize(query)
-        scored_chunks: List[Tuple[float, Dict[str, Any]]] = []
+        query_vec = self._encode_text(query)
 
-        for chunk in self.corpus:
-            # Apply disease filter if requested
+        # 1. Dense Cosine similarity scores from Qdrant / embedding index
+        cosine_scores = self._query_dense_cosine_scores(query_vec)
+
+        # 2. Sparse Okapi BM25 lexical scores
+        raw_bm25_scores: Dict[int, float] = {}
+        for idx, chunk in enumerate(self.corpus):
+            raw_bm25_scores[idx] = self._compute_bm25_score(query_tokens, idx, chunk)
+
+        max_bm25 = max(raw_bm25_scores.values()) if raw_bm25_scores else 0.0
+
+        # 3. Filter and compute combined hybrid score
+        scored_chunks: List[Tuple[float, float, float, Dict[str, Any]]] = []
+        for idx, chunk in enumerate(self.corpus):
             if disease_filter:
                 entity = chunk.get("disease_entity", "").upper()
                 target = disease_filter.upper()
                 if target not in entity and entity != "ALL_RESPIRATORY_CARDIAC":
                     continue
 
-            score = self._compute_keyword_score(query_tokens, chunk)
-            if score > 0:
-                scored_chunks.append((score, chunk))
-            elif not disease_filter:
-                # Add with zero score so we have candidates
-                scored_chunks.append((0.0, chunk))
+            raw_bm25 = raw_bm25_scores[idx]
+            bm25_norm = (raw_bm25 / max_bm25) if max_bm25 > 1e-8 else 0.0
+            cos_sim = cosine_scores.get(idx, 0.0)
 
-        # Sort descending by relevance score
+            hybrid_score = self.alpha * bm25_norm + (1.0 - self.alpha) * cos_sim
+
+            # Only include candidates with positive lexical or semantic signal when disease_filter is set
+            if raw_bm25 > 0 or cos_sim > 0.05 or not disease_filter:
+                scored_chunks.append((hybrid_score, bm25_norm, cos_sim, chunk))
+
+        # Sort descending by hybrid score
         scored_chunks.sort(key=lambda x: x[0], reverse=True)
 
         results: List[Dict[str, Any]] = []
-        for score, chunk in scored_chunks[:top_k]:
+        for hybrid_score, bm25_norm, cos_sim, chunk in scored_chunks[:top_k]:
             item = dict(chunk)
-            item["relevance_score"] = round(float(score), 2)
+            item["bm25_score"] = round(float(bm25_norm), 4)
+            item["cosine_score"] = round(float(cos_sim), 4)
+            item["relevance_score"] = round(float(hybrid_score), 4)
             results.append(item)
 
-        # Fallback if no matching chunks found
         if not results:
-            results = [dict(c) for c in self.corpus[:top_k]]
+            for idx, c in enumerate(self.corpus[:top_k]):
+                item = dict(c)
+                item["bm25_score"] = 0.0
+                item["cosine_score"] = round(float(cosine_scores.get(idx, 0.0)), 4)
+                item["relevance_score"] = item["cosine_score"]
+                results.append(item)
 
         return results
-

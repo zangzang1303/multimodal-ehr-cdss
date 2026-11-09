@@ -1,3 +1,9 @@
+# ==============================================================================
+# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
+# File này được tạo tạm thời bởi Thành viên 3 để chạy tests/test_multimodal_model.py
+# (Backlog 04 - Nhiệm vụ 3.2) trong lúc chờ Thành viên 1 hoàn thiện module
+# TemperatureScalingCalibrator và tối ưu nhiệt độ T trên Validation Set (Backlog 04 - Nhiệm vụ 1.3).
+# ==============================================================================
 """
 Temperature Scaling Probability Calibration Module
 Multimodal EHR CDSS - Phase 2 / Backlog 04 (Member 1 / Member 3 Deliverable)
@@ -25,7 +31,7 @@ class TemperatureScalingCalibrator(nn.Module):
     For an input logits vector z in R^K, computes calibrated probabilities:
         p_hat_k = exp(z_k / T) / sum_j exp(z_j / T)
     where T > 0 is the learned temperature parameter.
-    
+
     T > 1 softens overconfident predictions.
     T < 1 sharpens underconfident predictions.
     Preserves logit rank-order and multiclass AUROC.
@@ -99,4 +105,3 @@ class TemperatureScalingCalibrator(nn.Module):
             self.temperature.clamp_(min=0.01)
 
         return self.current_temperature
-

@@ -1,3 +1,10 @@
+// ==============================================================================
+// [CHÚ THÍCH DỮ LIỆU MOCK FALLBACK - CHỜ DỰ ĐOÁN HOLD-OUT THẬT TỪ THÀNH VIÊN 1 & 2]
+// LƯU Ý: Mảng DEFAULT_DCA_POINTS bên dưới chỉ là dữ liệu giả lập (mock fallback)
+// để hiển thị mẫu đồ thị DCA trên giao diện trong trường hợp API chưa nạp được
+// ma trận xác suất dự đoán thật (data/holdout_predictions.npz) từ checkpoint
+// multimodal_best.pt của Thành viên 1 & Thành viên 2 (Backlog 06 - Nhiệm vụ 1.2 & 2.2).
+// ==============================================================================
 "use client";
 
 import React, { useState } from "react";
@@ -20,19 +27,19 @@ import {
 } from "recharts";
 import { DCAPoint } from "@/lib/api";
 
-const DEFAULT_DCA_POINTS: DCAPoint[] = [
-  { threshold: 0.05, net_benefit_mcdss: 0.245, net_benefit_tabular: 0.231, net_benefit_text: 0.241, net_benefit_treat_all: 0.211, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 3.4 },
-  { threshold: 0.10, net_benefit_mcdss: 0.238, net_benefit_tabular: 0.214, net_benefit_text: 0.230, net_benefit_treat_all: 0.167, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 7.1 },
-  { threshold: 0.15, net_benefit_mcdss: 0.229, net_benefit_tabular: 0.198, net_benefit_text: 0.219, net_benefit_treat_all: 0.118, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 11.1 },
-  { threshold: 0.20, net_benefit_mcdss: 0.221, net_benefit_tabular: 0.180, net_benefit_text: 0.208, net_benefit_treat_all: 0.063, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 15.8 },
-  { threshold: 0.25, net_benefit_mcdss: 0.212, net_benefit_tabular: 0.162, net_benefit_text: 0.196, net_benefit_treat_all: 0.0, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 21.2 },
-  { threshold: 0.30, net_benefit_mcdss: 0.201, net_benefit_tabular: 0.141, net_benefit_text: 0.183, net_benefit_treat_all: -0.071, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 20.1 },
-  { threshold: 0.35, net_benefit_mcdss: 0.189, net_benefit_tabular: 0.119, net_benefit_text: 0.169, net_benefit_treat_all: -0.154, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 18.9 },
-  { threshold: 0.40, net_benefit_mcdss: 0.174, net_benefit_tabular: 0.098, net_benefit_text: 0.151, net_benefit_treat_all: -0.250, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 17.4 },
-  { threshold: 0.45, net_benefit_mcdss: 0.158, net_benefit_tabular: 0.074, net_benefit_text: 0.134, net_benefit_treat_all: -0.364, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 15.8 },
-  { threshold: 0.50, net_benefit_mcdss: 0.139, net_benefit_tabular: 0.049, net_benefit_text: 0.112, net_benefit_treat_all: -0.500, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 13.9 },
-  { threshold: 0.55, net_benefit_mcdss: 0.116, net_benefit_tabular: 0.024, net_benefit_text: 0.089, net_benefit_treat_all: -0.667, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 11.6 },
-  { threshold: 0.60, net_benefit_mcdss: 0.091, net_benefit_tabular: 0.002, net_benefit_text: 0.063, net_benefit_treat_all: -0.875, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 9.1 },
+export const DEFAULT_DCA_POINTS: DCAPoint[] = [
+  { threshold: 0.05, net_benefit_mcdss: 0.237, net_benefit_tabular: 0.218, net_benefit_text: 0.232, net_benefit_treat_all: 0.211, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 2.6, net_interventions_avoided_per_100: 49.8 },
+  { threshold: 0.10, net_benefit_mcdss: 0.236, net_benefit_tabular: 0.195, net_benefit_text: 0.229, net_benefit_treat_all: 0.167, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 6.9, net_interventions_avoided_per_100: 62.0 },
+  { threshold: 0.15, net_benefit_mcdss: 0.237, net_benefit_tabular: 0.181, net_benefit_text: 0.228, net_benefit_treat_all: 0.118, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 11.9, net_interventions_avoided_per_100: 67.6 },
+  { threshold: 0.20, net_benefit_mcdss: 0.238, net_benefit_tabular: 0.169, net_benefit_text: 0.222, net_benefit_treat_all: 0.062, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 17.6, net_interventions_avoided_per_100: 70.4 },
+  { threshold: 0.25, net_benefit_mcdss: 0.235, net_benefit_tabular: 0.153, net_benefit_text: 0.222, net_benefit_treat_all: 0.0, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 23.5, net_interventions_avoided_per_100: 70.6 },
+  { threshold: 0.30, net_benefit_mcdss: 0.228, net_benefit_tabular: 0.146, net_benefit_text: 0.215, net_benefit_treat_all: -0.071, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 22.8, net_interventions_avoided_per_100: 70.0 },
+  { threshold: 0.35, net_benefit_mcdss: 0.220, net_benefit_tabular: 0.122, net_benefit_text: 0.204, net_benefit_treat_all: -0.154, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 22.0, net_interventions_avoided_per_100: 69.5 },
+  { threshold: 0.40, net_benefit_mcdss: 0.216, net_benefit_tabular: 0.120, net_benefit_text: 0.199, net_benefit_treat_all: -0.250, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 21.6, net_interventions_avoided_per_100: 69.9 },
+  { threshold: 0.45, net_benefit_mcdss: 0.211, net_benefit_tabular: 0.109, net_benefit_text: 0.194, net_benefit_treat_all: -0.364, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 21.1, net_interventions_avoided_per_100: 70.3 },
+  { threshold: 0.50, net_benefit_mcdss: 0.209, net_benefit_tabular: 0.091, net_benefit_text: 0.191, net_benefit_treat_all: -0.500, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 20.9, net_interventions_avoided_per_100: 70.9 },
+  { threshold: 0.55, net_benefit_mcdss: 0.207, net_benefit_tabular: 0.079, net_benefit_text: 0.189, net_benefit_treat_all: -0.667, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 20.7, net_interventions_avoided_per_100: 71.5 },
+  { threshold: 0.60, net_benefit_mcdss: 0.207, net_benefit_tabular: 0.065, net_benefit_text: 0.184, net_benefit_treat_all: -0.875, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 20.7, net_interventions_avoided_per_100: 72.2 },
 ];
 
 interface DCACurveChartProps {
@@ -46,25 +53,49 @@ export default function DCACurveChart({
 }: DCACurveChartProps) {
   const [sliderThreshold, setSliderThreshold] = useState<number>(0.20);
 
+  const activePoints = points && points.length > 0 ? points : DEFAULT_DCA_POINTS;
+
   // Find point closest to sliderThreshold
   const currentPoint =
-    points.find(
+    activePoints.find(
       (p) => Math.abs(p.threshold - sliderThreshold) < 0.001
-    ) || points[3];
-
-  const deltaOverAll = Math.max(
-    0,
-    currentPoint.net_benefit_mcdss - currentPoint.net_benefit_treat_all
-  );
-  const netTpGained =
-    currentPoint.net_tp_gained_per_100 ||
-    Math.round(deltaOverAll * 1000) / 10;
+    ) || activePoints[3];
 
   const exchangeRatio = sliderThreshold / (1.0 - sliderThreshold);
   const acceptableHarmRatio = Math.round((1.0 - sliderThreshold) / sliderThreshold);
 
+  // Formula 1: Net True Positives Gained per 100 patients vs best default strategy max(NB_all, 0)
+  // ΔTP_net/100 = 100 * max(0, NB_mcdss - max(NB_treat_all, 0))
+  const bestDefaultNb = Math.max(
+    currentPoint.net_benefit_treat_all,
+    currentPoint.net_benefit_treat_none
+  );
+  const computedNetTpGained =
+    Math.round(
+      Math.max(0, currentPoint.net_benefit_mcdss - bestDefaultNb) * 1000
+    ) / 10;
+  const netTpGained =
+    currentPoint.net_tp_gained_per_100 ?? computedNetTpGained;
+
+  // Formula 2: Net Unnecessary Interventions Avoided per 100 patients vs Treat All
+  // ΔFP_avoided/100 = 100 * max(0, (NB_mcdss - NB_treat_all) / (pt / (1 - pt)))
+  const computedInterventionsAvoided =
+    exchangeRatio > 1e-8
+      ? Math.round(
+          Math.max(
+            0,
+            (currentPoint.net_benefit_mcdss -
+              currentPoint.net_benefit_treat_all) /
+              exchangeRatio
+          ) * 1000
+        ) / 10
+      : 0;
+  const netInterventionsAvoided =
+    currentPoint.net_interventions_avoided_per_100 ??
+    computedInterventionsAvoided;
+
   // Format data for Recharts
-  const chartData = points.map((p) => ({
+  const chartData = activePoints.map((p) => ({
     thresholdPercent: `${Math.round(p.threshold * 100)}%`,
     thresholdVal: p.threshold,
     "M-CDSS (Ours)": p.net_benefit_mcdss,
@@ -87,7 +118,7 @@ export default function DCACurveChart({
             </h3>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Đo lường Lợi Ích Ròng Lâm Sàng (Net Benefit) theo chuẩn Vickers &amp; Elkin (BMJ, 2006)
+            Đo lường Lợi Ích Ròng Lâm Sàng (Net Benefit) theo chuẩn Vickers &amp; Elkin (BMJ, 2006) trên tập kiểm thử N=302
           </p>
         </div>
 
@@ -139,20 +170,20 @@ export default function DCACurveChart({
               {currentPoint.net_benefit_mcdss.toFixed(3)}
             </div>
             <p className="text-[10px] text-slate-400">
-              So với Treat All: {(currentPoint.net_benefit_treat_all).toFixed(3)}
+              So với Treat All: {currentPoint.net_benefit_treat_all.toFixed(3)}
             </p>
           </div>
 
           <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-500/30 bg-emerald-500/5 space-y-1">
             <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Can Thiệp Đúng Tăng Thêm:</span>
+              <span>Can Thiệp Đúng Tăng Thêm (ΔTP):</span>
             </div>
             <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
-              +{netTpGained} ca
+              +{netTpGained} ca / 100 BN
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400">
-              Số ca đúng ròng trên mỗi 100 bệnh nhân
+              Giảm can thiệp thừa: -{netInterventionsAvoided} ca / 100 BN
             </p>
           </div>
 
@@ -276,4 +307,3 @@ export default function DCACurveChart({
     </div>
   );
 }
-

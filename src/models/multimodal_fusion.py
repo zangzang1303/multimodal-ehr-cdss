@@ -1,3 +1,9 @@
+# ==============================================================================
+# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
+# File này được tạo tạm thời bởi Thành viên 3 để chạy tests/test_multimodal_model.py
+# (Backlog 04 - Nhiệm vụ 3.2) trong lúc chờ Thành viên 1 hoàn thiện mạng
+# CrossAttentionFusion và huấn luyện trọng số thực tế (Backlog 04 - Nhiệm vụ 1.2).
+# ==============================================================================
 """
 Cross-Attention Late Fusion Module
 Multimodal EHR CDSS - Phase 2 / Backlog 04 (Member 1 / Member 3 Deliverable)
@@ -23,7 +29,7 @@ class CrossAttentionFusion(nn.Module):
 
     Tabular Stream (Query): H_tab in R^[Batch, M+1, d]
     Text Stream (Key/Value): H_text in R^[Batch, S+2, d]
-    
+
     Fusion Mechanism:
     1. Cross-Attention: A = softmax(Q_tab K_text^T / sqrt(d)) V_text
     2. Adaptive Gating: g = sigmoid(W_g [h_tab^cls || h_cross^cls] + b_g)
@@ -133,4 +139,3 @@ class CrossAttentionFusion(nn.Module):
         if return_features:
             return logits, attn_weights, h_fused
         return logits, attn_weights
-
