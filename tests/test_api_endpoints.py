@@ -380,6 +380,41 @@ def test_benchmarks_ablation_endpoint(client):
     assert models["cross_attention_fusion"]["ece"] == artifact["variants"]["cross_attention"]["test"]["ece"]
 
 
+def test_multimodal_checkpoint_contract_and_unavailable_assets(client, monkeypatch):
+    from src.api.routes import inference
+
+    payload = {
+        "patient_id": "PT-TEST",
+        "tabular_features": {
+            "age": 60, "systolic_bp": 130, "diastolic_bp": 80, "heart_rate": 75,
+            "respiratory_rate": 18, "spo2": 96, "temperature": 37,
+            "wbc_count": 6.5, "crp": 5, "gender": "M",
+            "smoking_status": "NEVER", "history_hypertension": 0,
+            "history_diabetes": 0,
+        },
+        "clinical_notes": "Patient reports intermittent wheezing and cough.",
+    }
+    checkpoint = {
+        "classes": ["ASTHMA", "COPD", "HEART_FAILURE", "PNEUMONIA"],
+        "temperature": 1.3,
+        "training_metadata": {"trained_at": "2026-11-05", "calibrated_test_metrics": {"ece": 0.12}},
+    }
+    monkeypatch.setattr(inference, "predict_checkpoint", lambda *_: (checkpoint, [0.4, 0.3, 0.2, 0.1]))
+    response = client.post("/api/v1/predict/multimodal", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["prediction_source"] == "checkpoint"
+    assert data["calibrated"] is True
+    assert sum(item["probability"] for item in data["top_k_predictions"]) == pytest.approx(1)
+    assert data["ece_score"] == 0.12
+
+    payload["clinical_notes"] = " "
+    assert client.post("/api/v1/predict/multimodal", json=payload).status_code == 422
+    payload["clinical_notes"] = "Patient reports intermittent wheezing and cough."
+    monkeypatch.setattr(inference, "predict_checkpoint", lambda *_: (_ for _ in ()).throw(FileNotFoundError("missing weights")))
+    assert client.post("/api/v1/predict/multimodal", json=payload).status_code == 503
+
+
 
 def test_evaluation_benchmark_endpoint(client):
     """

@@ -3,7 +3,7 @@ Inference API Endpoints for Baselines
 Multimodal EHR CDSS - Phase 1 / Backlog 02 (Task 3.3)
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
 from src.api.schemas import (
     BaselineModelResult,
@@ -14,6 +14,7 @@ from src.api.schemas import (
     TopKPrediction,
 )
 from src.data_pipeline.deidentifier import ClinicalDeidentifier
+from src.api.multimodal_service import predict_checkpoint
 
 router = APIRouter(prefix="/predict")
 
@@ -138,8 +139,52 @@ DISEASE_DISPLAY_NAMES = {
     "ASTHMA": "Hen phế quản (ASTHMA)",
     "COPD": "Bệnh phổi tắc nghẽn mạn tính (COPD)",
     "CONGESTIVE_HEART_FAILURE": "Suy tim sung huyết (HEART_FAILURE)",
+    "HEART_FAILURE": "Suy tim sung huyết (HEART_FAILURE)",
     "COMMUNITY_ACQUIRED_PNEUMONIA": "Viêm phổi mắc phải cộng đồng (PNEUMONIA)",
+    "PNEUMONIA": "Viêm phổi mắc phải cộng đồng (PNEUMONIA)",
 }
+
+
+@router.post("/multimodal", response_model=MultimodalMockResponse)
+def predict_multimodal(request: PatientInferenceRequest) -> MultimodalMockResponse:
+    """Run the fitted research checkpoint; return 503 when local assets are missing."""
+    if not request.clinical_notes or len(request.clinical_notes.strip()) < 10:
+        raise HTTPException(status_code=422, detail="Clinical notes require at least 10 characters")
+    clean_note = deidentifier.deidentify_text(request.clinical_notes)
+    try:
+        checkpoint, probabilities = predict_checkpoint(
+            request.tabular_features.model_dump(), clean_note
+        )
+    except (FileNotFoundError, OSError) as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    classes = list(checkpoint["classes"])
+    ordered = sorted(zip(classes, probabilities), key=lambda pair: pair[1], reverse=True)
+    top_k = [
+        TopKPrediction(
+            disease=disease,
+            disease_name=DISEASE_DISPLAY_NAMES.get(disease, disease),
+            probability=probability,
+            percentage=round(probability * 100, 1),
+            risk_level=_determine_risk_level(probability),
+        )
+        for disease, probability in ordered
+    ]
+    top_disease, confidence = ordered[0]
+    metrics = checkpoint.get("training_metadata", {}).get("calibrated_test_metrics", {})
+    return MultimodalMockResponse(
+        patient_id=request.patient_id,
+        prediction_source="checkpoint",
+        model_version=checkpoint.get("training_metadata", {}).get("trained_at"),
+        predicted_disease=top_disease,
+        predicted_disease_name=DISEASE_DISPLAY_NAMES.get(top_disease, top_disease),
+        confidence=confidence,
+        calibrated=True,
+        temperature=float(checkpoint["temperature"]),
+        ece_score=metrics.get("ece"),
+        top_k_predictions=top_k,
+        timestamp=datetime.now(timezone.utc).isoformat(),
+    )
 
 
 def _determine_risk_level(prob: float) -> str:

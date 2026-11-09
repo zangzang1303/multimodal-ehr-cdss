@@ -107,6 +107,11 @@ export default function GuidelineDrawer({
                       <span className="text-[10px] text-slate-400 font-mono">
                         {g.chunk_id}
                       </span>
+                      {!g.source_verified && (
+                        <span className="text-[10px] text-amber-700 dark:text-amber-300">
+                          Nguồn chưa xác minh
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -114,6 +119,9 @@ export default function GuidelineDrawer({
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
                     {g.section_title}
                   </h4>
+                  <p className="text-[11px] text-slate-500">
+                    {g.source_id || g.guideline_source} · {g.version || "chưa rõ phiên bản"} · {g.section_locator || "chưa có vị trí nguồn"}
+                  </p>
 
                   {/* Content snippet */}
                   <p className="text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap font-sans bg-slate-50 dark:bg-slate-900/40 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/60">
@@ -128,7 +136,7 @@ export default function GuidelineDrawer({
           <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex items-center justify-between text-xs text-slate-500">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>Cơ sở tri thức Qdrant Vector Store • M-CDSS RAG</span>
+              <span>Kiểm tra nguồn và phiên bản phác đồ trước khi áp dụng</span>
             </div>
             <button
               type="button"

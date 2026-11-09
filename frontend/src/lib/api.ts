@@ -252,6 +252,8 @@ export interface ModalityStreamResult {
 
 export interface MultimodalMockResponse {
   patient_id: string;
+  prediction_source: "mock" | "checkpoint";
+  model_version?: string | null;
   predicted_disease: string;
   predicted_disease_name: string;
   confidence: number;
@@ -292,6 +294,21 @@ export async function predictMultimodalMock(
     throw new Error(`Multimodal mock prediction failed (${response.status}): ${errorText}`);
   }
 
+  return response.json();
+}
+
+export async function predictMultimodal(
+  payload: PatientInferenceRequest
+): Promise<MultimodalMockResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/predict/multimodal`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Multimodal inference unavailable (${response.status}): ${detail}`);
+  }
   return response.json();
 }
 
@@ -435,6 +452,10 @@ export interface EvidenceSpan {
 
 export interface GuidelineReference {
   chunk_id: string;
+  source_id?: string;
+  version?: string;
+  section_locator?: string;
+  source_verified?: boolean;
   guideline_source: string;
   disease_entity: string;
   section_title: string;
@@ -454,6 +475,7 @@ export interface AgentExplainRequest {
 
 export interface AgentExplainResponse {
   patient_id: string;
+  display_note: string;
   primary_diagnosis: string;
   primary_diagnosis_name: string;
   differential_diagnosis?: string;

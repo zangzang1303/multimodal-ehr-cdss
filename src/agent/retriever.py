@@ -9,7 +9,9 @@ Supports both live Qdrant Vector DB connection and local In-Memory Fallback.
 """
 
 import math
+import os
 import re
+from collections import Counter
 from typing import Any, Dict, List, Optional
 
 
@@ -123,38 +125,61 @@ class HybridGuidelineRetriever:
         corpus: Optional[List[Dict[str, Any]]] = None,
         qdrant_client: Optional[Any] = None,
         collection_name: str = "clinical_guidelines",
+        embedding_fn: Optional[Any] = None,
     ):
         self.corpus = corpus or STANDARD_GUIDELINE_CORPUS
         self.qdrant_client = qdrant_client
         self.collection_name = collection_name
+        self.embedding_fn = embedding_fn
+        if self.qdrant_client is None and os.getenv("QDRANT_URL"):
+            from qdrant_client import QdrantClient
+
+            self.qdrant_client = QdrantClient(url=os.environ["QDRANT_URL"], timeout=2)
+        if self.embedding_fn is None and os.getenv("MCDSS_DENSE_MODEL"):
+            from sentence_transformers import SentenceTransformer
+
+            encoder = SentenceTransformer(os.environ["MCDSS_DENSE_MODEL"], local_files_only=True)
+            self.embedding_fn = lambda text: encoder.encode(text).tolist()
 
     def _tokenize(self, text: str) -> List[str]:
         """Simple lower-case word tokenizer."""
         return re.findall(r"\w+", text.lower())
 
-    def _compute_keyword_score(self, query_tokens: List[str], chunk: Dict[str, Any]) -> float:
-        """
-        Computes relevance score based on keyword overlap with query tokens.
-        """
-        chunk_text = (
-            chunk.get("text_content", "")
-            + " "
-            + chunk.get("section_title", "")
-            + " "
-            + " ".join(chunk.get("keywords", []))
-        ).lower()
+    def _bm25_rank(self, query: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Rank exact corpus text with BM25; scores are local ranking values."""
+        documents = [
+            self._tokenize(" ".join([c.get("text_content", ""), c.get("section_title", ""),
+                                     " ".join(c.get("keywords", []))]))
+            for c in chunks
+        ]
+        frequencies = [Counter(tokens) for tokens in documents]
+        avg_length = sum(map(len, documents)) / max(len(documents), 1)
+        terms = set(self._tokenize(query))
+        scores = []
+        for chunk, counts, tokens in zip(chunks, frequencies, documents):
+            score = 0.0
+            for term in terms:
+                frequency = counts[term]
+                if not frequency:
+                    continue
+                document_frequency = sum(term in item for item in frequencies)
+                idf = math.log(1 + (len(chunks) - document_frequency + 0.5) / (document_frequency + 0.5))
+                score += idf * frequency * 2.2 / (
+                    frequency + 1.2 * (0.25 + 0.75 * len(tokens) / max(avg_length, 1))
+                )
+            item = dict(chunk)
+            item["relevance_score"] = round(score, 6)
+            scores.append(item)
+        return sorted(scores, key=lambda item: item["relevance_score"], reverse=True)
 
-        score = 0.0
-        for token in query_tokens:
-            if len(token) < 2:
-                continue
-            if token in chunk_text:
-                score += 1.0
-                # Extra boost if present in keywords list
-                if token in [k.lower() for k in chunk.get("keywords", [])]:
-                    score += 1.5
-
-        return score
+    @staticmethod
+    def _with_provenance(chunk: Dict[str, Any]) -> Dict[str, Any]:
+        item = dict(chunk)
+        item.setdefault("source_id", item.get("guideline_source", ""))
+        item.setdefault("version", item.get("guideline_source", "").rsplit("_", 1)[-1])
+        item.setdefault("section_locator", item.get("section_title", ""))
+        item.setdefault("source_verified", False)
+        return item
 
     def retrieve(
         self,
@@ -165,44 +190,42 @@ class HybridGuidelineRetriever:
         """
         Retrieves top_k most relevant guideline chunks for a clinical query.
         """
-        # If live Qdrant is connected, try querying it
-        if self.qdrant_client is not None:
+        if top_k < 1:
+            raise ValueError("top_k must be positive")
+        target = disease_filter.upper() if disease_filter else None
+        candidates = [
+            self._with_provenance(chunk) for chunk in self.corpus
+            if not target or target in chunk.get("disease_entity", "").upper()
+            or chunk.get("disease_entity") == "ALL_RESPIRATORY_CARDIAC"
+        ]
+        sparse = self._bm25_rank(query, candidates)
+        dense = []
+        if self.qdrant_client is not None and self.embedding_fn is not None:
             try:
-                # Placeholder for live Qdrant search
-                pass
+                response = self.qdrant_client.query_points(
+                    collection_name=self.collection_name,
+                    query=self.embedding_fn(query),
+                    limit=max(top_k * 4, 10),
+                    with_payload=True,
+                )
+                for point in response.points:
+                    payload = self._with_provenance(point.payload or {})
+                    if not all(payload.get(key) for key in ("chunk_id", "source_id", "version", "section_locator", "text_content")):
+                        continue
+                    if target and target not in payload.get("disease_entity", "").upper() and payload.get("disease_entity") != "ALL_RESPIRATORY_CARDIAC":
+                        continue
+                    dense.append(payload)
             except Exception:
-                pass
+                # A failed vector store does not make the local research corpus authoritative.
+                dense = []
 
-        # Fallback / In-Memory BM25 hybrid search
-        query_tokens = self._tokenize(query)
-        scored_chunks: List[Tuple[float, Dict[str, Any]]] = []
-
-        for chunk in self.corpus:
-            # Apply disease filter if requested
-            if disease_filter:
-                entity = chunk.get("disease_entity", "").upper()
-                target = disease_filter.upper()
-                if target not in entity and entity != "ALL_RESPIRATORY_CARDIAC":
-                    continue
-
-            score = self._compute_keyword_score(query_tokens, chunk)
-            if score > 0:
-                scored_chunks.append((score, chunk))
-            elif not disease_filter:
-                # Add with zero score so we have candidates
-                scored_chunks.append((0.0, chunk))
-
-        # Sort descending by relevance score
-        scored_chunks.sort(key=lambda x: x[0], reverse=True)
-
-        results: List[Dict[str, Any]] = []
-        for score, chunk in scored_chunks[:top_k]:
-            item = dict(chunk)
-            item["relevance_score"] = round(float(score), 2)
-            results.append(item)
-
-        # Fallback if no matching chunks found
-        if not results:
-            results = [dict(c) for c in self.corpus[:top_k]]
-
-        return results
+        merged = {}
+        for ranking in (sparse, dense):
+            for rank, item in enumerate(ranking):
+                key = item["chunk_id"]
+                merged.setdefault(key, {**item, "fusion_score": 0.0})
+                merged[key]["fusion_score"] += 1 / (60 + rank + 1)
+                if item.get("source_verified"):
+                    merged[key].update(item)
+        results = sorted(merged.values(), key=lambda item: item["fusion_score"], reverse=True)
+        return results[:top_k]

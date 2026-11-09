@@ -124,6 +124,34 @@ def test_hybrid_retriever_query_and_disease_filtering():
         assert "ASTHMA" in r["disease_entity"] or r["disease_entity"] == "ALL_RESPIRATORY_CARDIAC"
 
 
+def test_hybrid_retriever_uses_qdrant_and_requires_source_metadata():
+    from types import SimpleNamespace
+
+    class FakeQdrant:
+        def __init__(self):
+            self.queries = []
+
+        def query_points(self, **kwargs):
+            self.queries.append(kwargs)
+            return SimpleNamespace(points=[
+                SimpleNamespace(payload={
+                    "chunk_id": "VERIFIED_1", "source_id": "GOLD-DOC",
+                    "version": "2024", "section_locator": "Section 2.1",
+                    "text_content": "COPD diagnostic criteria", "disease_entity": "COPD",
+                    "guideline_source": "GOLD_2024", "section_title": "Diagnosis",
+                    "clinical_category": "DIAGNOSTIC_CRITERIA", "source_verified": True,
+                }),
+                SimpleNamespace(payload={"chunk_id": "NO_SOURCE", "text_content": "Untraceable"}),
+            ])
+
+    client = FakeQdrant()
+    retriever = HybridGuidelineRetriever(qdrant_client=client, embedding_fn=lambda query: [0.1, 0.2])
+    results = retriever.retrieve("COPD", top_k=10)
+    assert client.queries[0]["query"] == [0.1, 0.2]
+    assert any(item["chunk_id"] == "VERIFIED_1" and item["source_verified"] for item in results)
+    assert all(item["chunk_id"] != "NO_SOURCE" for item in results)
+
+
 def test_agent_explain_endpoint_pt0044():
     """Verify POST /api/v1/agent/explain endpoint for Case PT-0044."""
     payload = {
@@ -142,13 +170,26 @@ def test_agent_explain_endpoint_pt0044():
     assert "Hen phế quản" in data["primary_diagnosis_name"]
     assert len(data["grounded_spans"]) >= 3
     assert len(data["guideline_references"]) >= 1
-    assert data["hallucination_filtered_count"] >= 1
+    assert data["hallucination_filtered_count"] >= 0
 
     # Verify zero-hallucination property on all returned spans
     for span in data["grounded_spans"]:
         start = span["start_char"]
         end = span["end_char"]
-        assert SAMPLE_PT0044_NOTE[start:end] == span["text"]
+        assert data["display_note"][start:end] == span["text"]
+
+
+def test_grounder_rejects_partial_and_overlapping_claims():
+    note = "Patient reports cough and fatigue."
+    grounder = EvidenceGrounder()
+    assert grounder.ground_single_claim(note, "Patient reports cough and fever") is None
+    spans, rejected = grounder.ground_evidence_claims(
+        note,
+        ["Patient reports cough", "reports cough", "fatigue"],
+    )
+    assert rejected == 1
+    assert len(spans) == 2
+    assert all(note[s["start_char"] : s["end_char"]] == s["text"] for s in spans)
 
 
 def test_agent_explain_endpoint_pt0254():

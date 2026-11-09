@@ -83,30 +83,7 @@ class EvidenceGrounder:
                     "is_exact": False,
                 }
 
-        # 4. Fallback sub-phrase search for long compound claims (at least 5 words)
-        if len(words) >= 5:
-            # Try matching head phrase (first 4 words)
-            head_phrase = r"\s+".join(re.escape(w) for w in words[:4])
-            head_match = re.search(head_phrase, raw_clinical_note, re.IGNORECASE)
-            if head_match:
-                # Find sentence boundary or line break
-                end_pos = min(len(raw_clinical_note), head_match.start() + len(clean_claim) + 20)
-                # Align to nearest period or newline if possible
-                slice_text = raw_clinical_note[head_match.start():end_pos]
-                period_idx = slice_text.find(".")
-                actual_end = head_match.start() + period_idx if period_idx != -1 else head_match.end()
-                return {
-                    "start_char": head_match.start(),
-                    "end_char": max(actual_end, head_match.end()),
-                    "text": raw_clinical_note[head_match.start():max(actual_end, head_match.end())],
-                    "category": category,
-                    "label": label or "Bằng chứng một phần",
-                    "reason": reason,
-                    "confidence": 0.85,
-                    "is_exact": False,
-                }
-
-        # Claim not found in patient text -> Reject to prevent hallucination
+        # A matching prefix does not verify the rest of a clinical claim.
         return None
 
     def ground_evidence_claims(
@@ -141,6 +118,12 @@ class EvidenceGrounder:
                 reason=rsn,
             )
 
+            if span is not None and any(
+                span["start_char"] < previous["end_char"]
+                and previous["start_char"] < span["end_char"]
+                for previous in grounded
+            ):
+                span = None
             if span is not None:
                 grounded.append(span)
             else:

@@ -92,6 +92,10 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
     guideline_refs = [
         GuidelineReference(
             chunk_id=c["chunk_id"],
+            source_id=c.get("source_id", ""),
+            version=c.get("version", ""),
+            section_locator=c.get("section_locator", ""),
+            source_verified=c.get("source_verified", False),
             guideline_source=c["guideline_source"],
             disease_entity=c["disease_entity"],
             section_title=c["section_title"],
@@ -110,7 +114,7 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
 
     if patient_id == "PT-0044" or "18yo" in notes_lower:
         differential_reasoning = (
-            "Hội đồng AI phân tích ca bệnh Đặng Thu Mai (PT-0044, 18 tuổi): "
+            "Phân tích minh họa cho ca PT-0044: "
             "Bệnh nhân trẻ tuổi khởi phát triệu chứng khó thở, ho và mệt mỏi, đang dùng thuốc hít (inhaler). "
             "Theo tiêu chuẩn GINA 2024, tuổi khởi phát trẻ cùng bệnh cảnh đáp ứng thuốc hít là đặc trưng mạnh mẽ của Hen phế quản. "
             "Chẩn đoán COPD bị bác bỏ do bệnh nhân không có tiền sử tiếp xúc khói thuốc lá kéo dài và tuổi < 40 theo tiêu chí loại trừ của GOLD 2024."
@@ -140,13 +144,6 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
                 "label": "Huyết động học ngoài cơn cấp",
                 "reason": "Sinh hiệu ổn định ngoài cơn cấp; cần đo hô hấp ký để xác định dao động FEV1.",
             },
-            # Intentionally unsupported claim to test and demonstrate anti-hallucination filter
-            {
-                "text": "Bệnh nhân có tiền sử hút thuốc lá 40 bao năm và tràn dịch màng phổi hai bên",
-                "category": "supporting",
-                "label": "Thông tin ảo giác",
-                "reason": "Không có trong bệnh án gốc",
-            },
         ]
         investigations = [
             "Đo chức năng hô hấp (Spirometry) trước và sau nghiệm pháp giãn phế quản (Reversibility Test)",
@@ -156,7 +153,7 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
 
     elif patient_id == "PT-0254" or "tracheostomy" in notes_lower:
         differential_reasoning = (
-            "Hội đồng AI phân tích ca bệnh Huỳnh Phương Mai (PT-0254, 65 tuổi): "
+            "Phân tích minh họa cho ca PT-0254: "
             "Bệnh nhân cao tuổi có can thiệp mở khí quản (tracheostomy) do đợt suy hô hấp cấp 3 tháng trước, "
             "khám phổi nghe ran rít/ran ngáy (wheezes), đang điều trị corticoid và thuốc giãn phế quản (Pulmicort, prednisone). "
             "Theo tiêu chuẩn GOLD 2024, tiền sử suy hô hấp cần mở khí quản kết hợp thuốc duy trì phù hợp chẩn đoán COPD giai đoạn nặng. "
@@ -193,13 +190,6 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
                 "label": "Nhịp tim đều (Loại trừ suy tim cấp)",
                 "reason": "Không có dấu hiệu loạn nhịp hay rung nhĩ thường gặp ở suy tim sung huyết.",
             },
-            # Intentionally unsupported claim to demonstrate anti-hallucination filter
-            {
-                "text": "Chỉ số BNP huyết thanh tăng vọt lên 1500 pg/mL và phù toàn thân",
-                "category": "counter",
-                "label": "Thông tin ảo giác",
-                "reason": "Không tồn tại trong hồ sơ",
-            },
         ]
         investigations = [
             "Đo khí máu động mạch (ABGs) đánh giá tình trạng ứ CO2 mạn tính",
@@ -227,14 +217,6 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
                 "reason": "Trích dẫn nguyên văn từ nội dung diễn biến lâm sàng của bệnh nhân.",
             })
 
-        # Intentionally unsupported claim to verify anti-hallucination detection
-        claims_to_ground.append({
-            "text": "Bệnh nhân có triệu chứng xuất huyết tiêu hóa ồ ạt kèm hôn mê sâu",
-            "category": "red_flag",
-            "label": "Thông tin ảo giác",
-            "reason": "Câu giả định kiểm thử bộ lọc chống ảo giác",
-        })
-
         investigations = [
             "Đo chức năng thông khí phổi (Hô hấp ký) trước và sau nghiệm pháp giãn phế quản",
             "Chụp X-quang tim phổi thẳng hoặc CT lồng ngực liều thấp",
@@ -249,7 +231,7 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
 
     # Execute Evidence Grounding and Anti-Hallucination verification
     grounded_raw, rejected_count = grounder.ground_evidence_claims(
-        raw_clinical_note=raw_notes,
+        raw_clinical_note=clean_notes,
         claims=claims_to_ground,
     )
 
@@ -267,10 +249,23 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
         for s in grounded_raw
     ]
 
+    # The example corpus has no independently verified page-level provenance.
+    # Keep the response grounded in displayed text and avoid turning its
+    # illustrative snippets into clinical advice.
+    differential_reasoning = (
+        f"Giả thuyết cần đối chiếu: {top1} và {top2}. "
+        f"Có {len(grounded_spans)} đoạn khớp chính xác với ghi chú đã khử định danh. "
+        "Các trích đoạn phác đồ hiện chưa được xác minh nguồn và phiên bản; "
+        "bác sĩ cần kiểm tra bản gốc trước khi kết luận."
+    )
+    if not any(reference.source_verified for reference in guideline_refs):
+        investigations = []
+
     exec_time = round((time.time() - start_time) * 1000, 2)
 
     return AgentExplainResponse(
         patient_id=patient_id,
+        display_note=clean_notes,
         primary_diagnosis=top1,
         primary_diagnosis_name=disease_names.get(top1, top1),
         differential_diagnosis=top2,

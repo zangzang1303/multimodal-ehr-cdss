@@ -31,7 +31,8 @@ export default function EvidenceViewer({
       (s) =>
         s.start_char >= 0 &&
         s.end_char > s.start_char &&
-        s.end_char <= rawNotes.length
+        s.end_char <= rawNotes.length &&
+        s.text === rawNotes.slice(s.start_char, s.end_char)
     )
     .sort((a, b) => a.start_char - b.start_char);
 
@@ -42,6 +43,7 @@ export default function EvidenceViewer({
       lastEnd = s.end_char;
     }
   }
+  const discardedCount = spans.length - validSpans.length;
 
   // Segment raw text into non-highlighted and highlighted spans
   const segments: Array<
@@ -177,15 +179,13 @@ export default function EvidenceViewer({
         <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
           <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
           <span>
-            <strong>Đảm bảo không ảo giác (Zero-Hallucination):</strong> 100% câu
-            trích dẫn đều đã ánh xạ về tọa độ ký tự chính xác trong hồ sơ bệnh
-            án.
+            Các đoạn được tô sáng đã khớp chính xác với ghi chú đã khử định danh.
           </span>
         </div>
 
-        {hallucinationFilteredCount > 0 && (
+        {hallucinationFilteredCount + discardedCount > 0 && (
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 font-mono">
-            Đã loại bỏ {hallucinationFilteredCount} suy diễn không căn cứ
+            {hallucinationFilteredCount + discardedCount} trích dẫn chưa xác minh hoặc chồng lấn
           </span>
         )}
       </div>

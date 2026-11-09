@@ -89,6 +89,10 @@ export default function DCACurveChart({
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Đường cong minh họa bằng điểm dựng sẵn; chưa đo trên dự đoán từng bệnh nhân.
           </p>
+          <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+            Bệnh đích giả định: COPD so với các nhãn còn lại. Hành động giả định: chuyển xét nghiệm xác nhận.
+            Tỷ lệ hiện mắc giả định: 25%. Phân tích minh họa trên dữ liệu nghiên cứu.
+          </p>
         </div>
 
         <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold self-start sm:self-auto">
