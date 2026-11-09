@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 540" width="100%" height="100%" font-family="Inter, Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0F4C81"/>
+    </marker>
+    <marker id="arrowTeal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0D9488"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1080" height="540" fill="#FFFFFF" rx="8"/>
+  <text x="540" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#0F4C81">
+    KIẾN TRÚC PHẦN MỀM ĐA TẦNG HỆ THỐNG M-CDSS (DOCKER CONTAINERIZED STACK)
+  </text>
+
+  <!-- TIER 1: FRONTEND -->
+  <rect x="30" y="60" width="290" height="445" rx="10" fill="#F8FAFC" stroke="#0F4C81" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="175" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#0F4C81">
+    TẦNG GIAO DIỆN (Next.js 14 :3000)
+  </text>
+
+  <rect x="50" y="105" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#0F4C81" stroke-width="1.5"/>
+  <text x="175" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">PatientDataForm.tsx</text>
+  <text x="175" y="152" text-anchor="middle" font-size="11" fill="#475569">Nhập 12 biến sinh hiệu &amp; bệnh án tự do</text>
+
+  <rect x="50" y="198" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#0F4C81" stroke-width="1.5"/>
+  <text x="175" y="225" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">DiagnosticCard.tsx</text>
+  <text x="175" y="245" text-anchor="middle" font-size="11" fill="#475569">Thanh đo xác suất hiệu chuẩn (ECE &lt; 0.05)</text>
+
+  <rect x="50" y="291" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#0F4C81" stroke-width="1.5"/>
+  <text x="175" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">EvidenceViewer &amp; Drawer</text>
+  <text x="175" y="338" text-anchor="middle" font-size="11" fill="#475569">Tô sáng vị trí [start, end] &amp; CPGs</text>
+
+  <rect x="50" y="384" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#0F4C81" stroke-width="1.5"/>
+  <text x="175" y="411" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">DCACurveChart.tsx</text>
+  <text x="175" y="431" text-anchor="middle" font-size="11" fill="#475569">Đồ thị Lợi ích ròng DCA &amp; Bảng PROBAST</text>
+
+  <!-- TIER 2: FASTAPI GATEWAY -->
+  <rect x="385" y="60" width="310" height="445" rx="10" fill="#F0FDFA" stroke="#0D9488" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="540" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#0D9488">
+    TẦNG ĐIỀU PHỐI API (FastAPI :8000)
+  </text>
+
+  <rect x="405" y="105" width="270" height="72" rx="6" fill="#FFFFFF" stroke="#0D9488" stroke-width="1.5"/>
+  <text x="540" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#0F766E">POST /api/v1/predict/mock</text>
+  <text x="540" y="152" text-anchor="middle" font-size="11" fill="#475569">Suy luận Đa phương thức &amp; 3 Baselines</text>
+
+  <rect x="405" y="198" width="270" height="72" rx="6" fill="#FFFFFF" stroke="#0D9488" stroke-width="1.5"/>
+  <text x="540" y="225" text-anchor="middle" font-size="12" font-weight="700" fill="#0F766E">POST /api/v1/agent/explain</text>
+  <text x="540" y="245" text-anchor="middle" font-size="11" fill="#475569">Luồng hội chẩn RAG &amp; Evidence Grounder</text>
+
+  <rect x="405" y="291" width="270" height="72" rx="6" fill="#FFFFFF" stroke="#0D9488" stroke-width="1.5"/>
+  <text x="540" y="318" text-anchor="middle" font-size="12" font-weight="700" fill="#0F766E">GET /api/v1/evaluation/benchmark</text>
+  <text x="540" y="338" text-anchor="middle" font-size="11" fill="#475569">Chỉ số đối chứng, tọa độ DCA &amp; PROBAST</text>
+
+  <rect x="405" y="384" width="270" height="72" rx="6" fill="#FFFFFF" stroke="#0D9488" stroke-width="1.5"/>
+  <text x="540" y="411" text-anchor="middle" font-size="12" font-weight="700" fill="#0F766E">Pydantic V2 Schema &amp; /health</text>
+  <text x="540" y="431" text-anchor="middle" font-size="11" fill="#475569">Kiểm định biên sinh lý &amp; Bảo mật CORS</text>
+
+  <!-- TIER 3: AI CORE & QDRANT -->
+  <rect x="760" y="60" width="290" height="445" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="905" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#B45309">
+    TẦNG LÕI AI &amp; KHO TRI THỨC
+  </text>
+
+  <rect x="780" y="105" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+  <text x="905" y="130" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Multimodal Fusion Core</text>
+  <text x="905" y="148" text-anchor="middle" font-size="10.5" fill="#475569">FT-Transformer + Bio_ClinicalBERT</text>
+  <text x="905" y="164" text-anchor="middle" font-size="10.5" fill="#0D9488">Cross-Attention + Temp Scaling (T)</text>
+
+  <rect x="780" y="198" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+  <text x="905" y="223" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Agentic RAG &amp; Grounder</text>
+  <text x="905" y="241" text-anchor="middle" font-size="10.5" fill="#475569">LangGraph Diagnostic StateGraph</text>
+  <text x="905" y="257" text-anchor="middle" font-size="10.5" fill="#DC2626">Kiểm chứng chuỗi con O(N) chống ảo giác</text>
+
+  <rect x="780" y="291" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+  <text x="905" y="318" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Qdrant Vector DB (:6333)</text>
+  <text x="905" y="338" text-anchor="middle" font-size="11" fill="#475569">Phác đồ Bộ Y tế, GINA, GOLD, ESC</text>
+
+  <rect x="780" y="384" width="250" height="72" rx="6" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+  <text x="905" y="411" text-anchor="middle" font-size="12" font-weight="700" fill="#1E293B">Strict Split Test Set (N=302)</text>
+  <text x="905" y="431" text-anchor="middle" font-size="11" fill="#475569">Kiểm toán 0% rò rỉ cấp độ bệnh nhân</text>
+
+  <!-- ARROWS -->
+  <line x1="300" y1="141" x2="398" y2="141" stroke="#0F4C81" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+  <line x1="398" y1="225" x2="306" y2="225" stroke="#0F4C81" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+  <line x1="300" y1="327" x2="398" y2="245" stroke="#0F4C81" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+  <line x1="300" y1="420" x2="398" y2="327" stroke="#0F4C81" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+
+  <line x1="675" y1="141" x2="773" y2="141" stroke="#0D9488" stroke-width="1.8" marker-end="url(#arrowTeal)"/>
+  <line x1="675" y1="234" x2="773" y2="234" stroke="#0D9488" stroke-width="1.8" marker-end="url(#arrowTeal)"/>
+  <line x1="905" y1="270" x2="905" y2="285" stroke="#0D9488" stroke-width="1.8" marker-end="url(#arrowTeal)"/>
+  <line x1="675" y1="327" x2="773" y2="420" stroke="#0D9488" stroke-width="1.8" marker-end="url(#arrowTeal)"/>
+</svg>
+

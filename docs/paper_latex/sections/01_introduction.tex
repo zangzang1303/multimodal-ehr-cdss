@@ -1,0 +1,22 @@
+% ==============================================================================
+% Phân mục 01: Mở đầu & Khoảng trống Nghiên cứu (Introduction & Research Gap)
+% ==============================================================================
+\section{Mở Đầu và Khoảng Trống Nghiên Cứu (Introduction)}
+\label{sec:introduction}
+
+Trong thực hành lâm sàng tại khoa cấp cứu và chăm sóc ban đầu, việc phân biệt sớm các hội chứng khó thở cấp tính có biểu hiện chồng lấp --- điển hình là Hen phế quản (\texttt{ASTHMA}), Bệnh phổi tắc nghẽn mạn tính (\texttt{COPD}), Suy tim sung huyết (\texttt{HEART\_FAILURE}) và Viêm phổi (\texttt{PNEUMONIA}) --- đóng vai trò quyết định đến phác đồ xử trí giờ đầu. Một quyết định sử dụng nhầm thuốc chẹn beta trên bệnh nhân co thắt phế quản cấp hoặc truyền dịch quá mức trên bệnh nhân suy tim bị chẩn đoán nhầm là viêm phổi có thể dẫn đến biến cố bất lợi nghiêm trọng.
+
+Tuy nhiên, các hệ thống trí tuệ nhân tạo hỗ trợ chẩn đoán từ Hồ sơ sức khỏe điện tử (EHR) hiện nay đang đối mặt với ba rào cản phương pháp luận lớn đã được chỉ ra trong tổng quan hệ thống của Hunik và cộng sự trên tạp chí \textit{JMIR} \cite{hunik2024diagnostic}:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Sự đơn điệu về phương thức dữ liệu (Unimodal Bias):} Trong số 10.657 công trình được sàng lọc và 15 nghiên cứu đạt chuẩn đưa vào phân tích chuyên sâu, 100\% (15/15) chỉ khai thác dữ liệu có cấu trúc dạng bảng (mã định danh bệnh ICD, chỉ số sinh hiệu, xét nghiệm máu). Nguồn tri thức lâm sàng phong phú nằm trong ghi chú bệnh án tự do của bác sĩ (tiền sử khởi phát, đáp ứng thuốc giãn phế quản tại nhà, tính chất đờm và âm sắc tiếng ran phổi) hoàn toàn bị bỏ ngỏ.
+    \item \textbf{Nguy cơ sai lệch phương pháp luận cao (High Risk of Bias):} Khi thẩm định bằng công cụ chuẩn quốc tế PROBAST \cite{collins2021protocol}, 60\% (9/15) nghiên cứu có nguy cơ sai lệch cao và 40\% (6/15) không rõ ràng; không có bất kỳ nghiên cứu nào (0/15) đạt mức nguy cơ sai lệch thấp (\textit{Low Risk of Bias}), chủ yếu do rò rỉ dữ liệu giữa tập huấn luyện và tập kiểm thử hoặc thiếu hiệu chuẩn xác suất.
+    \item \textbf{Hộp đen thiếu giải trình và nguy cơ ``ảo giác'' (Hallucination):} Các mô hình học sâu thuần túy chỉ xuất ra một con số xác suất mà không chỉ rõ bằng chứng lâm sàng tương ứng trong bệnh án hay điều khoản phác đồ y khoa (\textit{Clinical Practice Guidelines} -- CPGs). Ngược lại, việc áp dụng trực tiếp các mô hình ngôn ngữ lớn (LLM) sinh văn bản tự do lại tiềm ẩn nguy cơ bịa đặt triệu chứng không có thật trong hồ sơ người bệnh.
+\end{enumerate}
+
+Để giải quyết trọn vẹn ba khoảng trống trên, đề tài đề xuất và hiện thực hóa hệ thống \textbf{M-CDSS} (\textit{Multimodal Electronic Health Record Clinical Decision Support System}) với 3 đóng góp kỹ thuật cốt lõi:
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item Thiết kế kiến trúc dung hợp \textbf{Cross-Attention Late Fusion} kết hợp \textit{FT-Transformer} \cite{gorishniy2021revisiting} và \textit{Bio\_ClinicalBERT} \cite{alsentzer2019publicly}, kèm tầng hiệu chuẩn nhiệt độ \textit{Temperature Scaling} \cite{guo2017calibration} giúp kiểm soát sai số hiệu chuẩn $\text{ECE} < 0.05$.
+    \item Xây dựng hệ thống đa tác tử \textbf{Agentic RAG} tích hợp cơ chế \textbf{Character-Offset Evidence Grounding} độ phức tạp $\mathcal{O}(N)$, đảm bảo 100\% câu trích dẫn chứng cứ được tô sáng trên giao diện đều tồn tại nguyên vẹn trong bệnh án gốc và đối chiếu trực tiếp với phác đồ GINA 2024 \cite{gina2024asthma} và GOLD 2024 \cite{gold2024copd}.
+    \item Kiến trúc phần mềm vi dịch vụ 3 tầng chuẩn hóa giao thức RESTful, tích hợp công cụ phân tích Lợi ích ròng lâm sàng (\textit{Decision Curve Analysis} -- DCA) \cite{vickers2006decision} và đóng gói trọn gói bằng \texttt{Docker Compose}.
+\end{itemize}
+

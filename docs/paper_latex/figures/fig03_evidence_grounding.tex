@@ -1,0 +1,52 @@
+% ==============================================================================
+% Hình 3: Cơ chế Neo Bằng Chứng Ký Tự (Character-Offset Evidence Grounding)
+% ==============================================================================
+\begin{figure}[htbp]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[node distance=0.9cm and 1.2cm]
+
+    % Raw Note Box
+    \node[mcdssBox, text width=13.5cm, align=left, fill=mcdssBgLight] (raw_note) {
+        \textbf{Văn bản bệnh án gốc ($T$, độ dài $N$ ký tự --- Ví dụ Ca PT-0044):}\\[0.2em]
+        \texttt{\footnotesize "... Patient is an \colorbox{yellow!35}{\textbf{18yo female presenting with acute wheezing}} and shortness of breath after exercise. History of childhood asthma, currently using \colorbox{teal!25}{\textbf{albuterol inhaler PRN}} ..."}
+    };
+
+    % Candidate Spans
+    \node[mcdssAgent, below left=1.0cm and -2.2cm of raw_note, text width=5.8cm, align=left] (cand_valid) {
+        \textbf{Trích dẫn ứng viên hợp lệ $s_1$:}\\
+        \texttt{\scriptsize "18yo female presenting with acute wheezing"}\\
+        $\rightarrow$ Khớp chính xác tại $[start=18, end=60]$
+    };
+
+    \node[mcdssBox, below right=1.0cm and -2.2cm of raw_note, text width=5.8cm, align=left, draw=mcdssDanger, fill=red!4] (cand_invalid) {
+        \textbf{Trích dẫn ảo giác $s_{\text{hallucinated}}$:}\\
+        \texttt{\scriptsize "Spirometry shows FEV1/FVC ratio of 0.58"}\\
+        $\rightarrow$ Không tồn tại trong $T$ ($\text{find}(s) = -1$)
+    };
+
+    % Verification Engine
+    \node[mcdssService, below=2.6cm of raw_note, text width=8.5cm] (verifier) {
+        \textbf{Thuật toán Đối sánh Tất định \texttt{EvidenceGrounder.verify\_and\_locate()}}\\
+        \normalfont\scriptsize Độ phức tạp $\mathcal{O}(N)$ $\cdot$ Chuẩn hóa khoảng trắng $\cdot$ Bất biến chữ hoa/thường
+    };
+
+    % Final UI Output
+    \node[mcdssBox, below=0.9cm of verifier, text width=11.0cm, fill=teal!6] (ui_render) {
+        \textbf{Payload JSON trả về cho \texttt{EvidenceViewer.tsx}:}\\
+        \texttt{\scriptsize \{"start\_char": 18, "end\_char": 60, "verified": true, "clinical\_rationale": "Khởi phát trẻ tuổi + ran rít cấp"\}}
+    };
+
+    % Connections
+    \draw[mcdssArrow] (raw_note.south) -- (cand_valid.north);
+    \draw[mcdssArrow, draw=mcdssDanger] (raw_note.south) -- (cand_invalid.north);
+    \draw[mcdssArrow] (cand_valid.south) -- node[left, font=\tiny\sffamily\bfseries, text=mcdssSecondary] {Chấp nhận (Verified)} (verifier.north west);
+    \draw[mcdssDashedArrow, draw=mcdssDanger] (cand_invalid.south) -- node[right, font=\tiny\sffamily\bfseries, text=mcdssDanger] {Bác bỏ tức thì (Rejected)} (verifier.north east);
+    \draw[mcdssArrow] (verifier.south) -- (ui_render.north);
+
+\end{tikzpicture}%
+}
+\caption{Cơ chế kiểm chứng vị trí ký tự $\mathcal{O}(N)$ trong \texttt{EvidenceGrounder}: Chỉ những chuỗi con tồn tại nguyên vẹn trong văn bản gốc mới được cấp tọa độ $[start, end]$ để tô sáng trên giao diện bác sĩ; mọi suy diễn ngoài văn bản đều bị chặn hoàn toàn.}
+\label{fig:evidence_grounding}
+\end{figure}
+

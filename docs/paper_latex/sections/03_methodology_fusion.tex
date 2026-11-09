@@ -1,0 +1,35 @@
+% ==============================================================================
+% Phân mục 03: Kiến trúc Dung hợp Đa phương thức & Hiệu chuẩn (Methodology)
+% ==============================================================================
+\section{Kiến Trúc Học Sâu Đa Phương Thức và Hiệu Chuẩn Xác Suất (Multimodal Methodology)}
+\label{sec:methodology}
+
+\subsection{Mã hóa Đặc trưng Chuyên biệt cho Từng Phương thức}
+Thay vì ghép nối phẳng (\textit{Early Concatenation}) làm lu mờ cấu trúc tương tác riêng của từng nguồn dữ liệu, M-CDSS sử dụng hai bộ mã hóa chuyên biệt đưa dữ liệu về cùng không gian nhúng ẩn $d_{\text{model}} = 128$:
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Nhánh Bảng số (\textit{FT-Transformer Encoder} \cite{gorishniy2021revisiting}):} Mỗi đặc trưng số học $x_j^{\text{(num)}}$ và đặc trưng phân loại $x_k^{\text{(cat)}}$ được ánh xạ thành một vector token $\bm{t}_i \in \mathbb{R}^{d}$ thông qua bộ \texttt{TabularFeatureTokenizer}:
+    \begin{equation}
+        \bm{t}_j^{\text{(num)}} = x_j^{\text{(num)}} \cdot \bm{W}_j^{\text{(num)}} + \bm{b}_j^{\text{(num)}}, \quad
+        \bm{T}_{\text{tab}} = \text{TransformerEncoder}\left(\big[\bm{t}_{\text{[CLS]}}, \bm{t}_1, \dots, \bm{t}_M\big]\right) \in \mathbb{R}^{(M+1) \times d}
+    \end{equation}
+    \item \textbf{Nhánh Ngôn ngữ Y sinh (\textit{Bio\_ClinicalBERT Encoder} \cite{alsentzer2019publicly}):} Văn bản bệnh án $T$ được phân tách thành chuỗi $L$ subword tokens và đi qua mạng \texttt{emilyalsentzer/Bio\_ClinicalBERT}, sau đó chiếu tuyến tính qua tầng \texttt{LinearProjection} để thu được ma trận trạng thái ẩn văn bản $\bm{H}_{\text{text}} \in \mathbb{R}^{L \times d}$.
+\end{itemize}
+
+\subsection{Dung hợp Chú ý Chéo (Cross-Attention Late Fusion) và Hiệu chuẩn Nhiệt độ}
+Như đã chứng minh qua phân tích các ca bệnh sai biệt thực tế (điển hình là ca \texttt{PT-0044} và \texttt{PT-0254}), dữ liệu bảng đóng vai trò ``mỏ neo huyết động học'' giúp kiểm chứng các triệu chứng mô tả trong văn bản. Do đó, tầng dung hợp sử dụng vector biểu diễn bảng làm Truy vấn ($\bm{Q}$), chiếu vào Khóa ($\bm{K}$) và Giá trị ($\bm{V}$) của văn bản lâm sàng:
+\begin{equation}
+    \bm{Q} = \bm{T}_{\text{tab}} \bm{W}_Q, \quad
+    \bm{K} = \bm{H}_{\text{text}} \bm{W}_K, \quad
+    \bm{V} = \bm{H}_{\text{text}} \bm{W}_V
+\end{equation}
+\begin{equation}
+    \text{CrossAttn}(\bm{Q}, \bm{K}, \bm{V}) = \text{softmax}\!\left(\frac{\bm{Q}\bm{K}^\top}{\sqrt{d_k}} + \bm{M}_{\text{pad}}\right)\bm{V}
+\end{equation}
+trong đó $\bm{M}_{\text{pad}}$ là mặt nạ che các token đệm ($-\infty$ tại vị trí padding). Vector dung hợp sau kết nối tắt (\textit{Residual Connection}) và chuẩn hóa tầng (\textit{LayerNorm}) được đưa qua đầu phân loại MLP để sinh vector logits $\bm{z} \in \mathbb{R}^4$.
+
+Cuối cùng, để khắc phục hiện tượng quá tự tin (\textit{overconfidence}) thường gặp ở mạng nơ-ron sâu, tầng \textbf{Temperature Scaling} \cite{guo2017calibration} tối ưu hóa tham số nhiệt độ vô hướng $T > 0$ bằng thuật toán L-BFGS đối với hàm mất mát Negative Log-Likelihood trên tập Validation:
+\begin{equation}
+    \hat{p}_c = \frac{\exp(z_c / T)}{\sum_{j=1}^{4} \exp(z_j / T)}, \quad c \in \{1, 2, 3, 4\}
+\end{equation}
+Quá trình này giữ nguyên thứ tự xếp hạng giữa các lớp (không làm thay đổi AUROC/Accuracy) nhưng kéo sai số hiệu chuẩn kỳ vọng (ECE) xuống dưới ngưỡng an toàn lâm sàng $0.05$.
+

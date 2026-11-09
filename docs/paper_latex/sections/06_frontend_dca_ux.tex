@@ -1,0 +1,34 @@
+% ==============================================================================
+% Phân mục 06 [TRỌNG TÂM NHIỆM VỤ 3.2]: Giao diện Bác sĩ, DCA & Docker Compose
+% ==============================================================================
+\section{Trực Quan Hóa Bàn Làm Việc Lâm Sàng, Đồ Thị DCA Tương Tác và Đóng Gói Hệ Thống (Clinical UX \& Containerization)}
+\label{sec:frontend_dca_ux}
+
+\subsection{Bàn làm việc Hội chẩn Tương tác và Ngăn kéo Phác đồ Y khoa}
+Giao diện người dùng của M-CDSS được thiết kế chuyên biệt cho quy trình khám chữa bệnh thực tế trên cả màn hình máy trạm bệnh viện và máy tính bảng cầm tay của bác sĩ nội trú (\textit{Responsive Clinical Tablet Layout}):
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Biểu mẫu Nhập liệu Đa phương thức (\texttt{PatientDataForm.tsx}):} Cho phép bác sĩ nhập nhanh 12 thông số sinh hiệu/xét nghiệm kèm ghi chú khám bệnh, đồng thời tích hợp bộ nạp nhanh (\textit{One-Click Clinical Presets}) cho các ca bệnh điển hình thuộc tập kiểm thử độc lập như \texttt{PT-0044} (Điểm mù Bảng số) và \texttt{PT-0254} (Điểm mù Văn bản) để phục vụ kiểm tra chéo tức thì.
+    \item \textbf{Thẻ Chẩn đoán Hiệu chuẩn (\texttt{DiagnosticCard.tsx}):} Hiển thị trực quan phân phối xác suất đã qua hiệu chuẩn nhiệt độ ($\text{ECE} < 0.05$) kèm huy hiệu trạng thái an toàn hiệu chuẩn và bảng đối chứng trực tiếp giữa mô hình dung hợp M-CDSS với các mô hình đơn phương thức.
+    \item \textbf{Trình tô sáng Bằng chứng \& Ngăn kéo Y văn (\texttt{EvidenceViewer.tsx} \& \texttt{GuidelineDrawer.tsx}):} Thực hiện cắt chuỗi văn bản gốc $T$ theo mảng tọa độ $[\text{start\_char}, \text{end\_char}]$ không chồng lấp để tô sáng các cụm từ triệu chứng ngay trong ngữ cảnh đoạn văn. Khi bác sĩ nhấp vào thẻ tra cứu phác đồ, ngăn kéo trượt bên phải (\textit{Slide-over Drawer}) sẽ hiển thị nguyên văn khuyến nghị của GINA 2024, GOLD 2024 hoặc Bộ Y tế kèm mức độ chứng cứ (\textit{Evidence Level A/B}).
+\end{itemize}
+
+\subsection{Trực quan hóa Đường cong Quyết định (Interactive Decision Curve Analysis)}
+Các chỉ số học máy truyền thống như AUROC hay F1-score chỉ đánh giá độ chính xác thống kê mà không tính đến hệ quả lâm sàng của việc bỏ sót bệnh (\textit{False Negative}) so với điều trị thừa (\textit{False Positive}). Để chứng minh giá trị thực tiễn của M-CDSS theo phương pháp của Vickers và Elkin \cite{vickers2006decision}, chúng tôi xây dựng module tương tác \texttt{DCACurveChart.tsx} trên trang thẩm định \texttt{/evaluation}.
+
+Tại một ngưỡng xác suất quyết định can thiệp $p_t \in [0.05, 0.60]$ do bác sĩ lựa chọn qua thanh trượt tương tác, Lợi ích ròng lâm sàng (\textit{Net Benefit}) trên tập kiểm thử quy mô $N = 302$ được tính toán thời gian thực theo công thức:
+\begin{equation}
+    \text{Net Benefit}(p_t) = \frac{\text{TP}(p_t)}{N} - \frac{\text{FP}(p_t)}{N} \cdot \left(\frac{p_t}{1 - p_t}\right)
+\end{equation}
+trong đó tỷ số $\frac{p_t}{1 - p_t}$ biểu thị trọng số đánh đổi lợi ích/rủi ro lâm sàng. Bên cạnh việc vẽ 3 đường cong đối chiếu (\textit{M-CDSS Calibrated}, \textit{Treat All}, \textit{Treat None}), thành phần giao diện còn quy đổi trực tiếp ra chỉ số \textbf{Số ca can thiệp đúng tăng thêm trên 100 bệnh nhân} (\textit{Net True Positives per 100 patients}):
+\begin{equation}
+    \Delta \text{TP}_{\text{net}/100}(p_t) = 100 \times \frac{\text{NB}_{\text{M-CDSS}}(p_t) - \text{NB}_{\text{Treat All}}(p_t)}{p_t / (1 - p_t)}
+\end{equation}
+giúp bác sĩ và nhà quản lý y tế định lượng rõ ràng lợi ích của hệ thống bằng ngôn ngữ lâm sàng trực quan.
+
+\subsection{Đóng gói Trọn gói Một lệnh Chạy với Docker Compose}
+Nhằm đảm bảo tính tái lập khoa học (\textit{Reproducibility}) theo tiêu chuẩn TRIPOD-AI \cite{collins2021protocol}, toàn bộ hệ sinh thái M-CDSS được đóng gói thông qua tệp cấu hình \texttt{docker-compose.yml} tại thư mục gốc:
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Tối ưu hóa ảnh Container Đa tầng:} \texttt{frontend/Dockerfile} sử dụng 3 tầng tách biệt (\texttt{deps} $\rightarrow$ \texttt{builder} $\rightarrow$ \texttt{runner} trên nền \texttt{node:20-alpine}) chạy dưới quyền người dùng phi đặc quyền \texttt{nextjs}, giảm hơn 70\% dung lượng ảnh thực thi.
+    \item \textbf{Khởi tạo Phụ thuộc theo Trạng thái Sức khỏe (\textit{Healthcheck-gated Orchestration}):} Dịch vụ \texttt{api} chỉ khởi chạy sau khi \texttt{qdrant} vượt qua kiểm tra cổng kết nối (\texttt{service\_healthy}), và \texttt{frontend} chỉ mở cổng giao tiếp sau khi điểm cuối \texttt{http://api:8000/health} trả về mã \texttt{200 OK}. Toàn bộ hệ thống được triển khai hoàn chỉnh chỉ với một lệnh duy nhất: \texttt{docker compose up --build -d}.
+\end{itemize}
+

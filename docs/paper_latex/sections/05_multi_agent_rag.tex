@@ -1,0 +1,41 @@
+% ==============================================================================
+% Phân mục 05 [TRỌNG TÂM NHIỆM VỤ 3.2]: Hệ thống Đa tác tử & Chống ảo giác
+% ==============================================================================
+\section{Hiện Thực Hệ Thống Đa Tác Tử và Cơ Chế Neo Bằng Chứng Chống Ảo Giác (Multi-Agent RAG \& Evidence Grounding)}
+\label{sec:multi_agent_rag}
+
+Một trong những yêu cầu khắt khe nhất của y học chứng cứ (\textit{Evidence-Based Medicine}) là mọi gợi ý chẩn đoán phân biệt phải truy nguyên được về hai nguồn căn cứ độc lập: (1) triệu chứng cụ thể ghi nhận trên chính bệnh nhân đó, và (2) điều khoản tương ứng trong hướng dẫn thực hành lâm sàng chính thống. Để đáp ứng yêu cầu này mà không rơi vào bẫy ``ảo giác ngôn ngữ'' (\textit{LLM Hallucination}), chúng tôi thiết kế kiến trúc hội chẩn đa tác tử kết hợp bộ kiểm chứng tất định, được minh họa tại Hình~\ref{fig:multi_agent_rag_flow}.
+
+\input{figures/fig02_multi_agent_rag_flow}
+
+\subsection{Đồ thị Trạng thái Hội chẩn Đa tác tử (LangGraph StateGraph)}
+Luồng suy luận giải trình trong module \texttt{src/agent/} được điều phối qua một máy trạng thái hữu hạn có hướng bao gồm 4 nút xử lý tuần tự:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Nút Phân loại \& Lập truy vấn (\textit{Triage \& Query Formulation Node}):} Tiếp nhận vector sinh hiệu $\bm{x}_{\text{tab}}$, văn bản bệnh án $T$ và phân phối xác suất hiệu chuẩn $\hat{\bm{p}}$. Tác tử xác định cặp chẩn đoán cạnh tranh sát nhất (Top-1 và Top-2, ví dụ: \texttt{ASTHMA} 88.5\% so với \texttt{COPD} 7.2\% ở ca \texttt{PT-0044}) và trích xuất các dấu hiệu sinh lý bất thường để kiến tạo câu truy vấn y khoa chuyên biệt.
+    \item \textbf{Nút Truy xuất Tri thức Lai (\textit{HybridGuidelineRetriever} --- \texttt{src/agent/retriever.py}):} Thực hiện tìm kiếm kết hợp trên kho phác đồ y khoa (\texttt{data/guidelines/clinical\_guidelines\_db.json} và \texttt{Qdrant}). Điểm tương đồng của mỗi phân đoạn phác đồ $d_k$ đối với truy vấn $q$ được tính theo công thức tổ hợp lồi giữa điểm khớp từ khóa y khoa chuẩn hóa ($S_{\text{lex}}$, tương tự BM25) và độ tương đồng cosine của vector nhúng ngữ nghĩa ($S_{\text{sem}}$):
+    \begin{equation}
+        S_{\text{hybrid}}(q, d_k) = \alpha \cdot S_{\text{lex}}(q, d_k) + (1 - \alpha) \cdot S_{\text{sem}}(q, d_k) + \beta \cdot \mathbb{I}(\text{disease}(d_k) \in \{\text{Top-1}, \text{Top-2}\})
+    \end{equation}
+    với trọng số thực nghiệm $\alpha = 0.65$ ưu tiên khớp chính xác thuật ngữ lâm sàng (như \texttt{FEV1/FVC}, \texttt{BNP}, \texttt{CURB-65}, \texttt{SpO2}) và $\beta = 0.25$ tăng cường ưu tiên cho các phác đồ thuộc nhóm bệnh đang cần chẩn đoán phân biệt.
+    \item \textbf{Nút Lập luận Lâm sàng (\textit{Clinical Reasoning Node}):} Đối chiếu các phân đoạn phác đồ Top-$k$ thu được với hồ sơ bệnh nhân để tổng hợp báo cáo giải trình, đồng thời trích xuất danh sách các câu bằng chứng ứng viên $\{s_1, s_2, \dots, s_m\}$ từ ghi chú lâm sàng.
+    \item \textbf{Nút Kiểm chứng Chống ảo giác (\textit{EvidenceGrounder Node} --- \texttt{src/agent/evidence\_grounder.py}):} Đóng vai trò cổng kiểm duyệt bắt buộc (\textit{Hard Verification Gate}) trước khi xuất kết quả ra API.
+\end{enumerate}
+
+\subsection{Thuật toán Neo Bằng chứng Ký tự $\mathcal{O}(N)$ (Character-Offset Evidence Grounding)}
+Để triệt tiêu hoàn toàn khả năng tác tử tự suy diễn hoặc trích dẫn sai lệch nội dung bệnh án, module \texttt{EvidenceGrounder} thực thi thuật toán đối sánh chuỗi con tất định có độ phức tạp thời gian tuyến tính $\mathcal{O}(N)$ theo độ dài văn bản gốc $N = |T|$ (Hình~\ref{fig:evidence_grounding}).
+
+\input{figures/fig03_evidence_grounding}
+
+Với mỗi câu trích dẫn ứng viên $s_j$ do tác tử đề xuất, hàm \texttt{verify\_and\_locate}$(T, s_j)$ thực hiện quy trình 3 bước:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Đối sánh chính xác tuyệt đối (\textit{Exact Substring Search}):} Tìm vị trí xuất hiện đầu tiên $p = T.\text{find}(s_j)$. Nếu $p \ge 0$, trả về cặp chỉ số ký tự $[start, end] = [p, p + |s_j|]$.
+    \item \textbf{Đối sánh bất biến chữ hoa/thường (\textit{Case-Insensitive Fallback}):} Nếu bước 1 không khớp do khác biệt viết hoa đầu câu, thực hiện tìm kiếm trên chuỗi chữ thường $p = \text{lower}(T).\text{find}(\text{lower}(s_j))$ nhưng vẫn trích xuất chuỗi gốc $T[p : p + |s_j|]$ để bảo toàn nguyên trạng văn bản bác sĩ viết.
+    \item \textbf{Đối sánh chuẩn hóa khoảng trắng (\textit{Whitespace-Normalized Regex Alignment}):} Trong trường hợp văn bản bệnh án có ký tự xuống dòng hoặc nhiều dấu cách liên tiếp, thuật toán biên dịch biểu thức chính quy thoát ký tự đặc biệt $\text{pattern} = \texttt{\textbackslash s+}.\text{join}(\text{escape}(w) \text{ for } w \in s_j.\text{split}())$ và ánh xạ ngược lại vị trí $[m.\text{start}(), m.\text{end}()]$ trên văn bản gốc $T$.
+\end{enumerate}
+
+Mọi ứng viên $s_j$ không vượt qua được cả 3 bước đối sánh trên ($\text{find} = -1$) đều bị bác bỏ tức thì và ghi nhận vào bộ đếm kiểm toán \texttt{rejected\_hallucination\_count}. Nhờ cơ chế này, mọi đối tượng \texttt{EvidenceSpan} được gửi xuống giao diện \texttt{EvidenceViewer.tsx} đều thỏa mãn bất biến toán học:
+\begin{equation}
+    0 \le \text{start\_char} < \text{end\_char} \le |T| \quad \text{và} \quad \text{verified} \equiv \text{True}
+\end{equation}
+đảm bảo độ tin cậy tuyệt đối (100\% \textit{Hallucination-Free Grounding}) khi bác sĩ rà soát hồ sơ.
+
