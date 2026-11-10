@@ -1,141 +1,105 @@
-# ==============================================================================
-# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
-# File này được tạo tạm thời bởi Thành viên 3 để chạy tests/test_multimodal_model.py
-# (Backlog 04 - Nhiệm vụ 3.2) trong lúc chờ Thành viên 1 hoàn thiện mạng
-# CrossAttentionFusion và huấn luyện trọng số thực tế (Backlog 04 - Nhiệm vụ 1.2).
-# ==============================================================================
-"""
-Cross-Attention Late Fusion Module
-Multimodal EHR CDSS - Phase 2 / Backlog 04 (Member 1 / Member 3 Deliverable)
-
-Implements:
-- CrossAttentionFusion: Multi-head cross-attention layer mapping Tabular Queries to Text Keys/Values,
-  combined with an adaptive Gated Residual Fusion mechanism and 4-class Classification Head.
-
-Mathematical Specification:
-docs/02_MULTIMODAL_ARCHITECTURE_AND_MATH.md Section 4
-"""
+"""Tabular/text fusion heads for the Phase 2 ablation."""
 
 from __future__ import annotations
 
-from typing import Optional, Tuple
 import torch
 from torch import Tensor, nn
 
 
 class CrossAttentionFusion(nn.Module):
-    """
-    Cross-Attention Late Fusion Layer between Tabular Stream and Text Stream.
+    """Tabular CLS queries non-padding text tokens, then uses a residual gate."""
 
-    Tabular Stream (Query): H_tab in R^[Batch, M+1, d]
-    Text Stream (Key/Value): H_text in R^[Batch, S+2, d]
-
-    Fusion Mechanism:
-    1. Cross-Attention: A = softmax(Q_tab K_text^T / sqrt(d)) V_text
-    2. Adaptive Gating: g = sigmoid(W_g [h_tab^cls || h_cross^cls] + b_g)
-    3. Fused Representation: h_fused = g * h_tab^cls + (1 - g) * h_cross^cls
-    4. Classification: logits = Linear(h_fused) -> R^4
-    """
-
-    def __init__(
-        self,
-        embed_dim: int = 128,
-        num_heads: int = 4,
-        num_classes: int = 4,
-        dropout: float = 0.1,
-    ) -> None:
+    def __init__(self, d_token: int = 128, num_classes: int = 4, n_heads: int = 4,
+                 dropout: float = 0.1) -> None:
         super().__init__()
-        if embed_dim % num_heads != 0:
-            raise ValueError(f"embed_dim ({embed_dim}) must be divisible by num_heads ({num_heads})")
+        if d_token % n_heads or num_classes < 2:
+            raise ValueError("Invalid attention width or class count")
+        self.attention = nn.MultiheadAttention(d_token, n_heads, dropout=dropout, batch_first=True)
+        self.gate = nn.Linear(2 * d_token, d_token)
+        self.norm = nn.LayerNorm(d_token)
+        self.head = nn.Linear(d_token, num_classes)
 
-        self.embed_dim = embed_dim
-        self.num_heads = num_heads
-        self.num_classes = num_classes
+    def forward(self, tab_tokens: Tensor, text_tokens: Tensor, attention_mask: Tensor,
+                *, tabular_present: Tensor | None = None,
+                text_present: Tensor | None = None) -> Tensor:
+        if tab_tokens.ndim != 3 or text_tokens.ndim != 3 or tab_tokens.shape[0] != text_tokens.shape[0]:
+            raise ValueError("Expected [batch, tokens, width] for both modalities")
+        if tab_tokens.shape[2] != self.head.in_features or text_tokens.shape[2] != self.head.in_features:
+            raise ValueError("Modality widths must match d_token")
+        if attention_mask.shape != text_tokens.shape[:2]:
+            raise ValueError("attention_mask must match text token dimensions")
+        batch = tab_tokens.shape[0]
+        if tabular_present is None:
+            tabular_present = torch.ones(batch, dtype=torch.bool, device=tab_tokens.device)
+        if text_present is None:
+            text_present = attention_mask.bool().any(dim=1)
+        if tabular_present.shape != (batch,) or text_present.shape != (batch,):
+            raise ValueError("Presence flags must have shape [batch]")
+        if not torch.all(tabular_present | text_present):
+            raise ValueError("At least one modality is required per row")
+        valid = attention_mask.bool() & text_present[:, None]
+        # MultiheadAttention cannot process a row with every key masked.
+        safe_valid = valid.clone()
+        safe_valid[~safe_valid.any(dim=1), 0] = True
+        tab_cls = tab_tokens[:, :1]
+        cross, _ = self.attention(tab_cls, text_tokens, text_tokens,
+                                  key_padding_mask=~safe_valid, need_weights=False)
+        tab_cls = tab_cls.squeeze(1)
+        cross = cross.squeeze(1)
+        gate = torch.sigmoid(self.gate(torch.cat([tab_cls, cross], dim=-1)))
+        fused = gate * tab_cls + (1 - gate) * cross
+        text_mean = (text_tokens * valid.unsqueeze(-1)).sum(1) / valid.sum(1).clamp_min(1).unsqueeze(-1)
+        fused = torch.where(text_present[:, None], fused, tab_cls)
+        fused = torch.where(tabular_present[:, None], fused, text_mean)
+        return self.head(self.norm(fused))
 
-        # Multi-Head Cross Attention
-        self.cross_attn = nn.MultiheadAttention(
-            embed_dim=embed_dim,
-            num_heads=num_heads,
-            dropout=dropout,
-            batch_first=True,
-        )
-        self.layer_norm_q = nn.LayerNorm(embed_dim)
-        self.layer_norm_kv = nn.LayerNorm(embed_dim)
 
-        # Gated fusion projection: g = sigmoid(W * [h_tab; h_cross] + b)
-        self.gate_proj = nn.Sequential(
-            nn.Linear(embed_dim * 2, embed_dim),
-            nn.Sigmoid(),
-        )
-        self.dropout = nn.Dropout(dropout)
-        self.post_norm = nn.LayerNorm(embed_dim)
+class ConcatFusion(nn.Module):
+    """Parameter-matched simple late-fusion comparator."""
 
-        # Classification Head: h_fused -> K logits (ASTHMA, COPD, HEART_FAILURE, PNEUMONIA)
-        self.classifier = nn.Linear(embed_dim, num_classes)
+    def __init__(self, d_token: int = 128, num_classes: int = 4, dropout: float = 0.1) -> None:
+        super().__init__()
+        self.head = nn.Sequential(nn.LayerNorm(2 * d_token), nn.Dropout(dropout),
+                                  nn.Linear(2 * d_token, num_classes))
 
-        self.reset_parameters()
+    def forward(self, tab_tokens: Tensor, text_tokens: Tensor, attention_mask: Tensor) -> Tensor:
+        valid = attention_mask.bool()
+        mean = (text_tokens * valid.unsqueeze(-1)).sum(1) / valid.sum(1).clamp_min(1).unsqueeze(-1)
+        return self.head(torch.cat([tab_tokens[:, 0], mean], dim=-1))
 
-    def reset_parameters(self) -> None:
-        """Initialize linear layers with Xavier uniform."""
-        nn.init.xavier_uniform_(self.classifier.weight)
-        nn.init.zeros_(self.classifier.bias)
 
-    def forward(
-        self,
-        h_tab: Tensor,
-        h_text: Tensor,
-        text_padding_mask: Optional[Tensor] = None,
-        return_features: bool = False,
-    ) -> Tuple[Tensor, Tensor] | Tuple[Tensor, Tensor, Tensor]:
-        """
-        Execute forward pass of Cross-Attention Late Fusion.
+class AblationModel(nn.Module):
+    """Shared feature encoders with one of four explicit classification heads."""
 
-        Args:
-            h_tab: Tabular representation [Batch, M+1, embed_dim].
-            h_text: Text representation [Batch, S+2, embed_dim].
-            text_padding_mask: Optional binary padding mask [Batch, S+2] (True for padding positions).
-            return_features: Whether to also return the intermediate h_fused representation.
+    MODES = ("tabular", "text", "concat", "cross_attention")
 
-        Returns:
-            logits: Classification logits [Batch, num_classes].
-            attn_weights: Cross-attention weights [Batch, M+1, S+2].
-            (Optional) h_fused: Fused feature representation [Batch, embed_dim].
-        """
-        if h_tab.ndim != 3 or h_tab.shape[-1] != self.embed_dim:
-            raise ValueError(
-                f"Expected h_tab of shape [Batch, M+1, {self.embed_dim}], got {tuple(h_tab.shape)}"
-            )
-        if h_text.ndim != 3 or h_text.shape[-1] != self.embed_dim:
-            raise ValueError(
-                f"Expected h_text of shape [Batch, S+2, {self.embed_dim}], got {tuple(h_text.shape)}"
-            )
+    def __init__(self, mode: str, *, text_width: int = 768, d_token: int = 128,
+                 num_classes: int = 4, n_blocks: int = 4, n_heads: int = 4,
+                 dropout: float = 0.1) -> None:
+        super().__init__()
+        if mode not in self.MODES:
+            raise ValueError(f"mode must be one of {self.MODES}")
+        from src.models.tabular_encoder import FTTransformerEncoder
 
-        q = self.layer_norm_q(h_tab)
-        kv = self.layer_norm_kv(h_text)
+        self.mode = mode
+        self.tabular = FTTransformerEncoder(d_token=d_token, n_blocks=n_blocks,
+                                            n_heads=n_heads, dropout=dropout) if mode != "text" else None
+        self.text_projection = nn.Linear(text_width, d_token) if mode != "tabular" else None
+        if mode in ("tabular", "text"):
+            self.head = nn.Sequential(nn.LayerNorm(d_token), nn.Linear(d_token, num_classes))
+        elif mode == "concat":
+            self.head = ConcatFusion(d_token, num_classes, dropout)
+        else:
+            self.head = CrossAttentionFusion(d_token, num_classes, n_heads, dropout)
 
-        # Multi-Head Cross Attention: Query = Tabular, Key/Value = Text
-        attn_out, attn_weights = self.cross_attn(
-            query=q,
-            key=kv,
-            value=kv,
-            key_padding_mask=text_padding_mask,
-        )
-
-        # Extract representations at [CLS] token position (index 0)
-        h_tab_cls = h_tab[:, 0, :]        # [Batch, embed_dim]
-        h_cross_cls = attn_out[:, 0, :]   # [Batch, embed_dim]
-
-        # Compute dynamic gating weights: g in (0, 1)^d
-        concat_cls = torch.cat([h_tab_cls, h_cross_cls], dim=-1)  # [Batch, 2 * embed_dim]
-        gate = self.gate_proj(concat_cls)                         # [Batch, embed_dim]
-
-        # Residual Gated Fusion
-        h_fused = gate * h_tab_cls + (1.0 - gate) * h_cross_cls   # [Batch, embed_dim]
-        h_fused = self.post_norm(self.dropout(h_fused))
-
-        # Project to 4 diagnostic logits
-        logits = self.classifier(h_fused)                         # [Batch, num_classes]
-
-        if return_features:
-            return logits, attn_weights, h_fused
-        return logits, attn_weights
+    def forward(self, numerical: Tensor, categorical: Tensor, text_hidden: Tensor,
+                attention_mask: Tensor) -> Tensor:
+        tab = self.tabular(numerical, categorical) if self.tabular is not None else None
+        text = self.text_projection(text_hidden.float()) if self.text_projection is not None else None
+        if self.mode == "tabular":
+            return self.head(tab[:, 0])
+        if self.mode == "text":
+            valid = attention_mask.bool()
+            pooled = (text * valid.unsqueeze(-1)).sum(1) / valid.sum(1).clamp_min(1).unsqueeze(-1)
+            return self.head(pooled)
+        return self.head(tab, text, attention_mask)

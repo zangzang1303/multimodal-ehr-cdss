@@ -1,126 +1,107 @@
-# ==============================================================================
-# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
-# File này (bao gồm DummyClinicalBackbone mock offline) được tạo tạm thời bởi
-# Thành viên 3 để chạy tests/test_multimodal_model.py (Backlog 04 - Nhiệm vụ 3.2)
-# trong lúc chờ Thành viên 2 hoàn thiện ClinicalTextEncoder nạp Bio_ClinicalBERT
-# thực tế (Backlog 04 - Nhiệm vụ 2.1).
-# ==============================================================================
-"""
-Clinical Text Encoder Module
-Multimodal EHR CDSS - Phase 2 / Backlog 04 (Member 2 / Member 3 Deliverable)
 
-Implements:
-- ClinicalTextEncoder: Wraps Biomedical BERT (Bio_ClinicalBERT / BioLinkBERT)
-  and projects text representations from d_text (768) to multimodal dimension d (128).
-
-Mathematical Specification:
-docs/02_MULTIMODAL_ARCHITECTURE_AND_MATH.md Section 3
-"""
 
 from __future__ import annotations
 
-from types import SimpleNamespace
-from typing import Optional
+from typing import Any, Sequence
 import torch
 from torch import Tensor, nn
 
 
-class DummyClinicalBackbone(nn.Module):
-    """
-    Lightweight dummy transformer backbone for offline testing and fast CI execution.
-    Outputs [Batch, Seq_len, hidden_size].
-    """
-
-    def __init__(self, vocab_size: int = 1000, hidden_size: int = 768) -> None:
-        super().__init__()
-        self.embedding = nn.Embedding(vocab_size, hidden_size)
-        self.proj = nn.Linear(hidden_size, hidden_size)
-
-    def forward(
-        self,
-        input_ids: Tensor,
-        attention_mask: Optional[Tensor] = None,
-        **kwargs,
-    ) -> SimpleNamespace:
-        out = self.proj(self.embedding(input_ids))
-        if attention_mask is not None:
-            out = out * attention_mask.unsqueeze(-1).float()
-        return SimpleNamespace(last_hidden_state=out)
+DEFAULT_TEXT_MODEL = "emilyalsentzer/Bio_ClinicalBERT"
 
 
 class ClinicalTextEncoder(nn.Module):
-    """
-    Biomedical Clinical Text Encoder.
-
-    Extracts contextual subword embeddings T_text in R^[Batch, S+2, 768]
-    and projects them via W_proj to multimodal embedding space H_text in R^[Batch, S+2, 128].
-    """
+   
 
     def __init__(
         self,
-        model_name: str = "emilyalsentzer/Bio_ClinicalBERT",
-        embed_dim: int = 128,
-        max_length: int = 256,
-        dropout_rate: float = 0.1,
+        model_name: str = DEFAULT_TEXT_MODEL,
+        d_token: int = 128,
+        max_length: int = 512,
         *,
-        backbone: Optional[nn.Module] = None,
+        backbone: nn.Module | None = None,
+        freeze_backbone: bool = False,
         local_files_only: bool = False,
+        dropout: float = 0.1,
     ) -> None:
         super().__init__()
         self.model_name = model_name
-        self.embed_dim = embed_dim
+        self.d_token = d_token
         self.max_length = max_length
+        self.freeze_backbone = freeze_backbone
+        self._tokenizer = None
 
-        if backbone is not None:
-            self.backbone = backbone
-            d_text = getattr(backbone, "hidden_size", 768)
-        else:
+        if backbone is None:
+            from transformers import AutoConfig, AutoModel
+
             try:
-                from transformers import AutoModel
-                self.backbone = AutoModel.from_pretrained(
-                    model_name,
-                    local_files_only=local_files_only,
+                backbone = AutoModel.from_pretrained(
+                    model_name, local_files_only=local_files_only
                 )
-                d_text = getattr(self.backbone.config, "hidden_size", 768)
-            except Exception:
-                # Fallback to dummy backbone if offline or transformers model not cached
-                self.backbone = DummyClinicalBackbone(hidden_size=768)
-                d_text = 768
+            except OSError:
+                config = AutoConfig.from_pretrained(
+                    model_name, local_files_only=local_files_only
+                )
+                backbone = AutoModel.from_config(config)
+        self.backbone = backbone
 
-        # Linear projection W_proj from d_text (768) -> d (128)
-        self.proj = nn.Linear(d_text, embed_dim)
-        self.layer_norm = nn.LayerNorm(embed_dim)
-        self.dropout = nn.Dropout(dropout_rate)
+        if freeze_backbone:
+            for parameter in self.backbone.parameters():
+                parameter.requires_grad_(False)
+
+        config_hidden = getattr(getattr(self.backbone, "config", None), "hidden_size", None)
+        self.d_text = int(config_hidden) if isinstance(config_hidden, int) else 768
+
+        self.proj = nn.Linear(self.d_text, d_token)
+        self.norm = nn.LayerNorm(d_token)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(
         self,
         input_ids: Tensor,
-        attention_mask: Optional[Tensor] = None,
+        attention_mask: Tensor | None = None,
     ) -> Tensor:
-        """
-        Extract and project contextual tokens.
+       
+        if input_ids.ndim != 2:
+            raise ValueError("input_ids must have shape [batch_size, seq_len]")
+        if attention_mask is not None and attention_mask.shape != input_ids.shape:
+            raise ValueError("attention_mask must match input_ids dimensions")
 
-        Args:
-            input_ids: Tensor of token ids with shape [Batch, S+2].
-            attention_mask: Optional binary mask of shape [Batch, S+2].
-
-        Returns:
-            H_text: Projected contextual representations of shape [Batch, S+2, embed_dim].
-        """
         outputs = self.backbone(input_ids=input_ids, attention_mask=attention_mask)
-        if hasattr(outputs, "last_hidden_state"):
-            t_text = outputs.last_hidden_state
-        elif isinstance(outputs, tuple):
-            t_text = outputs[0]
-        else:
-            t_text = outputs
+        last_hidden = getattr(outputs, "last_hidden_state", None)
+        if last_hidden is None and isinstance(outputs, (tuple, list)):
+            last_hidden = outputs[0]
+        if last_hidden is None and isinstance(outputs, Tensor):
+            last_hidden = outputs
+        if last_hidden is None:
+            raise RuntimeError("Transformer backbone did not return valid hidden states")
 
-        # Project: [Batch, S+2, 768] -> [Batch, S+2, 128]
-        h_text = self.proj(t_text)
-        h_text = self.layer_norm(h_text)
-        h_text = self.dropout(h_text)
-
-        if attention_mask is not None:
-            h_text = h_text * attention_mask.unsqueeze(-1).float()
-
+        projected = self.proj(last_hidden.float())
+        h_text = self.dropout(self.norm(projected))
         return h_text
+
+    def get_tokenizer(self, local_files_only: bool = False):
+        if self._tokenizer is None:
+            from transformers import AutoTokenizer
+
+            self._tokenizer = AutoTokenizer.from_pretrained(
+                self.model_name, local_files_only=local_files_only
+            )
+        return self._tokenizer
+
+    def tokenize(
+        self,
+        texts: Sequence[str] | str,
+        max_length: int | None = None,
+        local_files_only: bool = False,
+    ) -> dict[str, Tensor]:
+        tokenizer = self.get_tokenizer(local_files_only=local_files_only)
+        limit = max_length or self.max_length
+        return tokenizer(
+            texts if isinstance(texts, list) else [texts],
+            padding="max_length",
+            truncation=True,
+            max_length=limit,
+            return_tensors="pt",
+        )
+

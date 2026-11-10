@@ -206,7 +206,11 @@ def evaluate_holdout_dca(
     """
     repo_root = Path(__file__).resolve().parents[2]
     npz_path = predictions_path or (repo_root / "data" / "holdout_predictions.npz")
-    json_pred_path = repo_root / "data" / "holdout_predictions.json"
+    json_pred_path = (
+        predictions_path
+        if predictions_path is not None and predictions_path.suffix.lower() == ".json"
+        else repo_root / "data" / "holdout_predictions.json"
+    )
 
     if npz_path.exists() and npz_path.suffix == ".npz":
         loaded = np.load(npz_path)
@@ -251,6 +255,27 @@ def evaluate_holdout_dca(
         )
         prediction_source = "calibrated_simulation_pending_checkpoint"
 
+    y_true = np.asarray(y_true, dtype=int).reshape(-1)
+    matrices = [
+        np.asarray(prob_mcdss, dtype=float),
+        np.asarray(prob_tabular, dtype=float),
+        np.asarray(prob_text, dtype=float),
+    ]
+    if any(matrix.ndim != 2 for matrix in matrices):
+        raise ValueError("Hold-out probability matrices must have shape [N, C]")
+    expected_shape = matrices[0].shape
+    if expected_shape[0] != len(y_true) or any(
+        matrix.shape != expected_shape for matrix in matrices[1:]
+    ):
+        raise ValueError("Hold-out labels and probability matrices must have matching [N, C] shapes")
+    if expected_shape[0] == 0 or expected_shape[1] < 2:
+        raise ValueError("Hold-out artifact must contain samples and at least two classes")
+    if any(not np.isfinite(matrix).all() for matrix in matrices):
+        raise ValueError("Hold-out probability matrices must contain finite values")
+    if np.any(y_true < 0) or np.any(y_true >= expected_shape[1]):
+        raise ValueError("Hold-out labels must map to probability matrix class columns")
+    prob_mcdss, prob_tabular, prob_text = matrices
+
     points = compute_dca_curve_from_predictions(
         y_true=y_true,
         prob_mcdss=prob_mcdss,
@@ -261,6 +286,10 @@ def evaluate_holdout_dca(
 
     return {
         "n_samples": int(len(y_true)),
+        "class_prevalence": {
+            str(class_id): float(np.mean(y_true == class_id))
+            for class_id in range(prob_mcdss.shape[1])
+        },
         "prediction_source": prediction_source,
         "threshold_points": points,
     }

@@ -1,6 +1,5 @@
 % ==============================================================================
 % Phân mục 03: Kiến trúc Dung hợp Đa phương thức & Hiệu chuẩn (Methodology)
-% [PHỐI HỢP THÀNH VIÊN 1 & 2 --- BACKLOG 07 NHIỆM VỤ 1.2 & BACKLOG 04 NHIỆM VỤ 1.1-1.3, 2.1-2.2]
 % ==============================================================================
 \section{Kiến Trúc Học Sâu Đa Phương Thức và Hiệu Chuẩn Xác Suất (Multimodal Methodology)}
 \label{sec:methodology}
@@ -26,19 +25,10 @@ Như đã chứng minh qua phân tích các ca bệnh sai biệt thực tế (đ
 \begin{equation}
     \text{CrossAttn}(\bm{Q}, \bm{K}, \bm{V}) = \text{softmax}\!\left(\frac{\bm{Q}\bm{K}^\top}{\sqrt{d_k}} + \bm{M}_{\text{pad}}\right)\bm{V}
 \end{equation}
-trong đó $\bm{M}_{\text{pad}}$ là mặt nạ che các token đệm ($-\infty$ tại vị trí padding). Vector dung hợp sau cổng thích ứng \textit{Gated Residual Fusion} ($\bm{g} = \sigma(\bm{W}_g[\bm{h}_{\text{tab}}^{\text{[CLS]}} \Vert \bm{h}_{\text{cross}}] + \bm{b}_g)$) và chuẩn hóa tầng (\textit{LayerNorm}) được đưa qua đầu phân loại MLP để sinh vector logits $\bm{z} \in \mathbb{R}^4$.
+trong đó $\bm{M}_{\text{pad}}$ là mặt nạ che các token đệm ($-\infty$ tại vị trí padding). Vector dung hợp sau kết nối tắt (\textit{Residual Connection}) và chuẩn hóa tầng (\textit{LayerNorm}) được đưa qua đầu phân loại MLP để sinh vector logits $\bm{z} \in \mathbb{R}^4$.
 
 Cuối cùng, để khắc phục hiện tượng quá tự tin (\textit{overconfidence}) thường gặp ở mạng nơ-ron sâu, tầng \textbf{Temperature Scaling} \cite{guo2017calibration} tối ưu hóa tham số nhiệt độ vô hướng $T > 0$ bằng thuật toán L-BFGS đối với hàm mất mát Negative Log-Likelihood trên tập Validation:
 \begin{equation}
     \hat{p}_c = \frac{\exp(z_c / T)}{\sum_{j=1}^{4} \exp(z_j / T)}, \quad c \in \{1, 2, 3, 4\}
 \end{equation}
 Quá trình này giữ nguyên thứ tự xếp hạng giữa các lớp (không làm thay đổi AUROC/Accuracy) nhưng kéo sai số hiệu chuẩn kỳ vọng (ECE) xuống dưới ngưỡng an toàn lâm sàng $0.05$.
-
-\subsection{Cấu hình Huấn luyện và Tối ưu Thời gian Suy luận GPU (Template Chờ Bổ Sung)}
-% [TEMPLATE TRỐNG CHỜ KẾT QUẢ TỪ THÀNH VIÊN 1 & 2: BACKLOG 04 TASK 1.3, 2.2 & BACKLOG 05 TASK 1.3]
-Các thông số thực nghiệm thu được sau quá trình huấn luyện (\texttt{scripts/train\_multimodal.py} của Thành viên 2) và tối ưu hóa suy luận GPU (\texttt{src/api/routes/inference.py} của Thành viên 1) sẽ được điền vào khung dưới đây:
-\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Số kỷ nguyên hội tụ (\textit{Early Stopping Epoch}) và Loss tối ưu trên tập Validation:} \texttt{[TODO-TV2 (Backlog 04 Task 2.2): Điền epoch dừng sớm và NLL loss trên tập Validation sau khi chạy scripts/train\_multimodal.py]}.
-    \item \textbf{Tham số nhiệt độ tối ưu học được ($T^*$):} $T^* = \texttt{[TODO-TV1 (Backlog 04 Task 1.3): Điền giá trị nhiệt độ T* lưu trong data/checkpoints/multimodal\_best.pt]}$.
-    \item \textbf{Độ trễ suy luận trên GPU (\textit{Inference Latency}) và dung lượng Checkpoint sau rút gọn:} \texttt{[TODO-TV1 (Backlog 05 Task 1.3 \& Backlog 07 Task 1.1): Điền độ trễ trung bình ms/request trên GPU (mục tiêu <= 150ms) và dung lượng file multimodal\_best.pt]}.
-\end{itemize}

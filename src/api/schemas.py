@@ -284,12 +284,14 @@ class MultimodalMockResponse(BaseModel):
     """
 
     patient_id: str = Field(..., description="Patient identifier")
+    prediction_source: Literal["mock", "checkpoint"] = Field(default="mock")
+    model_version: Optional[str] = Field(default=None)
     predicted_disease: str = Field(..., description="Top predicted disease label")
     predicted_disease_name: str = Field(..., description="Vietnamese display name of top predicted disease")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Top-1 calibrated confidence")
-    calibrated: bool = Field(default=True, description="Whether probabilities are calibrated via Temperature Scaling")
-    temperature: float = Field(default=1.142, description="Optimal temperature T applied from validation optimization")
-    ece_score: float = Field(default=0.034, description="Expected Calibration Error (ECE < 0.05)")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Top-1 simulated score")
+    calibrated: bool = Field(default=False, description="Whether a fitted validation calibrator was applied")
+    temperature: Optional[float] = Field(default=None, description="Fitted validation temperature, if available")
+    ece_score: Optional[float] = Field(default=None, description="Measured ECE, if available")
     top_k_predictions: List[TopKPrediction] = Field(
         ...,
         description="Ranked list of Top-K diseases by calibrated probability",
@@ -328,6 +330,10 @@ class GuidelineReference(BaseModel):
     Referenced snippet from clinical practice guidelines (GINA, GOLD, ESC, BYT).
     """
     chunk_id: str = Field(..., description="Unique chunk identifier")
+    source_id: str = Field(default="", description="Stable source document identifier")
+    version: str = Field(default="", description="Source edition or year")
+    section_locator: str = Field(default="", description="Section or page locator")
+    source_verified: bool = Field(default=False, description="Whether source metadata was verified")
     guideline_source: str = Field(..., description="Guideline name (GOLD 2024, GINA 2024, ESC 2023, BYT 2020)")
     disease_entity: str = Field(..., description="Disease entity (COPD, ASTHMA, HEART_FAILURE, PNEUMONIA)")
     section_title: str = Field(..., description="Guideline section header")
@@ -353,6 +359,7 @@ class AgentExplainResponse(BaseModel):
     Comprehensive output payload of the Agentic RAG Clinical Consultation.
     """
     patient_id: str = Field(..., description="Patient identifier")
+    display_note: str = Field(..., description="De-identified note used for all evidence offsets")
     primary_diagnosis: str = Field(..., description="Primary suspected diagnosis (Hypothesis 1)")
     primary_diagnosis_name: str = Field(..., description="Vietnamese display name of primary diagnosis")
     differential_diagnosis: Optional[str] = Field(default=None, description="Secondary differential diagnosis (Hypothesis 2)")

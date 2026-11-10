@@ -1,76 +1,100 @@
 {
-  "experiment_metadata": {
-    "evaluation_date": "2026-10-28T04:15:00Z",
-    "test_samples": 302,
-    "num_classes": 4,
-    "split_strategy": "Strict Group Split (0% patient/source note overlap)",
-    "classes": [
-      "ASTHMA",
-      "COPD",
-      "HEART_FAILURE",
-      "PNEUMONIA"
-    ],
-    "calibration_method": "Temperature Scaling (Validation NLL Optimized)"
+  "metadata": {
+    "generated_at": "2026-11-05T08:28:03.150032+00:00",
+    "split": "data\\processed_rebuilt_strict",
+    "split_rows": {
+      "train": 1425,
+      "val": 273,
+      "test": 302
+    },
+    "audit_file": "data\\rebuilt_strict_split_audit.json",
+    "baseline_file": "data\\rebuilt_strict_results_2026-10-28.json",
+    "seed": 42,
+    "device": "cuda",
+    "text_model": "emilyalsentzer/Bio_ClinicalBERT",
+    "text_backbone_frozen": true,
+    "max_length": 512,
+    "epochs_max": 12,
+    "batch_size": 16,
+    "note": "Frozen text backbone; not directly equivalent to Phase 1 fine-tuned text baseline."
   },
-  "models": {
-    "tabular_only": {
-      "id": "tabular_only",
-      "name": "FT-Transformer (Tabular-only)",
-      "modality": "Structured Tabular Only",
-      "macro_auroc": 0.897621,
-      "macro_auprc": 0.702308,
-      "macro_f1": 0.578943,
-      "accuracy": 0.65894,
-      "brier_score": 0.472502,
-      "ece": 0.115186,
-      "net_gain_auroc": 0.0,
-      "description": "Học sâu dạng bảng đơn thuần, nhạy bén với sinh hiệu và biến động huyết động học tức thời nhưng thiếu ngữ cảnh bệnh sử."
+  "strict_baseline_auroc": {
+    "baseline_1_classical_tabular": 0.922315,
+    "baseline_2_tabular_deep": 0.897621,
+    "baseline_3_text_only": 0.973453
+  },
+  "variants": {
+    "tabular": {
+      "selected_epoch": 3,
+      "validation_nll": 0.5569965243339539,
+      "temperature": 1.2365299463272095,
+      "test": {
+        "macro_auroc": 0.8987648505679356,
+        "macro_auprc": 0.699662654972183,
+        "macro_f1": 0.5386303167338636,
+        "accuracy": 0.6556291390728477,
+        "brier_score": 0.47632452825211136,
+        "ece": 0.10129639901072772
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": -0.02355014943206435,
+        "baseline_2_tabular_deep": 0.0011438505679356448,
+        "baseline_3_text_only": -0.07468814943206437
+      }
     },
-    "text_only": {
-      "id": "text_only",
-      "name": "Bio_ClinicalBERT (Text-only)",
-      "modality": "Unstructured Clinical Notes Only",
-      "macro_auroc": 0.973512,
-      "macro_auprc": 0.931405,
-      "macro_f1": 0.842105,
-      "accuracy": 0.854305,
-      "brier_score": 0.232914,
-      "ece": 0.037312,
-      "net_gain_auroc": 0.075891,
-      "description": "Mô hình ngôn ngữ y sinh nắm bắt sâu sắc bệnh sử và tiền căn dùng thuốc nhưng dễ bị nhiễu ngữ nghĩa khi bệnh cảnh nặng."
+    "text": {
+      "selected_epoch": 1,
+      "validation_nll": 1.3727705478668213,
+      "temperature": 1.0,
+      "test": {
+        "macro_auroc": 0.6605452038124725,
+        "macro_auprc": 0.40144397350597044,
+        "macro_f1": 0.1483843537414966,
+        "accuracy": 0.2152317880794702,
+        "brier_score": 0.7674891804251837,
+        "ece": 0.07728824621399505
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": -0.2617697961875275,
+        "baseline_2_tabular_deep": -0.2370757961875275,
+        "baseline_3_text_only": -0.3129077961875275
+      }
     },
-    "concat_fusion": {
-      "id": "concat_fusion",
-      "name": "Concat Late Fusion",
-      "modality": "Tabular + Text (Concatenation)",
-      "macro_auroc": 0.958214,
-      "macro_auprc": 0.884521,
-      "macro_f1": 0.814022,
-      "accuracy": 0.824503,
-      "brier_score": 0.284019,
-      "ece": 0.054218,
-      "net_gain_auroc": 0.060593,
-      "description": "Ghép nối đơn giản h_tab || h_text, thiếu tương tác chú ý hai chiều giữa các chỉ số xét nghiệm và từ ngữ bệnh án."
+    "concat": {
+      "selected_epoch": 2,
+      "validation_nll": 0.6157954931259155,
+      "temperature": 1.3245905637741089,
+      "test": {
+        "macro_auroc": 0.9119578375795265,
+        "macro_auprc": 0.7416809525442074,
+        "macro_f1": 0.6379864068410037,
+        "accuracy": 0.7152317880794702,
+        "brier_score": 0.41475167988102635,
+        "ece": 0.10494911463450121
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": -0.010357162420473465,
+        "baseline_2_tabular_deep": 0.014336837579526529,
+        "baseline_3_text_only": -0.06149516242047348
+      }
     },
-    "cross_attention_fusion": {
-      "id": "cross_attention_fusion",
-      "name": "Cross-Attention Gated Fusion (Ours)",
-      "modality": "Multimodal Late Fusion (Q_tab -> KV_text)",
-      "macro_auroc": 0.984518,
-      "macro_auprc": 0.948012,
-      "macro_f1": 0.887215,
-      "accuracy": 0.89404,
-      "brier_score": 0.174528,
-      "ece": 0.031204,
-      "net_gain_auroc": 0.086897,
-      "description": "Dung hợp tương tác chú ý liên phương thức có cổng thích ứng và hiệu chuẩn Temperature Scaling, đạt chuẩn ECE < 0.05."
+    "cross_attention": {
+      "selected_epoch": 3,
+      "validation_nll": 0.44421452283859253,
+      "temperature": 1.3541077375411987,
+      "test": {
+        "macro_auroc": 0.9594141527959706,
+        "macro_auprc": 0.8536225677057602,
+        "macro_f1": 0.6503384600981267,
+        "accuracy": 0.7748344370860927,
+        "brier_score": 0.34959917250530276,
+        "ece": 0.097339602594344
+      },
+      "delta_auroc_vs_strict_baselines": {
+        "baseline_1_classical_tabular": 0.03709915279597065,
+        "baseline_2_tabular_deep": 0.06179315279597064,
+        "baseline_3_text_only": -0.01403884720402937
+      }
     }
-  },
-  "key_findings": {
-    "auroc_gain_over_tabular": 0.086897,
-    "ece_reduction": "ECE giảm từ 0.1152 xuống 0.0312 (tiệm cận ngưỡng khuyến nghị ECE < 0.05)",
-    "best_configuration": "Cross-Attention Gated Fusion (Ours)",
-    "conclusion": "Mô hình đa phương thức Cross-Attention cho thấy mức cải thiện +0.0869 AUROC so với Tabular-only trên tập kiểm thử độc lập, đồng thời hỗ trợ bù đắp các khiếm khuyết lâm sàng giữa hai phương thức đơn lẻ."
   }
 }
-

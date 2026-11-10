@@ -50,38 +50,14 @@ export default function DiagnosticCard({
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
     const [showExplanation, setShowExplanation] = useState<boolean>(false);
 
-    // Helper function to return styling according to the 3 risk bands
-    const getRiskBandConfig = (percentage: number) => {
-        if (percentage >= 70) {
-            return {
-                label: "Nguy cơ cao",
-                tier: "high",
-                textColor: "text-rose-600 dark:text-rose-400",
-                bgColor: "bg-rose-500",
-                badgeBg:
-                    "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20",
-                barColor: "bg-gradient-to-r from-rose-500 to-rose-600",
-            };
-        }
-        if (percentage >= 30) {
-            return {
-                label: "Nguy cơ trung bình",
-                tier: "moderate",
-                textColor: "text-amber-600 dark:text-amber-400",
-                bgColor: "bg-amber-500",
-                badgeBg:
-                    "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20",
-                barColor: "bg-gradient-to-r from-amber-500 to-amber-600",
-            };
-        }
+    const getRiskBandConfig = () => {
         return {
-            label: "Nguy cơ thấp",
-            tier: "low",
-            textColor: "text-emerald-600 dark:text-emerald-400",
-            bgColor: "bg-emerald-500",
-            badgeBg:
-                "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20",
-            barColor: "bg-gradient-to-r from-emerald-500 to-emerald-600",
+            label: "Điểm nghiên cứu",
+            tier: "unvalidated",
+            textColor: "text-sky-600 dark:text-sky-400",
+            bgColor: "bg-sky-500",
+            badgeBg: "bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20",
+            barColor: "bg-sky-500",
         };
     };
 
@@ -93,7 +69,7 @@ export default function DiagnosticCard({
         risk_level: "high",
     };
 
-    const topBand = getRiskBandConfig(topPrediction.percentage);
+    const topBand = getRiskBandConfig();
 
     const handleAuditEvidence = async () => {
         if (explainData) {
@@ -101,10 +77,10 @@ export default function DiagnosticCard({
             return;
         }
 
-        const noteToAudit =
-            clinicalNotes && clinicalNotes.trim().length >= 5
-                ? clinicalNotes
-                : `Bệnh nhân ${result.patient_id} vào viện vì khó thở tăng dần kèm ho kéo dài. Khám phổi nghe ran rít ran ngáy thì thở ra. Tiền sử dùng thuốc theo chỉ định.`;
+        if (!clinicalNotes || clinicalNotes.trim().length < 5) {
+            setExplainError("Cần nhập ghi chú bệnh án trước khi đối chiếu chứng cứ.");
+            return;
+        }
 
         setExplainLoading(true);
         setExplainError(null);
@@ -112,7 +88,7 @@ export default function DiagnosticCard({
         try {
             const data = await explainClinicalCase({
                 patient_id: result.patient_id,
-                clinical_notes: noteToAudit,
+                clinical_notes: clinicalNotes,
                 target_diagnosis: result.predicted_disease,
                 differential_diagnosis:
                     result.top_k_predictions[1]?.disease || undefined,
@@ -174,12 +150,12 @@ export default function DiagnosticCard({
                                 aria-label="Xem giải thích hiệu chuẩn xác suất"
                             >
                                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                                <span>Calibrated Confidence</span>
+                                <span>{result.calibrated ? "Calibrated Confidence" : "Dữ liệu mô phỏng"}</span>
                                 <HelpCircle className="w-3 h-3 text-emerald-600/70" />
                             </button>
 
                             {/* Tooltip popover */}
-                            {showTooltip && (
+                            {showTooltip && result.calibrated && (
                                 <div
                                     role="tooltip"
                                     className="absolute right-0 top-full mt-2 w-80 sm:w-96 p-4 rounded-xl bg-slate-900 text-white dark:bg-slate-800 text-xs shadow-2xl border border-slate-700 z-50 animate-in fade-in duration-200"
@@ -198,13 +174,12 @@ export default function DiagnosticCard({
                                                     Temperature Scaling (T ={" "}
                                                     {result.temperature})
                                                 </strong>{" "}
-                                                trên tập Validation nội bộ, tiệm
-                                                cận ngưỡng khuyến nghị{" "}
+                                                trên tập Validation nội bộ. Sai số
+                                                hiệu chuẩn đo trên tập test:{" "}
                                                 <strong className="text-emerald-400">
-                                                    ECE = {result.ece_score}{" "}
-                                                    &lt; 0.05
+                                                    ECE = {result.ece_score == null ? "chưa đo" : result.ece_score.toFixed(4)}
                                                 </strong>
-                                                .
+                                                . Cần ngoại kiểm trước khi sử dụng lâm sàng.
                                             </p>
                                         </div>
                                     </div>
@@ -212,11 +187,8 @@ export default function DiagnosticCard({
                                         <span className="font-semibold text-slate-300">
                                             Ý nghĩa y khoa:
                                         </span>{" "}
-                                        Điểm số phản ánh tần suất rủi ro ước
-                                        tính trên tập kiểm thử nội bộ, hỗ trợ
-                                        giảm thiểu hiện tượng tự tin thái quá
-                                        (overconfidence) thường gặp ở các mô
-                                        hình học sâu.
+                                        Chỉ số ECE đo trên tập kiểm thử nội bộ;
+                                        mô hình chưa được ngoại kiểm lâm sàng.
                                     </div>
                                 </div>
                             )}
@@ -238,14 +210,14 @@ export default function DiagnosticCard({
                             <span
                                 className={`inline-block w-2 h-2 rounded-full ${topBand.bgColor}`}
                             />
-                            Phân tầng rủi ro:{" "}
+                            Phân loại hiển thị:{" "}
                             <strong className={topBand.textColor}>
                                 {topBand.label}
                             </strong>
                             <span className="text-slate-400">•</span>
-                            <span>
-                                ECE: {(result.ece_score * 100).toFixed(1)}%
-                            </span>
+                            {result.ece_score != null && (
+                                <span>ECE: {(result.ece_score * 100).toFixed(1)}%</span>
+                            )}
                         </p>
                     </div>
 
@@ -254,7 +226,7 @@ export default function DiagnosticCard({
                             {topPrediction.percentage}%
                         </span>
                         <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                            độ tin cậy
+                            điểm mô hình
                         </span>
                     </div>
                 </div>
@@ -269,26 +241,13 @@ export default function DiagnosticCard({
                             Bảng Phân Bố Xác Suất Tham Khảo Top-K Bệnh Lý
                             (Ranked Pathologies)
                         </h4>
-                        <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-500">
-                            <span className="flex items-center gap-1">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500" />{" "}
-                                &lt;30%: Thấp
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <span className="w-2 h-2 rounded-full bg-amber-500" />{" "}
-                                30-70%: Trung bình
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <span className="w-2 h-2 rounded-full bg-rose-500" />{" "}
-                                &gt;70%: Cao
-                            </span>
-                        </div>
+                        <span className="text-[11px] text-slate-500">Chưa có ngưỡng rủi ro lâm sàng được xác nhận</span>
                     </div>
 
                     {/* List of 4 pathologies */}
                     <div className="space-y-4">
                         {result.top_k_predictions.map((item, idx) => {
-                            const band = getRiskBandConfig(item.percentage);
+                            const band = getRiskBandConfig();
                             const isTop = idx === 0;
 
                             return (
@@ -620,12 +579,7 @@ export default function DiagnosticCard({
 
                             {/* Evidence Viewer with Highlighted Spans */}
                             <EvidenceViewer
-                                rawNotes={
-                                    clinicalNotes &&
-                                    clinicalNotes.trim().length >= 5
-                                        ? clinicalNotes
-                                        : `Bệnh nhân ${result.patient_id} vào viện vì khó thở tăng dần kèm ho kéo dài. Khám phổi nghe ran rít ran ngáy thì thở ra. Tiền sử dùng thuốc theo chỉ định.`
-                                }
+                                rawNotes={explainData.display_note}
                                 spans={explainData.grounded_spans}
                                 hallucinationFilteredCount={
                                     explainData.hallucination_filtered_count

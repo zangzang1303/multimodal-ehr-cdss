@@ -289,8 +289,9 @@ def test_predict_mock_endpoint(client):
     assert "predicted_disease" in data
     assert "confidence" in data
     assert 0.0 <= data["confidence"] <= 1.0
-    assert data["calibrated"] is True
-    assert data["ece_score"] < 0.05
+    assert data["calibrated"] is False
+    assert data["temperature"] is None
+    assert data["ece_score"] is None
     assert "top_k_predictions" in data
     assert len(data["top_k_predictions"]) == 4
 
@@ -367,13 +368,51 @@ def test_benchmarks_ablation_endpoint(client):
     assert "concat_fusion" in models
     assert "cross_attention_fusion" in models
 
-    # Check that Cross-Attention achieves > 0.04 AUROC gain over Tabular-only
+    # The dashboard must report the canonical training artifact, not fixture values.
+    import json
+    from pathlib import Path
+
+    artifact = json.loads((Path(__file__).resolve().parents[1] / "data" / "ablation_results.json").read_text(encoding="utf-8"))
     tab_auroc = models["tabular_only"]["macro_auroc"]
     ca_auroc = models["cross_attention_fusion"]["macro_auroc"]
-    assert ca_auroc - tab_auroc >= 0.04, "Cross-Attention must outperform Tabular by >= 0.04 AUROC"
+    assert tab_auroc == artifact["variants"]["tabular"]["test"]["macro_auroc"]
+    assert ca_auroc == artifact["variants"]["cross_attention"]["test"]["macro_auroc"]
+    assert models["cross_attention_fusion"]["ece"] == artifact["variants"]["cross_attention"]["test"]["ece"]
 
-    # Check ECE calibration threshold < 0.05
-    assert models["cross_attention_fusion"]["ece"] < 0.05
+
+def test_multimodal_checkpoint_contract_and_unavailable_assets(client, monkeypatch):
+    from src.api.routes import inference
+
+    payload = {
+        "patient_id": "PT-TEST",
+        "tabular_features": {
+            "age": 60, "systolic_bp": 130, "diastolic_bp": 80, "heart_rate": 75,
+            "respiratory_rate": 18, "spo2": 96, "temperature": 37,
+            "wbc_count": 6.5, "crp": 5, "gender": "M",
+            "smoking_status": "NEVER", "history_hypertension": 0,
+            "history_diabetes": 0,
+        },
+        "clinical_notes": "Patient reports intermittent wheezing and cough.",
+    }
+    checkpoint = {
+        "classes": ["ASTHMA", "COPD", "HEART_FAILURE", "PNEUMONIA"],
+        "temperature": 1.3,
+        "training_metadata": {"trained_at": "2026-11-05", "calibrated_test_metrics": {"ece": 0.12}},
+    }
+    monkeypatch.setattr(inference, "predict_checkpoint", lambda *_: (checkpoint, [0.4, 0.3, 0.2, 0.1]))
+    response = client.post("/api/v1/predict/multimodal", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["prediction_source"] == "checkpoint"
+    assert data["calibrated"] is True
+    assert sum(item["probability"] for item in data["top_k_predictions"]) == pytest.approx(1)
+    assert data["ece_score"] == 0.12
+
+    payload["clinical_notes"] = " "
+    assert client.post("/api/v1/predict/multimodal", json=payload).status_code == 422
+    payload["clinical_notes"] = "Patient reports intermittent wheezing and cough."
+    monkeypatch.setattr(inference, "predict_checkpoint", lambda *_: (_ for _ in ()).throw(FileNotFoundError("missing weights")))
+    assert client.post("/api/v1/predict/multimodal", json=payload).status_code == 503
 
 
 
@@ -398,8 +437,9 @@ def test_evaluation_benchmark_endpoint(client):
     assert "model_benchmarks" in data
     benchmarks = data["model_benchmarks"]
     assert "mcdss_multimodal_core" in benchmarks
-    assert benchmarks["mcdss_multimodal_core"]["macro_auroc"] >= 0.88
-    assert benchmarks["mcdss_multimodal_core"]["ece"] < 0.05
+    assert benchmarks["mcdss_multimodal_core"]["macro_auroc"] == pytest.approx(0.9594141527959706)
+    assert benchmarks["mcdss_multimodal_core"]["ece"] == pytest.approx(0.097339602594344)
+    assert data["evaluation_metadata"]["dca_status"] == "illustrative_points_not_patient_level_validation"
 
     # Verify Decision Curve Analysis (DCA) points
     assert "decision_curve_analysis" in data
@@ -419,7 +459,7 @@ def test_evaluation_benchmark_endpoint(client):
     assert "probast_compliance_summary" in data
     probast = data["probast_compliance_summary"]
     assert "overall_bias_risk" in probast
-    assert "Low Risk" in probast["overall_bias_risk"]
+    assert probast["overall_bias_risk"] == "Not independently assessed"
 
 
 def test_agent_explain_in_api_endpoints(client):

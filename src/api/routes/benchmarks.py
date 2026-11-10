@@ -70,7 +70,48 @@ async def get_ablation_benchmarks():
         try:
             with open(ABLATION_JSON_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            return data
+            # The training pipeline writes the canonical `variants` format.  Keep
+            # that artifact intact and adapt it for the evaluation dashboard.
+            if "variants" not in data:
+                return data
+            names = {
+                "tabular": ("tabular_only", "FT-Transformer (Tabular-only)", "Structured Tabular"),
+                "text": ("text_only", "Frozen Bio_ClinicalBERT (Text-only)", "Clinical notes"),
+                "concat": ("concat_fusion", "Concat Late Fusion", "Tabular + text"),
+                "cross_attention": (
+                    "cross_attention_fusion", "Cross-Attention Gated Fusion", "Tabular + text"
+                ),
+            }
+            tabular_auroc = data["variants"]["tabular"]["test"]["macro_auroc"]
+            models = {}
+            for variant, (key, name, modality) in names.items():
+                metrics = data["variants"][variant]["test"]
+                models[key] = {
+                    "id": key, "name": name, "modality": modality,
+                    **metrics,
+                    "net_gain_auroc": metrics["macro_auroc"] - tabular_auroc,
+                    "description": "Kết quả trên tập kiểm thử strict split của đợt huấn luyện hiện hành.",
+                }
+            cross = models["cross_attention_fusion"]
+            tabular = models["tabular_only"]
+            return {
+                "experiment_metadata": {
+                    "evaluation_date": data["metadata"]["generated_at"],
+                    "test_samples": data["metadata"]["split_rows"]["test"],
+                    "num_classes": 4,
+                    "split_strategy": "Strict group split",
+                    "classes": ["ASTHMA", "COPD", "HEART_FAILURE", "PNEUMONIA"],
+                },
+                "models": models,
+                "key_findings": {
+                    "auroc_gain_over_tabular": cross["net_gain_auroc"],
+                    "ece_reduction": (
+                        f"ECE: {tabular['ece']:.4f} → {cross['ece']:.4f}"
+                    ),
+                    "best_configuration": max(models.values(), key=lambda m: m["macro_auroc"])["name"],
+                    "conclusion": "Kết quả chỉ áp dụng cho tập kiểm thử strict split hiện hành.",
+                },
+            }
         except Exception as e:
             raise HTTPException(
                 status_code=500,

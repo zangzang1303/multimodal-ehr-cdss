@@ -20,7 +20,7 @@ import {
   MultimodalMockResponse,
   PatientInferenceRequest,
   predictBaselines,
-  predictMultimodalMock,
+  predictMultimodal,
   TabularFeatures,
 } from "@/lib/api";
 import DiagnosticCard from "@/components/DiagnosticCard";
@@ -302,7 +302,7 @@ export default function PatientDataForm() {
 
       const [baselineRes, multiRes] = await Promise.allSettled([
         predictBaselines(payload),
-        predictMultimodalMock(payload),
+        predictMultimodal(payload),
       ]);
 
       if (baselineRes.status === "fulfilled") {
@@ -310,6 +310,9 @@ export default function PatientDataForm() {
       }
       if (multiRes.status === "fulfilled") {
         setMultimodalResponse(multiRes.value);
+      } else {
+        setMultimodalResponse(null);
+        setError(multiRes.reason instanceof Error ? multiRes.reason.message : "Không thể chạy mô hình đa phương thức.");
       }
       if (baselineRes.status === "rejected" && multiRes.status === "rejected") {
         throw baselineRes.reason;
@@ -629,12 +632,12 @@ export default function PatientDataForm() {
                 {loading ? (
                   <>
                     <Activity className="w-4 h-4 animate-spin" />
-                    <span>Đang gửi dự đoán tới 3 Baselines...</span>
+                    <span>Đang chạy mô hình đa phương thức...</span>
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 fill-white" />
-                    <span>Chạy Dự Đoán 3 Baselines</span>
+                    <span>Chạy mô hình đa phương thức và đối chứng</span>
                   </>
                 )}
               </button>
@@ -843,4 +846,3 @@ export default function PatientDataForm() {
     </div>
   );
 }
-

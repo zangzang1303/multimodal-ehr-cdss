@@ -252,12 +252,14 @@ export interface ModalityStreamResult {
 
 export interface MultimodalMockResponse {
   patient_id: string;
+  prediction_source: "mock" | "checkpoint";
+  model_version?: string | null;
   predicted_disease: string;
   predicted_disease_name: string;
   confidence: number;
   calibrated: boolean;
-  temperature: number;
-  ece_score: number;
+  temperature: number | null;
+  ece_score: number | null;
   top_k_predictions: TopKPrediction[];
   modality_streams: {
     tabular_stream?: ModalityStreamResult;
@@ -292,6 +294,21 @@ export async function predictMultimodalMock(
     throw new Error(`Multimodal mock prediction failed (${response.status}): ${errorText}`);
   }
 
+  return response.json();
+}
+
+export async function predictMultimodal(
+  payload: PatientInferenceRequest
+): Promise<MultimodalMockResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/predict/multimodal`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Multimodal inference unavailable (${response.status}): ${detail}`);
+  }
   return response.json();
 }
 
@@ -334,10 +351,10 @@ export interface AblationStudyResponse {
 
 export const FALLBACK_ABLATION_RESULTS: AblationStudyResponse = {
   experiment_metadata: {
-    evaluation_date: "2026-10-28T04:15:00Z",
+    evaluation_date: "2026-11-05T08:28:03.150032+00:00",
     test_samples: 302,
     num_classes: 4,
-    split_strategy: "Strict Group Split (0% overlap)",
+    split_strategy: "Strict group split",
     classes: ["ASTHMA", "COPD", "HEART_FAILURE", "PNEUMONIA"],
   },
   models: {
@@ -345,12 +362,12 @@ export const FALLBACK_ABLATION_RESULTS: AblationStudyResponse = {
       id: "tabular_only",
       name: "FT-Transformer (Tabular-only)",
       modality: "Structured Tabular Only",
-      macro_auroc: 0.8976,
-      macro_auprc: 0.7023,
-      macro_f1: 0.5789,
-      accuracy: 0.6589,
-      brier_score: 0.4725,
-      ece: 0.1152,
+      macro_auroc: 0.8987648505679356,
+      macro_auprc: 0.699662654972183,
+      macro_f1: 0.5386303167338636,
+      accuracy: 0.6556291390728477,
+      brier_score: 0.47632452825211136,
+      ece: 0.10129639901072772,
       net_gain_auroc: 0.0,
       description: "Học sâu dạng bảng đơn thuần, nhạy với sinh hiệu tức thời nhưng thiếu ngữ cảnh bệnh sử.",
     },
@@ -358,47 +375,47 @@ export const FALLBACK_ABLATION_RESULTS: AblationStudyResponse = {
       id: "text_only",
       name: "Bio_ClinicalBERT (Text-only)",
       modality: "Unstructured Clinical Notes Only",
-      macro_auroc: 0.9735,
-      macro_auprc: 0.9314,
-      macro_f1: 0.8421,
-      accuracy: 0.8543,
-      brier_score: 0.2329,
-      ece: 0.0373,
-      net_gain_auroc: 0.0759,
+      macro_auroc: 0.6605452038124725,
+      macro_auprc: 0.40144397350597044,
+      macro_f1: 0.1483843537414966,
+      accuracy: 0.2152317880794702,
+      brier_score: 0.7674891804251837,
+      ece: 0.07728824621399505,
+      net_gain_auroc: -0.2382196467554631,
       description: "Mô hình ngôn ngữ y sinh nắm bắt sâu sắc bệnh sử nhưng dễ bị nhiễu ngữ nghĩa ở ca phức tạp.",
     },
     concat_fusion: {
       id: "concat_fusion",
       name: "Concat Late Fusion",
       modality: "Tabular + Text (Concatenation)",
-      macro_auroc: 0.9582,
-      macro_auprc: 0.8845,
-      macro_f1: 0.8140,
-      accuracy: 0.8245,
-      brier_score: 0.2840,
-      ece: 0.0542,
-      net_gain_auroc: 0.0606,
+      macro_auroc: 0.9119578375795265,
+      macro_auprc: 0.7416809525442074,
+      macro_f1: 0.6379864068410037,
+      accuracy: 0.7152317880794702,
+      brier_score: 0.41475167988102635,
+      ece: 0.10494911463450121,
+      net_gain_auroc: 0.0131929870115909,
       description: "Ghép nối đơn giản h_tab || h_text, không có tương tác ngữ nghĩa chéo giữa chỉ số và từ khóa.",
     },
     cross_attention_fusion: {
       id: "cross_attention_fusion",
       name: "Cross-Attention Gated Fusion (Ours)",
       modality: "Multimodal Late Fusion (Q_tab -> KV_text)",
-      macro_auroc: 0.9845,
-      macro_auprc: 0.9480,
-      macro_f1: 0.8872,
-      accuracy: 0.8940,
-      brier_score: 0.1745,
-      ece: 0.0312,
-      net_gain_auroc: 0.0869,
+      macro_auroc: 0.9594141527959706,
+      macro_auprc: 0.8536225677057602,
+      macro_f1: 0.6503384600981267,
+      accuracy: 0.7748344370860927,
+      brier_score: 0.34959917250530276,
+      ece: 0.097339602594344,
+      net_gain_auroc: 0.060649302228035,
       description: "Dung hợp tương tác chú ý liên phương thức có cổng thích ứng và hiệu chuẩn Temperature Scaling.",
     },
   },
   key_findings: {
-    auroc_gain_over_tabular: 0.0869,
-    ece_reduction: "ECE giảm từ 0.1152 xuống 0.0312 (tiệm cận ngưỡng khuyến nghị < 0.05)",
-    best_configuration: "Cross-Attention Gated Fusion (Ours)",
-    conclusion: "Mô hình đa phương thức Cross-Attention cho thấy mức cải thiện +0.0869 AUROC so với Tabular-only trên tập kiểm thử độc lập, đồng thời hỗ trợ bù đắp các khiếm khuyết lâm sàng giữa hai phương thức đơn lẻ.",
+    auroc_gain_over_tabular: 0.060649302228035,
+    ece_reduction: "ECE: 0.1013 → 0.0973 (strict test)",
+    best_configuration: "Cross-Attention Gated Fusion",
+    conclusion: "Kết quả chỉ áp dụng cho tập kiểm thử strict split hiện hành.",
   },
 };
 
@@ -435,6 +452,10 @@ export interface EvidenceSpan {
 
 export interface GuidelineReference {
   chunk_id: string;
+  source_id?: string;
+  version?: string;
+  section_locator?: string;
+  source_verified?: boolean;
   guideline_source: string;
   disease_entity: string;
   section_title: string;
@@ -454,6 +475,7 @@ export interface AgentExplainRequest {
 
 export interface AgentExplainResponse {
   patient_id: string;
+  display_note: string;
   primary_diagnosis: string;
   primary_diagnosis_name: string;
   differential_diagnosis?: string;
@@ -506,8 +528,10 @@ export interface EvaluationBenchmarkResponse {
     evaluation_cohort: string;
     test_samples: number;
     classes: string[];
-    prevalence_per_class: number;
+    prevalence_per_class: Record<string, number>;
     validation_standard: string;
+    dca_status?: string;
+    dca_prediction_source?: string;
   };
   model_benchmarks: Record<
     string,

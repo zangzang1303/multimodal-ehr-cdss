@@ -1,6 +1,6 @@
 "use client";
 
-import DCACurveChart, { DEFAULT_DCA_POINTS } from "@/components/DCACurveChart";
+import DCACurveChart from "@/components/DCACurveChart";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -45,7 +45,8 @@ export default function AblationEvaluationPage() {
   const [data, setData] = useState<AblationStudyResponse>(
     FALLBACK_ABLATION_RESULTS
   );
-  const [dcaPoints, setDcaPoints] = useState<DCAPoint[]>(DEFAULT_DCA_POINTS);
+  const [dcaPoints, setDcaPoints] = useState<DCAPoint[]>([]);
+  const [dcaStatus, setDcaStatus] = useState<string>("illustrative_simulation_pending_patient_level_predictions");
   const [loading, setLoading] = useState<boolean>(true);
   const [isDark, setIsDark] = useState<boolean>(true);
   const [mounted, setMounted] = useState<boolean>(false);
@@ -79,10 +80,12 @@ export default function AblationEvaluationPage() {
       setData(ablationRes);
       if (evalRes?.decision_curve_analysis?.threshold_points?.length) {
         setDcaPoints(evalRes.decision_curve_analysis.threshold_points);
+        setDcaStatus(evalRes.evaluation_metadata.dca_status ?? "illustrative_simulation_pending_patient_level_predictions");
       }
     } catch {
       setData(FALLBACK_ABLATION_RESULTS);
-      setDcaPoints(DEFAULT_DCA_POINTS);
+      setDcaPoints([]);
+      setDcaStatus("illustrative_simulation_pending_patient_level_predictions");
     } finally {
       setLastRefreshed(new Date());
       setLoading(false);
@@ -238,7 +241,7 @@ export default function AblationEvaluationPage() {
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               Khảo sát thực nghiệm đối chứng vai trò của cơ chế chú ý liên phương thức (Cross-Attention)
-              và hiệu chuẩn Temperature Scaling trên tập kiểm thử độc lập ({data.experiment_metadata.test_samples} mẫu, 0% rò rỉ bệnh nhân).
+              và hiệu chuẩn Temperature Scaling trên tập kiểm thử độc lập ({data.experiment_metadata.test_samples} mẫu, phân tách nhóm bệnh nhân theo dữ liệu hiện hành).
             </p>
           </div>
         </div>
@@ -277,9 +280,9 @@ export default function AblationEvaluationPage() {
             }`}
           >
             <Scale className="w-4 h-4" />
-            <span>2. Lợi Ích Lâm Sàng DCA &amp; PROBAST (Backlog 06)</span>
+            <span>2. Minh họa DCA &amp; khung PROBAST (Backlog 06)</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-normal">
-              Mới
+              Minh họa
             </span>
           </button>
         </div>
@@ -287,7 +290,7 @@ export default function AblationEvaluationPage() {
         {activeTab === "dca" ? (
           <div className="space-y-8 animate-in fade-in duration-200">
             {/* Interactive DCA Curve Component */}
-            <DCACurveChart points={dcaPoints} isDark={isDark} />
+            <DCACurveChart points={dcaPoints} isDark={isDark} dcaStatus={dcaStatus} />
 
             {/* PROBAST 4 Domains Compliance Matrix */}
             <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
@@ -299,7 +302,7 @@ export default function AblationEvaluationPage() {
                   </h3>
                 </div>
                 <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
-                  Đánh giá tổng thể: Low Risk of Bias
+                  Chưa có đánh giá PROBAST độc lập
                 </span>
               </div>
 
@@ -307,40 +310,40 @@ export default function AblationEvaluationPage() {
                 <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
                     <span>Miền 1: Người Tham Gia (Participants)</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                    <span className="text-slate-500 font-bold">Chưa đánh giá</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-                    Thu nhận bệnh nhân ngoại trú người lớn (≥18 tuổi) có triệu chứng hô hấp/tuần hoàn. Không loại trừ tùy tiện nhóm bệnh nặng hay có bệnh nền phức tạp.
+                    Cần mô tả nguồn dữ liệu, tiêu chí chọn mẫu và khả năng áp dụng cho quần thể bệnh nhân thực tế.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
                     <span>Miền 2: Biến Dự Đoán (Predictors)</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                    <span className="text-slate-500 font-bold">Chưa đánh giá</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-                    Khóa mốc thời gian (Temporal Alignment) trước khi xác lập chẩn đoán; cấm tuyệt đối đưa các tiêu chuẩn vàng (Hô hấp ký FEV1/FVC, Siêu âm tim EF) vào biến đầu vào.
+                    Cần kiểm tra mốc thời gian của từng biến và chứng minh không có rò rỉ thông tin sau chẩn đoán.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
                     <span>Miền 3: Kết Cục Chẩn Đoán (Outcome)</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                    <span className="text-slate-500 font-bold">Chưa đánh giá</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-                    Nhãn bệnh được xác lập khách quan theo mã chuẩn ICD-10 và đối chiếu phác đồ quốc tế (GINA, GOLD, ESC); người gán nhãn độc lập với mô hình.
+                    Cần kiểm tra quy trình gán nhãn và mức độ độc lập giữa người gán nhãn với dự đoán mô hình.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
                     <span>Miền 4: Phân Tích Số Liệu (Analysis)</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">Low Risk</span>
+                    <span className="text-slate-500 font-bold">Chưa đánh giá</span>
                   </div>
                   <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
-                    Kiểm soát 0% rò rỉ qua Patient Group Splitting; gán đa biến MICE bảo tồn mẫu; hiệu chuẩn Temperature Scaling (ECE &lt; 0.05); kiểm tra độ công bằng phân nhóm.
+                    Cần đánh giá sai lệch, hiệu chuẩn, thiếu dữ liệu và kiểm định ngoài trước khi chấm mức nguy cơ.
                   </p>
                 </div>
               </div>
@@ -359,7 +362,7 @@ export default function AblationEvaluationPage() {
               +{(data.key_findings.auroc_gain_over_tabular * 100).toFixed(2)}%
             </div>
             <p className="text-[11px] text-slate-500">
-              Đạt mức cải thiện kỳ vọng (+0.0869 AUROC) so với mô hình dạng bảng trên tập kiểm thử độc lập.
+              Kết quả lấy từ artifact huấn luyện strict split hiện hành.
             </p>
           </div>
 
@@ -385,7 +388,7 @@ export default function AblationEvaluationPage() {
               {(data.models.cross_attention_fusion.macro_f1 * 100).toFixed(2)}%
             </div>
             <p className="text-[11px] text-slate-500">
-              Tăng +30.8% so với Tabular và +4.5% so với Text-only.
+              So sánh với các cấu hình khác trên cùng tập kiểm thử.
             </p>
           </div>
 
@@ -398,7 +401,7 @@ export default function AblationEvaluationPage() {
               {(data.models.cross_attention_fusion.ece * 100).toFixed(2)}%
             </div>
             <p className="text-[11px] text-slate-500">
-              Tiệm cận ngưỡng khuyến nghị y khoa (ECE &lt; 5.0% trên tập kiểm thử nội bộ).
+              ECE của cấu hình này theo tập kiểm thử hiện hành.
             </p>
           </div>
         </div>
@@ -591,7 +594,7 @@ export default function AblationEvaluationPage() {
               <span>Hiệu chuẩn Temperature Scaling</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Thuật toán Temperature Scaling tối ưu NLL trên tập Validation giúp giảm sai lệch ECE từ 11.52% xuống 3.12% (tiệm cận ngưỡng ECE &lt; 0.05), hỗ trợ giảm thiểu hiện tượng tự tin thái quá và đưa xác suất ước tính về gần hơn với phân bố thực nghiệm.
+              10.13% xuống 9.73% theo artifact hiện hành.
             </p>
           </div>
         </div>

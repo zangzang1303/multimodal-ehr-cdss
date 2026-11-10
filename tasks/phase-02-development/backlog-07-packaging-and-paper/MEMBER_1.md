@@ -1,4 +1,4 @@
-# BACKLOG 05 - NHIỆM VỤ THÀNH VIÊN 1 (LEAD ML / MODELING)
+# BACKLOG 07 - NHIỆM VỤ THÀNH VIÊN 1 (LEAD ML / MODELING)
 ### Trọng Tâm: Tối Ưu GPU Runtime, Soạn Thảo Methodology & Results Bài Báo, Gắn Release Tag v1.0.0
 
 ---
@@ -8,8 +8,8 @@
 ### 🔹 Nhiệm vụ 1.1: Tối Ưu Hóa Trọng Số Mô Hình & GPU Container
 * **Độ ưu tiên:** `[P1 - Critical]`
 * **Mô tả:**
-  1. Dọn dẹp và chuẩn hóa tệp checkpoint cuối cùng `data/checkpoints/multimodal_best.pt` (chỉ giữ lại model weights và nhiệt độ $T$, loại bỏ optimizer states để giảm dung lượng file xuống tối thiểu).
-  2. Cấu hình PyTorch GPU runtime trong `Dockerfile` cho Backend API, bảo đảm container nhận diện được card đồ họa NVIDIA.
+  1. Chuẩn hóa checkpoint suy luận gồm weights, nhiệt độ $T$, thứ tự nhãn, cấu hình, scaler/tokenizer và phiên bản thư viện cần thiết; bỏ optimizer states nhưng giữ đủ thông tin tái lập dự đoán.
+  2. Kiểm tra backend container trên CPU và, nếu có NVIDIA runtime, trên GPU; ghi tài nguyên và thời gian suy luận thực tế thay vì mặc định mọi máy có GPU.
 * **Đầu ra (Deliverable):** Tệp trọng số mô hình tối ưu, `Dockerfile` cho API Backend.
 * **Trạng thái:** `[ ] TODO`
 
@@ -25,8 +25,8 @@
 
 ---
 
-### 🔹 Nhiệm vụ 1.3: Gắn Release Tag & Công Bố Weights
+### 🔹 Nhiệm vụ 1.3: Chuẩn Bị Release Và Rà Quyền Công Bố Weights
 * **Độ ưu tiên:** `[P1 - Critical]`
-* **Mô tả:** Rà soát lại toàn bộ code tầng model, dọn dẹp các script thử nghiệm tạm thời, gắn release tag `v1.0.0` trên git và soạn thảo release notes.
-* **Đầu ra (Deliverable):** Git Tag `v1.0.0`, Release Notes chính thức.
+* **Mô tả:** Rà code/model card, nguồn dữ liệu và điều kiện giấy phép của pretrained weights; soạn release notes và danh sách artifact được phép phân phối. Chỉ gắn tag hoặc công bố weights sau khi nhóm duyệt phạm vi phát hành.
+* **Đầu ra (Deliverable):** Release notes dự thảo, model card, manifest/checksum và quyết định cấp phép; tag nếu đã được duyệt.
 * **Trạng thái:** `[ ] TODO`

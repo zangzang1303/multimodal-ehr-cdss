@@ -1,4 +1,4 @@
-"""Model implementations for M-CDSS (Phase 1 Baselines & Phase 2 Multimodal Core)."""
+
 
 from src.models.baselines import (
     ClassicalTabularBaseline,
@@ -6,7 +6,7 @@ from src.models.baselines import (
     TextOnlyBaseline,
 )
 from src.models.calibration import TemperatureScalingCalibrator
-from src.models.multimodal_fusion import CrossAttentionFusion
+from src.models.multimodal_fusion import AblationModel, ConcatFusion, CrossAttentionFusion
 from src.models.tabular_encoder import FTTransformerEncoder, TabularTokenizer
 from src.models.text_encoder import ClinicalTextEncoder
 
@@ -18,5 +18,7 @@ __all__ = [
     "FTTransformerEncoder",
     "ClinicalTextEncoder",
     "CrossAttentionFusion",
+    "ConcatFusion",
+    "AblationModel",
     "TemperatureScalingCalibrator",
 ]

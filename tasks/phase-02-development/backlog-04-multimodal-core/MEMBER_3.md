@@ -1,4 +1,4 @@
-# BACKLOG 02 (BACKLOG 04) - NHIỆM VỤ THÀNH VIÊN 3 (FULL-STACK AI & FRONTEND)
+# BACKLOG 04 - NHIỆM VỤ THÀNH VIÊN 3 (FULL-STACK AI & FRONTEND)
 ### Trọng Tâm: Mock Endpoint, DiagnosticCard Component, Unit Tests Mạng Học Sâu & Dashboard Ablation
 
 ---
@@ -11,10 +11,10 @@
   1. Viết mock endpoint `POST /api/v1/predict/mock` trên FastAPI để Frontend phát triển giao diện hiển thị kết quả chẩn đoán sớm.
   2. Xây dựng `frontend/src/components/DiagnosticCard.tsx`:
      - Hiển thị danh sách Top-K bệnh lý có xác suất cao nhất.
-     - Thanh đo rủi ro tương ứng (Progress bar) với 3 dải màu: Xanh lá ($<30\%$), Vàng cam ($30\% - 70\%$), Đỏ ($>70\%$).
-     - Hiển thị nhãn *"Calibrated Confidence"* kèm tooltip giải thích xác suất đã hiệu chuẩn.
-* **Đầu ra (Deliverable):** `src/api/routes/inference.py`, `frontend/src/components/DiagnosticCard.tsx`.
-* **Trạng thái:** `[x] COMPLETED` (100% pass tests và đã tích hợp vào form lâm sàng)
+     - Thanh xác suất cho từng nhãn; không gán màu xanh/vàng/đỏ theo ngưỡng lâm sàng chưa được xác định và đánh giá.
+     - Chỉ hiển thị *"Calibrated Confidence"* khi phản hồi thực sự dùng $T$ đã khớp trên validation; mock phải có nhãn dữ liệu mô phỏng rõ ràng.
+* **Đầu ra (Deliverable):** `DiagnosticCard.tsx`.
+* **Trạng thái:** `[ ] TODO`
 
 ---
 
@@ -23,17 +23,17 @@
 * **Mô tả:**
   1. Viết `tests/test_multimodal_model.py`:
      - Kiểm tra `TabularTokenizer`: Nhận ma trận số và xuất đúng kích thước `[Batch, M+1, 128]`.
-     - Kiểm tra `ClinicalTextEncoder`: Nhận input_ids và attention_mask, xuất đúng kích thước `[Batch, S+2, 128]`.
+     - Kiểm tra `ClinicalTextEncoder`: Nhận input_ids và attention_mask, xuất đúng kích thước `[Batch, L, 128]` với $L$ là chiều token thực tế (có padding); kiểm tra attention không dùng token padding.
      - Kiểm tra `CrossAttentionFusion`: Forward pass, backward pass, gradients không bị lỗi NaN.
-     - Kiểm tra `TemperatureScalingCalibrator`: Tỷ lệ xác suất sau hiệu chuẩn có tổng bằng 1.0.
+     - Kiểm tra `TemperatureScalingCalibrator`: $T>0$, xác suất sau hiệu chuẩn cộng thành 1, fit chỉ từ validation và lưu/nạp checkpoint giữ nguyên dự đoán.
   2. Chạy lệnh: `pytest tests/test_multimodal_model.py -v` (bảo đảm pass 100%).
-* **Đầu ra (Deliverable):** `tests/test_multimodal_model.py` (9/9 unit tests passed), nền tảng mạng `src/models/`.
-* **Trạng thái:** `[x] COMPLETED` (52/52 pytest suite pass toàn diện)
+* **Đầu ra (Deliverable):** `tests/test_multimodal_model.py`.
+* **Trạng thái:** `[ ] TODO`
 
 ---
 
 ### 🔹 Nhiệm vụ 3.3: Xây Dựng Trang Báo Cáo Ablation Study Trên Web
 * **Độ ưu tiên:** `[P2 - Normal]`
 * **Mô tả:** Tạo trang `frontend/src/app/evaluation/page.tsx` hiển thị bảng so sánh trực quan các chỉ số (AUROC, F1, ECE) giữa Tabular-only, Text-only, Concat và Cross-Attention.
-* **Đầu ra (Deliverable):** `frontend/src/app/evaluation/page.tsx`, `data/ablation_results.json`, endpoint `GET /api/v1/benchmarks/ablation`.
-* **Trạng thái:** `[x] COMPLETED` (Next.js 14 production build pass 100%, render biểu đồ Recharts mượt mà)
+* **Đầu ra (Deliverable):** `frontend/src/app/evaluation/page.tsx`.
+* **Trạng thái:** `[ ] TODO`
