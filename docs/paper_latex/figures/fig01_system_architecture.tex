@@ -57,14 +57,14 @@
         Cross-Attention + Temp Scaling ($T$)
     };
     \node[mcdssAgent, right=2.4cm of api_agent, text width=3.9cm] (core_agent) {
-        \textbf{Agentic RAG \& Grounder}\\
-        \scriptsize LangGraph Orchestrator +\\
+        \textbf{DiagnosticStateGraph}\\
+        \scriptsize 4-Node Agentic Pipeline +\\
         Kiểm chứng vị trí ký tự $\mathcal{O}(N)$
     };
     \node[mcdssBox, right=2.4cm of api_eval, text width=3.9cm] (core_qdrant) {
         \textbf{Qdrant Vector DB (:6333)}\\
         \scriptsize Kho phác đồ GINA, GOLD, ESC\\
-        Hybrid Search (Dense + BM25)
+        Hybrid Search (Cosine + BM25)
     };
     \node[mcdssBox, right=2.4cm of api_health, text width=3.9cm] (core_store) {
         \textbf{Strict Split Benchmarks}\\

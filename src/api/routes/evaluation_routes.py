@@ -6,125 +6,12 @@ Provides quantitative benchmarks comparing Baselines vs Multimodal Core,
 and computes clinical Decision Curve Analysis (DCA) Net Benefit metrics.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 from fastapi import APIRouter
 from src.api.routes.benchmarks import get_ablation_benchmarks
+from src.evaluation.dca_analysis import evaluate_holdout_dca
 
 router = APIRouter(prefix="/evaluation")
-
-# Decision Curve Analysis points computed per Vickers et al. (BMJ 2006)
-# Pre-calculated over hold-out test set (N=302, 4-class balanced cohort, prev=0.25)
-DCA_THRESHOLD_POINTS: List[Dict[str, Any]] = [
-    {
-        "threshold": 0.05,
-        "net_benefit_mcdss": 0.245,
-        "net_benefit_tabular": 0.231,
-        "net_benefit_text": 0.241,
-        "net_benefit_treat_all": 0.211,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 3.4,
-    },
-    {
-        "threshold": 0.10,
-        "net_benefit_mcdss": 0.238,
-        "net_benefit_tabular": 0.214,
-        "net_benefit_text": 0.230,
-        "net_benefit_treat_all": 0.167,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 7.1,
-    },
-    {
-        "threshold": 0.15,
-        "net_benefit_mcdss": 0.229,
-        "net_benefit_tabular": 0.198,
-        "net_benefit_text": 0.219,
-        "net_benefit_treat_all": 0.118,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 11.1,
-    },
-    {
-        "threshold": 0.20,
-        "net_benefit_mcdss": 0.221,
-        "net_benefit_tabular": 0.180,
-        "net_benefit_text": 0.208,
-        "net_benefit_treat_all": 0.063,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 15.8,
-    },
-    {
-        "threshold": 0.25,
-        "net_benefit_mcdss": 0.212,
-        "net_benefit_tabular": 0.162,
-        "net_benefit_text": 0.196,
-        "net_benefit_treat_all": 0.0,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 21.2,
-    },
-    {
-        "threshold": 0.30,
-        "net_benefit_mcdss": 0.201,
-        "net_benefit_tabular": 0.141,
-        "net_benefit_text": 0.183,
-        "net_benefit_treat_all": -0.071,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 20.1,
-    },
-    {
-        "threshold": 0.35,
-        "net_benefit_mcdss": 0.189,
-        "net_benefit_tabular": 0.119,
-        "net_benefit_text": 0.169,
-        "net_benefit_treat_all": -0.154,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 18.9,
-    },
-    {
-        "threshold": 0.40,
-        "net_benefit_mcdss": 0.174,
-        "net_benefit_tabular": 0.098,
-        "net_benefit_text": 0.151,
-        "net_benefit_treat_all": -0.250,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 17.4,
-    },
-    {
-        "threshold": 0.45,
-        "net_benefit_mcdss": 0.158,
-        "net_benefit_tabular": 0.074,
-        "net_benefit_text": 0.134,
-        "net_benefit_treat_all": -0.364,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 15.8,
-    },
-    {
-        "threshold": 0.50,
-        "net_benefit_mcdss": 0.139,
-        "net_benefit_tabular": 0.049,
-        "net_benefit_text": 0.112,
-        "net_benefit_treat_all": -0.500,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 13.9,
-    },
-    {
-        "threshold": 0.55,
-        "net_benefit_mcdss": 0.116,
-        "net_benefit_tabular": 0.024,
-        "net_benefit_text": 0.089,
-        "net_benefit_treat_all": -0.667,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 11.6,
-    },
-    {
-        "threshold": 0.60,
-        "net_benefit_mcdss": 0.091,
-        "net_benefit_tabular": 0.002,
-        "net_benefit_text": 0.063,
-        "net_benefit_treat_all": -0.875,
-        "net_benefit_treat_none": 0.0,
-        "net_tp_gained_per_100": 9.1,
-    },
-]
-
 
 @router.options("/benchmark")
 async def options_benchmark():
@@ -144,7 +31,7 @@ async def get_clinical_evaluation_benchmark() -> Dict[str, Any]:
             "test_samples": 302,
             "classes": ["ASTHMA", "COPD", "HEART_FAILURE", "PNEUMONIA"],
             "prevalence_per_class": 0.25,
-            "validation_standard": "TRIPOD-AI & PROBAST Compliant",
+            "validation_standard": "TRIPOD-AI reporting framework; PROBAST not independently assessed",
         },
         "model_benchmarks": {
             "classical_tabular": {
@@ -190,13 +77,9 @@ async def get_clinical_evaluation_benchmark() -> Dict[str, Any]:
             },
         },
         "decision_curve_analysis": {
-            "threshold_points": DCA_THRESHOLD_POINTS,
-            "optimal_clinical_threshold_range": [0.10, 0.45],
-            "dca_conclusion": (
-                "Đường cong Net Benefit của M-CDSS vượt trội hơn hẳn chiến lược Treat All và Treat None "
-                "trên toàn bộ dải ngưỡng can thiệp lâm sàng thực tế pt ∈ [0.10, 0.45], "
-                "giúp tăng thêm từ 7 đến 21 ca can thiệp đúng trên mỗi 100 bệnh nhân mà không làm tăng can thiệp thừa."
-            ),
+            "threshold_points": [],
+            "analysis_threshold_range": [0.10, 0.45],
+            "dca_conclusion": "DCA is computed dynamically from the available hold-out prediction source.",
         },
         "probast_compliance_summary": {
             "participants_risk": "Low Risk (Stratified Group Split, không rò rỉ bệnh nhân)",
@@ -210,7 +93,15 @@ async def get_clinical_evaluation_benchmark() -> Dict[str, Any]:
     ablation = await get_ablation_benchmarks()
     models = ablation["models"]
     result["evaluation_metadata"]["test_samples"] = ablation["experiment_metadata"]["test_samples"]
-    result["evaluation_metadata"]["dca_status"] = "illustrative_points_not_patient_level_validation"
+    dca = evaluate_holdout_dca()
+    is_empirical = dca["prediction_source"] == "empirical_holdout_artifact"
+    result["evaluation_metadata"]["test_samples"] = dca["n_samples"]
+    result["evaluation_metadata"]["dca_status"] = (
+        "empirical_holdout_predictions" if is_empirical
+        else "illustrative_simulation_pending_patient_level_predictions"
+    )
+    result["evaluation_metadata"]["dca_prediction_source"] = dca["prediction_source"]
+    result["evaluation_metadata"]["prevalence_per_class"] = dca["class_prevalence"]
     result["evaluation_metadata"]["probast_status"] = "not_independently_assessed"
     for target, source in (
         ("tabular_deep", "tabular_only"),
@@ -223,8 +114,11 @@ async def get_clinical_evaluation_benchmark() -> Dict[str, Any]:
     )
     result["model_benchmarks"].pop("classical_tabular")
     result["decision_curve_analysis"]["dca_conclusion"] = (
-        "Illustrative curve only; compute from patient-level predictions before clinical interpretation."
+        "Computed from patient-level hold-out predictions; this is a research analysis, not evidence of clinical utility."
+        if is_empirical else
+        "Illustrative simulation only; patient-level predictions are required before clinical interpretation."
     )
+    result["decision_curve_analysis"]["threshold_points"] = dca["threshold_points"]
     result["probast_compliance_summary"] = {
         key: "Not independently assessed" for key in result["probast_compliance_summary"]
     }

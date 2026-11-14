@@ -20,30 +20,25 @@ import {
 } from "recharts";
 import { DCAPoint } from "@/lib/api";
 
-const DEFAULT_DCA_POINTS: DCAPoint[] = [
-  { threshold: 0.05, net_benefit_mcdss: 0.245, net_benefit_tabular: 0.231, net_benefit_text: 0.241, net_benefit_treat_all: 0.211, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 3.4 },
-  { threshold: 0.10, net_benefit_mcdss: 0.238, net_benefit_tabular: 0.214, net_benefit_text: 0.230, net_benefit_treat_all: 0.167, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 7.1 },
-  { threshold: 0.15, net_benefit_mcdss: 0.229, net_benefit_tabular: 0.198, net_benefit_text: 0.219, net_benefit_treat_all: 0.118, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 11.1 },
-  { threshold: 0.20, net_benefit_mcdss: 0.221, net_benefit_tabular: 0.180, net_benefit_text: 0.208, net_benefit_treat_all: 0.063, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 15.8 },
-  { threshold: 0.25, net_benefit_mcdss: 0.212, net_benefit_tabular: 0.162, net_benefit_text: 0.196, net_benefit_treat_all: 0.0, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 21.2 },
-  { threshold: 0.30, net_benefit_mcdss: 0.201, net_benefit_tabular: 0.141, net_benefit_text: 0.183, net_benefit_treat_all: -0.071, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 20.1 },
-  { threshold: 0.35, net_benefit_mcdss: 0.189, net_benefit_tabular: 0.119, net_benefit_text: 0.169, net_benefit_treat_all: -0.154, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 18.9 },
-  { threshold: 0.40, net_benefit_mcdss: 0.174, net_benefit_tabular: 0.098, net_benefit_text: 0.151, net_benefit_treat_all: -0.250, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 17.4 },
-  { threshold: 0.45, net_benefit_mcdss: 0.158, net_benefit_tabular: 0.074, net_benefit_text: 0.134, net_benefit_treat_all: -0.364, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 15.8 },
-  { threshold: 0.50, net_benefit_mcdss: 0.139, net_benefit_tabular: 0.049, net_benefit_text: 0.112, net_benefit_treat_all: -0.500, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 13.9 },
-  { threshold: 0.55, net_benefit_mcdss: 0.116, net_benefit_tabular: 0.024, net_benefit_text: 0.089, net_benefit_treat_all: -0.667, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 11.6 },
-  { threshold: 0.60, net_benefit_mcdss: 0.091, net_benefit_tabular: 0.002, net_benefit_text: 0.063, net_benefit_treat_all: -0.875, net_benefit_treat_none: 0.0, net_tp_gained_per_100: 9.1 },
-];
-
 interface DCACurveChartProps {
   points?: DCAPoint[];
   isDark?: boolean;
+  dcaStatus?: string;
 }
 
 export default function DCACurveChart({
-  points = DEFAULT_DCA_POINTS,
+  points = [],
   isDark = true,
+  dcaStatus = "illustrative_simulation_pending_patient_level_predictions",
 }: DCACurveChartProps) {
+  const isIllustrative = dcaStatus !== "empirical_holdout_predictions";
+  if (points.length === 0) {
+    return (
+      <div className="p-6 rounded-2xl border border-amber-300 bg-amber-50 text-sm text-amber-900">
+        Chưa tải được dữ liệu DCA từ API. Biểu đồ sẽ hiển thị khi endpoint đánh giá khả dụng.
+      </div>
+    );
+  }
   const [sliderThreshold, setSliderThreshold] = useState<number>(0.20);
 
   // Find point closest to sliderThreshold
@@ -87,16 +82,17 @@ export default function DCACurveChart({
             </h3>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Đường cong minh họa bằng điểm dựng sẵn; chưa đo trên dự đoán từng bệnh nhân.
+            {isIllustrative
+              ? "Đường cong minh họa từ mô phỏng; chưa đo trên dự đoán từng bệnh nhân."
+              : "Đường cong tính từ dự đoán từng bệnh nhân trong tập hold-out; đây chưa phải bằng chứng về lợi ích lâm sàng."}
           </p>
           <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-            Bệnh đích giả định: COPD so với các nhãn còn lại. Hành động giả định: chuyển xét nghiệm xác nhận.
-            Tỷ lệ hiện mắc giả định: 25%. Phân tích minh họa trên dữ liệu nghiên cứu.
+            Phân tích macro One-vs-Rest trên bốn nhãn bệnh; ngưỡng là giả định nghiên cứu và cần được xác nhận lâm sàng.
           </p>
         </div>
 
         <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold self-start sm:self-auto">
-          Dải ngưỡng minh họa: pt ∈ [10%, 45%]
+          Dải ngưỡng phân tích: pt ∈ [10%, 45%]
         </span>
       </div>
 
@@ -266,12 +262,12 @@ export default function DCACurveChart({
       <div className="p-4 rounded-xl bg-indigo-500/5 dark:bg-indigo-950/20 border border-indigo-500/20 text-xs text-indigo-900 dark:text-indigo-200 leading-relaxed space-y-1.5">
         <div className="font-bold flex items-center gap-1.5">
           <CheckCircle2 className="w-4 h-4 text-indigo-500" />
-          <span>Cách đọc đường cong DCA minh họa:</span>
+          <span>{isIllustrative ? "Cách đọc đường cong DCA minh họa:" : "Diễn giải kết quả DCA:"}</span>
         </div>
         <p>
-          Các điểm dựng sẵn chỉ minh họa cách so sánh lợi ích ròng giữa mô hình,
-          can thiệp tất cả và không can thiệp. Cần tính lại từ dự đoán và nhãn
-          kiểm thử trước khi đưa ra kết luận lâm sàng.
+          {isIllustrative
+            ? "Các xác suất mô phỏng chỉ minh họa phép tính và cách so sánh lợi ích ròng. Cần dự đoán từng bệnh nhân trước khi diễn giải kết quả thực nghiệm."
+            : "Các đường cong được tính từ dự đoán hold-out từng bệnh nhân. Kết quả nghiên cứu này chưa xác nhận lợi ích, ngưỡng hành động hoặc hiệu quả triển khai lâm sàng."}
         </p>
       </div>
     </div>

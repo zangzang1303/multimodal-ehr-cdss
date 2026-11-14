@@ -8,26 +8,34 @@
 Giao diện người dùng của M-CDSS được thiết kế chuyên biệt cho quy trình khám chữa bệnh thực tế trên cả màn hình máy trạm bệnh viện và máy tính bảng cầm tay của bác sĩ nội trú (\textit{Responsive Clinical Tablet Layout}):
 \begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
     \item \textbf{Biểu mẫu Nhập liệu Đa phương thức (\texttt{PatientDataForm.tsx}):} Cho phép bác sĩ nhập nhanh 12 thông số sinh hiệu/xét nghiệm kèm ghi chú khám bệnh, đồng thời tích hợp bộ nạp nhanh (\textit{One-Click Clinical Presets}) cho các ca bệnh điển hình thuộc tập kiểm thử độc lập như \texttt{PT-0044} (Điểm mù Bảng số) và \texttt{PT-0254} (Điểm mù Văn bản) để phục vụ kiểm tra chéo tức thì.
-    \item \textbf{Thẻ Chẩn đoán Hiệu chuẩn (\texttt{DiagnosticCard.tsx}):} Hiển thị trực quan phân phối xác suất đã qua hiệu chuẩn nhiệt độ ($\text{ECE} < 0.05$) kèm huy hiệu trạng thái an toàn hiệu chuẩn và bảng đối chứng trực tiếp giữa mô hình dung hợp M-CDSS với các mô hình đơn phương thức.
-    \item \textbf{Trình tô sáng Bằng chứng \& Ngăn kéo Y văn (\texttt{EvidenceViewer.tsx} \& \texttt{GuidelineDrawer.tsx}):} Thực hiện cắt chuỗi văn bản gốc $T$ theo mảng tọa độ $[\text{start\_char}, \text{end\_char}]$ không chồng lấp để tô sáng các cụm từ triệu chứng ngay trong ngữ cảnh đoạn văn. Khi bác sĩ nhấp vào thẻ tra cứu phác đồ, ngăn kéo trượt bên phải (\textit{Slide-over Drawer}) sẽ hiển thị nguyên văn khuyến nghị của GINA 2024, GOLD 2024 hoặc Bộ Y tế kèm mức độ chứng cứ (\textit{Evidence Level A/B}).
+    \item \textbf{Thẻ Chẩn đoán Hiệu chuẩn (\texttt{DiagnosticCard.tsx}):} Hiển thị trực quan phân phối xác suất đã qua hiệu chuẩn nhiệt độ (mục tiêu $\text{ECE} < 0.05$; giá trị thực nghiệm chính thức: \texttt{[TODO-TV1/TV2: Điền ECE thực nghiệm sau hiệu chuẩn]}) kèm huy hiệu trạng thái an toàn hiệu chuẩn và bảng đối chứng trực tiếp giữa mô hình dung hợp M-CDSS với các mô hình đơn phương thức.
+    \item \textbf{Trình tô sáng Bằng chứng \& Ngăn kéo Y văn (\texttt{EvidenceViewer.tsx} \& \texttt{GuidelineDrawer.tsx}):} Thực hiện cắt chuỗi văn bản gốc $T$ theo mảng tọa độ $[\text{start\_char}, \text{end\_char}]$ không chồng lấp để tô sáng các cụm từ triệu chứng ngay trong ngữ cảnh đoạn văn. Khi bác sĩ nhấp vào thẻ tra cứu phác đồ, ngăn kéo trượt bên phải (\textit{Slide-over Drawer}) sẽ hiển thị nguyên văn khuyến nghị của GINA 2024, GOLD 2024, ESC 2023 hoặc Bộ Y tế kèm mức độ chứng cứ (\textit{Evidence Level A/B}).
 \end{itemize}
 
 \subsection{Trực quan hóa Đường cong Quyết định (Interactive Decision Curve Analysis)}
-Các chỉ số học máy truyền thống như AUROC hay F1-score chỉ đánh giá độ chính xác thống kê mà không tính đến hệ quả lâm sàng của việc bỏ sót bệnh (\textit{False Negative}) so với điều trị thừa (\textit{False Positive}). Để chứng minh giá trị thực tiễn của M-CDSS theo phương pháp của Vickers và Elkin \cite{vickers2006decision}, chúng tôi xây dựng module tương tác \texttt{DCACurveChart.tsx} trên trang thẩm định \texttt{/evaluation}.
+Các chỉ số học máy truyền thống như AUROC hay F1-score chỉ đánh giá độ chính xác thống kê mà không tính đến hệ quả lâm sàng của việc bỏ sót bệnh (\textit{False Negative}) so với điều trị thừa (\textit{False Positive}). Để chứng minh giá trị thực tiễn của M-CDSS theo phương pháp của Vickers và Elkin \cite{vickers2006decision}, chúng tôi xây dựng module tính toán \texttt{src/evaluation/dca\_analysis.py} kết nối trực tiếp qua điểm cuối \texttt{GET /api/v1/evaluation/benchmark} tới thành phần biểu đồ tương tác \texttt{DCACurveChart.tsx} trên trang thẩm định \texttt{/evaluation}.
 
-Tại một ngưỡng xác suất quyết định can thiệp $p_t \in [0.05, 0.60]$ do bác sĩ lựa chọn qua thanh trượt tương tác, Lợi ích ròng lâm sàng (\textit{Net Benefit}) trên tập kiểm thử quy mô $N = 302$ được tính toán thời gian thực theo công thức:
+Tại mỗi ngưỡng xác suất quyết định can thiệp $p_t \in [0.05, 0.60]$ do bác sĩ điều chỉnh qua thanh trượt tương tác, Lợi ích ròng lâm sàng trung bình vĩ mô (\textit{One-vs-Rest Macro Net Benefit}) trên tập kiểm thử độc lập quy mô $N = 302$ ($C = 4$ nhóm bệnh) được tính toán theo công thức:
 \begin{equation}
-    \text{Net Benefit}(p_t) = \frac{\text{TP}(p_t)}{N} - \frac{\text{FP}(p_t)}{N} \cdot \left(\frac{p_t}{1 - p_t}\right)
+    \text{NB}_{\text{model}}(p_t) = \frac{1}{C} \sum_{c=1}^{C} \left( \frac{\text{TP}_c(p_t)}{N} - \frac{\text{FP}_c(p_t)}{N} \cdot \left(\frac{p_t}{1 - p_t}\right) \right)
 \end{equation}
-trong đó tỷ số $\frac{p_t}{1 - p_t}$ biểu thị trọng số đánh đổi lợi ích/rủi ro lâm sàng. Bên cạnh việc vẽ 3 đường cong đối chiếu (\textit{M-CDSS Calibrated}, \textit{Treat All}, \textit{Treat None}), thành phần giao diện còn quy đổi trực tiếp ra chỉ số \textbf{Số ca can thiệp đúng tăng thêm trên 100 bệnh nhân} (\textit{Net True Positives per 100 patients}):
-\begin{equation}
-    \Delta \text{TP}_{\text{net}/100}(p_t) = 100 \times \frac{\text{NB}_{\text{M-CDSS}}(p_t) - \text{NB}_{\text{Treat All}}(p_t)}{p_t / (1 - p_t)}
-\end{equation}
-giúp bác sĩ và nhà quản lý y tế định lượng rõ ràng lợi ích của hệ thống bằng ngôn ngữ lâm sàng trực quan.
+trong đó tỷ số $\frac{p_t}{1 - p_t}$ biểu thị trọng số đánh đổi lợi ích/rủi ro lâm sàng. Chiến lược can thiệp tất cả (\textit{Treat All}) có lợi ích ròng $\text{NB}_{\text{Treat All}}(p_t) = \frac{1}{C}\sum_{c=1}^{C}\big(\pi_c - (1 - \pi_c)\frac{p_t}{1 - p_t}\big)$ với tỷ lệ hiện mắc $\pi_c = N_c / N$, và chiến lược không can thiệp (\textit{Treat None}) có $\text{NB}_{\text{Treat None}}(p_t) \equiv 0$.
+
+Từ đó, thành phần giao diện \texttt{DCACurveChart.tsx} quy đổi trực tiếp ra hai chỉ số lâm sàng trên mỗi 100 bệnh nhân khớp hoàn toàn với tầng Backend:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Số ca can thiệp đúng tăng thêm trên 100 bệnh nhân (\texttt{net\_tp\_gained\_per\_100}):} So sánh với chiến lược mặc định tốt nhất $\max(\text{NB}_{\text{Treat All}}(p_t), 0)$ ở cùng mức dương tính giả:
+    \begin{equation}
+        \Delta \text{TP}_{\text{net}/100}(p_t) = 100 \times \max\!\Big(0,\; \text{NB}_{\text{M-CDSS}}(p_t) - \max\big(\text{NB}_{\text{Treat All}}(p_t), 0\big)\Big)
+    \end{equation}
+    \item \textbf{Số ca can thiệp thừa tránh được trên 100 bệnh nhân (\texttt{net\_interventions\_avoided\_per\_100}):} So sánh với chiến lược \textit{Treat All} ở cùng mức phát hiện bệnh:
+    \begin{equation}
+        \Delta \text{FP}_{\text{avoided}/100}(p_t) = 100 \times \max\!\left(0,\; \frac{\text{NB}_{\text{M-CDSS}}(p_t) - \text{NB}_{\text{Treat All}}(p_t)}{p_t / (1 - p_t)}\right)
+    \end{equation}
+\end{enumerate}
 
 \subsection{Đóng gói Trọn gói Một lệnh Chạy với Docker Compose}
-Nhằm đảm bảo tính tái lập khoa học (\textit{Reproducibility}) theo tiêu chuẩn TRIPOD-AI \cite{collins2021protocol}, toàn bộ hệ sinh thái M-CDSS được đóng gói thông qua tệp cấu hình \texttt{docker-compose.yml} tại thư mục gốc:
+Nhằm đảm bảo tính tái lập khoa học (\textit{Reproducibility}) theo tiêu chuẩn TRIPOD-AI \cite{collins2021protocol}, toàn bộ hệ sinh thái M-CDSS được cấu hình đóng gói thông qua tệp \texttt{docker-compose.yml} tại thư mục gốc:
 \begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Tối ưu hóa ảnh Container Đa tầng:} \texttt{frontend/Dockerfile} sử dụng 3 tầng tách biệt (\texttt{deps} $\rightarrow$ \texttt{builder} $\rightarrow$ \texttt{runner} trên nền \texttt{node:20-alpine}) chạy dưới quyền người dùng phi đặc quyền \texttt{nextjs}, giảm hơn 70\% dung lượng ảnh thực thi.
-    \item \textbf{Khởi tạo Phụ thuộc theo Trạng thái Sức khỏe (\textit{Healthcheck-gated Orchestration}):} Dịch vụ \texttt{api} chỉ khởi chạy sau khi \texttt{qdrant} vượt qua kiểm tra cổng kết nối (\texttt{service\_healthy}), và \texttt{frontend} chỉ mở cổng giao tiếp sau khi điểm cuối \texttt{http://api:8000/health} trả về mã \texttt{200 OK}. Toàn bộ hệ thống được triển khai hoàn chỉnh chỉ với một lệnh duy nhất: \texttt{docker compose up --build -d}.
+    \item \textbf{Tối ưu hóa ảnh Container Đa tầng:} \texttt{frontend/Dockerfile} sử dụng 3 tầng tách biệt (\texttt{deps} $\rightarrow$ \texttt{builder} $\rightarrow$ \texttt{runner} trên nền \texttt{node:20-alpine}) kết hợp cấu hình \texttt{output: "standalone"} và chạy dưới quyền người dùng phi đặc quyền \texttt{nextjs}.
+    \item \textbf{Khởi tạo Phụ thuộc theo Trạng thái Sức khỏe (\textit{Healthcheck-gated Orchestration}):} Dịch vụ \texttt{api} chỉ khởi chạy sau khi \texttt{qdrant} vượt qua kiểm tra cổng kết nối (\texttt{service\_healthy}), và \texttt{frontend} chỉ mở cổng giao tiếp sau khi điểm cuối \texttt{http://127.0.0.1:8000/health} trả về mã \texttt{200 OK}.
 \end{itemize}

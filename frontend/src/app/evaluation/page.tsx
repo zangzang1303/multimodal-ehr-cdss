@@ -35,14 +35,18 @@ import {
 } from "recharts";
 import {
   AblationStudyResponse,
+  DCAPoint,
   FALLBACK_ABLATION_RESULTS,
   getAblationBenchmarks,
+  getClinicalEvaluationBenchmark,
 } from "@/lib/api";
 
 export default function AblationEvaluationPage() {
   const [data, setData] = useState<AblationStudyResponse>(
     FALLBACK_ABLATION_RESULTS
   );
+  const [dcaPoints, setDcaPoints] = useState<DCAPoint[]>([]);
+  const [dcaStatus, setDcaStatus] = useState<string>("illustrative_simulation_pending_patient_level_predictions");
   const [loading, setLoading] = useState<boolean>(true);
   const [isDark, setIsDark] = useState<boolean>(true);
   const [mounted, setMounted] = useState<boolean>(false);
@@ -69,10 +73,19 @@ export default function AblationEvaluationPage() {
   const loadAblationData = async () => {
     setLoading(true);
     try {
-      const result = await getAblationBenchmarks();
-      setData(result);
+      const [ablationRes, evalRes] = await Promise.all([
+        getAblationBenchmarks(),
+        getClinicalEvaluationBenchmark().catch(() => null),
+      ]);
+      setData(ablationRes);
+      if (evalRes?.decision_curve_analysis?.threshold_points?.length) {
+        setDcaPoints(evalRes.decision_curve_analysis.threshold_points);
+        setDcaStatus(evalRes.evaluation_metadata.dca_status ?? "illustrative_simulation_pending_patient_level_predictions");
+      }
     } catch {
       setData(FALLBACK_ABLATION_RESULTS);
+      setDcaPoints([]);
+      setDcaStatus("illustrative_simulation_pending_patient_level_predictions");
     } finally {
       setLastRefreshed(new Date());
       setLoading(false);
@@ -277,7 +290,7 @@ export default function AblationEvaluationPage() {
         {activeTab === "dca" ? (
           <div className="space-y-8 animate-in fade-in duration-200">
             {/* Interactive DCA Curve Component */}
-            <DCACurveChart isDark={isDark} />
+            <DCACurveChart points={dcaPoints} isDark={isDark} dcaStatus={dcaStatus} />
 
             {/* PROBAST 4 Domains Compliance Matrix */}
             <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">

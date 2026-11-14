@@ -520,6 +520,7 @@ export interface DCAPoint {
   net_benefit_treat_all: number;
   net_benefit_treat_none: number;
   net_tp_gained_per_100?: number;
+  net_interventions_avoided_per_100?: number;
 }
 
 export interface EvaluationBenchmarkResponse {
@@ -527,8 +528,10 @@ export interface EvaluationBenchmarkResponse {
     evaluation_cohort: string;
     test_samples: number;
     classes: string[];
-    prevalence_per_class: number;
+    prevalence_per_class: Record<string, number>;
     validation_standard: string;
+    dca_status?: string;
+    dca_prediction_source?: string;
   };
   model_benchmarks: Record<
     string,

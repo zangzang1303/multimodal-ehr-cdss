@@ -1,3 +1,12 @@
+# ==============================================================================
+# [CHÚ THÍCH MOCK FALLBACK - CHỜ KẾT QUẢ ABLATION STUDY TỪ THÀNH VIÊN 1]
+# LƯU Ý: Endpoint /api/v1/benchmarks/baselines trả về kết quả thực nghiệm thật của
+# Giai đoạn 1 (data/rebuilt_strict_results_2026-10-28.json). Tuy nhiên, endpoint
+# /api/v1/benchmarks/ablation hiện đang đọc tệp data/ablation_results.json chứa
+# dữ liệu giả lập (mock) phục vụ hiển thị biểu đồ UI của Thành viên 3 (Backlog 04 -
+# Nhiệm vụ 3.3), chờ Thành viên 1 chạy xong 5-Fold Cross-Validation Ablation Study
+# thực tế (Backlog 04 - Nhiệm vụ 1.4).
+# ==============================================================================
 """
 Baseline Benchmarks API Endpoints
 Multimodal EHR CDSS - Phase 1 / Backlog 03 (Task 3.2)

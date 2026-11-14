@@ -12,7 +12,7 @@
 Kiến trúc hệ thống tuân thủ nguyên lý tách biệt mối quan tâm (\textit{Separation of Concerns}) thông qua ba dịch vụ độc lập giao tiếp qua mạng nội bộ ảo \texttt{mcdss-internal-net}:
 \begin{enumerate}[leftmargin=1.8em, itemsep=0.25em]
     \item \textbf{Tầng Giao diện Lâm sàng (\textit{Presentation Tier} --- Next.js 14, Cổng 3000):} Được xây dựng bằng \texttt{React 18} và \texttt{TypeScript} theo kiến trúc \textit{App Router}. Tầng này cung cấp bàn làm việc hội chẩn tương tác cho bác sĩ (\texttt{PatientDataForm}, \texttt{DiagnosticCard}, \texttt{EvidenceViewer}, \texttt{GuidelineDrawer}) và bảng điều khiển thẩm định lâm sàng (\texttt{DCACurveChart}). Để tối ưu hóa dung lượng đóng gói, ứng dụng được biên dịch ở chế độ độc lập (\texttt{output: "standalone"}) qua quy trình Docker đa tầng (\textit{Multi-stage build}).
-    \item \textbf{Tầng Điều phối \& Hợp đồng Dữ liệu (\textit{Application \& API Gateway Tier} --- FastAPI, Cổng 8000):} Đóng vai trò cổng giao tiếp RESTful trung tâm vận hành trên máy chủ bất đồng bộ \texttt{Uvicorn}. Tầng này thực thi kiểm định biên sinh lý chặt chẽ bằng \texttt{Pydantic V2} trước khi chuyển luồng dữ liệu tới lõi suy luận đa phương thức hoặc đồ thị tác tử giải thích.
+    \item \textbf{Tầng Điều phối \& Hợp đồng Dữ liệu (\textit{Application \& API Gateway Tier} --- FastAPI, Cổng 8000):} Đóng vai trò cổng giao tiếp RESTful trung tâm vận hành trên máy chủ bất đồng bộ \texttt{Uvicorn}. Tầng này thực thi kiểm định biên sinh lý chặt chẽ bằng \texttt{Pydantic V2} trước khi chuyển luồng dữ liệu tới lõi suy luận đa phương thức hoặc đồ thị tác tử giải thích \texttt{DiagnosticStateGraph}.
     \item \textbf{Tầng Lõi Suy luận AI \& Cơ sở dữ liệu Vector (\textit{AI Core \& Persistence Tier} --- PyTorch \& Qdrant, Cổng 6333):} Bao gồm mô hình dung hợp \texttt{MultimodalEHRClassifier} đã hiệu chuẩn nhiệt độ và cơ sở dữ liệu vector \texttt{Qdrant} lưu trữ các phân đoạn phác đồ điều trị y khoa chính thống (GINA, GOLD, ESC, Bộ Y tế).
 \end{enumerate}
 
@@ -20,7 +20,7 @@ Kiến trúc hệ thống tuân thủ nguyên lý tách biệt mối quan tâm (
 Trong tin học y tế, việc truyền nhầm đơn vị đo lường hoặc nhập các giá trị sinh hiệu phi sinh lý (ví dụ: $\text{SpO}_2 > 100\%$ hoặc nhịp tim âm) có thể khiến mô hình học sâu đưa ra dự đoán sai lệch nguy hiểm. Do đó, mọi yêu cầu HTTP gửi tới tầng Backend đều bắt buộc đi qua lớp kiểm định hợp đồng dữ liệu \texttt{TabularFeatures} (\texttt{src/api/schemas.py}):
 \begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
     \item \textbf{Ràng buộc miền giá trị sinh lý (\textit{Physiological Domain Constraints}):} Tuổi bệnh nhân $\in [0, 120]$ năm; Huyết áp tâm thu $\in [40, 300]\text{ mmHg}$; Huyết áp tâm trương $\in [20, 200]\text{ mmHg}$; Nhịp tim $\in [20, 300]\text{ bpm}$; Nhịp thở $\in [4, 80]\text{ lần/phút}$; Thân nhiệt $\in [30.0, 45.0]^\circ\text{C}$; Độ bão hòa oxy máu $\text{SpO}_2 \in [50.0, 100.0]\%$.
-    \item \textbf{Ràng buộc toàn vẹn văn bản bệnh án (\textit{Clinical Note Validation}):} Trường \texttt{clinical\_note} bắt buộc có độ dài tối thiểu $L_{\min} \ge 10$ ký tự sau khi cắt bỏ khoảng trắng thừa; mọi yêu cầu vi phạm bị chặn ngay tại tầng cổng với mã trạng thái \texttt{HTTP 422 Unprocessable Entity}.
+    \item \textbf{Ràng buộc toàn vẹn văn bản bệnh án (\textit{Clinical Note Validation}):} Trường \texttt{clinical\_note} bắt buộc có độ dài tối thiểu hợp lệ sau khi cắt bỏ khoảng trắng thừa; mọi yêu cầu vi phạm bị chặn ngay tại tầng cổng với mã trạng thái \texttt{HTTP 422} hoặc \texttt{400}.
     \item \textbf{Định chuẩn Tiên đề Xác suất (\textit{Probability Axiom Enforcement}):} Tại đầu ra, lớp kiểm định \texttt{PredictionResponse} xác nhận vector xác suất dự đoán trên 4 nhóm bệnh thỏa mãn $\sum_{c=1}^{4} \hat{p}_c = 1.0 \pm 10^{-3}$ trước khi trả về cho trình duyệt của bác sĩ.
 \end{itemize}
 
@@ -37,10 +37,10 @@ Bảng~\ref{tab:rest_endpoints} tổng hợp toàn bộ hệ thống điểm cu�
 \midrule
 \texttt{GET /health} & \texttt{HealthResponse} & Kiểm tra trạng thái sống (\textit{Liveness/Readiness}) của container API và kết nối nội bộ Docker. \\[0.4em]
 \texttt{POST /api/v1/predict/mock} & \texttt{PredictionResponse} & Thực thi suy luận đa phương thức (hoặc đối chứng với 3 mô hình Baseline), trả về phân phối xác suất đã hiệu chuẩn ($\text{ECE} < 0.05$) và trọng số chú ý chéo. \\[0.4em]
-\texttt{POST /api/v1/agent/explain} & \texttt{AgentExplainResponse} & Kích hoạt đồ thị hội chẩn đa tác tử \texttt{LangGraph}, truy xuất phác đồ GINA/GOLD và trả về danh sách câu bằng chứng đã xác thực tọa độ ký tự $[start, end]$. \\[0.4em]
+\texttt{POST /api/v1/agent/explain} & \texttt{AgentExplainResponse} & Kích hoạt đồ thị hội chẩn 4 nút \texttt{DiagnosticStateGraph}, truy xuất lai Qdrant--BM25 và trả về danh sách câu bằng chứng đã xác thực tọa độ ký tự $[\text{start\_char}, \text{end\_char}]$. \\[0.4em]
 \texttt{GET /api/v1/benchmarks/baselines} & \texttt{BaselineBenchmarkList} & Xuất ma trận chỉ số định lượng của 3 mô hình đơn phương thức trên tập kiểm thử độc lập ($N=302$). \\[0.4em]
 \texttt{GET /api/v1/benchmarks/ablation} & \texttt{AblationBenchmarkList} & Cung cấp kết quả thực nghiệm cắt bỏ thành phần (\textit{Ablation Study}) chứng minh đóng góp của tầng Cross-Attention và Temperature Scaling. \\[0.4em]
-\texttt{GET /api/v1/evaluation/benchmark} & \texttt{EvaluationBenchmark} & Cung cấp tọa độ đường cong quyết định DCA ($p_t \in [0.05, 0.60]$) và bảng kiểm 4 miền PROBAST (\textit{Low Risk of Bias}). \\
+\texttt{GET /api/v1/evaluation/benchmark} & \texttt{EvaluationBenchmark} & Tính toán động tọa độ đường cong quyết định DCA ($p_t \in [0.05, 0.60]$) qua \texttt{dca\_analysis.py} và trả về bảng kiểm 4 miền PROBAST. \\
 \bottomrule
 \end{tabularx}
 \end{table}
