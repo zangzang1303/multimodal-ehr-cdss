@@ -1,0 +1,102 @@
+{
+  "benchmark_name": "M-CDSS Phase 2 Strict Holdout Clinical Benchmark",
+  "evaluated_at": "2026-11-09T14:51:23.316497+00:00",
+  "test_samples": 286,
+  "num_classes": 4,
+  "classes": [
+    "ASTHMA",
+    "COPD",
+    "HEART_FAILURE",
+    "PNEUMONIA"
+  ],
+  "temperature": 1.3541077375411987,
+  "multimodal_model": {
+    "macro_auroc": 0.5523956070395665,
+    "macro_auprc": 0.36103028871215326,
+    "macro_f1": 0.37855123356245496,
+    "accuracy": 0.3776223776223776,
+    "brier_score": 0.9634936500318899,
+    "ece": 0.33435628766363323
+  },
+  "per_class_summary": {
+    "ASTHMA": {
+      "auroc": 0.6900960539979232,
+      "f1": 0.42028985507246375
+    },
+    "COPD": {
+      "auroc": 0.6875204716672126,
+      "f1": 0.43137254901960786
+    },
+    "HEART_FAILURE": {
+      "auroc": 0.3771372420569931,
+      "f1": 0.36065573770491804
+    },
+    "PNEUMONIA": {
+      "auroc": 0.45482866043613707,
+      "f1": 0.3018867924528302
+    }
+  },
+  "dca_target": "HEART_FAILURE",
+  "dca_curve_sample_points": [
+    {
+      "threshold": 0.05,
+      "net_benefit_model": 0.07894736842105263,
+      "net_benefit_all": 0.20868605079131394,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.11632653061224489,
+      "net_benefit_model": 0.06697459584295612,
+      "net_benefit_all": 0.14929181672830635,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.18265306122448977,
+      "net_benefit_model": 0.049907021817134176,
+      "net_benefit_all": 0.08025806902211399,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.24897959183673468,
+      "net_benefit_model": 0.03175357251444209,
+      "net_benefit_all": -0.0009691395560960658,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.31530612244897954,
+      "net_benefit_model": 0.016013048054776824,
+      "net_benefit_all": -0.097933363209071,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.3816326530612244,
+      "net_benefit_model": -0.0015809273235015547,
+      "net_benefit_all": -0.21569849292621554,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.4479591836734693,
+      "net_benefit_model": -0.002520584775667925,
+      "net_benefit_all": -0.3617620826493283,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.5142857142857142,
+      "net_benefit_model": -0.022624434389140247,
+      "net_benefit_all": -0.5477169888934593,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.5806122448979592,
+      "net_benefit_model": -0.0026798019498749243,
+      "net_benefit_all": -0.7924897486941281,
+      "net_benefit_none": 0.0
+    },
+    {
+      "threshold": 0.6469387755102041,
+      "net_benefit_model": -0.0069525849872670575,
+      "net_benefit_all": -1.1292291523505396,
+      "net_benefit_none": 0.0
+    }
+  ]
+}

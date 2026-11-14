@@ -1,3 +1,12 @@
+COLLABORATION & HANDOFF NOTES:
+----------------------------------------------------------------------------------------
+[MEMBER 1 - Lead ML / Modeling]:
+  - Member 1 owns task 1.2 and can override or refine this module.
+  - Member 1 can customize the default target disease (e.g., HEART_FAILURE vs ASTHMA/COPD),
+    add bootstrap 95% confidence intervals (Net Benefit CI), or include unimodal baseline curves.
+[MEMBER 3 - Full-Stack AI & Frontend]:
+  - Member 3 should use the JSON output from `calculate_net_benefit` / `scripts/evaluate_clinical_utility.py`
+    to feed the interactive DCA Recharts/Chart.js component in the doctor's web UI.
 # ==============================================================================
 # [MOCK / STAND-IN FILE - CHỜ MA TRẬN DỰ ĐOÁN THẬT TỪ THÀNH VIÊN 1 & 2]
 # LƯU Ý QUAN TRỌNG:

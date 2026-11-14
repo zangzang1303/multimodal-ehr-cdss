@@ -1,0 +1,47 @@
+[
+  {
+    "chunk_id": "GOLD_2024_DIAG_01",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Chỉ số then chốt xem xét chẩn đoán COPD và tiêu chuẩn vàng",
+    "page_or_section": "Chapter 1, Key Points, Trang 14-16",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Chẩn đoán COPD cần được xem xét ở bất kỳ bệnh nhân nào có khó thở, ho mạn tính hoặc khạc đờm mạn tính và/hoặc tiền sử phơi nhiễm các yếu tố nguy cơ của bệnh (đặc biệt hút thuốc lá > 10 bao-năm, khói bếp than, bụi nghề nghiệp). Tiêu chuẩn vàng để xác định chẩn đoán là đo chức năng thông khí phổi: bắt buộc có tỷ lệ FEV1/FVC < 0.70 sau nghiệm pháp hồi phục phế quản với thuốc giãn phế quản, chứng minh có tắc nghẽn luồng khí thở ra không hồi phục hoàn toàn."
+  },
+  {
+    "chunk_id": "GOLD_2024_DIFF_02",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Chẩn đoán phân biệt COPD với Hen, Suy tim và Viêm phổi",
+    "page_or_section": "Table 1.6, Trang 22",
+    "clinical_category": "DIFFERENTIAL",
+    "evidence_level": "Evidence B",
+    "text_content": "Chẩn đoán phân biệt COPD: (1) Với Hen: COPD khởi phát tuổi trung niên, triệu chứng tiến triển chậm từ từ, hút thuốc lá thời gian dài, giới hạn luồng khí không hồi phục. (2) Với Suy tim ứ huyết: Suy tim có ran ẩm mịn đáy phổi hai bên, X-quang bóng tim to, phù hai chi dưới, NT-proBNP tăng cao, giới hạn luồng khí hạn chế chứ không phải tắc nghẽn đơn thuần. (3) Với Viêm phổi: Viêm phổi thường có sốt cấp tính, khạc đờm mủ đục vàng/xanh, ran nổ khu trú, hình ảnh đông đặc trên X-quang/CT ngực."
+  },
+  {
+    "chunk_id": "GOLD_2024_REDFLAGS_03",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Dấu hiệu Cờ đỏ đợt cấp COPD nặng đe dọa suy hô hấp cấp",
+    "page_or_section": "Chapter 5, Trang 135-138",
+    "clinical_category": "RED_FLAGS",
+    "evidence_level": "Evidence A",
+    "text_content": "Dấu hiệu cờ đỏ chỉ định nhập viện cấp cứu trong đợt cấp COPD: Khó thở đột ngột tăng nặng ở mức nghỉ ngơi; nhịp thở > 30 lần/phút; co kéo rõ cơ liên sườn và cơ ức đòn chũm; tím tái đầu chi và môi; SpO2 giảm dưới 88% khi thở khí phòng; thở nghịch thường ngực - bụng; xuất hiện rối loạn ý thức (ngủ gà, lú lẫn do tăng PaCO2 máu); rối loạn huyết động (tụt huyết áp hoặc loạn nhịp tim mới xuất hiện)."
+  },
+  {
+    "chunk_id": "GOLD_2024_EXCL_04",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Tiêu chuẩn loại trừ chẩn đoán COPD đơn thuần",
+    "page_or_section": "Chapter 1, Differential Diagnosis, Trang 23",
+    "clinical_category": "EXCLUSION_CRITERIA",
+    "evidence_level": null,
+    "text_content": "Loại trừ chẩn đoán COPD nếu: Chức năng thông khí sau nghiệm pháp hồi phục phế quản cho tỷ lệ FEV1/FVC >= 0.70; giãn phế quản thể tích lớn thứ phát sau lao phổi xơ hóa chiếm ưu thế; suy tim sung huyết nặng đang có ứ dịch cấp tính mà chưa điều trị ổn định; ung thư phế quản gây xẹp phổi hoặc tắc nghẽn đường thở trung tâm do u xâm lấn."
+  }
+]
+
