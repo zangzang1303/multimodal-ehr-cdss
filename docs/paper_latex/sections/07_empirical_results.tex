@@ -1,0 +1,75 @@
+% ==============================================================================
+% Phân mục 07: Kết quả Thực nghiệm & Phân tích Lợi ích Ròng Lâm sàng (Results)
+% [PHỐI HỢP THÀNH VIÊN 1 & 2 --- BACKLOG 07 NHIỆM VỤ 1.2 & BACKLOG 06 NHIỆM VỤ 1.1-1.3, 2.1-2.3]
+% ==============================================================================
+\section{Kết Quả Thực Nghiệm, Nghiên Cứu Cắt Bỏ và Lợi Ích Ròng Lâm Sàng (Empirical Results)}
+\label{sec:empirical_results}
+
+\subsection{Đối chứng Toàn diện với Ba Mô hình Đơn phương thức và Nghiên cứu Cắt bỏ}
+Toàn bộ các mô hình được đánh giá khách quan trên cùng tập kiểm thử độc lập $N = 302$ hồ sơ bệnh án (\textit{Strict Hold-out Test Set}, phân bố gồm 71 ca \texttt{ASTHMA}, 71 ca \texttt{COPD}, 106 ca \texttt{HEART\_FAILURE} và 54 ca \texttt{PNEUMONIA}). Nhóm 1 trong Bảng~\ref{tab:benchmark_comparison} trình bày kết quả thực nghiệm chính thức của 3 mô hình đơn phương thức Giai đoạn 1 từ tệp \texttt{data/rebuilt\_strict\_results\_2026-10-28.json}; Nhóm 2 là khung kết quả chờ điền sau khi Thành viên 1 và Thành viên 2 hoàn tất huấn luyện và đánh giá mô hình đa phương thức Giai đoạn 2.
+
+\begin{table}[htbp]
+\centering
+\caption{Kết quả thực nghiệm của 3 mô hình Baseline Giai đoạn 1 (nguồn: \texttt{data/rebuilt\_strict\_results\_2026-10-28.json}) và khung bảng chờ bổ sung kết quả Ablation / M-CDSS Giai đoạn 2 của Thành viên 1 \& 2 trên tập kiểm thử độc lập ($N = 302$).}
+\label{tab:benchmark_comparison}
+\footnotesize
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Kiến trúc Mô hình} & \textbf{AUROC} $\uparrow$ & \textbf{AUPRC} $\uparrow$ & \textbf{Macro-F1} $\uparrow$ & \textbf{Accuracy} $\uparrow$ & \textbf{Brier} $\downarrow$ & \textbf{ECE} $\downarrow$ \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Nhóm 1: Các mô hình Baseline đơn phương thức --- Đã nghiệm thu Giai đoạn 1 (\texttt{rebuilt\_strict\_results\_2026-10-28.json})}} \\
+CatBoost (\textit{Nhánh Bảng số GBDT}) \cite{prokhorenkova2018catboost} & 0.9223 & 0.7872 & 0.6083 & 0.6854 & 0.3844 & 0.0663 \\
+FT-Transformer (\textit{Nhánh Bảng số Học sâu}) \cite{gorishniy2021revisiting} & 0.8976 & 0.7023 & 0.5789 & 0.6589 & 0.4725 & 0.1152 \\
+Bio\_ClinicalBERT (\textit{Nhánh Văn bản Lâm sàng}) \cite{alsentzer2019publicly} & 0.9735 & 0.9314 & 0.8421 & 0.8543 & 0.2329 & 0.0373 \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Nhóm 2: Nghiên cứu Cắt bỏ \& Mô hình Dung hợp Giai đoạn 2 --- Chờ bổ sung từ Thành viên 1 \& 2}} \\
+Concat Late Fusion (\textit{Ghép nối phẳng $\bm{h}_{\text{tab}} \Vert \bm{h}_{\text{text}}$}) & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV2]} \\
+M-CDSS Uncalibrated (\textit{Cross-Attention trước hiệu chuẩn}) & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV2]} \\
+\rowcolor{mcdssBgLight}
+\textbf{M-CDSS Calibrated (\textit{Cross-Attention + Temp Scaling})} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV2]}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nhận xét kết quả thực nghiệm (Khung chờ điền số liệu từ Thành viên 1 \& 2):
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Đóng góp của Dung hợp Chú ý chéo:} \texttt{[TODO-TV1 (Backlog 04 Task 1.4 \& Backlog 06 Task 1.1): Điền mức cải thiện $\Delta\text{AUROC}$ và $\Delta\text{Macro-F1}$ của M-CDSS so với FT-Transformer, Bio\_ClinicalBERT và Concat Late Fusion sau khi có kết quả chạy thật]}.
+    \item \textbf{Hiệu quả của Temperature Scaling:} \texttt{[TODO-TV2 (Backlog 04 Task 2.3): Điền mức giảm ECE và Brier Score trước và sau khi hiệu chuẩn nhiệt độ, kèm tham chiếu đồ thị Reliability Diagram data/calibration\_curve.png]}.
+\end{enumerate}
+
+\subsection{Giải quyết Điểm mù Đơn phương thức và Phân tích Lỗi (Error Analysis)}
+Thực nghiệm Giai đoạn 1 (\texttt{data/rebuilt\_strict\_results\_2026-10-28.json}) đã xác định các ca bệnh điển hình thể hiện sự đối lập giữa hai phương thức đơn lẻ trên tập kiểm thử:
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Ca bệnh \texttt{PT-0044} (Nhãn thực tế: \texttt{ASTHMA} --- Điểm mù Bảng số):} Nhánh bảng số dự đoán nhầm thành \texttt{COPD} với độ tự tin $78.82\%$, trong khi nhánh văn bản \textit{Bio\_ClinicalBERT} dự đoán đúng \texttt{ASTHMA} ($85.80\%$). Kết quả trên mô hình dung hợp M-CDSS: \texttt{[TODO-TV1/TV2: Điền xác suất dự đoán thực tế sau hiệu chuẩn và trọng số Cross-Attention của M-CDSS trên ca PT-0044]}.
+    \item \textbf{Ca bệnh \texttt{PT-0254} (Nhãn thực tế: \texttt{COPD} --- Điểm mù Văn bản):} Nhánh văn bản \textit{Bio\_ClinicalBERT} bị nhiễu ngữ cảnh và dự đoán nhầm sang \texttt{HEART\_FAILURE} ($59.00\%$), trong khi nhánh bảng số dự đoán đúng \texttt{COPD} ($75.22\%$). Kết quả trên mô hình dung hợp M-CDSS: \texttt{[TODO-TV1/TV2: Điền xác suất dự đoán thực tế sau hiệu chuẩn và trọng số Cross-Attention của M-CDSS trên ca PT-0254]}.
+    \item \textbf{Ma trận Nhầm lẫn Đa lớp (\textit{Confusion Matrix}):} \texttt{[TODO-TV2 (Backlog 06 Task 2.1): Chèn biểu đồ data/confusion\_matrix.png và phân tích các ca bệnh chồng lấp giữa 4 nhóm bệnh trên tập Test]}.
+\end{itemize}
+
+\subsection{Phân tích Đường cong Quyết định (DCA Net Benefit --- Template Chờ Bổ Sung)}
+% [TEMPLATE TRỐNG CHỜ KẾT QUẢ TỪ THÀNH VIÊN 1 & 2: BACKLOG 06 TASK 1.2 & 2.2]
+Bảng~\ref{tab:dca_empirical_template} được tạo sẵn để điền số liệu Lợi ích ròng lâm sàng (\textit{Net Benefit}) tính trực tiếp từ ma trận xác suất dự đoán từng mẫu (\texttt{data/holdout\_predictions.npz}) trên tập kiểm thử $N=302$ sau khi Thành viên 1 và Thành viên 2 hoàn thành Nhiệm vụ 1.2 \& 2.2 (Backlog 06).
+
+\begin{table}[htbp]
+\centering
+\caption{[Template chờ điền dữ liệu] Lợi ích ròng lâm sàng (One-vs-Rest Macro Net Benefit) tại các ngưỡng xác suất quyết định $p_t$ tiêu biểu trên tập kiểm thử độc lập ($N = 302$ --- Nhiệm vụ 1.2 \& 2.2 Backlog 06 của Thành viên 1 \& 2).}
+\label{tab:dca_empirical_template}
+\footnotesize
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Ngưỡng $p_t$} & $\text{NB}_{\text{Treat All}}$ & $\text{NB}_{\text{Tabular}}$ & $\text{NB}_{\text{Text}}$ & $\text{NB}_{\text{M-CDSS}}$ & $\Delta\text{TP}_{\text{net}/100}$ & $\Delta\text{FP}_{\text{avoided}/100}$ \\
+\midrule
+$p_t = 0.10$ & 0.167 & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
+$p_t = 0.20$ & 0.062 & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
+$p_t = 0.25$ & 0.000 & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
+$p_t = 0.35$ & $-0.154$ & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
+$p_t = 0.45$ & $-0.364$ & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Kiểm định Ngoại kiểm và Khảo sát Đánh giá của Bác sĩ (Template Chờ Bổ Sung)}
+% [TEMPLATE TRỐNG CHỜ KẾT QUẢ TỪ THÀNH VIÊN 1 (TASK 1.3) & THÀNH VIÊN 2 (TASK 2.3) - BACKLOG 06]
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Kiểm định Ngoại kiểm (\textit{External Validation}):} \texttt{[TODO-TV1 (Backlog 06 Task 1.3): Điền kết quả đánh giá độ suy giảm hiệu năng $\Delta\text{AUROC}$ trên tập dữ liệu ngoại kiểm độc lập]}.
+    \item \textbf{Khảo sát Đánh giá Định tính với Bác sĩ (\textit{Clinician Blind-Review Survey}):} \texttt{[TODO-TV2 (Backlog 06 Task 2.3): Điền điểm trung bình thang đo Likert (1--5) của 2--3 bác sĩ trên 20 ca bệnh ngẫu nhiên về: (1) Độ chính xác dự đoán sơ bộ, (2) Tính thuyết phục của câu chứng cứ highlight, và (3) Tính hữu ích của trích dẫn phác đồ GINA/GOLD/ESC]}.
+\end{itemize}

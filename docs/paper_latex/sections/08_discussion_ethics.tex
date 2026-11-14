@@ -1,0 +1,42 @@
+% ==============================================================================
+% Phân mục 08: Thảo luận, Bảng kiểm PROBAST & Tuyên bố Y đức (Discussion & Ethics)
+% [PHỐI HỢP THÀNH VIÊN 2 --- BACKLOG 07 NHIỆM VỤ 2.2 & 2.3]
+% ==============================================================================
+\section{Thảo Luận, Thẩm Định PROBAST và Tuyên Bố Y Đức (Discussion, PROBAST \& Ethics)}
+\label{sec:discussion_ethics}
+
+\subsection{Đối chiếu Tiêu chuẩn Nguy cơ Sai lệch Quốc tế PROBAST}
+Khác với 15 nghiên cứu tiền nhiệm trong tổng quan hệ thống của Hunik và cộng sự \cite{hunik2024diagnostic} đều rơi vào mức nguy cơ sai lệch cao hoặc không rõ ràng, quy trình phát triển và kiểm định M-CDSS được thiết kế ngay từ đầu để đáp ứng cả 4 miền tiêu chuẩn của công cụ \textbf{PROBAST} \cite{collins2021protocol} (Bảng~\ref{tab:probast_summary}).
+
+\begin{table}[htbp]
+\centering
+\caption{Tóm tắt kết quả tự kiểm toán nguy cơ sai lệch theo 4 miền tiêu chuẩn PROBAST \cite{collins2021protocol}.}
+\label{tab:probast_summary}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}llX@{}}
+\toprule
+\textbf{Miền Đánh giá (Domain)} & \textbf{Mức Sai lệch} & \textbf{Bằng chứng Thực thi Kỹ thuật trong Dự án M-CDSS} \\
+\midrule
+1. Đối tượng (\textit{Participants}) & \textbf{Thấp (\textit{Low})} & Đoàn hệ 2.000 hồ sơ đa phương thức cân bằng 4 nhóm bệnh; phân chia nghiêm ngặt theo định danh bệnh nhân (\textit{Strict Group Split}), kiểm toán tự động 0\% trùng lặp giữa Train/Val/Test. \\[0.4em]
+2. Biến dự báo (\textit{Predictors}) & \textbf{Thấp (\textit{Low})} & Áp dụng khóa thời gian \texttt{TemporalAligner} và danh sách cấm tiêu chuẩn vàng (\texttt{[REDACTED\_DIAGNOSIS]}), đảm bảo không sử dụng thông tin phát sinh sau thời điểm chẩn đoán. \\[0.4em]
+3. Kết cục (\textit{Outcome}) & \textbf{Thấp (\textit{Low})} & Nhãn chẩn đoán xác định dựa trên mã chuẩn hóa ICD-10 và đối chiếu nhất quán với tiêu chuẩn vàng trong hướng dẫn GINA 2024, GOLD 2024, ESC và Bộ Y tế. \\[0.4em]
+4. Phân tích (\textit{Analysis}) & \textbf{Thấp (\textit{Low})} & Xử lý dữ liệu khuyết thiếu (WBC 20.5\%, CRP 22.4\%) bằng thuật toán MICE kèm biến chỉ báo khuyết thiếu chỉ khớp trên tập Train; hiệu chuẩn xác suất bằng Temperature Scaling (kết quả ECE thực nghiệm: \texttt{[TODO-TV2: Điền ECE thực nghiệm < 0.05]}); lượng hóa lợi ích ròng lâm sàng bằng DCA. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Phụ lục Bảng Thẩm định Chi tiết 20 Tiêu chí PROBAST (Chờ bổ sung):} \texttt{[TODO-TV2 (Backlog 07 Task 2.2): Đính kèm bảng giải trình chi tiết từng câu hỏi tín hiệu (20 signaling questions) của PROBAST vào phần Supplementary Material]}.
+    \item \textbf{Chứng chỉ Kiểm toán Bảo mật PHI Toàn Kho lưu trữ (Chờ bổ sung):} \texttt{[TODO-TV2 (Backlog 07 Task 2.3): Điền kết quả rà quét bảo mật PHI lần cuối trên toàn bộ repository và lịch sử git commit]}.
+\end{itemize}
+
+\subsection{Giới hạn Nghiên cứu và Tuyên bố Y đức (Limitations \& Ethical Boundaries)}
+Bên cạnh những kết quả tích cực, nghiên cứu ghi nhận một số giới hạn minh bạch cần tiếp tục mở rộng trong tương lai:
+\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Đặc thù dữ liệu tổng hợp chuẩn hóa:} Mặc dù bộ dữ liệu kết hợp từ Synthea EHR và MTSamples phản ánh sát phân bố sinh lý và văn phong ghi chú y khoa, hệ thống cần được ngoại kiểm (\textit{External Validation}) thêm trên dữ liệu bệnh án điện tử thực tế đa trung tâm tại các bệnh viện tuyến đầu Việt Nam trước khi triển khai lâm sàng rộng rãi.
+    \item \textbf{Phạm vi nhóm bệnh:} Hiện tại mô hình tập trung phân loại 4 hội chứng hô hấp -- tim mạch phổ biến nhất; việc mở rộng sang các bệnh lý đồng mắc phức tạp (\textit{multi-label comorbidities}) là hướng phát triển tiếp theo của kiến trúc dung hợp.
+\end{itemize}
+
+\begin{clinicalbox}{TUYÊN BỐ RANH GIỚI LÂM SÀNG VÀ ĐẠO ĐỨC Y SINH (CLINICAL DISCLAIMER)}
+Hệ thống M-CDSS là một nguyên mẫu nghiên cứu khoa học phục vụ \textbf{hỗ trợ ra quyết định lâm sàng (Clinical Decision Support)}, được thiết kế để cung cấp góc nhìn tham khảo thứ hai kèm dẫn chiếu y văn minh bạch cho nhân viên y tế. Hệ thống \textbf{tuyệt đối không thay thế quyền quyết định chuyên môn của bác sĩ điều trị} và không tự động ra y lệnh trên bệnh nhân thực tế.
+\end{clinicalbox}

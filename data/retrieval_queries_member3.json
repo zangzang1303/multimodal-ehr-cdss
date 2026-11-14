@@ -1,0 +1,6 @@
+[
+  {"query": "COPD hút thuốc khó thở FEV1/FVC", "relevant_chunk_ids": ["GOLD_2024_DIAG_CRITERIA_01"]},
+  {"query": "hen thở rít dị ứng gắng sức", "relevant_chunk_ids": ["GINA_2024_ASTHMA_CRITERIA_01"]},
+  {"query": "suy tim orthopnea phù NT-proBNP", "relevant_chunk_ids": ["ESC_2023_HEART_FAILURE_01"]},
+  {"query": "viêm phổi sốt đờm mủ bạch cầu CRP", "relevant_chunk_ids": ["BYT_2020_COMMUNITY_PNEUMONIA_01"]}
+]

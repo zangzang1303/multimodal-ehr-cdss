@@ -1,0 +1,75 @@
+% ==============================================================================
+% BÀI BÁO KHOA HỌC M-CDSS (CHUẨN TRIPOD-AI & PROBAST)
+% File gốc (Master Document): Biên dịch bằng pdflatex hoặc xelatex + bibtex
+% Cấu trúc đa file rõ ràng giúp dễ dàng theo dõi và chỉnh sửa từng phân mục
+% ==============================================================================
+\documentclass[11pt,a4paper]{article}
+
+% Nạp gói Template Học thuật tùy chỉnh của dự án M-CDSS
+\usepackage{templates/mcdss_article}
+
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% KHỐI TIÊU ĐỀ & THÔNG TIN TÁC GIẢ
+% ------------------------------------------------------------------------------
+\mcdsstitle
+    {M-CDSS: Hệ Thống Hỗ Trợ Quyết Định Lâm Sàng Đa Phương Thức Kết Hợp Chú Ý Chéo, Hiệu Chuẩn Nhiệt Độ và Đa Tác Tử Truy Xuất Y Văn Chống Ảo Giác}
+    {Nguyễn Nho Dương\textsuperscript{1}, Lê Tuấn Cảnh\textsuperscript{2}, Nguyễn Văn Cường\textsuperscript{3}}
+    {\textsuperscript{1}Trưởng nhóm Học máy \& Mô hình hóa Đa phương thức (Lead ML / Multimodal Modeling) \\
+     \textsuperscript{2}Kỹ sư Dữ liệu Y sinh \& Bảo mật Quyền riêng tư (Biomedical Data Engineering \& Privacy) \\
+     \textsuperscript{3}Kỹ sư Toàn phần AI, Hệ thống Đa tác tử \& Kiến trúc Phần mềm (Full-Stack AI \& Agent Architecture)}
+    {Electronic Health Records (EHR), Multimodal Deep Learning, Cross-Attention Late Fusion, Temperature Scaling Calibration, Agentic RAG, Evidence Grounding, Decision Curve Analysis (DCA), TRIPOD-AI, PROBAST.}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 00: TÓM TẮT CÓ CẤU TRÚC (STRUCTURED ABSTRACT)
+% ------------------------------------------------------------------------------
+\input{sections/00_abstract}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 01: MỞ ĐẦU & KHOẢNG TRỐNG NGHIÊN CỨU
+% ------------------------------------------------------------------------------
+\input{sections/01_introduction}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 02: ĐOÀN HỆ LÂM SÀNG & QUY TRÌNH DỮ LIỆU (PHỐI HỢP THÀNH VIÊN 2)
+% ------------------------------------------------------------------------------
+\input{sections/02_clinical_cohort}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 03: PHƯƠNG PHÁP LUẬN DUNG HỢP & HIỆU CHUẨN (PHỐI HỢP THÀNH VIÊN 1)
+% ------------------------------------------------------------------------------
+\input{sections/03_methodology_fusion}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 04 [TRỌNG TÂM NHIỆM VỤ 3.2]: KIẾN TRÚC PHẦN MỀM & GIAO THỨC RESTFUL
+% ------------------------------------------------------------------------------
+\input{sections/04_software_architecture}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 05 [TRỌNG TÂM NHIỆM VỤ 3.2]: ĐA TÁC TỬ RAG & NEO BẰNG CHỨNG KÝ TỰ
+% ------------------------------------------------------------------------------
+\input{sections/05_multi_agent_rag}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 06 [TRỌNG TÂM NHIỆM VỤ 3.2]: GIAO DIỆN BÁC SĨ, ĐỒ THỊ DCA & DOCKER
+% ------------------------------------------------------------------------------
+\input{sections/06_frontend_dca_ux}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 07: KẾT QUẢ THỰC NGHIỆM, CA BỆNH & LỢI ÍCH RÒNG LÂM SÀNG
+% ------------------------------------------------------------------------------
+\input{sections/07_empirical_results}
+
+% ------------------------------------------------------------------------------
+% PHÂN MỤC 08: THẢO LUẬN, THẨM ĐỊNH PROBAST & TUYÊN BỐ Y ĐỨC
+% ------------------------------------------------------------------------------
+\input{sections/08_discussion_ethics}
+
+% ------------------------------------------------------------------------------
+% TÀI LIỆU THAM KHẢO (BIBTEX)
+% ------------------------------------------------------------------------------
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}

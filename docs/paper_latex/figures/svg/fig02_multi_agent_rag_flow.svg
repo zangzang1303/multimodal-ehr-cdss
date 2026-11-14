@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 420" width="100%" height="100%" font-family="Inter, Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrMain" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0F4C81"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#DC2626"/>
+    </marker>
+  </defs>
+
+  <rect width="1040" height="420" fill="#FFFFFF" rx="8"/>
+  <text x="520" y="34" text-anchor="middle" font-size="17" font-weight="700" fill="#0F4C81">
+    LUỒNG HỘI CHẨN ĐA TÁC TỬ &amp; CƠ CHẾ CHỐNG ẢO GIÁC (AGENTIC RAG &amp; EVIDENCE GROUNDING)
+  </text>
+
+  <!-- Step 1 -->
+  <rect x="30" y="75" width="210" height="95" rx="8" fill="#F8FAFC" stroke="#0F4C81" stroke-width="1.8"/>
+  <text x="135" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#0F4C81">1. Hồ Sơ Ca Bệnh Đầu Vào</text>
+  <text x="135" y="125" text-anchor="middle" font-size="11" fill="#334155">• 12 biến sinh hiệu &amp; xét nghiệm</text>
+  <text x="135" y="143" text-anchor="middle" font-size="11" fill="#334155">• Ghi chú lâm sàng tự do (T)</text>
+  <text x="135" y="160" text-anchor="middle" font-size="11" fill="#0D9488">• Xác suất hiệu chuẩn P(y|x)</text>
+
+  <!-- Step 2 -->
+  <rect x="290" y="75" width="210" height="95" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.8"/>
+  <text x="395" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#B45309">2. Tác Tử Phân Loại</text>
+  <text x="395" y="123" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">(Triage &amp; Query Node)</text>
+  <text x="395" y="143" text-anchor="middle" font-size="11" fill="#334155">Nhận diện cặp chẩn đoán phân biệt</text>
+  <text x="395" y="160" text-anchor="middle" font-size="11" fill="#334155">Top-1 vs Top-2 &amp; sinh truy vấn</text>
+
+  <!-- Step 3 -->
+  <rect x="550" y="75" width="210" height="95" rx="8" fill="#F0FDFA" stroke="#0D9488" stroke-width="1.8"/>
+  <text x="655" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#0F766E">3. Truy Xuất Y Văn Lai</text>
+  <text x="655" y="123" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">(HybridGuidelineRetriever)</text>
+  <text x="655" y="143" text-anchor="middle" font-size="11" fill="#334155">0.65 Từ khóa Y khoa + 0.35 Vector</text>
+  <text x="655" y="160" text-anchor="middle" font-size="11" fill="#334155">Trích xuất điều khoản GINA/GOLD/ESC</text>
+
+  <!-- Step 4 -->
+  <rect x="800" y="75" width="210" height="95" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.8"/>
+  <text x="905" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#B45309">4. Tác Tử Lập Luận</text>
+  <text x="905" y="123" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">(Clinical Reasoning Node)</text>
+  <text x="905" y="143" text-anchor="middle" font-size="11" fill="#334155">Tổng hợp biện giải lâm sàng &amp;</text>
+  <text x="905" y="160" text-anchor="middle" font-size="11" fill="#334155">đề xuất các câu trích dẫn ứng viên</text>
+
+  <!-- Step 5: Anti-Hallucination Gate -->
+  <rect x="520" y="245" width="490" height="110" rx="8" fill="#FEF2F2" stroke="#DC2626" stroke-width="2"/>
+  <text x="765" y="273" text-anchor="middle" font-size="13.5" font-weight="700" fill="#DC2626">
+    5. CỔNG KIỂM CHỨNG CHỐNG ẢO GIÁC (EvidenceGrounder - Độ phức tạp O(N))
+  </text>
+  <text x="765" y="296" text-anchor="middle" font-size="11.5" fill="#1E293B">
+    • Đối sánh chuỗi con tất định (Exact &amp; Whitespace-Normalized Substring Matching) trên văn bản gốc T
+  </text>
+  <text x="765" y="316" text-anchor="middle" font-size="11.5" fill="#0F766E" font-weight="600">
+    ✓ Khớp hợp lệ (0 &lt;= start &lt; end &lt;= N): Cấp tọa độ ký tự [start_char, end_char] &amp; gắn cờ verified = true
+  </text>
+  <text x="765" y="336" text-anchor="middle" font-size="11.5" fill="#DC2626" font-weight="600">
+    ✗ Không tồn tại trong bệnh án gốc (find = -1): Bác bỏ tức thì (Anti-Hallucination Rejection)
+  </text>
+
+  <!-- Step 6: Output -->
+  <rect x="30" y="245" width="410" height="110" rx="8" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+  <text x="235" y="273" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0F766E">
+    6. Giao Diện Bác Sĩ (EvidenceViewer &amp; GuidelineDrawer)
+  </text>
+  <text x="235" y="296" text-anchor="middle" font-size="11.5" fill="#1E293B">
+    • Tô sáng chính xác câu chứng cứ trong bệnh án theo [start, end]
+  </text>
+  <text x="235" y="316" text-anchor="middle" font-size="11.5" fill="#1E293B">
+    • Hiển thị điều khoản phác đồ GINA 2024 / GOLD 2024 / Bộ Y tế
+  </text>
+  <text x="235" y="336" text-anchor="middle" font-size="11.5" fill="#0F4C81" font-weight="600">
+    • Cam kết 100% bằng chứng có nguồn gốc thực (hallucination_free = true)
+  </text>
+
+  <!-- Arrows -->
+  <line x1="240" y1="122" x2="283" y2="122" stroke="#0F4C81" stroke-width="2" marker-end="url(#arrMain)"/>
+  <line x1="500" y1="122" x2="543" y2="122" stroke="#0F4C81" stroke-width="2" marker-end="url(#arrMain)"/>
+  <line x1="760" y1="122" x2="793" y2="122" stroke="#0F4C81" stroke-width="2" marker-end="url(#arrMain)"/>
+  <line x1="905" y1="170" x2="905" y2="238" stroke="#DC2626" stroke-width="2" marker-end="url(#arrRed)"/>
+  <line x1="520" y1="300" x2="447" y2="300" stroke="#0F4C81" stroke-width="2" marker-end="url(#arrMain)"/>
+</svg>

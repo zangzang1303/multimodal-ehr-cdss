@@ -11,6 +11,7 @@ import {
   Moon,
   RefreshCw,
   Sun,
+  Sparkles,
 } from "lucide-react";
 import { getHealth, HealthResponse } from "@/lib/api";
 import PatientDataForm from "@/components/PatientDataForm";
@@ -158,6 +159,9 @@ export default function Home() {
             Khung ứng dụng lâm sàng giai đoạn 1 hỗ trợ kết nối dữ liệu bệnh án điện tử đa phương thức
             và đánh giá các mô hình nền tảng đối chứng.
           </p>
+          <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-2 italic max-w-xl mx-auto">
+            * Hệ thống nguyên mẫu phục vụ nghiên cứu học thuật hỗ trợ quyết định (CDSS), không thay thế đánh giá chuyên môn của bác sĩ.
+          </p>
         </div>
 
         {/* Offline Warning Banner if Backend Is Offline */}
@@ -201,14 +205,23 @@ export default function Home() {
             </div>
           </div>
 
-          <Link
-            href="/baselines"
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-semibold shadow-sm flex items-center justify-center gap-2 transition-all flex-shrink-0 self-stretch sm:self-auto"
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Xem Benchmark Baselines</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-2 flex-shrink-0 self-stretch sm:self-auto">
+            <Link
+              href="/baselines"
+              className="px-3.5 py-2 rounded-xl border border-sky-300 dark:border-sky-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-sky-700 dark:text-sky-300 text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-all"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-sky-500" />
+              <span>Xem 3 Baselines</span>
+            </Link>
+            <Link
+              href="/evaluation"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white text-xs font-semibold shadow-sm flex items-center justify-center gap-1.5 transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Ablation Study (Phase 2)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
         {/* Doctor Clinical Intake & 3-Baselines Prediction Form */}

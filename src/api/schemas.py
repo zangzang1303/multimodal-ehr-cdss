@@ -251,120 +251,132 @@ class PatientInferenceResponse(BaseModel):
     )
 
 
-# ---------------------------------------------------------
-# Agentic RAG & Explainability Schemas (Backlog 05 - Member 2)
-# ---------------------------------------------------------
+class TopKPrediction(BaseModel):
+    """
+    Individual pathology prediction with probability score and calibrated risk tier.
+    """
+
+    disease: str = Field(..., description="Canonical disease identifier")
+    disease_name: str = Field(..., description="Vietnamese clinical display name")
+    probability: float = Field(..., ge=0.0, le=1.0, description="Calibrated probability (0.0 to 1.0)")
+    percentage: float = Field(..., ge=0.0, le=100.0, description="Formatted probability percentage")
+    risk_level: Literal["low", "moderate", "high"] = Field(
+        ...,
+        description="Clinical risk level: low (<30%), moderate (30-70%), high (>70%)",
+    )
+
+
+class ModalityStreamResult(BaseModel):
+    """
+    Diagnostic prediction for an individual or fused modality stream.
+    """
+
+    stream_name: str = Field(..., description="Name of the stream (Tabular, Text, Cross-Attention Fusion)")
+    predicted_disease: str = Field(..., description="Predicted diagnosis")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score")
+
+
+class MultimodalMockResponse(BaseModel):
+    """
+    Comprehensive response for Phase 2 Multimodal Core mock prediction endpoint.
+    Includes top predicted pathology, calibrated probability, Top-K ranked list,
+    and cross-modal comparison for DiagnosticCard component.
+    """
+
+    patient_id: str = Field(..., description="Patient identifier")
+    prediction_source: Literal["mock", "checkpoint"] = Field(default="mock")
+    model_version: Optional[str] = Field(default=None)
+    predicted_disease: str = Field(..., description="Top predicted disease label")
+    predicted_disease_name: str = Field(..., description="Vietnamese display name of top predicted disease")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Top-1 simulated score")
+    calibrated: bool = Field(default=False, description="Whether a fitted validation calibrator was applied")
+    temperature: Optional[float] = Field(default=None, description="Fitted validation temperature, if available")
+    ece_score: Optional[float] = Field(default=None, description="Measured ECE, if available")
+    top_k_predictions: List[TopKPrediction] = Field(
+        ...,
+        description="Ranked list of Top-K diseases by calibrated probability",
+    )
+    modality_streams: Dict[str, ModalityStreamResult] = Field(
+        default_factory=dict,
+        description="Predictions from individual streams (Tabular, Text) vs Multimodal Fusion",
+    )
+    fusion_gate_weights: Optional[Dict[str, float]] = Field(
+        default=None,
+        description="Dynamic attention gate weights (g_tab vs g_text)",
+    )
+    timestamp: str = Field(..., description="ISO 8601 prediction timestamp")
+
+
 
 class EvidenceSpan(BaseModel):
     """
-    Character offset span mapped onto the active de-identified clinical note.
-    Guarantees note[start:end] == text.
+    Spans of characters within raw clinical text grounded to supporting evidence.
     """
-    text: str = Field(..., description="Exact substring slice from clinical note")
-    start: int = Field(..., ge=0, description="Start character offset index")
-    end: int = Field(..., ge=0, description="End character offset index")
-    confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Span confidence score")
-    match_type: str = Field(default="exact", description="Match type: exact, case_insensitive, normalized, fuzzy_candidate")
-
-
-class ClaimAudit(BaseModel):
-    """
-    Validation audit of a clinical claim produced by the agent.
-    """
-    claim: str = Field(..., description="Clinical claim or assertion text")
-    status: Literal["verified", "candidate", "unverified"] = Field(
-        default="unverified",
-        description="Claim grounding verification status",
+    start_char: int = Field(..., ge=0, description="Start index in raw patient clinical notes")
+    end_char: int = Field(..., ge=0, description="End index in raw patient clinical notes")
+    text: str = Field(..., description="Exact substring matched within the note")
+    category: Literal["supporting", "counter", "red_flag"] = Field(
+        default="supporting",
+        description="Category of evidence: supporting top-1 diagnosis, counter/differential, or red-flag emergency",
     )
-    spans: list[EvidenceSpan] = Field(default_factory=list, description="Grounding spans in note")
-    confidence: float = Field(default=0.0, description="Overall verification confidence")
-    match_type: str = Field(default="none", description="Resolution strategy")
-    clinical_interpretation_note: Optional[str] = Field(
-        default=None,
-        description="Explicit note separating character offset tracking from clinical interpretation",
-    )
-    reason: Optional[str] = Field(default=None, description="Rejection reason if unverified")
+    label: str = Field(..., description="Human-readable badge label (e.g., 'Bằng chứng ủng hộ', 'Dấu hiệu cờ đỏ')")
+    reason: Optional[str] = Field(default=None, description="Clinical reason or guideline criteria why this text is significant")
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Grounding confidence")
+    is_exact: bool = Field(default=True, description="Whether matched exactly or via normalized regex")
 
 
-class GuidelineCitation(BaseModel):
+class GuidelineReference(BaseModel):
     """
-    Digitalized clinical practice guideline excerpt cited by the RAG system.
+    Referenced snippet from clinical practice guidelines (GINA, GOLD, ESC, BYT).
     """
     chunk_id: str = Field(..., description="Unique chunk identifier")
-    source_id: str = Field(..., description="Guideline source authority: GINA_2024, GOLD_2024, ESC_2023, BYT_VN_CAP_2020")
-    version: str = Field(..., description="Guideline official version/year")
-    target_disease: str = Field(..., description="Target disease entity")
-    section_title: str = Field(..., description="Guideline section or table header")
-    page_or_section: str = Field(..., description="Page or chapter reference")
-    clinical_category: str = Field(..., description="Category: DIAGNOSTIC_CRITERIA, DIFFERENTIAL, RED_FLAGS, etc.")
-    evidence_level: Optional[str] = Field(default=None, description="Evidence grade (e.g. Evidence A/Level_A) if stated")
-    text_content: str = Field(..., description="Full text excerpt from official guideline")
+    source_id: str = Field(default="", description="Stable source document identifier")
+    version: str = Field(default="", description="Source edition or year")
+    section_locator: str = Field(default="", description="Section or page locator")
+    source_verified: bool = Field(default=False, description="Whether source metadata was verified")
+    guideline_source: str = Field(..., description="Guideline name (GOLD 2024, GINA 2024, ESC 2023, BYT 2020)")
+    disease_entity: str = Field(..., description="Disease entity (COPD, ASTHMA, HEART_FAILURE, PNEUMONIA)")
+    section_title: str = Field(..., description="Guideline section header")
+    clinical_category: str = Field(..., description="Category (DIAGNOSTIC_CRITERIA, DIFFERENTIAL_DIAGNOSIS, RED_FLAG)")
+    evidence_level: str = Field(default="Level_A", description="Clinical evidence level (Level A, B, C)")
+    text_content: str = Field(..., description="Authoritative clinical guidance text snippet")
+    relevance_score: Optional[float] = Field(default=1.0, description="Relevance ranking score")
 
 
 class AgentExplainRequest(BaseModel):
     """
-    Payload for POST /api/v1/agent/explain.
-    Accepts de-identified clinical note (S) and optional model probabilities.
-    Treats client-supplied patient_id and target_diagnosis as untrusted.
+    Request payload to trigger Multi-Agent Clinical Differential Consultation and Evidence Grounding.
     """
-    clinical_note: str = Field(
-        ...,
-        min_length=10,
-        description="De-identified clinical note (S) displayed to the clinician",
-        examples=["Bệnh nhân khó thở tăng dần, tiền sử hút thuốc lá 35 bao-năm, FEV1/FVC = 0.58..."],
-    )
-    patient_id: Optional[str] = Field(
-        default="ANON_PATIENT",
-        description="Untrusted client identifier",
-    )
-    target_diagnosis: Optional[str] = Field(
-        default=None,
-        description="Client-suggested diagnosis label (treated as unverified input, not ground truth)",
-    )
-    calibrated_probabilities: Optional[Dict[str, float]] = Field(
-        default=None,
-        description="Calibrated probability distribution from multimodal model",
-    )
-    tabular_features: Optional[Dict[str, Any]] = Field(
-        default=None,
-        description="Optional physiological vitals and lab measurements",
-    )
+    patient_id: str = Field(default="PT-001", description="Patient identifier")
+    clinical_notes: str = Field(..., min_length=5, description="Raw or de-identified clinical notes text")
+    target_diagnosis: Optional[str] = Field(default=None, description="Optional primary hypothesis to audit (e.g. COPD, ASTHMA)")
+    differential_diagnosis: Optional[str] = Field(default=None, description="Optional secondary hypothesis to compare against")
+    calibrated_probabilities: Optional[Dict[str, float]] = Field(default=None, description="Optional map of calibrated probabilities")
 
 
 class AgentExplainResponse(BaseModel):
     """
-    Output payload for POST /api/v1/agent/explain.
-    Contains grounded claims, character spans, and guideline citations.
+    Comprehensive output payload of the Agentic RAG Clinical Consultation.
     """
-    status: Literal["success", "insufficient_evidence", "error"] = Field(
-        default="success",
-        description="Overall endpoint execution status",
-    )
-    patient_id: str = Field(..., description="Echoed patient identifier")
-    top1_diagnosis: str = Field(..., description="Primary hypothesis H1")
-    top2_diagnosis: Optional[str] = Field(default=None, description="Differential hypothesis H2")
-    differential_reasoning: str = Field(..., description="Structured clinical differential rationale")
-    pro_evidence_claims: list[str] = Field(default_factory=list, description="Claims supporting H1")
-    counter_evidence_claims: list[str] = Field(default_factory=list, description="Claims supporting H2 or refuting H1")
-    red_flags: list[str] = Field(default_factory=list, description="Emergency red flags detected")
-    verified_spans: list[EvidenceSpan] = Field(
+    patient_id: str = Field(..., description="Patient identifier")
+    display_note: str = Field(..., description="De-identified note used for all evidence offsets")
+    primary_diagnosis: str = Field(..., description="Primary suspected diagnosis (Hypothesis 1)")
+    primary_diagnosis_name: str = Field(..., description="Vietnamese display name of primary diagnosis")
+    differential_diagnosis: Optional[str] = Field(default=None, description="Secondary differential diagnosis (Hypothesis 2)")
+    differential_diagnosis_name: Optional[str] = Field(default=None, description="Vietnamese display name of differential diagnosis")
+    differential_reasoning: str = Field(..., description="Chain-of-thought clinical differential justification")
+    grounded_spans: List[EvidenceSpan] = Field(
         default_factory=list,
-        description="Offset spans mapped onto clinical_note for UI highlighting",
+        description="List of verified character offsets in patient note for frontend highlighting",
     )
-    claim_audits: list[ClaimAudit] = Field(
+    guideline_references: List[GuidelineReference] = Field(
         default_factory=list,
-        description="Complete verification audit for each claim",
+        description="Relevant clinical practice guideline chunks retrieved via Hybrid RAG",
     )
-    guideline_citations: list[GuidelineCitation] = Field(
+    red_flags: List[str] = Field(default_factory=list, description="Clinical red-flag alerts requiring emergency attention")
+    recommended_investigations: List[str] = Field(
         default_factory=list,
-        description="Verifiable clinical guidelines with official IDs and sections",
+        description="Recommended next diagnostic tests per guideline (e.g. Spirometry, NT-proBNP, CXR)",
     )
-    has_insufficient_evidence: bool = Field(
-        default=False,
-        description="Flag set when guideline sources cannot be retrieved or claims lack grounding",
-    )
-    warning: Optional[str] = Field(
-        default=None,
-        description="Clinical cautionary warning (e.g., untrusted client label ignored or missing guideline chunks)",
-    )
-
+    hallucination_filtered_count: int = Field(default=0, description="Number of unsupported claims filtered out to ensure 0% hallucination")
+    execution_time_ms: float = Field(default=0.0, description="Execution time in milliseconds")

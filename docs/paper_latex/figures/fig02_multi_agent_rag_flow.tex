@@ -1,0 +1,65 @@
+% ==============================================================================
+% Hình 2: Luồng Hội Chẩn Đa Tác Tử & Truy Xuất Tri Thức Lai (Agentic RAG Flow)
+% ==============================================================================
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[node distance=1.1cm and 1.3cm]
+
+    % Input node
+    \node[mcdssBox, fill=blue!5, text width=3.1cm] (input) {
+        \textbf{Đầu vào Hội chẩn}\\
+        \scriptsize Sinh hiệu $\bm{x}_{\text{tab}}$, Bệnh án $T$,\\
+        Xác suất $\hat{\bm{p}}$ (Top-1, Top-2)
+    };
+
+    % Node 1: Triage & Query Formulation
+    \node[mcdssAgent, right=1.2cm of input, text width=3.3cm] (triage) {
+        \textbf{1. Tác tử Phân loại}\\
+        \scriptsize (\texttt{triage\_and\_query\_node})\\
+        Ẩn danh PHI \& tạo truy vấn y khoa
+    };
+
+    % Node 2: Hybrid Retriever
+    \node[mcdssService, right=1.2cm of triage, text width=3.5cm] (retriever) {
+        \textbf{2. Truy xuất Lai}\\
+        \normalfont\scriptsize (\texttt{HybridGuidelineRetriever})\\
+        0.65 Okapi BM25 + 0.35 Qdrant Cosine
+    };
+
+    % Node 3: Diagnostic Synthesis
+    \node[mcdssAgent, below=1.2cm of retriever, text width=3.5cm] (synthesis) {
+        \textbf{3. Tác tử Tổng hợp}\\
+        \scriptsize (\texttt{clinical\_reasoning\_node})\\
+        Đối chiếu chẩn đoán phân biệt \& trích dẫn CPG
+    };
+
+    % Node 4: Evidence Grounder
+    \node[mcdssService, left=1.2cm of synthesis, text width=3.3cm, draw=mcdssDanger] (grounder) {
+        \textbf{4. Bộ Kiểm Chứng}\\
+        \normalfont\scriptsize (\texttt{EvidenceGrounder} $\mathcal{O}(N)$)\\
+        Đối sánh chuỗi con \& tính tọa độ $[start, end]$
+    };
+
+    % Output Verified
+    \node[mcdssBox, left=1.2cm of grounder, fill=teal!8, text width=3.1cm] (output) {
+        \textbf{Báo cáo Đã Xác thực}\\
+        \scriptsize \texttt{hallucination\_filtered}\\
+        Highlight câu bệnh án \& điều khoản GINA/GOLD
+    };
+
+    % Arrows
+    \draw[mcdssArrow] (input) -- (triage);
+    \draw[mcdssArrow] (triage) -- node[above, font=\tiny\sffamily] {Query + Disease Filter} (retriever);
+    \draw[mcdssArrow] (retriever) -- node[right, font=\tiny\sffamily] {Top-$k$ Phác đồ} (synthesis);
+    \draw[mcdssArrow] (synthesis) -- node[above, font=\tiny\sffamily] {Candidate Spans} (grounder);
+    \draw[mcdssArrow] (grounder) -- node[above, font=\tiny\sffamily] {100\% Khớp gốc} (output);
+
+    % Anti-hallucination rejection loop
+    \draw[mcdssDashedArrow, draw=mcdssDanger] (grounder.south) -- ++(0,-0.55) -| node[pos=0.25, below, font=\tiny\sffamily\bfseries, text=mcdssDanger] {Loại bỏ câu trích dẫn không tồn tại trong văn bản gốc (Anti-Hallucination Gate)} (synthesis.south);
+
+\end{tikzpicture}%
+}
+\caption{Đồ thị trạng thái hội chẩn đa tác tử (\texttt{DiagnosticStateGraph}). Mọi câu trích dẫn chứng cứ do tác tử sinh ra đều phải đi qua cổng kiểm chứng tất định \texttt{EvidenceGrounder} trước khi hiển thị cho bác sĩ.}
+\label{fig:multi_agent_rag_flow}
+\end{figure}

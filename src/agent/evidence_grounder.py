@@ -1,8 +1,21 @@
+# ==============================================================================
+# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
+# File này được tạo tạm thời bởi Thành viên 3 để kiểm thử tests/test_agent_rag.py
+# và tích hợp component EvidenceViewer.tsx (Backlog 05 - Nhiệm vụ 3.2 & 3.3)
+# trong lúc chờ Thành viên 2 bàn giao module evidence_grounder.py chính thức
+# (Backlog 05 - Nhiệm vụ 2.2).
+# ==============================================================================
+"""
+Evidence Grounder Engine
+M-CDSS Phase 2 / Backlog 05 (Task 3.2 & 3.3)
 
+Locates LLM-generated evidence claims within raw de-identified clinical notes
+using exact and flexible character offset mapping. Enforces strict zero-hallucination
+filtering: any claim not grounded in patient notes is rejected.
+"""
 
 import re
-import difflib
-from typing import List, Dict, Any, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class EvidenceGrounder:

@@ -17,10 +17,13 @@ import {
 } from "lucide-react";
 import {
   BaselineInferenceResponse,
+  MultimodalMockResponse,
   PatientInferenceRequest,
   predictBaselines,
+  predictMultimodal,
   TabularFeatures,
 } from "@/lib/api";
+import DiagnosticCard from "@/components/DiagnosticCard";
 
 interface FieldMeta {
   key: keyof Pick<
@@ -181,6 +184,8 @@ export default function PatientDataForm() {
   const [error, setError] = useState<string | null>(null);
   const [predictionResponse, setPredictionResponse] =
     useState<BaselineInferenceResponse | null>(null);
+  const [multimodalResponse, setMultimodalResponse] =
+    useState<MultimodalMockResponse | null>(null);
 
   const handleNumericalChange = (key: keyof TabularFeatures, value: string) => {
     const num = parseFloat(value);
@@ -272,6 +277,7 @@ export default function PatientDataForm() {
     setTabular(INITIAL_TABULAR);
     setClinicalNotes("");
     setPredictionResponse(null);
+    setMultimodalResponse(null);
     setError(null);
   };
 
@@ -294,8 +300,23 @@ export default function PatientDataForm() {
         clinical_notes: clinicalNotes,
       };
 
-      const result = await predictBaselines(payload);
-      setPredictionResponse(result);
+      const [baselineRes, multiRes] = await Promise.allSettled([
+        predictBaselines(payload),
+        predictMultimodal(payload),
+      ]);
+
+      if (baselineRes.status === "fulfilled") {
+        setPredictionResponse(baselineRes.value);
+      }
+      if (multiRes.status === "fulfilled") {
+        setMultimodalResponse(multiRes.value);
+      } else {
+        setMultimodalResponse(null);
+        setError(multiRes.reason instanceof Error ? multiRes.reason.message : "Không thể chạy mô hình đa phương thức.");
+      }
+      if (baselineRes.status === "rejected" && multiRes.status === "rejected") {
+        throw baselineRes.reason;
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -349,7 +370,7 @@ export default function PatientDataForm() {
           </div>
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Nhập Liệu Lâm Sàng Cho Bác Sĩ (Clinical Data Intake)
+              Nhập Liệu Lâm Sàng Thử Nghiệm (Clinical Data Intake - Prototype)
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Nhập song song chỉ số sinh hiệu, xét nghiệm và ghi chú diễn tiến lâm sàng
@@ -611,12 +632,12 @@ export default function PatientDataForm() {
                 {loading ? (
                   <>
                     <Activity className="w-4 h-4 animate-spin" />
-                    <span>Đang gửi dự đoán tới 3 Baselines...</span>
+                    <span>Đang chạy mô hình đa phương thức...</span>
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 fill-white" />
-                    <span>Chạy Dự Đoán 3 Baselines</span>
+                    <span>Chạy mô hình đa phương thức và đối chứng</span>
                   </>
                 )}
               </button>
@@ -624,6 +645,11 @@ export default function PatientDataForm() {
           </div>
         </div>
       </form>
+
+      {/* Hiển Thị Kết Quả DiagnosticCard (Multimodal Core) */}
+      {multimodalResponse && (
+        <DiagnosticCard result={multimodalResponse} onReset={handleReset} clinicalNotes={clinicalNotes} />
+      )}
 
       {/* Hiển Thị Kết Quả 3 Baselines */}
       {predictionResponse && (
@@ -651,7 +677,7 @@ export default function PatientDataForm() {
                 </div>
 
                 <div className="space-y-1">
-                  <div className="text-xs text-slate-500">Chẩn đoán dự báo:</div>
+                  <div className="text-xs text-slate-500">Dự đoán tham khảo:</div>
                   <div
                     className={`text-xs px-2 py-1 rounded-lg border font-semibold inline-block ${
                       getDiseaseLabelBadge(
@@ -707,7 +733,7 @@ export default function PatientDataForm() {
                 </div>
 
                 <div className="space-y-1">
-                  <div className="text-xs text-slate-500">Chẩn đoán dự báo:</div>
+                  <div className="text-xs text-slate-500">Dự đoán tham khảo:</div>
                   <div
                     className={`text-xs px-2 py-1 rounded-lg border font-semibold inline-block ${
                       getDiseaseLabelBadge(
@@ -763,7 +789,7 @@ export default function PatientDataForm() {
                 </div>
 
                 <div className="space-y-1">
-                  <div className="text-xs text-slate-500">Chẩn đoán dự báo:</div>
+                  <div className="text-xs text-slate-500">Dự đoán tham khảo:</div>
                   <div
                     className={`text-xs px-2 py-1 rounded-lg border font-semibold inline-block ${
                       getDiseaseLabelBadge(
@@ -807,9 +833,16 @@ export default function PatientDataForm() {
               </div>
             )}
           </div>
+
+          {/* Research Disclaimer */}
+          <div className="pt-3 text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 flex items-start gap-2">
+            <Info className="w-3.5 h-3.5 text-sky-500 flex-shrink-0 mt-0.5" />
+            <span>
+              <strong>Ghi chú nghiên cứu:</strong> Dự đoán từ các mô hình baseline đơn phương thức mang tính chất đối chứng kỹ thuật trên tập dữ liệu nghiên cứu, không mang giá trị chỉ định y khoa.
+            </span>
+          </div>
         </div>
       )}
     </div>
   );
 }
-

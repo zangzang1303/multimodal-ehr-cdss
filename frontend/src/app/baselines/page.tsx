@@ -220,6 +220,14 @@ export default function BaselinesBenchmarkPage() {
 
           {/* Action Buttons: Refresh & Theme */}
           <div className="flex items-center space-x-3">
+            <Link
+              href="/evaluation"
+              className="px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="hidden sm:inline">Ablation Study (Phase 2)</span>
+            </Link>
+
             <button
               onClick={loadBenchmarkData}
               disabled={loading}
@@ -295,7 +303,7 @@ export default function BaselinesBenchmarkPage() {
 
               <div className="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200/90 leading-relaxed space-y-2">
                 <p>
-                  <strong>1. Điểm mù dữ liệu đơn lẻ (Unimodal Blindspot):</strong> Mô hình dữ liệu bảng (XGBoost, FT-Transformer) tuy có AUROC cao nhờ chỉ số xét nghiệm cấp tính nhưng <em>hoàn toàn mù mờ</em> trước bệnh sử hút thuốc nhiều năm, thói quen sinh hoạt và mô tả cơn khó thở kịch phát. Ngược lại, mô hình ClinicalBERT đọc hiểu ghi chú nhưng thiếu độ nhạy lượng hóa của SpO2 và chỉ số viêm (WBC, CRP).
+                  <strong>1. Điểm mù dữ liệu đơn lẻ (Unimodal Blindspot):</strong> Mô hình dữ liệu bảng (XGBoost, FT-Transformer) tuy có AUROC cao nhờ chỉ số xét nghiệm cấp tính nhưng <em>hạn chế trong việc nắm bắt</em> bệnh sử hút thuốc kéo dài, thói quen sinh hoạt và diễn tiến khó thở kịch phát mô tả trong bệnh án. Ngược lại, mô hình ClinicalBERT đọc hiểu ghi chú nhưng thiếu độ nhạy lượng hóa của SpO2 và chỉ số viêm (WBC, CRP).
                 </p>
                 <p>
                   <strong>2. Hiệu chuẩn trên tập kiểm thử tổng hợp:</strong> ECE của ba mô hình dao động từ <strong>{(minEce * 100).toFixed(2)}% đến {(maxEce * 100).toFixed(2)}%</strong>. Kết quả này chỉ phản ánh tập hold-out tổng hợp hiện tại; cần kiểm định và hiệu chuẩn lại trên dữ liệu bệnh viện độc lập trước khi triển khai lâm sàng.
@@ -311,7 +319,7 @@ export default function BaselinesBenchmarkPage() {
                   Xem Kiến Trúc Đề Xuất Giai Đoạn 2 (Cross-Attention + RAG)
                 </a>
                 <span className="text-xs text-amber-800/80 dark:text-amber-300/80 font-medium">
-                  → Cần tích hợp Temperature Scaling ($ECE &lt; 0.05$) và Evidence Grounding để giải quyết triệt để.
+                  → Cần tích hợp Temperature Scaling ($ECE &lt; 0.05$) và Evidence Grounding để hỗ trợ kiểm soát độ tin cậy và minh chứng y văn.
                 </span>
               </div>
             </div>
@@ -565,7 +573,7 @@ export default function BaselinesBenchmarkPage() {
                       stroke="#ef4444"
                       strokeDasharray="4 4"
                       label={{
-                        value: "Ngưỡng An Toàn Lâm Sàng ECE = 5%",
+                        value: "Ngưỡng Tham Khảo ECE = 5%",
                         position: "top",
                         fill: "#ef4444",
                         fontSize: 11,
@@ -607,7 +615,7 @@ export default function BaselinesBenchmarkPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white text-xs font-semibold shadow-md shadow-sky-600/20 transition-all self-start sm:self-auto"
             >
               <Activity className="w-4 h-4" />
-              Thử Nghiệm Chẩn Đoán Thực Tế
+              Thử Nghiệm Nhập Liệu Lâm Sàng
             </Link>
           </div>
 
@@ -638,7 +646,7 @@ export default function BaselinesBenchmarkPage() {
                 3. Hiệu Chuẩn ECE &amp; RAG Minh Chứng
               </div>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                Tối ưu tham số Temperature Scaling $T$ để hạ $ECE &lt; 0.05$; kết hợp tầng Agentic RAG đối chiếu phác đồ quốc tế (GINA, GOLD, ESC) và trích dẫn ký tự bằng chứng triệt tiêu ảo giác.
+                Tối ưu tham số Temperature Scaling $T$ hướng tới $ECE &lt; 0.05$; kết hợp tầng Agentic RAG đối chiếu phác đồ quốc tế (GINA, GOLD, Bộ Y tế) và trích dẫn bằng chứng cụ thể nhằm giảm thiểu nguy cơ phát sinh thông tin sai lệch (hallucination).
               </p>
             </div>
           </div>

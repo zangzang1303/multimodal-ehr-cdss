@@ -1,5 +1,5 @@
 # ==============================================================================
-# Multimodal EHR CDSS - Backend Dockerfile (Phase 1)
+# Multimodal EHR CDSS - Backend Dockerfile (Phase 2 - Production Ready)
 # ==============================================================================
 FROM python:3.12-slim
 
@@ -12,14 +12,13 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt .
+COPY requirements-deploy.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements-deploy.txt
 
 # Copy application source code and configurations
 COPY configs/ /app/configs/
@@ -29,7 +28,7 @@ COPY src/ /app/src/
 EXPOSE 8000
 
 # Healthcheck definition
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=20s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Launch FastAPI with Uvicorn
