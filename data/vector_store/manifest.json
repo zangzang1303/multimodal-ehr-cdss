@@ -1,0 +1,60 @@
+{
+  "manifest_version": "1.0.0",
+  "generated_at": "2026-11-17T09:45:10.015167+00:00",
+  "database": {
+    "engine": "Qdrant",
+    "qdrant_client_version": "1.20.0",
+    "docker_image": "qdrant/qdrant:latest",
+    "collection_name": "clinical_guidelines",
+    "vector_dim": 768,
+    "distance_metric": "Cosine",
+    "total_points": 14
+  },
+  "embedding": {
+    "model_name": "sentence-transformers/all-mpnet-base-v2",
+    "normalize_embeddings": true
+  },
+  "snapshot": {
+    "filename": "qdrant_snapshot.tar.gz",
+    "relative_path": "data/vector_store/qdrant_snapshot.tar.gz",
+    "size_bytes": 56275,
+    "sha256": "BD43BEEB158AC9259EAF789CE86B491677D65ED3C3C81D15463A780A8055FA59"
+  },
+  "source_guidelines": [
+    {
+      "filename": "byt_pneumonia.json",
+      "relative_path": "data/guidelines/byt_pneumonia.json",
+      "size_bytes": 3443,
+      "sha256": "4BB304C0E19008871B82082C24E6218C6983CE6E19A74A5EA00F357E7215D9A9"
+    },
+    {
+      "filename": "CATALOG.yaml",
+      "relative_path": "data/guidelines/CATALOG.yaml",
+      "size_bytes": 3701,
+      "sha256": "95E77BEAC6B8BAB6146B8F79630DDA59B7EB4E44F14AB9A4D2CD843B901382D5"
+    },
+    {
+      "filename": "esc_heart_failure.json",
+      "relative_path": "data/guidelines/esc_heart_failure.json",
+      "size_bytes": 3341,
+      "sha256": "1623946A49C65BFFF6C341828C7846F4AB164FE6C5FA6E59653EF0C60418EF25"
+    },
+    {
+      "filename": "gina_asthma.json",
+      "relative_path": "data/guidelines/gina_asthma.json",
+      "size_bytes": 3751,
+      "sha256": "49DA658CEB28731C2D8BD7EDFCA89935398F1EA07062F04930535BBCA5E6DFFE"
+    },
+    {
+      "filename": "gold_copd.json",
+      "relative_path": "data/guidelines/gold_copd.json",
+      "size_bytes": 3780,
+      "sha256": "25434243D6A6B67E4EC170F123BFB6E54C5B9B1734040603B6F9858A8FC7E74C"
+    }
+  ],
+  "licensing_and_distribution": {
+    "policy": "Non-commercial clinical decision support and educational research use",
+    "permitted_distribution": "Pre-indexed vector embeddings derived under fair academic research terms",
+    "copyright_notice": "Original guidelines copyright belongs to GINA, GOLD, ESC, and Vietnam Ministry of Health (BYT)."
+  }
+}
