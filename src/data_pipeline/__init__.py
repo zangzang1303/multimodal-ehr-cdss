@@ -19,10 +19,14 @@ __all__ = [
     "create_patient_level_splits",
     "get_data_loaders",
     "process_and_save_patient_splits",
+    "verify_manifest",
+    "generate_manifest",
 ]
 
 
 _LAZY_IMPORTS = {
+    "verify_manifest": ("src.data_pipeline.manifest", "verify_manifest"),
+    "generate_manifest": ("src.data_pipeline.manifest", "generate_manifest"),
     "TemporalAligner": ("src.data_pipeline.temporal_aligner", "TemporalAligner"),
     "ClinicalImputer": ("src.data_pipeline.imputer", "ClinicalImputer"),
     "ClinicalMICEImputer": ("src.data_pipeline.imputer", "ClinicalMICEImputer"),

@@ -80,7 +80,7 @@ class ClinicalDeidentifier:
         # Structured EHR exports often carry PHI in labelled header fields. These
         # rules are language-aware and do not depend on an English NER model.
         self.structured_name_pattern = re.compile(
-            r"(?i)((?:Patient Name|Tên bệnh nhân|Họ và tên|Doctor Name|Tên bác sĩ|Attending Physician)\s*:\s*)"
+            r"(?i)((?:Patient Name|Tên bệnh nhân|Bệnh nhân|Họ và tên|Doctor Name|Tên bác sĩ|Bác sĩ khám|Attending Physician)\s*:\s*)"
             r"[^\r\n|]+"
         )
         self.structured_facility_pattern = re.compile(
@@ -88,10 +88,13 @@ class ClinicalDeidentifier:
         )
         self.structured_id_pattern = re.compile(
             r"(?i)\b((?:(?:Patient|Encounter|Medical Record|MRN)\s+ID|"
-            r"Citizen ID/SSN|Insurance ID(?:\s*\(BHYT\))?)\s*:\s*)[A-Za-z0-9_-]+"
+            r"Citizen ID/SSN|Insurance(?:\s*ID)?(?:\s*\(BHYT\))?|Thẻ BHYT|Mã BHYT|Số CMND/CCCD|CMND|CCCD|BHYT)\s*:\s*)[A-Za-z0-9_-]+"
         )
         self.structured_location_pattern = re.compile(
-            r"(?im)^(\s*(?:Residential Address|Home Address|Địa chỉ)\s*:\s*)[^\r\n|]+"
+            r"(?im)^(\s*(?:Residential Address|Home Address|Địa chỉ|Nơi cư trú)\s*:\s*)[^\r\n|]+"
+        )
+        self.structured_phone_pattern = re.compile(
+            r"(?i)((?:Điện thoại liên hệ|Điện thoại|SĐT|Phone|Contact|Mobile)\s*:\s*)[0-9+.\-\s]+"
         )
 
         self.email_pattern = re.compile(
@@ -101,13 +104,12 @@ class ClinicalDeidentifier:
 
         self.phone_pattern = re.compile(r"(?:\+84|\b0)(?:[\s.-]?)(?:3|5|7|8|9)(?:[\s.-]?\d){8}\b")
 
-        self.labeled_id_pattern = re.compile(
-            r"\b(?:CCCD|CMND|BHYT|MRN|HSBA|Mã thẻ|Số thẻ|Mã định danh|Định danh|SSN)[:\s]+([A-Za-z0-9\-_]{6,16})\b",
-            re.IGNORECASE,
-        )
+        # BHYT: \b[A-Z]{2}\d{1,2}\d{10,13}\b and labeled forms
+        self.bhyt_pattern = re.compile(r"\b[A-Z]{2}\d{1,2}\d{10,13}\b")
 
-        self.bhyt_pattern = re.compile(
-            r"\b(?:DN|GD|TE|CA|QN|HC|XK|HT|TB|NO|CT|XB|TN|CS|XN|MS|HD|TQ|TA|TY|HG|LS|PV|CN|HS|SV|GB|CB|CF|CH|KC|HN|DT|DK|XD|BT|TS|TC|TV)\d{13}\b"
+        self.labeled_id_pattern = re.compile(
+            r"\b(?:CCCD|CMND|BHYT|Thẻ BHYT|Mã thẻ|Insurance|MRN|HSBA|Số thẻ|Mã định danh|Định danh|SSN)[:\s]+([A-Za-z0-9\-_]{6,20})\b",
+            re.IGNORECASE,
         )
 
         self.standalone_id_pattern = re.compile(r"\b\d{9}\b|\b\d{12}\b")
@@ -119,23 +121,33 @@ class ClinicalDeidentifier:
             re.compile(r"\b\d{1,2}\.\d{1,2}\.\d{2,4}\b"),
         ]
 
+        # Vietnamese academic doctor titles / degrees: GS, PGS, TS, ThS, BS, BSCK, CKI, CKII
+        self.academic_doctor_pattern = re.compile(
+            r"(?:GS|PGS|TS|ThS|BS|BSCK|CKI{1,2})\.?(?:\s*[A-Z]+\.)*\s+[A-ZĐ][\wÀ-ỹ]+(?:\s+[A-ZĐ][\wÀ-ỹ]+){0,3}"
+        )
+
         self.doctor_context_pattern = re.compile(
-            r"(?:\b(?i:bác sĩ|bác sỹ|bs\.|bs|y sĩ|điều dưỡng|dr\.|doctor)\s+)"
-            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]*){1,5})\b"
+            r"(?:\b(?i:bác sĩ|bác sỹ|bs\.|bs|y sĩ|điều dưỡng|dr\.|doctor)\s*(?::|-)?\s*)"
+            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]+){1,3})\b"
         )
 
         self.patient_context_pattern = re.compile(
-            r"(?:\b(?i:bệnh nhân|bn\.|bn|patient|pt\.)\s+)"
-            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]*){1,5})\b"
+            r"(?:\b(?i:bệnh nhân|bn\.|bn|patient|pt\.)\s*(?::|-)?\s*)"
+            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]+){1,3})\b"
         )
 
         self.contact_context_pattern = re.compile(
             r"(?:\b(?i:người nhà|thân nhân|liên hệ|người giám hộ|family|contact)\s*(?::|-)?\s*)"
-            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]*){1,5})\b"
+            r"([A-ZÀ-ỸĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ]+){1,3})\b"
+        )
+
+        # Uppercase hospital headers and standard context hospitals
+        self.hospital_uppercase_pattern = re.compile(
+            r"\bBỆNH VIỆN(?:\s+[A-ZĐÀ-Ỹ0-9]+)+\b"
         )
 
         self.hospital_context_pattern = re.compile(
-            r"\b(?i:bệnh viện|bv|phòng khám|trạm y tế|trung tâm y tế)\s+([A-ZÀ-ỸĐ][a-zà-ỹđ0-9]*(?:\s+[A-ZÀ-ỸĐ][a-zà-ỹđ0-9]*)*)\b"
+            r"\b(?i:bệnh viện|bv|phòng khám|trạm y tế|trung tâm y tế)\s+([A-ZÀ-ỸĐ][A-Za-z0-9à-ỹđ\s]+?)(?=\s*[\r\n|,;.]|\s*$)"
         )
         self.hospital_en_pattern = re.compile(
             r"\b([A-Z][a-zA-Z0-9]*(?:\s+[A-Z][a-zA-Z0-9]*)*\s+(?i:hospital|clinic|health center|medical center|infirmary))\b"
@@ -160,6 +172,12 @@ class ClinicalDeidentifier:
         result = self.structured_location_pattern.sub(
             lambda m: m.group(1) + self.LOC_TOKEN, result
         )
+        result = self.structured_phone_pattern.sub(
+            lambda m: m.group(1) + self.PHONE_TOKEN, result
+        )
+
+        result = self.hospital_uppercase_pattern.sub(self.HOSPITAL_TOKEN, result)
+        result = self.academic_doctor_pattern.sub(self.NAME_TOKEN, result)
 
         result = self.doctor_context_pattern.sub(
             lambda m: m.group(0).replace(m.group(1), self.NAME_TOKEN),

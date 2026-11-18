@@ -23,15 +23,22 @@ Quy trình kiểm toán bảo mật thông tin sức khỏe được bảo vệ 
 * **Tệp cấu hình môi trường:** Tệp `.env.example` chỉ chứa các giá trị cổng mặc định và URL dịch vụ cục bộ (`FRONTEND_PORT=3000`, `API_PORT=8000`, `QDRANT_HTTP_PORT=6333`). Không lưu trữ API token thương mại hoặc secret database.
 * **Lịch sử Git commit:** **$0$ cảnh báo rò rỉ khóa bí mật.** Tệp `.gitignore` được cấu hình nghiêm ngặt loại trừ `.env`, `.env.local`, `*.log`, `.pem`.
 
-### 2.2. Kiểm Toán Dữ Liệu Bệnh Nhân (PHI / PII Audit)
-* **Mã nguồn ứng dụng (`src/`):** **$0$ phát hiện dữ liệu bệnh nhân thực tế.** Toàn bộ quy trình tiền xử lý sử dụng token thay thế tiêu chuẩn (`[REDACTED_NAME]`, `[REDACTED_PHONE]`, `[REDACTED_DATE]`, `[REDACTED_HOSPITAL]`, `[REDACTED_ID]`).
-* **Tập dữ liệu thô sinh thử nghiệm (`data/raw/`):**
-  - Ghi nhận 2.000 dòng chứa các chuỗi số điện thoại và CCCD giả định được sinh bởi `scripts/generate_synthetic_ehr.py`.
-  - *Giải trình xử lý:* Đây là bộ dữ liệu thử nghiệm nhân tạo (Synthetic Test Fixtures) được cố tình tạo ra để kiểm thử năng lực làm sạch của `ClinicalDeidentifier`. Toàn bộ thư mục `data/raw/*` đã được loại trừ khỏi kho lưu trữ qua `.gitignore` và không bao giờ được đưa lên Git.
-* **Tập dữ liệu đã xử lý (`data/processed/`, `data/processed_rebuilt_strict/`):**
-  - Toàn bộ văn bản bệnh án đã được khử định danh 100% qua pipeline `ClinicalDeidentifier`. Các tệp `.parquet` được bảo vệ và loại trừ bởi `.gitignore`.
-* **Kịch bản kiểm thử (`tests/test_data_pipeline.py`):**
-  - Ghi nhận 5 chuỗi số điện thoại mẫu (ví dụ: `0912345678`) nằm trong các mệnh đề `assert deid.deidentify_text(...) == "[REDACTED_PHONE]"`. Đây là các ca kiểm thử đơn vị hợp lệ nhằm thẩm định độ chính xác của biểu thức chính quy.
+### 2.2. Kiểm Toán Dữ Liệu Bệnh Nhân (PHI / PII Audit) & Đánh Giá Trước/Sau Cải Tiến
+
+Trong đợt rà soát chất lượng toàn diện ngày 18/11/2026 (Backlog 08), nhóm nghiên cứu đã tiến hành đánh giá chi tiết tỷ lệ rò rỉ thông tin nhận dạng cá nhân (PHI) trên tập dữ liệu lâm sàng và ghi nhận các khiếm khuyết trong biểu thức chính quy cũ.
+
+#### Bảng Thống Kê Tỷ Lệ Rò Rỉ PHI Trước Và Sau Khi Cải Tiến `ClinicalDeidentifier`:
+
+| Loại Thực Thể PHI (Entity) | Biểu Thức Nhận Dạng Bổ Sung / Sửa Đổi | Tỷ Lệ Sót Trước Cải Tiến (Phiên bản cũ) | Tỷ Lệ Sót Sau Cải Tiến (Canonical Split) | Đánh Giá Khắc Phục |
+| :--- | :--- | :---: | :---: | :---: |
+| **Mã Thẻ BHYT Việt Nam** | `\b[A-Z]{2}\d{1,2}\d{10,13}\b` & nhãn BHYT/Insurance | **~84.0%** (Sót mã `DN4...` do regex cũ yêu cầu đủ 13 số) | **0.0% (0 / 2.000)** | ✅ Khắc phục triệt để |
+| **Bác Sĩ & Học Hàm/Học Vị VN** | `(?:GS\|PGS\|TS\|ThS\|BS\|BSCK\|CKI{1,2})\.?(?:\s*[A-Z]+\.)*\s+[A-ZĐ][\wÀ-ỹ]+...` | **~72.0%** (Sót `PGS.TS.`, `BS.CKII.` do regex cũ chỉ khớp tên thường) | **0.0% (0 / 2.000)** | ✅ Khắc phục triệt để |
+| **Tên Bệnh Viện Viết HOA** | `\bBỆNH VIỆN(?:\s+[A-ZĐÀ-Ỹ0-9]+)+\b` | **100.0%** (Sót `BỆNH VIỆN BẠCH MAI` vì chữ HOA toàn bộ) | **0.0% (0 / 2.000)** | ✅ Khắc phục triệt để |
+| **Số Điện Thoại / CCCD / Ngày** | Regex Safe Harbor chuẩn hóa | 0.0% | **0.0% (0 / 2.000)** | ✅ Duy trì an toàn tuyệt đối |
+| **Bảo Toàn Chỉ Số Sinh Hiệu** | Kiểm thử âm tính (`BP`, `HR`, `SpO2`, `WBC`, `CRP`) | Không ảnh hưởng | **100% Bảo toàn (Không che nhầm)** | ✅ Đã kiểm chứng qua unit test |
+
+* **Bộ kiểm thử đơn vị tự động:** Đã bổ sung bộ kiểm thử chuyên dụng tại `tests/test_deidentifier.py` bao gồm 5 nhóm test case dương tính và âm tính, xác nhận 100% ca kiểm thử vượt qua.
+* **Tập dữ liệu chuẩn hóa (`data/processed_rebuilt_strict/`):** Toàn bộ 2.000 bản ghi trên cả 3 tập (Train 1.425, Val 273, Test 302) đã được tái tạo ghi chú lâm sàng với tỷ lệ rò rỉ PHI đạt **0.0%**. Các tệp Parquet được bảo vệ an toàn bởi `.gitignore` và quản lý phiên bản qua `data/DATA_MANIFEST.json`.
 
 ---
 

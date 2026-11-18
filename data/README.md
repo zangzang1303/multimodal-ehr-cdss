@@ -1,73 +1,74 @@
 # Multimodal Clinical Decision Support System (M-CDSS) - Data Directory
 
-## 1. Tổng Quan Cấu Trúc Thư Mục Dữ Liệu
-Thư mục `data/` được tổ chức theo kiến trúc phân tầng phục vụ pipeline xử lý và mô hình học máy:
+> [!IMPORTANT]
+> **QUY CHUẨN DỮ LIỆU GIAI ĐOẠN 3 (PHASE 3 DATA GOVERNANCE)**
+> Kể từ Backlog 08, toàn bộ mô hình và kịch bản thực nghiệm tuân thủ nguyên tắc:
+> **"Một nguồn sự thật duy nhất (Single Source of Truth) — Không gõ tay số liệu — Xác thực SHA-256 trước khi chạy."**
+> 
+> - **Bộ dữ liệu chuẩn chính thức (Canonical):** 👉 [`data/processed_rebuilt_strict/`](processed_rebuilt_strict/)
+> - **Tệp kê khai toàn vẹn dữ liệu:** 👉 [`data/DATA_MANIFEST.json`](DATA_MANIFEST.json)
+> - **Các thư mục dữ liệu cũ (`data/processed/`, `data/processed_strict/`):** Đã đánh dấu là **LEGACY / DEPRECATED**.
+
+---
+
+## 1. Cấu Trúc Thư Mục Dữ Liệu
 
 ```
 data/
-├── raw/                      # Dữ liệu bán tổng hợp thô ban đầu (chưa khử định danh, chưa gán khuyết)
-│   ├── patients_raw.parquet  # Dữ liệu bảng số lâm sàng (2.000+ bệnh nhân)
-│   └── clinical_notes_raw.jsonl # Ghi chú bệnh án lâm sàng tự do (chứa PHI/PII giả định)
-├── processed/                # Dữ liệu đã qua pipeline tiền xử lý (De-ID, Temporal Lock, MICE)
-│   ├── train.parquet         # Tập huấn luyện (70%)
-│   ├── val.parquet           # Tập kiểm định (15%)
-│   └── test.parquet          # Tập kiểm thử độc lập (15%)
-├── checkpoints/              # Checkpoints trọng số mô hình trong quá trình huấn luyện
-├── guidelines/               # Hướng dẫn lâm sàng tham chiếu phục vụ RAG (Gold Guidelines)
-└── vector_store/             # Cơ sở dữ liệu vector (Qdrant / FAISS indices)
+├── DATA_MANIFEST.json         # Tệp kê khai SHA-256, số dòng, phân bố lớp và lệnh tái tạo
+├── processed_rebuilt_strict/  # [CANONICAL] Dữ liệu chuẩn (Train 1.425, Val 273, Test 302)
+│   ├── train.parquet
+│   ├── val.parquet
+│   └── test.parquet
+├── processed/                 # [LEGACY] Dữ liệu cũ trước kiểm soát rò rỉ nguồn
+├── raw/                       # Dữ liệu sinh thô (chưa khử định danh)
+│   ├── patients_raw.parquet   # Bảng số 2.000 bệnh nhân
+│   └── clinical_notes_raw.jsonl # Ghi chú thô chứa PHI giả định phục vụ test
+├── checkpoints/               # Trọng số mô hình đã huấn luyện
+├── evaluation_plots/          # Biểu đồ và chỉ số đánh giá lâm sàng
+└── guidelines/                # Hướng dẫn y khoa phục vụ RAG
 ```
 
-## 2. Đặc Tả Dữ Liệu Thô (`data/raw/`)
+---
 
-### 2.1. Bảng số lâm sàng (`patients_raw.parquet`)
-Tệp lưu trữ dưới định dạng Apache Parquet gồm các trường:
-* **Khóa định danh & Thời gian:**
-  - `patient_id` (`str`): Mã định danh bệnh nhân (VD: `PT-0001`).
-  - `encounter_id` (`str`): Mã đợt khám/nhập viện (VD: `ENC-0001`).
-  - `encounter_timestamp` (`str` / ISO 8601): Mốc thời gian bắt đầu tiếp nhận ca bệnh (VD: `2026-09-10T08:30:00`).
-  - `diagnostic_confirmed_timestamp` (`str` / ISO 8601): Mốc thời gian bác sĩ ra chẩn đoán chính thức (dùng để khóa chuỗi thời gian, chống rò rỉ nhãn theo PROBAST).
+## 2. Kênh Phân Phối Dữ Liệu Có Kiểm Soát Cho Nhóm Nghiên Cứu
 
-* **9 Biến số liên tục (Continuous Numerical Features):**
-  - `age` (`int`): Tuổi (18 - 110 tuổi).
-  - `systolic_bp` (`float`): Huyết áp tâm thu (mmHg, bình thường: 90.0 - 130.0).
-  - `diastolic_bp` (`float`): Huyết áp tâm trương (mmHg, bình thường: 60.0 - 85.0).
-  - `heart_rate` (`float`): Nhịp tim (bpm, bình thường: 60.0 - 100.0).
-  - `respiratory_rate` (`float`): Nhịp thở (breaths/min, bình thường: 12.0 - 20.0).
-  - `spo2` (`float`): Độ bão hòa oxy trong máu (% , bình thường: 95.0 - 100.0).
-  - `temperature` (`float`): Thân nhiệt (độ C, bình thường: 36.5 - 37.5).
-  - `wbc_count` (`float`): Số lượng bạch cầu ($10^9$/L, bình thường: 4.0 - 10.0, có 15-25% tỷ lệ thiếu ngẫu nhiên).
-  - `crp` (`float`): Protein phản ứng C (mg/L, bình thường: 0.0 - 5.0, có 15-25% tỷ lệ thiếu ngẫu nhiên).
+Do các tệp `.parquet` có dung lượng nhị phân và bị loại khỏi Git commit thông thường (`.gitignore`), nhóm nghiên cứu sử dụng **kênh phân phối có kiểm soát** theo một trong các phương án sau:
 
-* **4 Biến phân loại (Categorical Features):**
-  - `gender` (`str`): Giới tính (`"M"`, `"F"`, `"OTHER"`).
-  - `smoking_status` (`str`): Tình trạng hút thuốc lá (`"NEVER"`, `"FORMER"`, `"CURRENT"`).
-  - `history_hypertension` (`int`): Tiền sử tăng huyết áp (`0` hoặc `1`).
-  - `history_diabetes` (`int`): Tiền sử đái tháo đường (`0` hoặc `1`).
+### Phương án A: Tải từ GitHub Release Asset (Khuyến nghị cho nhóm)
+1. Tải gói lưu trữ dữ liệu `mcdss-data-canonical-strict-v1.0.0.tar.gz` từ GitHub Releases (kênh riêng tư của nhóm nghiên cứu).
+2. Giải nén vào thư mục `data/processed_rebuilt_strict/`:
+   ```bash
+   tar -xzf mcdss-data-canonical-strict-v1.0.0.tar.gz -C data/processed_rebuilt_strict/
+   ```
+3. Chạy xác thực tính toàn vẹn SHA-256:
+   ```bash
+   python -m src.data_pipeline.manifest data/processed_rebuilt_strict
+   ```
 
-* **Nhãn bệnh mục tiêu (Target Label):**
-  - `diagnosis_label` (`int`): Mã nhãn phân loại 4 nhóm bệnh:
-    * `0`: `ASTHMA` (Hen phế quản)
-    * `1`: `COPD` (Bệnh phổi tắc nghẽn mạn tính)
-    * `2`: `CONGESTIVE_HEART_FAILURE` (Suy tim sung huyết)
-    * `3`: `COMMUNITY_ACQUIRED_PNEUMONIA` (Viêm phổi mắc phải cộng đồng)
-
-### 2.2. Ghi chú lâm sàng tự do (`clinical_notes_raw.jsonl`)
-Mỗi bản ghi được lưu trên một dòng JSON Lines độc lập:
-```json
-{
-  "patient_id": "PT-0001",
-  "encounter_id": "ENC-0001",
-  "encounter_timestamp": "2026-09-10T08:30:00",
-  "diagnostic_confirmed_timestamp": "2026-09-10T11:00:00",
-  "raw_text": "Bệnh nhân Nguyễn Văn An, 64 tuổi, SĐT 0912345678 đến khám tại Bệnh viện Bạch Mai...",
-  "chief_complaint": "Khó thở khi gắng sức kèm ho khan...",
-  "history_of_present_illness": "Bệnh khởi phát 3 ngày trước...",
-  "physical_examination_notes": "Nghe phổi có rale rít rải rác...",
-  "prior_medications": "Salbutamol xịt..."
-}
+### Phương án B: Tái tạo tự động từ mã nguồn (Reproducible Pipeline)
+Nếu cần sinh lại bộ dữ liệu canonical từ dữ liệu thô:
+```bash
+python scripts/rebuild_canonical_dataset.py
 ```
-*Lưu ý bảo mật*: Trong `raw_text` cố tình chèn các thực thể PHI/PII giả định (tên bệnh nhân, số điện thoại, ngày khám, số CMND/CCCD, tên bệnh viện, thẻ BHYT) để phục vụ việc kiểm thử pipeline De-Identification ở Tuần 2.
+Lệnh này sẽ tự động:
+1. Nạp dữ liệu thô từ `data/raw/`.
+2. Áp dụng pipeline khử định danh sâu (`ClinicalDeidentifier`).
+3. Khớp phân chia Stratified Group Split bảo đảm không rò rỉ bệnh nhân và nhóm nguồn.
+4. Gán khuyết MICE chỉ fit trên Train và transform sang Val/Test.
+5. Cập nhật mã băm SHA-256 vào `data/DATA_MANIFEST.json`.
 
-## 3. Chính Sách Quản Trị Bảo Mật (HIPAA / Safe Harbor)
-- Toàn bộ dữ liệu trong `data/raw/`, `data/processed/`, và các file `*.parquet`, `*.jsonl`, `*.csv` đều được cấu hình trong `.gitignore` để ngăn chặn việc commit thông tin dữ liệu bệnh án lên Git repository.
-- Chỉ lưu trữ các tệp `.gitkeep` để duy trì cấu trúc thư mục rỗng trên remote.
+---
+
+## 3. Quy Tắc Xác Thực Bắt Buộc Trong Code (Manifest Verification Rule)
+
+Mọi script huấn luyện (`train_multimodal.py`, `run_baselines.py`, `run_multimodal_ablation.py`) và đánh giá (`evaluate_clinical_utility.py`) **bắt buộc phải gọi hàm `verify_manifest()` ngay khi khởi động**:
+
+```python
+from src.data_pipeline.manifest import verify_manifest
+
+# Dừng chương trình ngay lập tức nếu dữ liệu bị thay đổi hoặc không khớp SHA-256
+verify_manifest("data/processed_rebuilt_strict")
+```
+
+Nếu bất kỳ tệp dữ liệu nào bị sửa đổi, thiếu dòng, lệch phân bố nhãn hoặc sai khác mã SHA-256, chương trình sẽ báo lỗi `RuntimeError` và từ chối thực thi nhằm ngăn chặn tình trạng sai lệch số liệu khoa học.

@@ -6,15 +6,19 @@
 
 ---
 
-## 1. TỔNG HỢP KẾT QUẢ THẨM ĐỊNH THEO 4 MIỀN PROBAST+AI
+## 1. TỔNG HỢP KẾT QUẢ THẨM ĐỊNH THEO 4 MIỀN PROBAST+AI (CẬP NHẬT GIAI ĐOẠN 3 / BACKLOG 08)
 
-| Miền Đánh Giá (Domain) | Nguy Cơ Sai Lệch (Risk of Bias) | Mối Lo Ngại Về Tính Áp Dụng (Applicability Concerns) | Cơ Chế Kiểm Soát Kỹ Thuật & Giải Trình Minh Bạch |
+> [!IMPORTANT]
+> **ĐIỀU CHỈNH ĐÁNH GIÁ TRUNG THỰC KHOA HỌC:**
+> Sau đợt rà soát ngày 18/11/2026, nhóm nghiên cứu đã chấm lại toàn bộ 4 miền theo đúng nguyên tắc khách quan của công cụ PROBAST+AI (*Moons et al., The BMJ / Annals of Internal Medicine 2025*), từ chối việc tự đánh giá "Low Risk" hình thức khi chưa có ngoại kiểm lâm sàng độc lập.
+
+| Miền Đánh Giá (Domain) | Nguy Cơ Sai Lệch (Risk of Bias) | Mối Lo Ngại Về Tính Áp Dụng (Applicability Concerns) | Lý Do & Bằng Chứng Khoa Học Thực Tế |
 | :--- | :---: | :---: | :--- |
-| **Miền 1: Người tham gia (Participants)** | **Thấp (Low Risk)** | **Cao / Chưa rõ (High / Unclear)** | Sử dụng đoàn hệ chuẩn hóa 2.000 hồ sơ (Synthea EHR + MTSamples); phân chia nghiêm ngặt theo cấp độ bệnh nhân (*Strict Group Split*), 0% rò rỉ Train/Val/Test. **Giới hạn ngoại kiểm:** Cần thử nghiệm trên bệnh án thực tế tại Việt Nam. |
-| **Miền 2: Biến dự báo (Predictors)** | **Thấp (Low Risk)** | **Thấp (Low Concern)** | Module `TemporalAligner` khóa chuỗi thời gian $t < t_{\text{diag}}$; danh sách đen loại trừ toàn bộ tiêu chuẩn vàng ($FEV_1/FVC$, $LVEF$, cấy đờm). Toàn bộ biến có sẵn tại phòng khám ban đầu. |
-| **Miền 3: Kết cục (Outcome)** | **Thấp (Low Risk)** | **Thấp (Low Concern)** | Kết cục chẩn đoán xác định dựa trên mã ICD-10 và đối chiếu hướng dẫn quốc tế (GINA 2024, GOLD 2024, ESC 2023, Bộ Y tế Việt Nam). Người gán nhãn độc lập với mô hình. |
-| **Miền 4: Phân tích số liệu (Analysis)** | **Thấp (Low Risk)** | **Thấp (Low Concern)** | Gán dữ liệu khuyết MICE kèm biến chỉ báo (*Missingness Indicators*) chỉ khớp trên tập Train; tối ưu hóa AdamW, Early Stopping; đo lường toàn diện AUROC, AUPRC, DCA Net Benefit; hiệu chuẩn xác suất trung thực. |
-| **ĐÁNH GIÁ TỔNG THỂ (OVERALL)** | **NGUY CƠ SAI LỆCH NỘI KIỂM THẤP (LOW RISK)** | **CẦN NGOẠI KIỂM THỰC ĐỊA (EXTERNAL VALIDATION REQUIRED)** | Quy trình phát triển khắc phục triệt để các lỗi rò rỉ phương pháp luận bị JMIR cảnh báo. Kết luận được giới hạn trong phạm vi đoàn hệ thực nghiệm, không phóng đại tính sẵn sàng lâm sàng. |
+| **Miền 1: Người tham gia (Participants)** | **Cao (High Risk)** | **Cao (High Concern)** | Đoàn hệ bán tổng hợp từ Synthea EHR kết hợp MTSamples, không đại diện cho quần thể bệnh nhân thực tế tại các bệnh viện Việt Nam; thiếu tiêu chí tuyển chọn lâm sàng đa trung tâm. |
+| **Miền 2: Biến dự báo (Predictors)** | **Thấp / Chưa rõ (Low / Unclear)** | **Chưa rõ (Unclear)** | Cơ chế `TemporalAligner` khóa chuỗi thời gian $t < t_{\text{diag}}$ và danh sách đen tiêu chuẩn vàng hoạt động tốt; tuy nhiên ghi chú lâm sàng sinh theo template có chèn lại các biến số sinh hiệu, tiềm ẩn nguy cơ học đường tắt (shortcut learning) và dư thừa phương thức (RQ2). |
+| **Miền 3: Kết cục (Outcome)** | **Cao (High Risk)** | **Cao (High Concern)** | Nhãn kết cục được quy đổi từ mã bệnh tổng hợp Synthea; các đoạn trích tự sự MTSamples được ghép mà không có mối liên kết bệnh sinh học trực tiếp với chẩn đoán thực tế của bệnh nhân. |
+| **Miền 4: Phân tích số liệu (Analysis)** | **Chưa rõ (Unclear)** *(Cập nhật sau Backlog 09)* | **Chưa rõ (Unclear)** | Đã kiểm soát tốt việc chống rò rỉ bệnh nhân ($N_{\text{test}} = 302$, $0\%$ rò rỉ theo `rebuilt_strict_split_audit.json`); tuy nhiên hiện tại mới đánh giá trên một seed và một split duy nhất. Đang chờ kết quả đa seed ($\ge 3 - 5$ seeds) và khoảng tin cậy bootstrap 95% có hiệu chỉnh Holm trong Backlog 09. |
+| **ĐÁNH GIÁ TỔNG THỂ (OVERALL)** | **NGUY CƠ SAI LỆCH CAO (HIGH RISK OF BIAS)** | **MỐI QUAN TÂM ÁP DỤNG CAO (HIGH APPLICABILITY CONCERN)** | Hệ thống là một mô hình nghiên cứu thử nghiệm phương pháp luận (Methodological Prototype). Để bảo vệ khoa học thành công, nhóm minh bạch toàn bộ các giới hạn này trong báo cáo, biến việc phát hiện rủi ro thành đóng góp phân tích thực tế (RQ2-RQ4). |
 
 ---
 

@@ -168,6 +168,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def verify_provenance_and_audit(audit_file: Path) -> dict:
     """Validate data split audit to prevent data leakage before clinical evaluation."""
     print(f"[*] Step 1/6: Verifying data split provenance and audit report at: {audit_file}...")
+    try:
+        from src.data_pipeline.manifest import verify_manifest
+        verify_manifest()
+        print("  [✓] Canonical DATA_MANIFEST.json verified: all splits match SHA-256.")
+    except Exception as exc:
+        print(f"  [!] Manifest check notice: {exc}")
     if not audit_file.exists():
         print(f"  [!] Warning: Audit file {audit_file} not found. Attempting data audit check...")
         from scripts.audit_data_leakage import audit

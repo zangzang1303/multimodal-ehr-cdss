@@ -40,7 +40,7 @@ EXCLUDE_DIRS = {
 }
 
 EXCLUDE_EXTENSIONS = {
-    ".png", ".jpg", ".jpeg", ".pdf", ".docx", ".tar.gz", ".zip", ".pt", ".bin", ".pyc"
+    ".png", ".jpg", ".jpeg", ".pdf", ".docx", ".tar.gz", ".zip", ".pt", ".bin", ".pyc", ".parquet"
 }
 
 

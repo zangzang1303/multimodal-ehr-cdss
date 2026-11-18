@@ -1,0 +1,45 @@
+{
+  "manifest_version": "1.0.0",
+  "canonical_data_dir": "data/processed_rebuilt_strict",
+  "recreation_command": "python scripts/rebuild_canonical_dataset.py",
+  "commit": "HEAD",
+  "description": "Canonical preprocessed multimodal EHR dataset with strict patient-level splitting and full de-identification.",
+  "splits": {
+    "train": {
+      "path": "data/processed_rebuilt_strict/train.parquet",
+      "sha256": "2b54f3b8436d27e7e816bec5b236747f6f36183c746794fc965b04a0f0f7fc1a",
+      "row_count": 1425,
+      "class_distribution": {
+        "0": 358,
+        "1": 358,
+        "2": 340,
+        "3": 369
+      },
+      "features_count": 38
+    },
+    "val": {
+      "path": "data/processed_rebuilt_strict/val.parquet",
+      "sha256": "77a98a0ef5b2d88a84992442b3792f046fe64cd599d1791fc27b09a32931b392",
+      "row_count": 273,
+      "class_distribution": {
+        "0": 71,
+        "1": 71,
+        "2": 54,
+        "3": 77
+      },
+      "features_count": 38
+    },
+    "test": {
+      "path": "data/processed_rebuilt_strict/test.parquet",
+      "sha256": "d093f7cb3eb6eea573542fc70e7675020cb65b3c234744953b76783d5deb4c74",
+      "row_count": 302,
+      "class_distribution": {
+        "0": 71,
+        "1": 71,
+        "2": 106,
+        "3": 54
+      },
+      "features_count": 38
+    }
+  }
+}
