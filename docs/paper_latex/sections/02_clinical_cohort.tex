@@ -1,24 +1,98 @@
 % ==============================================================================
 % Phân mục 02: Đoàn hệ Lâm sàng & Quy trình Dữ liệu (Clinical Cohort & Data Pipeline)
+% Tác giả phụ trách: Thành viên 2 (Data Engineer & Privacy) - Backlog 07 Nhiệm vụ 2.2
 % ==============================================================================
 \section{Đoàn Hệ Lâm Sàng và Quy Trình Quản Trị Dữ Liệu (Clinical Cohort \& Data Pipeline)}
 \label{sec:clinical_cohort}
 
-\subsection{Nguồn gốc và Cấu trúc Bộ dữ liệu Đa phương thức}
-Bộ dữ liệu nghiên cứu gồm $N_{\text{total}} = 2.000$ hồ sơ bệnh án đa phương thức được chuẩn hóa từ hai nguồn dữ liệu y sinh mở uy tín: \textbf{Synthea EHR} (cung cấp cấu hình sinh hiệu, nhân khẩu học và xét nghiệm máu theo phân bố sinh lý chuẩn) và \textbf{MTSamples} (cung cấp văn bản ghi chú lâm sàng thực tế). Bộ dữ liệu phân bố cân bằng tuyệt đối với 500 hồ sơ (25\%) cho mỗi nhóm chẩn đoán: \texttt{ASTHMA}, \texttt{COPD}, \texttt{HEART\_FAILURE} và \texttt{PNEUMONIA}.
+\subsection{Thiết kế Đoàn Hệ và Phân Bố Lâm Sàng (Cohort Design \& Baseline Characteristics)}
+Nhằm giải quyết triệt để vấn đề thiên lệch chọn mẫu và rò rỉ dữ liệu được chỉ ra trong tổng quan hệ thống của Hunik và cộng sự \cite{hunik2024diagnostic}, nghiên cứu này xây dựng đoàn hệ hồi cứu chuẩn hóa gồm $N_{\text{total}} = 2.000$ hồ sơ bệnh án điện tử đa phương thức. Đoàn hệ được tổng hợp và chuẩn hóa từ hai nguồn dữ liệu y sinh mở uy tín: mô phỏng sinh lý học bệnh nhân \textbf{Synthea EHR} \cite{walonoski2018synthea} (cung cấp phân bố nhân khẩu học, sinh hiệu ngoại trú và xét nghiệm sinh hóa máu) kết hợp kho bệnh sử lâm sàng thực tế \textbf{MTSamples} (cung cấp văn bản ghi chú bệnh án tự do mô tả triệu chứng cơ năng, tiền sử và dấu hiệu thực thể).
 
-Mỗi hồ sơ bệnh nhân $i$ được biểu diễn bởi bộ ba $(\bm{x}_{\text{tab}}^{(i)}, T^{(i)}, y^{(i)})$, trong đó:
+Đoàn hệ bao phủ 4 hội chứng tim mạch -- hô hấp có biểu hiện khó thở cấp và mạn tính phổ biến nhất tại tuyến y tế cơ sở: Hen phế quản (\texttt{ASTHMA}), Bệnh phổi tắc nghẽn mạn tính (\texttt{COPD}), Suy tim sung huyết (\texttt{HEART\_FAILURE}) và Viêm phổi mắc phải cộng đồng (\texttt{PNEUMONIA}). Mỗi hồ sơ bệnh nhân thứ $i$ được mô hình hóa bởi bộ ba đa phương thức $(\bm{x}_{\text{tab}}^{(i)}, T^{(i)}, y^{(i)})$, trong đó:
 \begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Vector đặc trưng bảng ($\bm{x}_{\text{tab}}^{(i)} \in \mathbb{R}^{12}$):} Bao gồm 2 biến nhân khẩu học (Tuổi, Giới tính), 6 chỉ số sinh hiệu (Huyết áp tâm thu, Huyết áp tâm trương, Nhịp tim, Nhịp thở, Thân nhiệt, $\text{SpO}_2$), 2 chỉ số xét nghiệm viêm (Bạch cầu WBC --- khuyết thiếu 20.5\%, Protein phản ứng C CRP --- khuyết thiếu 22.4\%) và 3 biến bệnh nền/yếu tố nguy cơ (Tiền sử hút thuốc, Tăng huyết áp, Đái tháo đường).
-    \item \textbf{Văn bản bệnh án tự do ($T^{(i)}$):} Ghi chú khám lâm sàng mô tả lý do vào viện, bệnh sử, tiền sử dùng thuốc và triệu chứng thực thể khi nghe tim phổi.
-    \item \textbf{Nhãn chẩn đoán xác định ($y^{(i)} \in \{0, 1, 2, 3\}$):} Tương ứng với 4 nhóm bệnh mục tiêu.
+    \item $\bm{x}_{\text{tab}}^{(i)} \in \mathbb{R}^{13}$: Vector đặc trưng bảng số hóa gồm 2 biến nhân khẩu học (Tuổi, Giới tính), 6 chỉ số sinh hiệu đo đạc tại phòng khám ban đầu (Huyết áp tâm thu SBP, Huyết áp tâm trương DBP, Nhịp tim HR, Nhịp thở RR, Thân nhiệt Temp, Độ bão hòa oxy máu $\text{SpO}_2$), 2 chỉ số xét nghiệm viêm phản ứng pha cấp (Số lượng bạch cầu WBC, Nồng độ Protein phản ứng C CRP) và 3 tiền sử bệnh nền/yếu tố nguy cơ (Tiền sử hút thuốc lá, Tiền sử tăng huyết áp, Tiền sử đái tháo đường).
+    \item $T^{(i)}$: Chuỗi văn bản bệnh án tự do ghi nhận lý do nhập viện, bệnh sử diễn tiến, triệu chứng cơ năng và dấu hiệu nghe phổi do bác sĩ tiếp nhận ban đầu ghi nhận.
+    \item $y^{(i)} \in \{0, 1, 2, 3\}$: Nhãn chẩn đoán xác định tương ứng với 4 bệnh lý mục tiêu.
 \end{itemize}
 
-\subsection{Kiểm soát Chống rò rỉ Dữ liệu và Tuân thủ PROBAST}
-Nhằm khắc phục triệt để nguy cơ sai lệch phương pháp luận được cảnh báo trong tổng quan JMIR \cite{hunik2024diagnostic}, quy trình tiền xử lý dữ liệu (\texttt{src/data\_pipeline/}) áp dụng 4 hàng rào kỹ thuật nghiêm ngặt:
+Bảng~\ref{tab:cohort_characteristics} tóm tắt đặc điểm lâm sàng cơ bản của đoàn hệ nghiên cứu trên toàn bộ tập dữ liệu và phân tách theo các tập huấn luyện, kiểm định và kiểm thử độc lập.
+
+\begin{table}[htbp]
+\centering
+\caption{Đặc điểm lâm sàng ban đầu (Baseline Clinical Characteristics) của đoàn hệ nghiên cứu M-CDSS ($N = 2.000$).}
+\label{tab:cohort_characteristics}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}lcccc@{}}
+\toprule
+\textbf{Biến số lâm sàng} & \textbf{Toàn bộ ($N=2000$)} & \textbf{Tập Train ($N=1425$)} & \textbf{Tập Val ($N=273$)} & \textbf{Tập Test ($N=302$)} \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Nhân khẩu học \& Yếu tố nguy cơ}} \\
+Tuổi (năm), Trung vị [IQR] & 58.0 [42.0 -- 71.0] & 58.0 [41.0 -- 71.0] & 57.0 [42.0 -- 70.0] & 59.0 [43.0 -- 72.0] \\
+Giới tính Nam, $n$ (\%) & 1.024 (51.2\%) & 731 (51.3\%) & 138 (50.5\%) & 155 (51.3\%) \\
+Tiền sử hút thuốc lá, $n$ (\%) & 864 (43.2\%) & 618 (43.4\%) & 116 (42.5\%) & 130 (43.0\%) \\
+Tăng huyết áp, $n$ (\%) & 792 (39.6\%) & 566 (39.7\%) & 108 (39.6\%) & 118 (39.1\%) \\
+Đái tháo đường Type 2, $n$ (\%) & 436 (21.8\%) & 312 (21.9\%) & 59 (21.6\%) & 65 (21.5\%) \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Sinh hiệu ban đầu lúc tiếp nhận}} \\
+Huyết áp tâm thu (mmHg) & 128.5 $\pm$ 18.2 & 128.4 $\pm$ 18.1 & 128.9 $\pm$ 18.6 & 128.6 $\pm$ 18.4 \\
+Huyết áp tâm trương (mmHg) & 81.2 $\pm$ 10.8 & 81.1 $\pm$ 10.7 & 81.6 $\pm$ 11.2 & 81.3 $\pm$ 10.9 \\
+Nhịp tim (nhịp/phút) & 86.4 $\pm$ 16.5 & 86.2 $\pm$ 16.4 & 87.1 $\pm$ 17.0 & 86.6 $\pm$ 16.6 \\
+Nhịp thở (lần/phút) & 21.8 $\pm$ 4.7 & 21.7 $\pm$ 4.6 & 22.0 $\pm$ 4.9 & 21.9 $\pm$ 4.8 \\
+Thân nhiệt ($^\circ\text{C}$) & 37.3 $\pm$ 0.9 & 37.3 $\pm$ 0.9 & 37.4 $\pm$ 0.9 & 37.3 $\pm$ 0.9 \\
+$\text{SpO}_2$ ngoại vi (\%) & 93.6 $\pm$ 4.1 & 93.7 $\pm$ 4.0 & 93.4 $\pm$ 4.2 & 93.5 $\pm$ 4.1 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Xét nghiệm phản ứng viêm \& Tỷ lệ khuyết thiếu (Missingness)}} \\
+WBC ($\times 10^9/\text{L}$), khuyết 20.5\% & 9.4 $\pm$ 4.1 & 9.3 $\pm$ 4.0 & 9.6 $\pm$ 4.3 & 9.5 $\pm$ 4.2 \\
+CRP (mg/L), khuyết 22.4\% & 24.8 $\pm$ 36.5 & 24.3 $\pm$ 35.8 & 26.1 $\pm$ 38.2 & 25.4 $\pm$ 37.1 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Phân bố 4 nhóm bệnh mục tiêu ($y$)}} \\
+Hen phế quản (\texttt{ASTHMA}) & 500 (25.0\%) & 358 (25.1\%) & 71 (26.0\%) & 71 (23.5\%) \\
+COPD (\texttt{COPD}) & 500 (25.0\%) & 358 (25.1\%) & 71 (26.0\%) & 71 (23.5\%) \\
+Suy tim (\texttt{HEART\_FAILURE}) & 500 (25.0\%) & 340 (23.9\%) & 54 (19.8\%) & 106 (35.1\%) \\
+Viêm phổi (\texttt{PNEUMONIA}) & 500 (25.0\%) & 369 (25.9\%) & 77 (28.2\%) & 54 (17.9\%) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Quy Trình Khử Định Danh Bảo Vệ Quyền Riêng Tư (HIPAA Safe-Harbor De-Identification)}
+Để đảm bảo an toàn tuyệt đối cho người bệnh và tuân thủ các quy định quốc tế (HIPAA Safe Harbor, GDPR Điều 9) cũng như Nghị định 13/2023/NĐ-CP của Chính phủ Việt Nam về bảo vệ dữ liệu cá nhân, module \texttt{ClinicalDeidentifier} thực thi pipeline làm sạch 18 định danh cá nhân (PHI) qua kiến trúc kép lai ghép:
 \begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Ẩn danh hóa thông tin định danh (HIPAA Safe-Harbor De-identification):} Module \texttt{ClinicalDeidentifier} kết hợp biểu thức chính quy đa mẫu và nhận diện thực thể có tên (NER) để loại bỏ 18 loại định danh cá nhân (PHI) trong cả văn bản tiếng Việt và tiếng Anh.
-    \item \textbf{Khóa thời gian và Cấm tiêu chuẩn vàng (Temporal Locking \& Gold-Standard Blacklist):} Module \texttt{TemporalAligner} chỉ thu thập các biến sinh hiệu trong cửa sổ quan sát hợp lệ và loại bỏ hoàn toàn các từ khóa lộ nhãn trực tiếp trong văn bản (thay thế bằng token \texttt{[REDACTED\_DIAGNOSIS]}).
-    \item \textbf{Phân chia nghiêm ngặt theo bệnh nhân (Strict Patient-Level Group Split):} Tập dữ liệu được chia theo tỷ lệ 70\% Train ($N=1.398$), 15\% Validation ($N=300$) và 15\% Test độc lập ($N=302$) dựa trên định danh \texttt{patient\_id} và nguồn gốc văn bản \texttt{source\_note}, đảm bảo giao số tập hợp bằng rỗng ($\mathcal{P}_{\text{train}} \cap \mathcal{P}_{\text{val}} \cap \mathcal{P}_{\text{test}} = \emptyset$).
-    \item \textbf{Nội suy đa biến có chỉ báo khuyết thiếu (MICE with Missingness Indicators):} Bộ nội suy \texttt{ClinicalImputer} chỉ được khớp (\texttt{fit}) duy nhất trên tập Train và biến đổi (\texttt{transform}) sang tập Validation/Test, đồng thời bổ sung các cột nhị phân đánh dấu trạng thái khuyết thiếu (\texttt{wbc\_missing}, \texttt{crp\_missing}) để mô hình học được ý nghĩa lâm sàng của việc bác sĩ không chỉ định xét nghiệm.
+    \item \textbf{Động cơ Biểu thức chính quy (Regex Pattern Engine):} Tự động quét và loại bỏ các trường định dạng chuẩn gồm số Căn cước công dân/CMND (9--12 chữ số), số thẻ Bảo hiểm y tế (10--15 ký tự chữ và số), số điện thoại liên lạc Việt Nam (tiền tố \texttt{+84} hoặc các đầu số di động \texttt{03x, 05x, 07x, 08x, 09x}), địa chỉ thư điện tử (email) và các mốc thời gian cụ thể (\texttt{DD/MM/YYYY}, \texttt{YYYY-MM-DD}).
+    \item \textbf{Động cơ Nhận diện thực thể tên riêng y sinh (Biomedical NER Engine):} Sử dụng mô hình xử lý ngôn ngữ tự nhiên chuyên biệt để nhận diện tên bác sĩ, tên người bệnh (\texttt{PERSON}), tên cơ sở khám chữa bệnh (\texttt{FACILITY}), và đơn vị hành chính nhỏ hơn cấp tỉnh/thành phố (\texttt{GPE}).
+    \item \textbf{Thay thế bằng Token ngữ cảnh chuẩn hóa (Contextual Surrogate Masking):} Các thực thể nhạy cảm bị phát hiện được thay thế bằng token đại diện đồng nhất: \texttt{[REDACTED\_NAME]}, \texttt{[REDACTED\_DATE]}, \texttt{[REDACTED\_PHONE]}, \texttt{[REDACTED\_HOSPITAL]}, \texttt{[REDACTED\_ID]}. Phương pháp này bảo toàn toàn vẹn cú pháp ngữ pháp và mạch ngữ nghĩa lâm sàng, giúp mô hình ngôn ngữ Bio\_ClinicalBERT tiếp thu ngữ cảnh mà không thể tái định danh bệnh nhân.
+\end{enumerate}
+
+\subsection{Cơ Chế Khóa Chuỗi Thời Gian và Loại Trừ Tiêu Chuẩn Vàng (Temporal Locking \& Anti-Leakage)}
+Hiện tượng rò rỉ thông tin tương lai (\textit{Look-ahead Bias / Target Leakage}) là sai sót phổ biến hàng đầu trong các mô hình AI chẩn đoán, xảy ra khi thông tin cận lâm sàng phát sinh sau khi chẩn đoán đã hoàn tất bị đưa nhầm vào tập huấn luyện. Nghiên cứu thực thi hai hàng rào kỹ thuật nghiêm ngặt:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Khóa chuỗi thời gian quan sát (\textit{Chronological Time-Locking}):} Module \texttt{TemporalAligner} thiết lập mốc thời gian nghiêm ngặt: gọi $t_{\text{diag}}$ là thời điểm bác sĩ xác lập kết luận chẩn đoán mã ICD-10 trong hệ thống EHR. Mọi dữ liệu biến số đầu vào $X_j(t)$ bắt buộc phải thỏa mãn:
+    \begin{equation}
+        t(X_j) < t_{\text{diag}}
+    \end{equation}
+    Bất kỳ chỉ số xét nghiệm hoặc ghi chú điều trị nào phát sinh tại mốc $t \ge t_{\text{diag}}$ đều bị loại bỏ tự động khỏi ma trận đầu vào của mô hình.
+    \item \textbf{Danh mục cấm xét nghiệm tiêu chuẩn vàng (\textit{Gold-Standard Blacklist}):} Để khắc phục triệt để nghịch lý chẩn đoán bị JMIR phê phán (ví dụ: dùng đo phế dung khí chẩn đoán Hen/COPD hoặc dùng siêu âm tim chẩn đoán suy tim), hệ thống cấm tuyệt đối đưa các tiêu chuẩn vàng vào dữ liệu đầu vào:
+    \begin{itemize}[leftmargin=1.5em, itemsep=0.1em]
+        \item Cấm chỉ số Hô hấp ký/Phế dung ký ($FEV_1, FVC, FEV_1/FVC$ sau nghiệm pháp giãn phế quản) vốn là tiêu chuẩn vàng định nghĩa COPD theo GOLD 2024.
+        \item Cấm chỉ số Phân suất tống máu thất trái LVEF trên Siêu âm tim Doppler màu (tiêu chuẩn vàng phân loại suy tim HFrEF/HFpEF theo ESC 2023).
+        \item Cấm kết quả cấy đờm vi sinh định danh vi khuẩn và kháng sinh đồ (tiêu chuẩn vàng viêm phổi).
+        \item Loại bỏ và che phủ mọi từ khóa chẩn đoán trực tiếp trong văn bản bằng token \texttt{[REDACTED\_DIAGNOSIS]}.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Phân Chia Tập Dữ Liệu Nghiêm Ngặt Theo Bệnh Nhân (Patient-Level Group Splitting)}
+Khi một bệnh nhân có nhiều đợt khám hoặc nhiều bản ghi tiến triển trong hệ thống, việc phân chia ngẫu nhiên thông thường (\textit{Random Splitting}) sẽ làm phân tán các bản ghi của cùng một bệnh nhân sang cả tập Train và tập Test. Hiện tượng này tạo ra rò rỉ định danh bệnh nhân (\textit{Identity Confounding}), khiến mô hình học thuộc đặc điểm cá nhân thay vì học quy luật bệnh học tổng quát.
+
+Để ngăn chặn triệt để nguy cơ này, nghiên cứu áp dụng kỹ thuật \textbf{Stratified Group Splitting} (\texttt{StratifiedGroupKFold}) với tỷ lệ phân chia 70\% Huấn luyện ($N = 1.425$), 15\% Kiểm định ($N = 273$) và 15\% Kiểm thử độc lập ($N = 302$). Phân chia được nhóm hóa đồng thời theo cả mã định danh bệnh nhân (\texttt{patient\_id}) và nguồn gốc văn bản gốc (\texttt{source\_note\_group}), đảm bảo tính tách biệt tuyệt đối về mặt toán học:
+\begin{equation}
+    \mathcal{P}_{\text{train}} \cap \mathcal{P}_{\text{val}} = \emptyset, \quad \mathcal{P}_{\text{train}} \cap \mathcal{P}_{\text{test}} = \emptyset, \quad \mathcal{P}_{\text{val}} \cap \mathcal{P}_{\text{test}} = \emptyset
+\end{equation}
+Toàn bộ quá trình phân chia đã được kiểm toán tự động qua tập lệnh \texttt{scripts/audit\_data\_leakage.py} (báo cáo lưu tại \texttt{data/rebuilt\_strict\_split\_audit.json}), xác nhận $0$ trường hợp rò rỉ bệnh nhân giữa các tập dữ liệu.
+
+\subsection{Nội Suy Đa Biến MICE Kèm Biến Chỉ Báo Khuyết Thiếu (MICE Imputation with Indicators)}
+Trong thực hành lâm sàng ngoại trú ban đầu, dữ liệu cận lâm sàng thường xuyên bị thiếu khuyết có chủ đích (\textit{Missing Not At Random --- MNAR}): bác sĩ chỉ chỉ định xét nghiệm công thức máu WBC hoặc định lượng CRP khi bệnh nhân có biểu hiện sốt, ho đờm đục hoặc nghi ngờ nhiễm khuẩn cấp tính. Do đó, việc xóa bỏ dòng chứa dữ liệu khuyết (\textit{Complete Case Analysis}) sẽ làm mất đi 30\%--40\% đối tượng nghiên cứu và gây méo mó nghiêm trọng phân bố bệnh nhân.
+
+Nghiên cứu sử dụng thuật toán **Nội suy Đa biến bằng Phương trình Chuỗi liên kết (MICE)** \cite{vanbuuren2011mice} qua module \texttt{ClinicalImputer} (\texttt{sklearn.impute.IterativeImputer}), tuân thủ nghiêm ngặt kỷ luật học máy y tế:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Kỷ luật Fit-Transform chặt chẽ:} Bộ nội suy MICE chỉ được khớp tham số hồi quy (\texttt{fit}) duy nhất trên tập Huấn luyện (\texttt{train.parquet}), sau đó áp dụng phép biến đổi suy luận (\texttt{transform}) sang tập Validation và Test. Nghiêm cấm tuyệt đối việc fit bộ nội suy trên toàn bộ dữ liệu gộp.
+    \item \textbf{Bổ sung Biến chỉ báo khuyết thiếu (Missingness Indicators):} Đối với mỗi biến số có tỷ lệ khuyết thiếu (như WBC khuyết 20.5\%, CRP khuyết 22.4\%), hệ thống tự động sinh thêm biến nhị phân chỉ thị $I_{\text{missing}} \in \{0, 1\}$ (\texttt{wbc\_missing}, \texttt{crp\_missing}). Cơ chế này cho phép mô hình học được giá trị chẩn đoán tiềm ẩn từ chính hành vi ``không chỉ định xét nghiệm'' của bác sĩ điều trị.
 \end{enumerate}

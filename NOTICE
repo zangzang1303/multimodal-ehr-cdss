@@ -1,0 +1,79 @@
+================================================================================
+MULTIMODAL ELECTRONIC HEALTH RECORD CLINICAL DECISION SUPPORT SYSTEM (M-CDSS)
+THIRD-PARTY NOTICES, COPYRIGHT & LICENSING COMPLIANCE REGISTRY
+================================================================================
+
+This project incorporates software, pretrained models, clinical guidelines, and
+datasets subject to different licenses and terms of use. The original codebase
+authored by the M-CDSS Team is licensed under the MIT License (see LICENSE).
+
+--------------------------------------------------------------------------------
+1. ORIGINAL SOFTWARE SOURCE CODE
+--------------------------------------------------------------------------------
+Copyright (c) 2026 M-CDSS Research Team:
+  - Nguyen Nho Duong (Lead ML / Multimodal Modeling)
+  - Le Tuan Canh (Biomedical Data Engineering & Privacy)
+  - Nguyen Van Cuong (Full-Stack AI & System Architecture)
+License: MIT License.
+
+--------------------------------------------------------------------------------
+2. PRETRAINED NEURAL NETWORK BACKBONES & EMBEDDING MODELS
+--------------------------------------------------------------------------------
+a. Bio_ClinicalBERT (emilyalsentzer/Bio_ClinicalBERT)
+   - Authors: Emily Alsentzer, John Murphy, William Boag, Wei-Hung Weng, Di Jindi,
+     Tristan Naumann, Matthew McDermott (2019).
+   - Citation: "Publicly Available Clinical BERT Embeddings", NAACL Clinical NLP Workshop.
+   - License: Apache License 2.0 / Subject to PhysioNet Credentialed Data Use Agreement terms.
+   - Terms: For academic and educational research. Commercial redistribution of weights
+     derived from MIMIC-III is subject to PhysioNet credentialing requirements.
+
+b. Sentence Transformers all-mpnet-base-v2 (sentence-transformers/all-mpnet-base-v2)
+   - Authors: Nils Reimers, Iryna Gurevych, Hugging Face.
+   - License: Apache License 2.0.
+
+--------------------------------------------------------------------------------
+3. DATASET GENERATORS & CLINICAL CORPORA
+--------------------------------------------------------------------------------
+a. Synthea EHR Patient Generator
+   - Copyright (c) The MITRE Corporation.
+   - License: Apache License 2.0.
+   - Purpose: Generating synthetic realistic physiology and laboratory profiles.
+
+b. MTSamples Clinical Notes
+   - Source: MTSamples Public Clinical Transcription Collection.
+   - Usage: Non-commercial academic research reference for clinical linguistic patterns.
+
+--------------------------------------------------------------------------------
+4. CLINICAL PRACTICE GUIDELINES (CPG) & EVIDENCE CATALOG
+--------------------------------------------------------------------------------
+All original clinical guidelines digitized in `data/guidelines/` and indexed in
+`data/vector_store/` remain under the copyright of their respective issuing bodies.
+They are utilized solely for non-profit academic research, evidence citation, and
+clinical decision support grounding under fair use principles:
+
+a. GINA 2024: Global Strategy for Asthma Management and Prevention
+   - Copyright (c) Global Initiative for Asthma (GINA).
+   - URL: https://ginasthma.org/
+
+b. GOLD 2024: Global Strategy for the Diagnosis, Management, and Prevention of COPD
+   - Copyright (c) Global Initiative for Chronic Obstructive Lung Disease (GOLD).
+   - URL: https://goldcopd.org/
+
+c. ESC 2023: Guidelines for the Diagnosis and Treatment of Acute and Chronic Heart Failure
+   - Copyright (c) European Society of Cardiology (ESC).
+   - URL: https://www.escardio.org/
+
+d. Vietnam Ministry of Health (Bộ Y tế Việt Nam)
+   - Quyết định số 4815/QĐ-BYT: Hướng dẫn chẩn đoán và điều trị viêm phổi mắc phải cộng đồng.
+   - Quyết định số 1856/QĐ-BYT: Hướng dẫn chẩn đoán và điều trị Bệnh phổi tắc nghẽn mạn tính.
+   - Quyết định số 1851/QĐ-BYT: Hướng dẫn chẩn đoán và điều trị Hen phế quản người lớn.
+   - Official Vietnamese clinical protocols for public healthcare and medical education.
+
+--------------------------------------------------------------------------------
+5. CLINICAL & ETHICAL DISCLAIMER
+--------------------------------------------------------------------------------
+M-CDSS is a scientific research prototype designed strictly for assistive decision
+support and educational exploration. It does NOT constitute medical device software
+certified for autonomous clinical diagnosis or treatment, and does NOT replace the
+professional medical judgment of licensed physicians.
+================================================================================

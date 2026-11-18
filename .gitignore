@@ -13,6 +13,8 @@ data/processed/*
 !data/processed/.gitkeep
 data/vector_store/*
 !data/vector_store/.gitkeep
+!data/vector_store/README.md
+!data/vector_store/manifest.json
 data/checkpoints/*
 !data/checkpoints/.gitkeep
 *.csv
