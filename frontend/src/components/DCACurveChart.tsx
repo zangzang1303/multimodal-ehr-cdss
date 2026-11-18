@@ -31,21 +31,27 @@ export default function DCACurveChart({
   isDark = true,
   dcaStatus = "illustrative_simulation_pending_patient_level_predictions",
 }: DCACurveChartProps) {
+  const [sliderThreshold, setSliderThreshold] = useState<number>(0.20);
   const isIllustrative = dcaStatus !== "empirical_holdout_predictions";
   if (points.length === 0) {
     return (
-      <div className="p-6 rounded-2xl border border-amber-300 bg-amber-50 text-sm text-amber-900">
+      <div className="p-6 rounded-2xl border border-amber-300 bg-amber-50 dark:bg-amber-950/20 text-sm text-amber-900 dark:text-amber-200">
         Chưa tải được dữ liệu DCA từ API. Biểu đồ sẽ hiển thị khi endpoint đánh giá khả dụng.
       </div>
     );
   }
-  const [sliderThreshold, setSliderThreshold] = useState<number>(0.20);
+
+  // Filter points to predefined valid range [0.10, 0.45]
+  const validRangePoints = points.filter(
+    (p) => p.threshold >= 0.10 - 1e-4 && p.threshold <= 0.45 + 1e-4
+  );
+  const activePoints = validRangePoints.length > 0 ? validRangePoints : points;
 
   // Find point closest to sliderThreshold
   const currentPoint =
-    points.find(
+    activePoints.find(
       (p) => Math.abs(p.threshold - sliderThreshold) < 0.001
-    ) || points[3];
+    ) || activePoints[0];
 
   const deltaOverAll = Math.max(
     0,
@@ -71,7 +77,7 @@ export default function DCACurveChart({
   return (
     <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+      <div className="flex flex-col gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
@@ -91,9 +97,24 @@ export default function DCACurveChart({
           </p>
         </div>
 
-        <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold self-start sm:self-auto">
-          Dải ngưỡng phân tích: pt ∈ [10%, 45%]
-        </span>
+        <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+          <span className="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 font-medium">
+            Bệnh đích OvR: <strong>HEART_FAILURE / Macro 4 lớp</strong>
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 font-medium">
+            Hành động giả định: <strong>Siêu âm tim Doppler &amp; NT-proBNP</strong>
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-medium">
+            Tỷ lệ hiện mắc (Prevalence): <strong>35.1% HF (Macro 25.0%)</strong>
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20 font-medium">
+            Dải ngưỡng hợp lệ: <strong>pt ∈ [10%, 45%]</strong>
+          </span>
+        </div>
+
+        <p className="mt-2 text-xs text-rose-700 dark:text-rose-300 font-medium bg-rose-500/5 border border-rose-500/20 rounded-lg px-3 py-1.5">
+          Cảnh báo: Phân tích minh họa trên dữ liệu nghiên cứu tổng hợp — không thay thế thử nghiệm lâm sàng ngẫu nhiên có đối chứng (RCT).
+        </p>
       </div>
 
       {/* Interactive Slider & Real-Time Clinical Benefit Cards */}
@@ -102,7 +123,7 @@ export default function DCACurveChart({
           <div className="flex items-center gap-2">
             <Sliders className="w-4 h-4 text-sky-500" />
             <label className="text-xs font-bold text-slate-900 dark:text-white">
-              Điều Chỉnh Ngưỡng Xác Suất Can Thiệp (Threshold Probability pt):
+              Điều Chỉnh Ngưỡng Xác Suất Can Thiệp (Threshold Probability pt ∈ [0.10, 0.45]):
             </label>
           </div>
           <span className="text-sm font-mono font-black text-sky-600 dark:text-sky-400 bg-sky-500/10 px-3 py-1 rounded-lg border border-sky-500/20">
@@ -110,22 +131,22 @@ export default function DCACurveChart({
           </span>
         </div>
 
-        {/* Range Slider */}
+        {/* Range Slider constrained strictly to [0.10, 0.45] */}
         <div className="space-y-1.5">
           <input
             type="range"
-            min="0.05"
-            max="0.60"
+            min="0.10"
+            max="0.45"
             step="0.05"
             value={sliderThreshold}
             onChange={(e) => setSliderThreshold(parseFloat(e.target.value))}
             className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500 focus:outline-none"
           />
           <div className="flex justify-between text-[10px] text-slate-400 font-mono">
-            <span>5% (Nhạy cao)</span>
+            <span>10% (Nhạy cao)</span>
             <span>20% (Ngưỡng khám ban đầu)</span>
-            <span>40% (Ngưỡng chuyên khoa)</span>
-            <span>60% (Đặc hiệu cao)</span>
+            <span>35% (Ngưỡng cận chuyên khoa)</span>
+            <span>45% (Đặc hiệu cao)</span>
           </div>
         </div>
 
