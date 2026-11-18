@@ -99,3 +99,15 @@ tasks/
 | **01** | `backlog-01-week-01-setup-and-data` | Thiết lập môi trường, hợp đồng dữ liệu lâm sàng, dữ liệu thô và khung ứng dụng | **SẴN SÀNG LÀM** | [Xem Backlog 1](backlog-01-week-01-setup-and-data/README.md) |
 | **02** | `backlog-02-week-02-data-pipeline-and-privacy` | Pipeline khử định danh PHI, khóa chuỗi thời gian chống rò rỉ nhãn, MICE và dựng khung 3 Baselines | *Chờ Tuần 1* | [Xem Backlog 2](backlog-02-week-02-data-pipeline-and-privacy/README.md) |
 | **03** | `backlog-03-week-03-baselines-and-proposal` | Patient Split, huấn luyện 3 Baselines, đo đạc benchmark, phân tích sai số và Báo cáo Đề xuất Tối ưu | *Chờ Tuần 2* | [Xem Backlog 3](backlog-03-week-03-baselines-and-proposal/README.md) |
+
+---
+
+## 4. GIAI ĐOẠN 3: CỦNG CỐ NGHIÊN CỨU, HOÀN THIỆN ỨNG DỤNG & BẢO VỆ (lập ngày 2026-11-18)
+
+Rà soát toàn bộ dự án sau Backlog 07: [`docs/10_DANH_GIA_TONG_THE_VA_KE_HOACH_HOAN_THIEN.md`](../docs/10_DANH_GIA_TONG_THE_VA_KE_HOACH_HOAN_THIEN.md)
+
+| Backlog | Thư Mục | Trọng Tâm | Trạng Thái | Link |
+| :---: | :--- | :--- | :---: | :--- |
+| **08** | `phase-03-research-hardening/backlog-08-integrity-and-reproducibility` | Sửa checkpoint/đánh giá sai, fallback BERT ngẫu nhiên, `/agent/explain` lỗi, mock gán cứng, rò PHI, PROBAST | **SẴN SÀNG LÀM** | [Xem Backlog 8](phase-03-research-hardening/backlog-08-integrity-and-reproducibility/README.md) |
+| **09** | `phase-03-research-hardening/backlog-09-research-strengthening` | RQ1–RQ5: so sánh công bằng + CI, phân rã tín hiệu văn bản, mô phỏng bổ trợ, DCA, độ bền, đánh giá RAG | *Chờ Backlog 8* | [Xem Backlog 9](phase-03-research-hardening/backlog-09-research-strengthening/README.md) |
+| **10** | `phase-03-research-hardening/backlog-10-paper-app-and-defense` | Bài báo TRIPOD+AI, Docker clean-run, video, slide, tổng duyệt | *Chờ Backlog 9* | [Xem Backlog 10](phase-03-research-hardening/backlog-10-paper-app-and-defense/README.md) |
