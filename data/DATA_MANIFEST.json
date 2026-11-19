@@ -1,0 +1,30 @@
+{
+  "_mock_notice": "[MOCK FILE - TẠO TẠM BỞI THÀNH VIÊN 3 ĐỂ KIỂM THỬ PHASE 3 - CHỜ THÀNH VIÊN 2 CHỐT MANIFEST CHÍNH THỨC (BACKLOG 08 TASK 2.1)]",
+  "manifest_version": "1.0.0-mock",
+  "generated_by": "member3_mock_placeholder",
+  "manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "canonical_split_dir": "data/processed_rebuilt_strict",
+  "splits": {
+    "train": {
+      "rows": 1425,
+      "relative_path": "data/processed_rebuilt_strict/train.parquet",
+      "sha256": "mock-train-sha256-pending-member2"
+    },
+    "val": {
+      "rows": 273,
+      "relative_path": "data/processed_rebuilt_strict/val.parquet",
+      "sha256": "mock-val-sha256-pending-member2"
+    },
+    "test": {
+      "rows": 302,
+      "relative_path": "data/processed_rebuilt_strict/test.parquet",
+      "sha256": "mock-test-sha256-pending-member2",
+      "class_counts": {
+        "ASTHMA": 71,
+        "COPD": 71,
+        "HEART_FAILURE": 106,
+        "PNEUMONIA": 54
+      }
+    }
+  }
+}

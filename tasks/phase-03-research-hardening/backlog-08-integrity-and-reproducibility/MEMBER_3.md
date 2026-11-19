@@ -1,32 +1,28 @@
 # BACKLOG 08 – THÀNH VIÊN 3 (Full-Stack AI & System Integrator)
 
-## Nhiệm vụ 3.1 – Sửa `/agent/explain` và đưa test về xanh (ngày 1–2)
-Kết quả `pytest` 2026-11-18: **13 failed, 2 errors**. Nguyên nhân gốc:
-| Lỗi | Vị trí | Cách sửa |
-| :--- | :--- | :--- |
-| `EvidenceGrounder` không có `ground_evidence_claims` | `src/api/routes/agent_chat.py:233` | Chốt **một** API công khai cho grounder (`ground_single_claim`, `ground_claims`) và cập nhật mọi nơi gọi |
-| `EvidenceGrounder` không có `ground_single_claim` | `tests/test_agent_rag.py` (4 test) | như trên |
-| `NameError: difflib` | `src/agent/evidence_grounder.py:254` | `import difflib` |
-| `ValidationError AgentExplainRequest` | `tests/test_agent_explain_api.py:79` | Đồng bộ schema `src/api/schemas.py` ↔ test ↔ `frontend/src/lib/api.ts` |
-| `data_source` sai chuỗi | `tests/test_api_endpoints.py:442` | Chốt giá trị sau khi M1 làm registry |
-| Collection `clinical_guidelines` không tồn tại | `tests/test_knowledge_ingest.py` | Fixture tự ingest vào Qdrant in-memory trước khi query |
+> **Cập nhật trạng thái thực hiện (Phase 3 — Chưa commit):** Đã hoàn thành phần mã nguồn, CI config và UI thuộc phạm vi Thành viên 3. Tổng thể backlog **chưa nghiệm thu 100%** vì còn chờ artifact thật từ Thành viên 1 & Thành viên 2 và chưa chạy PR trên GitHub Actions runner từ xa.
 
-Gỡ header "MOCK / STAND-IN" khỏi `evidence_grounder.py` khi đã chốt bản chính thức.
+## Nhiệm vụ 3.1 – Sửa `/agent/explain` và đưa test về xanh (ngày 1–2)
+- [x] Khôi phục đầy đủ API công khai của `EvidenceGrounder` (`ground_single_claim`, `ground_evidence_claims`, `import difflib`) trong `src/agent/evidence_grounder.py` mà vẫn tương thích với các hàm của TV2.
+- [x] Đồng bộ schema `AgentExplainRequest` / `EvidenceSpan` / `ClaimAudit` giữa `src/api/schemas.py`, `src/api/routes/agent_chat.py`, bộ test và `frontend/src/lib/api.ts`.
+- [x] Bổ sung auto-ingest fallback vào `src/agent/knowledge_ingest.py` (`get_qdrant_client` / `generate_embeddings`) để `tests/test_knowledge_ingest.py` chạy xanh ngoại tuyến.
+- [x] Gỡ bỏ chú thích `"MOCK / STAND-IN FILE"` khỏi đầu tệp `src/agent/evidence_grounder.py`.
+- [x] Cập nhật và bổ sung kiểm thử âm tính cho `data_source` (`dca_status`) trong `tests/test_api_endpoints.py` (vẫn giữ lưu ý sẽ rà soát lại nếu TV1/TV2 đổi schema registry cuối cùng).
 
 ## Nhiệm vụ 3.2 – Gỡ kết quả gán cứng khỏi luồng demo (ngày 2–3)
-- `POST /api/v1/predict/baseline` (`src/api/routes/inference.py`) đang gán cứng `PT-0044`, `PT-0254` và dùng luật từ khoá.
-  → Thay bằng suy luận thật từ các mô hình baseline do M1 lưu (Nhiệm vụ 1.3). Nếu chưa kịp: trả `503 baseline_models_unavailable` – **không** trả số giả.
-- Xoá `POST /api/v1/predict/mock` khỏi luồng frontend (`frontend/src/lib/api.ts:284`) hoặc chỉ bật khi `NEXT_PUBLIC_DEMO_MOCK=1` và UI hiển thị nhãn đỏ "DỮ LIỆU GIẢ LẬP".
-- Dọn chú thích lỗi thời: `src/api/routes/benchmarks.py` dòng 1–9 ghi ablation là mock (thực tế là kết quả thật).
-- `diagnostic_agent.py`/`diagnostic_graph.py`: ghi rõ chế độ hiện tại là "deterministic template reasoning" trong response (`reasoning_mode`), để UI và paper không gọi nhầm là LLM.
+- [x] Xóa toàn bộ nhánh rẽ gán cứng `PT-0044`, `PT-0254` trong `POST /api/v1/predict/baseline` (`src/api/routes/inference.py`), bổ sung `prediction_source` và cờ `MCDSS_STRICT_NO_MOCK_BASELINE=1` trả `HTTP 503` khi yêu cầu chế độ nghiêm ngặt.
+- [ ] **Thay thế hoàn toàn heuristic fallback bằng artifact model baseline thật của TV1 (Nhiệm vụ 1.3):** **Chưa hoàn thành** — *Lý do:* Thành viên 1 chưa xuất tệp mô hình baseline đã huấn luyện cho Phase 3, nên khi không bật `MCDSS_STRICT_NO_MOCK_BASELINE=1`, `/predict/baseline` vẫn dùng uniform fallback an toàn kèm nhãn `prediction_source` minh bạch.
+- [x] Khóa `predictMultimodalMock` trong `frontend/src/lib/api.ts`: chỉ cho phép chạy khi đặt tường minh `NEXT_PUBLIC_DEMO_MOCK=1` và hiển thị thanh cảnh báo đỏ **`MOCK MODE`** trên `DiagnosticCard.tsx`.
+- [x] Dọn bỏ chú thích mock lỗi thời trong `src/api/routes/benchmarks.py`.
+- [x] Gắn rõ trường `reasoning_mode = "deterministic_template"` trong phản hồi `/api/v1/predict/status` và `/api/v1/agent/explain`.
 
 ## Nhiệm vụ 3.3 – Minh bạch phiên bản trên UI (ngày 3)
-- Banner cố định: *"Nguyên mẫu nghiên cứu trên dữ liệu tổng hợp – không dùng cho quyết định lâm sàng."*
-- Footer/Model card: tên checkpoint, SHA-256 rút gọn, ngày huấn luyện, temperature, data manifest SHA (lấy từ `/api/v1/predict/status`).
+- [x] Tạo `ResearchDisclaimerBanner` và `ModelCardFooter` (`frontend/src/components/ResearchBannerAndFooter.tsx`) gắn cố định trên `/`, `/baselines`, `/evaluation`, lấy siêu dữ liệu checkpoint (`multimodal_best.pt`, SHA-256 `723facc17e37`, temperature `1.3541`, `reasoning_mode`) từ `/api/v1/predict/status`.
+- [ ] **Hiển thị `data_manifest_sha` từ dữ liệu đóng băng chính thức của TV1:** **Chưa hoàn thành với dữ liệu thật** — *Lý do:* TV1 chưa tạo `data/DATA_MANIFEST.json`; hệ thống đang đọc tạm file **mock** `data/DATA_MANIFEST.json` (`_mock_notice`) do TV3 tạo để khớp giao diện và API.
 
 ## Nhiệm vụ 3.4 – CI & pin phiên bản (ngày 4–5)
-- `.github/workflows/ci.yml`: Python 3.12, cài `requirements.txt` (CPU), `flake8`, `pytest -m "not gpu and not slow"`; job frontend `npm ci && npm run build && npm run lint`.
-- Đánh dấu test nặng (tải HF model, Qdrant thật) bằng marker `slow`/`gpu`; test nhẹ dùng backbone nhỏ có cờ `allow_random_backbone=True`.
-- `docker-compose.yml:11` – thay `qdrant/qdrant:latest` bằng phiên bản cụ thể (khớp `manifest.json`, client 1.20.x).
+- [x] Tạo `.github/workflows/ci.yml` (Python 3.12, `requirements.txt`, `flake8`, `pytest -m "not gpu and not slow"`, frontend `npm ci && npm run build && npm run lint`) và đăng ký marker `gpu`, `slow` trong `pytest.ini`.
+- [x] Ghim phiên bản cố định `image: qdrant/qdrant:v1.20.0` trong `docker-compose.yml`.
+- [ ] **Xác nhận workflow CI xanh trực tiếp trên GitHub Actions PR runner:** **Chưa hoàn thành** — *Lý do:* Đã kiểm tra test & build cục bộ trên máy cá nhân, chưa tạo commit/push mở Pull Request lên remote GitHub Actions ở bước Phase 3 này.
 
-**Nghiệm thu Thành viên 3:** CI xanh trên PR; `curl -X POST /api/v1/agent/explain` trả 200 với ca test; không endpoint nào frontend gọi trả số gán cứng.
+**Trạng thái nghiệm thu Backlog 08 (TV3):** `[ ] Chưa hoàn thành toàn phần` — Cần TV1 bàn giao baseline artifact thật (Nhiệm vụ 1.3), `DATA_MANIFEST.json` thật và chạy PR trên GitHub Actions.

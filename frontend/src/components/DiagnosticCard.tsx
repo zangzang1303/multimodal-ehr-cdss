@@ -230,6 +230,24 @@ export default function DiagnosticCard({
                         </span>
                     </div>
                 </div>
+
+                {result.prediction_source === "mock" && (
+                    <div className="mt-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-800 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
+                        <AlertOctagon className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" />
+                        <span>
+                            DỮ LIỆU GIẢ LẬP (MOCK MODE) — Đang bật NEXT_PUBLIC_DEMO_MOCK=1, kết quả không xuất từ checkpoint thật.
+                        </span>
+                    </div>
+                )}
+
+                {topPrediction.probability < 0.55 && (
+                    <div className="mt-3 p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-900 dark:text-amber-200 text-xs font-semibold flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                        <span>
+                            Cảnh báo độ không chắc chắn cao (Max Prob &lt; 55%) &ndash; Mô hình không chắc chắn khi phân biệt các lớp, cần đánh giá lâm sàng và xét nghiệm chuyên sâu.
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Main Body: Top-K Ranked Diseases with 3-Band Progress Bars */}
@@ -493,6 +511,9 @@ export default function DiagnosticCard({
                                     <div className="flex items-center gap-2">
                                         <span className="text-xs font-bold text-indigo-900 dark:text-indigo-300">
                                             Biện Luận Chẩn Đoán Phân Biệt:
+                                        </span>
+                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 font-mono">
+                                            Chế độ: {explainData.reasoning_mode || "deterministic_template"} (Pipeline truy xuất + neo bằng chứng tất định)
                                         </span>
                                         <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-500/30">
                                             {explainData.primary_diagnosis_name}{" "}

@@ -245,6 +245,10 @@ class PatientInferenceResponse(BaseModel):
     """
 
     patient_id: str = Field(..., description="Patient identifier")
+    prediction_source: str = Field(
+        default="heuristic_baseline_fallback_pending_member1_cbm",
+        description="Prediction provenance until fitted baseline artifacts are loaded",
+    )
     baseline_results: Dict[str, BaselineModelResult] = Field(
         ...,
         description="Results from 3 baseline models: classical_tabular, tabular_deep, text_only",

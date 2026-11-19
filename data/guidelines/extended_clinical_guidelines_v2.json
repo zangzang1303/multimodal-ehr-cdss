@@ -1,0 +1,1149 @@
+[
+  {
+    "chunk_id": "GINA_2024_SYMPTOMS_05",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Đặc điểm biến thiên triệu chứng hô hấp trong Hen phế quản",
+    "page_or_section": "Section 1, Box 1-1, pp. 24-25",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Triệu chứng điển hình gợi ý Hen bao gồm thở khò khè (wheezing), khó thở, nặng ngực và ho, thường biểu hiện nhiều triệu chứng đồng thời, dao động cường độ theo thời gian, hay nặng lên ban đêm hoặc gần sáng và khởi phát bởi vận động, không khí lạnh hoặc dị nguyên.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "hen",
+        "asthma",
+        "khò khè",
+        "ban đêm",
+        "sáng sớm",
+        "biến thiên"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_SPIROMETRY_06",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Nghiệm pháp giãn phế quản và đo lưu lượng đỉnh PEF",
+    "page_or_section": "Section 1, Box 1-2, p. 26",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Xác nhận giới hạn luồng khí thở ra dao động trong Hen bằng hô hấp ký: FEV1 tăng > 12% và > 200 mL sau hít 200-400 mcg salbutamol, hoặc biến thiên lưu lượng đỉnh PEF trung bình ngày > 10% trong theo dõi 2 tuần, hoặc FEV1 tăng > 12% sau 4 tuần điều trị kháng viêm ICS.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "fev1",
+        "salbutamol",
+        "hô hấp ký",
+        "pef",
+        "giãn phế quản",
+        "hen"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_CHALLENGE_07",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Nghiệm pháp kích thích phế quản khi hô hấp ký bình thường",
+    "page_or_section": "Section 1, Box 1-2, p. 27",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence B",
+    "text_content": "Khi bệnh nhân đo chức năng phổi ngoài cơn có chỉ số bình thường nhưng vẫn nghi ngờ Hen, nghiệm pháp kích thích phế quản với methacholine (PC20 <= 8 mg/mL) hoặc thử thách gắng sức cho thấy FEV1 giảm >= 15% giúp khẳng định tăng đáp ứng đường thở.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "kích thích phế quản",
+        "methacholine",
+        "ngoài cơn",
+        "gắng sức",
+        "hen"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_DIFF_HF_08",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Phân biệt Hen phế quản với Hen tim và Suy tim sung huyết",
+    "page_or_section": "Section 1, Table 1-3, p. 31",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Phân biệt cơn khó thở kiểu hen tim trong Suy tim với Hen phế quản: Hen tim thường xuất hiện ở người cao tuổi có tiền sử tăng huyết áp, bệnh mạch vành, kèm tĩnh mạch cổ nổi, phù chân, ran ẩm đáy phổi và NT-proBNP tăng cao; trong khi Hen ít khi gây rối loạn huyết động nặng trừ cơn nguy kịch.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "hen tim",
+        "suy tim",
+        "nt-probnp",
+        "phân biệt",
+        "hen"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_DIFF_CAP_09",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Phân biệt Đợt cấp Hen phế quản với Viêm phổi cộng đồng",
+    "page_or_section": "Section 1, Box 1-3, p. 30",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Đợt cấp Hen phế quản thường không kèm sốt cao rét run kéo dài hay hội chứng đông đặc phổi khu trú, CRP và bạch cầu chỉ tăng nhẹ hoặc bình thường; ngược lại Viêm phổi cộng đồng có sốt > 38°C, đờm mủ, X-quang có đám mờ thâm nhiễm mới và CRP tăng cao.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "viêm phổi",
+        "sốt",
+        "crp",
+        "hen",
+        "phân biệt"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_TRACK1_10",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Chiến lược điều trị cắt cơn và ngừa cơn Track 1 (ICS-formoterol)",
+    "page_or_section": "Section 3, Box 3-5, pp. 62-66",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "GINA 2024 khuyến cáo Track 1 ưu tiên sử dụng phối hợp ICS-formoterol liều thấp làm thuốc cắt cơn (AIR/MART) cho bệnh nhân Hen ở mọi bậc nhằm giảm nguy cơ đợt kịch phát nặng thay vì lạm dụng SABA đơn thuần.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "ics-formoterol",
+        "saba",
+        "mart",
+        "điều trị hen",
+        "gina"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_BIOMARKERS_11",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Dấu ấn sinh học viêm Type 2 (FeNO và Bạch cầu ái toan)",
+    "page_or_section": "Section 1 & 3, pp. 28, 76",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence B",
+    "text_content": "Xét nghiệm FeNO (> 25-50 ppb) và bạch cầu ái toan máu tăng phản ánh tình trạng viêm đường thở type 2, hỗ trợ dự đoán đáp ứng tốt với corticoid dạng hít (ICS) trong Hen phế quản, dù FeNO bình thường không loại trừ chẩn đoán Hen không tăng bạch cầu ái toan.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "feno",
+        "ái toan",
+        "eosinophil",
+        "ics",
+        "hen"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_EIB_12",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Co thắt phế quản do gắng sức và tiếp xúc không khí lạnh",
+    "page_or_section": "Section 3.3, pp. 80-81",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Triệu chứng ho, khò khè và tức ngực xuất hiện sau 5-15 phút vận động mạnh hoặc hít không khí lạnh khô gợi ý co thắt phế quản do gắng sức; kiểm soát tốt bằng duy trì ICS hàng ngày và hít ICS-formoterol trước gắng sức.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "gắng sức",
+        "khò khè",
+        "không khí lạnh",
+        "hen"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_ACOS_13",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Tiếp cận bệnh nhân có đặc điểm chồng lấp Hen và COPD",
+    "page_or_section": "Section 5, Box 5-1, pp. 118-122",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Bệnh nhân có tiền sử Hen từ nhỏ nhưng hút thuốc lá nhiều về sau có thể biểu hiện hội chứng chồng lấp Hen-COPD với tắc nghẽn luồng khí dai dẳng kèm tăng eosinophil và đáp ứng từng phần với giãn phế quản; cần phối hợp ICS trong phác đồ nền để phòng ngừa tử vong.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "chồng lấp",
+        "acos",
+        "hen",
+        "copd",
+        "ics"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_SEVERITY_MOD_14",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Phân độ nặng đợt cấp Hen nhẹ và trung bình tại phòng khám",
+    "page_or_section": "Section 4, Box 4-3, p. 88",
+    "clinical_category": "RED_FLAG",
+    "evidence_level": "Evidence A",
+    "text_content": "Cơn hen cấp nhẹ đến trung bình biểu hiện nói được cả câu, thích ngồi hơn nằm, không kích động, nhịp thở tăng nhẹ, mạch 100-120 lần/phút, SpO2 từ 90-95% và PEF > 50% giá trị dự đoán; cần xử trí ngay SABA nhắc lại, oxy mục tiêu 93-95% và corticoid toàn thân sớm.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "cơn hen cấp",
+        "spo2",
+        "corticoid",
+        "saba"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_RISK_EXACERBATION_15",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Yếu tố nguy cơ gây đợt kịch phát Hen nặng và tử vong",
+    "page_or_section": "Section 2, Box 2-2B, p. 39",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Các yếu tố dự báo đợt kịch phát Hen độc lập với mức độ triệu chứng: sử dụng quá 2 bình xịt SABA/năm, không dùng ICS, FEV1 nền thấp (<60%), phơi nhiễm khói thuốc hoặc dị nguyên, tăng bạch cầu ái toan máu và tiền sử từng đặt nội khí quản vì Hen.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "nguy cơ",
+        "kịch phát",
+        "saba",
+        "nội khí quản",
+        "hen"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GINA_2024_ADHERENCE_16",
+    "source_id": "GINA_2024",
+    "version": "2024",
+    "target_disease": "ASTHMA",
+    "section_title": "Kiểm tra kỹ thuật hít và tuân thủ thuốc trước khi tăng bậc",
+    "page_or_section": "Section 3, Box 3-4, p. 55",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "Trước khi đánh giá Hen khó kiểm soát hoặc tăng liều ICS, bác sĩ cần kiểm tra trực tiếp kỹ thuật sử dụng bình xịt định liều/hít bột khô của người bệnh, rà soát tuân thủ thuốc và loại trừ các yếu tố gây nặng như trào ngược dạ dày thực quản hay viêm mũi xoang.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "kỹ thuật hít",
+        "tuân thủ",
+        "inhaler",
+        "hen"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_SPIROMETRY_GRADES_05",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Phân độ tắc nghẽn luồng khí GOLD 1 đến GOLD 4 trên hô hấp ký",
+    "page_or_section": "Chapter 2, Table 2.4, p. 22",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Ở bệnh nhân có FEV1/FVC < 0.70 sau nghiệm pháp giãn phế quản, mức độ nặng tắc nghẽn được phân loại theo %FEV1 dự đoán: GOLD 1 nhẹ (>= 80%), GOLD 2 trung bình (50-79%), GOLD 3 nặng (30-49%) và GOLD 4 rất nặng (< 30%).",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "gold 1",
+        "gold 4",
+        "fev1",
+        "hô hấp ký",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_ABE_ASSESSMENT_06",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Đánh giá phân nhóm GOLD ABE theo triệu chứng và tiền sử đợt cấp",
+    "page_or_section": "Chapter 2, Figure 2.3, p. 25",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Phân nhóm điều trị ban đầu GOLD 2024 ABE kết hợp gánh nặng triệu chứng (thang khó thở mMRC >= 2 hoặc điểm CAT >= 10) với tiền sử đợt cấp năm trước: Nhóm E có >= 2 đợt cấp trung bình hoặc >= 1 đợt cấp phải nhập viện bất kể điểm mMRC/CAT.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "gold abe",
+        "mmrc",
+        "cat",
+        "nhóm e",
+        "đợt cấp",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_DIFF_CHF_07",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Phân biệt COPD với Suy tim sung huyết (Congestive Heart Failure)",
+    "page_or_section": "Chapter 2, Table 2.5, p. 24",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Phân biệt COPD và Suy tim: COPD thường có tiền sử hút thuốc kéo dài, lồng ngực hình thùng, hô hấp ký FEV1/FVC < 0.70 cố định; Suy tim biểu hiện khó thở khi nằm (orthopnea), phù ngoại vi, bóng tim to trên X-quang, NT-proBNP tăng rõ rệt và hội chứng hạn chế hơn là tắc nghẽn.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "copd",
+        "suy tim",
+        "phân biệt",
+        "orthopnea",
+        "nt-probnp"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_DIFF_CAP_08",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Phân biệt Đợt cấp COPD với Viêm phổi mắc phải cộng đồng",
+    "page_or_section": "Chapter 5, pp. 96-98",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Bệnh nhân COPD vào viện vì tăng khó thở và đờm cần chụp X-quang ngực để phân biệt đợt cấp COPD đơn thuần với Viêm phổi: sự xuất hiện đám đông đặc nhu mô phổi mới kèm sốt cao, tăng bạch cầu và CRP > 40 mg/L hướng tới đồng nhiễm Viêm phổi.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "đợt cấp copd",
+        "viêm phổi",
+        "x-quang",
+        "crp",
+        "phân biệt"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_AECOPD_ANTHONISEN_09",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Tiêu chuẩn nhận diện đợt cấp COPD (AECOPD) và chỉ định kháng sinh",
+    "page_or_section": "Chapter 5, pp. 94-101",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence B",
+    "text_content": "Đợt cấp COPD đặc trưng bởi tình trạng xấu đi cấp tính trong vòng <= 14 ngày gồm tăng khó thở, tăng lượng đờm và tăng đờm mủ. Kháng sinh được chỉ định khi có đủ cả 3 triệu chứng chính (tiêu chuẩn Anthonisen type I) hoặc có 2 triệu chứng chính trong đó bắt buộc có tăng đờm mủ, hoặc cần thở máy.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "aecopd",
+        "đờm mủ",
+        "kháng sinh",
+        "anthonisen",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_HYPERCAPNIA_REDFLAG_10",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Dấu hiệu Cờ đỏ suy hô hấp tăng CO2 và kiểm soát Oxy trong đợt cấp COPD",
+    "page_or_section": "Chapter 5, Box 5.3, pp. 102-104",
+    "clinical_category": "RED_FLAG",
+    "evidence_level": "Evidence A",
+    "text_content": "Dấu hiệu cờ đỏ đợt cấp COPD nguy kịch: thở nhanh > 30 lần/phút, co kéo cơ phụ, sử dụng hô hấp nghịch thường, SpO2 < 88%, lơ mơ hoặc toan hô hấp (pH < 7.35, PaCO2 > 45 mmHg). Liệu pháp oxy kiểm soát cần giữ mục tiêu SpO2 88-92% để tránh làm nặng thêm ứ CO2 máu.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "cờ đỏ",
+        "tăng co2",
+        "spo2 88-92",
+        "toan hô hấp",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_TRACHEOSTOMY_CHRONIC_11",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Theo dõi bệnh nhân COPD nặng có mở khí quản hoặc suy hô hấp mạn",
+    "page_or_section": "Chapter 4 & 5, pp. 86, 108",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence B",
+    "text_content": "Bệnh nhân COPD giai đoạn tiến triển có tiền sử mở khí quản (tracheostomy) sau đợt suy hô hấp cấp đòi hỏi đánh giá khí máu động mạch định kỳ, chăm sóc ống mở khí quản chống nhiễm trùng, kết hợp corticoid hít duy trì và đánh giá chỉ định thở máy không xâm lấn tại nhà nếu PaCO2 >= 52 mmHg.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "mở khí quản",
+        "tracheostomy",
+        "suy hô hấp mạn",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_LABA_LAMA_ICS_12",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Phác đồ giãn phế quản tác dụng kéo dài (LABA+LAMA) và vai trò bạch cầu ái toan",
+    "page_or_section": "Chapter 3, Figure 3.2, pp. 50-54",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "Trong điều trị duy trì COPD nhóm B và E, phối hợp LABA + LAMA cải thiện rõ rệt chức năng phổi và giảm đợt cấp; việc bổ sung thêm ICS (bộ ba LABA+LAMA+ICS) được khuyến cáo đặc biệt khi bạch cầu ái toan máu >= 300 tế bào/uL và không nên dùng đơn trị ICS.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "laba",
+        "lama",
+        "ics",
+        "eosinophil",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_SMOKING_RISK_13",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Phơi nhiễm khói thuốc lá và yếu tố môi trường gây COPD",
+    "page_or_section": "Chapter 1, pp. 6-9",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Hút thuốc lá là yếu tố nguy cơ hàng đầu của COPD (thường > 10 bao-năm), nhưng COPD vẫn có thể gặp ở người không hút thuốc tiếp xúc khói bếp sinh khối, bụi nghề nghiệp hoặc khiếm khuyết phát triển phổi sớm; cai thuốc lá là biện pháp hiệu quả nhất làm chậm suy giảm FEV1.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "hút thuốc",
+        "bao-năm",
+        "cai thuốc",
+        "sinh khối",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_COMORBIDITIES_14",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Sàng lọc bệnh đồng mắc tim mạch trên bệnh nhân COPD",
+    "page_or_section": "Chapter 6, pp. 122-127",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Bệnh tim mạch (suy tim, bệnh mạch vành, rung nhĩ) thường đồng mắc phổ biến ở bệnh nhân COPD lớn tuổi và có thể gây ran phổi chồng lấp; đánh giá huyết áp, nhịp tim, ECG và NT-proBNP giúp phân tách triệu chứng do tim hay do đợt cấp hô hấp.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "đồng mắc",
+        "tim mạch",
+        "copd",
+        "suy tim",
+        "ecg"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_IMAGING_HRCT_15",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Vai trò chụp cắt lớp vi tính ngực độ phân giải cao (HRCT) trong COPD",
+    "page_or_section": "Chapter 2, pp. 26-27",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence B",
+    "text_content": "Chụp CT ngực không bắt buộc để chẩn đoán COPD thường quy nhưng rất hữu ích để đánh giá phân bố khí phế thũng (emphysema), phát hiện giãn phế quản kèm theo, sàng lọc ung thư phổi ở người hút thuốc lâu năm hoặc tìm tổn thương thay thế khi симптомы khó giải thích.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "hrct",
+        "ct ngực",
+        "khí phế thũng",
+        "giãn phế quản",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "GOLD_2024_REHAB_VACCINE_16",
+    "source_id": "GOLD_2024",
+    "version": "2024",
+    "target_disease": "COPD",
+    "section_title": "Phục hồi chức năng hô hấp và tiêm chủng phòng ngừa đợt cấp COPD",
+    "page_or_section": "Chapter 3, Table 3.5, pp. 46-49",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "Phục hồi chức năng hô hấp (vận động gắng sức có kiểm soát) cải thiện khó thở và khả năng đi bộ cho bệnh nhân nhóm B và E; tiêm phòng cúm hàng năm, phế cầu (PCV20/PPSV23) và RSV giúp giảm đáng kể tỷ lệ đợt cấp nhập viện và tử vong do viêm phổi thứ phát.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "phục hồi chức năng",
+        "tiêm chủng",
+        "cúm",
+        "phế cầu",
+        "copd"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_PHENOTYPES_LVEF_04",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Phân loại 3 kiểu hình Suy tim theo phân suất tống máu thất trái (LVEF)",
+    "page_or_section": "Section 3, Table 3, pp. 3611-3613",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "ESC phân loại Suy tim thành 3 nhóm dựa trên LVEF siêu âm tim: Suy tim phân suất tống máu giảm HFrEF (LVEF <= 40%), suy tim giảm nhẹ HFmrEF (LVEF 41-49% kèm triệu chứng/dấu hiệu suy tim), và suy tim phân suất tống máu bảo tồn HFpEF (LVEF >= 50% kèm bằng chứng bất thường cấu trúc/chức năng tâm trương và tăng peptide lợi niệu).",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "lvef",
+        "hfref",
+        "hfpef",
+        "siêu âm tim",
+        "suy tim"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_NATRIURETIC_PEPTIDES_05",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Ngưỡng giá trị peptide lợi niệu BNP và NT-proBNP trong loại trừ và chẩn đoán Suy tim",
+    "page_or_section": "Section 4, Figure 1, pp. 3616-3618",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence A",
+    "text_content": "Trong bệnh cảnh không cấp tính, nồng độ NT-proBNP < 125 pg/mL hoặc BNP < 35 pg/mL có giá trị dự báo âm tính rất cao giúp loại trừ suy tim; ở khoa cấp cứu với bệnh nhân khó thở cấp, ngưỡng gợi ý suy tim cấp là NT-proBNP >= 300 pg/mL (hoặc >= 450/900/1800 pg/mL phân tầng theo tuổi <50/50-75/>75) hoặc BNP >= 100 pg/mL.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "nt-probnp",
+        "bnp",
+        "loại trừ",
+        "suy tim cấp",
+        "esc"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_CONGESTION_SIGNS_06",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Triệu chứng thực thể ứ trệ tuần hoàn hệ thống và ứ dịch phổi",
+    "page_or_section": "Section 4, Table 4, p. 3615",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence B",
+    "text_content": "Thăm khám thực thể bệnh nhân suy tim sung huyết cần tìm các dấu hiệu đặc hiệu hơn của quá tải dịch gồm tĩnh mạch cổ nổi (JVP tăng), phản hồi gan-tĩnh mạch cổ dương tính, tiếng ngựa phi T3 (gallop), mỏm tim lệch trái, ran ẩm đối xứng hai đáy phổi và phù mềm ấn lõm hai chi dưới.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "tĩnh mạch cổ nổi",
+        "phù chi dưới",
+        "ran ẩm",
+        "ngựa phi t3",
+        "suy tim"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_DIFF_COPD_07",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Chẩn đoán phân biệt Suy tim với Bệnh phổi tắc nghẽn mạn tính (COPD)",
+    "page_or_section": "Section 4.3, p. 3619",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Khó thở do suy tim và COPD dễ nhầm lẫn khi nghe phổi có tiếng ran rít hoặc ran ẩm. Siêu âm tim kết hợp NT-proBNP và đánh giá huyết động học (huyết áp tăng/tụt bất thường, nhịp nhanh xoang hoặc rung nhĩ) đóng vai trò phân biệt then chốt; sinh hiệu bình ổn trên nền tiền sử hút thuốc nặng hướng nhiều tới COPD.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "phân biệt",
+        "suy tim",
+        "copd",
+        "huyết động",
+        "nt-probnp"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_DIFF_CAP_08",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Phân biệt Phù phổi cấp huyết động do Suy tim với Viêm phổi cộng đồng",
+    "page_or_section": "Section 11, p. 3648",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": "Evidence B",
+    "text_content": "Phù phổi do suy tim cấp thường biểu hiện X-quang có bóng tim to, đường Kerley B, tái phân bố tuần hoàn đỉnh phổi và thâm nhiễm cánh bướm đối xứng hai bên, ít khi sốt cao hay tăng mạnh CRP; ngược lại Viêm phổi có sốt, bạch cầu tăng, CRP tăng cao và đám mờ khu trú một thùy.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "phù phổi",
+        "kerley b",
+        "viêm phổi",
+        "suy tim",
+        "x-quang"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_SHOCK_REDFLAG_09",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Dấu hiệu Cờ đỏ Sốc tim và Phù phổi cấp suy hô hấp nguy kịch",
+    "page_or_section": "Section 11, Figure 6, pp. 3649-3653",
+    "clinical_category": "RED_FLAG",
+    "evidence_level": "Evidence A",
+    "text_content": "Cảnh báo cờ đỏ suy tim cấp mất bù đe dọa tính mạng: huyết áp tâm thu < 90 mmHg (hoặc tụt > 30 mmHg so với nền), giảm tưới máu ngoại vi (da lạnh ẩm, thiểu niệu < 0.5 mL/kg/h, lú lẫn, lactate máu > 2 mmol/L), SpO2 < 90% dù thở oxy, hoặc nhịp tim cực nhanh/chậm gây rối loạn huyết động.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "sốc tim",
+        "cờ đỏ",
+        "tụt huyết áp",
+        "lactate",
+        "phù phổi cấp",
+        "suy tim"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_FOUR_PILLARS_HFREF_10",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Tứ trụ điều trị nền tảng cho Suy tim phân suất tống máu giảm (HFrEF)",
+    "page_or_section": "Section 5, Figure 2, pp. 3622-3625",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "Điều trị chuẩn HFrEF nhằm giảm tử vong và tái nhập viện bắt buộc phối hợp sớm 4 nhóm thuốc nền tảng (Class I, Level A): (1) Ức chế men chuyển (ACEi) hoặc ARNI (sacubitril/valsartan), (2) Chẹn beta chọn lọc tim mạch, (3) Đối kháng thụ thể mineralocorticoid (MRA), và (4) Thuốc ức chế SGLT2 (dapagliflozin/empagliflozin).",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "tứ trụ",
+        "arni",
+        "sglt2i",
+        "chẹn beta",
+        "hfref",
+        "suy tim"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_UPDATE_HFPEF_SGLT2_11",
+    "source_id": "ESC_2023",
+    "version": "2023 Focused Update",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Cập nhật ESC 2023: Chỉ định Class I cho SGLT2i trong HFmrEF và HFpEF",
+    "page_or_section": "ESC 2023 Focused Update, Section 3-4, pp. 3628-3631",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "Bản cập nhật ESC 2023 chính thức nâng cấp khuyến cáo Class I (Level A) cho nhóm thuốc ức chế SGLT2 (dapagliflozin hoặc empagliflozin) ở toàn bộ bệnh nhân HFmrEF và HFpEF nhằm giảm nguy cơ nhập viện do suy tim và tử vong tim mạch, bất kể tình trạng đái tháo đường.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "esc 2023",
+        "sglt2",
+        "hfpef",
+        "hfmref",
+        "đái tháo đường"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_ECHO_WORKUP_12",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Khuyến cáo Siêu âm tim qua thành ngực và Xét nghiệm ban đầu",
+    "page_or_section": "Section 4.1, Table 6, pp. 3617-3619",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "Siêu âm tim Doppler màu qua thành ngực (TTE) là thăm dò hình ảnh chính đánh giá LVEF, kích thước buồng thất, áp lực động mạch phổi và bệnh van tim; đồng bộ thực hiện điện tâm đồ 12 chuyển đạo, điện giải đồ, creatinin/eGFR, công thức máu và bilan sắt huyết thanh.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "siêu âm tim",
+        "tte",
+        "ecg",
+        "điện giải",
+        "egfr",
+        "suy tim"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_DIURETICS_ACUTE_13",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Liệu pháp lợi tiểu quai đường tĩnh mạch trong Suy tim cấp quá tải dịch",
+    "page_or_section": "Section 11.3, Figure 9, p. 3654",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence B",
+    "text_content": "Ở bệnh nhân suy tim cấp có dấu hiệu sung huyết phổi hoặc phù toàn thân, khởi trị sớm lợi tiểu quai đường tĩnh mạch (furosemide) giúp giảm nhanh tiền gánh và triệu chứng khó thở; theo dõi đáp ứng qua lượng natri niệu tại thời điểm 2 giờ (>= 50-70 mEq/L) và cân bằng dịch xuất nhập.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "lợi tiểu quai",
+        "furosemide",
+        "sung huyết",
+        "suy tim cấp"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_AFIB_DECOMPENSATION_14",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Rung nhĩ và tăng huyết áp không kiểm soát thúc đẩy mất bù cấp",
+    "page_or_section": "Section 11 & 12, pp. 3647, 3662",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": "Evidence B",
+    "text_content": "Các yếu tố thúc đẩy đợt suy tim cấp thường gặp gồm rung nhĩ đáp ứng thất nhanh, cơn tăng huyết áp cấp cứu (HA tâm thu > 160-180 mmHg), hội chứng vành cấp, nhiễm trùng hô hấp và bỏ trị thuốc lợi tiểu hoặc ăn mặn.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "rung nhĩ",
+        "tăng huyết áp",
+        "mất bù",
+        "suy tim cấp"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_IRON_DEFICIENCY_15",
+    "source_id": "ESC_2023",
+    "version": "2023 Focused Update",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Sàng lọc thiếu sắt và bổ sung sắt tĩnh mạch cải thiện triệu chứng Suy tim",
+    "page_or_section": "ESC 2023 Focused Update, Section 6, p. 3633",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence A",
+    "text_content": "Bệnh nhân suy tim có LVEF giảm/giảm nhẹ cần được xét nghiệm định kỳ ferritin (< 100 ng/mL hoặc 100-299 ng/mL kèm TSAT < 20%) để phát hiện thiếu sắt và bù sắt carboxymaltose/derisomaltose tĩnh mạch nhằm cải thiện khả năng gắng sức và giảm tái nhập viện.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "thiếu sắt",
+        "ferritin",
+        "tsat",
+        "suy tim"
+      ]
+    }
+  },
+  {
+    "chunk_id": "ESC_2023_SAFETY_BETA_RENAL_16",
+    "source_id": "ESC_2023",
+    "version": "2023",
+    "target_disease": "HEART_FAILURE",
+    "section_title": "Lưu ý an toàn dùng chẹn beta và giám sát kali máu trong Suy tim",
+    "page_or_section": "Section 5 & 11, pp. 3624, 3655",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": "Evidence B",
+    "text_content": "Chẹn beta giao cảm chống chỉ định hoặc phải thận trọng trì hoãn trong đợt suy tim mất bù có sốc tim hoặc phù phổi cấp đang ứ dịch nặng, cũng như tránh nhầm lẫn trên bệnh nhân đang có co thắt phế quản cấp; giám sát kali huyết thanh và eGFR định kỳ khi chỉnh liều ACEi/ARNI/MRA.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "chẹn beta",
+        "kali máu",
+        "chống chỉ định",
+        "suy tim"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_INFECTIOUS_SIGN_04",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Hội chứng nhiễm trùng cấp và triệu chứng cơ năng Viêm phổi cộng đồng",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 3.1, trang 8-9",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": null,
+    "text_content": "Viêm phổi mắc phải cộng đồng thường khởi phát cấp tính trong vài ngày với sốt cao > 38°C hoặc hạ thân nhiệt ở người già, rét run, ho khạc đờm mủ xanh vàng hoặc màu gỉ sắt, đau tức ngực kiểu màng phổi và nhịp thở nhanh.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "viêm phổi",
+        "sốt",
+        "đờm mủ",
+        "đau ngực",
+        "nhiễm trùng"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_CONSOLIDATION_EXAM_05",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Khám phổi phát hiện Hội chứng đông đặc và ran nổ khu trú",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 3.1, trang 9",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": null,
+    "text_content": "Khám thực thể phổi ở bệnh nhân viêm phổi điển hình ghi nhận hội chứng đông đặc nhu mô: rung thanh tăng, gõ đục vùng tổn thương, rì rào phế nang giảm kèm nghe ran nổ cuối thì hít vào hoặc tiếng thổi ống khu trú tương ứng thùy phổi tổn thương.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "đông đặc",
+        "ran nổ",
+        "rung thanh",
+        "gõ đục",
+        "viêm phổi"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_LAB_INFLAMMATION_06",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Chỉ số cận lâm sàng viêm: Bạch cầu (WBC), CRP và Procalcitonin",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 3.2, trang 10-11",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": null,
+    "text_content": "Xét nghiệm máu trong viêm phổi do vi khuẩn thường thấy bạch cầu máu tăng > 10 G/L (hoặc < 4 G/L trong nhiễm khuẩn nặng), tỷ lệ bạch cầu trung tính > 80%, chỉ số viêm CRP tăng cao (> 20-50 mg/L) và Procalcitonin (> 0.5 ng/mL) giúp gợi ý căn nguyên vi khuẩn và theo dõi đáp ứng kháng sinh.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "bạch cầu",
+        "wbc",
+        "crp",
+        "procalcitonin",
+        "viêm phổi"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_CXR_INFILTRATE_07",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Tiêu chuẩn X-quang ngực thẳng chẩn đoán xác định Viêm phổi",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 3.2.2, trang 11-12",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": null,
+    "text_content": "Chụp X-quang phổi thẳng và nghiêng là tiêu chuẩn bắt buộc xác định viêm phổi cộng đồng với hình ảnh đám mờ thâm nhiễm nhu mô phổi mới xuất hiện dạng đông đặc thùy có phế quản đồ chứa khí, mờ nốt kê hoặc mô kẽ, đồng thời loại trừ áp xe hay tràn dịch màng phổi.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "x-quang ngực",
+        "thâm nhiễm",
+        "đông đặc thùy",
+        "viêm phổi"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_CURB65_SCORE_08",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Phân tầng độ nặng và nơi điều trị theo thang điểm CURB-65",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 4.1, trang 14-15",
+    "clinical_category": "DIAGNOSTIC_CRITERIA",
+    "evidence_level": null,
+    "text_content": "Thang điểm CURB-65 đánh giá 5 tiêu chí (mỗi tiêu chí 1 điểm): Lú lẫn mới khởi phát (Confusion), Ure máu > 7 mmol/L, Nhịp thở >= 30 lần/phút, Huyết áp < 90/60 mmHg và Tuổi >= 65. Điểm 0-1 cân nhắc điều trị ngoại trú, điểm 2 nhập viện khoa nội, điểm >= 3 đánh giá viêm phổi nặng cân nhắc ICU.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "curb-65",
+        "phân tầng",
+        "nhập viện",
+        "viêm phổi nặng"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_ICU_SEVERE_09",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Tiêu chuẩn Viêm phổi nặng cần hồi sức tích cực (ATS/IDSA trong BYT)",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 4.2, trang 16",
+    "clinical_category": "RED_FLAG",
+    "evidence_level": null,
+    "text_content": "Bệnh nhân viêm phổi nặng cần nhập ICU khi có >= 1 tiêu chuẩn chính (sốc nhiễm khuẩn cần thuốc vận mạch hoặc suy hô hấp cần thở máy xâm nhập) hoặc >= 3 tiêu chuẩn phụ: nhịp thở >= 30 lần/phút, PaO2/FiO2 <= 250, thâm nhiễm nhiều thùy phổi, lú lẫn, Ure >= 20 mg/dL, giảm bạch cầu/tiểu cầu, hạ thân nhiệt hoặc tụt huyết áp cần bù dịch tích cực.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "icu",
+        "viêm phổi nặng",
+        "sốc nhiễm khuẩn",
+        "cờ đỏ",
+        "vận mạch"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_SEPSIS_REDFLAG_10",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Cảnh báo Cờ đỏ Nhiễm khuẩn huyết và Suy hô hấp cấp do Viêm phổi",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 4.2 & SSC, trang 16-17",
+    "clinical_category": "RED_FLAG",
+    "evidence_level": null,
+    "text_content": "Dấu hiệu cờ đỏ cấp cứu bệnh nhân viêm phổi nghi ngờ nhiễm khuẩn huyết (Sepsis): SpO2 < 90%, nhịp thở >= 30 lần/phút, huyết áp tâm thu < 90 mmHg hoặc giảm > 40 mmHg so với nền, thay đổi tri giác (qSOFA >= 2), lactate động mạch > 2 mmol/L; cần lấy cấy máu trước khi truyền kháng sinh tĩnh mạch ngay trong giờ đầu.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "cờ đỏ",
+        "nhiễm khuẩn huyết",
+        "sepsis",
+        "qsofa",
+        "lactate",
+        "spo2 < 90"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_DIFF_CHF_11",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Chẩn đoán phân biệt Viêm phổi với Phù phổi do Suy tim",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 3.3, trang 12-13",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": null,
+    "text_content": "Phân biệt Viêm phổi và Suy tim sung huyết cấp: Bệnh nhân suy tim thường không sốt, không tăng bạch cầu/CRP rõ, ran ẩm rải rác hai đáy đối xứng, tĩnh mạch cổ nổi, phù chân và NT-proBNP tăng rất cao; đáp ứng nhanh với thuốc lợi tiểu hơn là kháng sinh.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "phân biệt",
+        "viêm phổi",
+        "suy tim",
+        "sốt",
+        "crp",
+        "nt-probnp"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_DIFF_COPD_12",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Phân biệt Viêm phổi trên nền COPD với Đợt cấp COPD đơn thuần",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 3.3, trang 13",
+    "clinical_category": "DIFFERENTIAL_DIAGNOSIS",
+    "evidence_level": null,
+    "text_content": "Ở bệnh nhân có bệnh nền COPD, khi khó thở tăng kèm sốt cao rét run, ran nổ cố định khu trú, bạch cầu tăng mạnh và X-quang ngực xuất hiện vùng đông đặc mới thì cần chẩn đoán Viêm phổi cộng đồng và điều trị kháng sinh phủ cả vi khuẩn gram âm/không điển hình thay vì chỉ giãn phế quản đơn thuần.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "viêm phổi",
+        "copd",
+        "phân biệt",
+        "đông đặc",
+        "ran nổ"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_MICROBIOLOGY_13",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Xét nghiệm vi sinh tìm căn nguyên trước khởi trị kháng sinh nội trú",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 3.2.3, trang 12",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": null,
+    "text_content": "Đối với bệnh nhân viêm phổi mức độ trung bình đến nặng cần nhập viện, thực hiện nhuộm Gram và cấy đờm định lượng, cấy máu 2 mẫu trước khi dùng liều kháng sinh đầu tiên (không làm chậm trễ điều trị) và cân nhắc xét nghiệm kháng nguyên nước tiểu phế cầu hoặc Legionella khi ca nặng.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "cấy máu",
+        "cấy đờm",
+        "vi sinh",
+        "phế cầu",
+        "viêm phổi"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_ABX_OUTPATIENT_14",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Kháng sinh điều trị Viêm phổi cộng đồng mức độ nhẹ ngoại trú",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 5.2.1, trang 19",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": null,
+    "text_content": "Điều trị CAP ngoại trú ở người khỏe mạnh không bệnh nền: ưu tiên amoxicillin đơn thuần hoặc beta-lactam kết hợp macrolide (hoặc doxycycline nếu nghi vi khuẩn không điển hình); nếu có bệnh nền tim phổi mạn hoặc mới dùng kháng sinh trong 3 tháng cần phối hợp amoxicillin-clavulanate/cefuroxime với macrolide hoặc fluoroquinolone hô hấp.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "kháng sinh",
+        "amoxicillin",
+        "ngoại trú",
+        "cap",
+        "viêm phổi"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_ABX_INPATIENT_15",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Kháng sinh tiêm truyền cho Viêm phổi cộng đồng nhập viện khoa nội và ICU",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 5.2.2-5.2.3, trang 20-21",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": null,
+    "text_content": "Bệnh nhân CAP nhập viện không vào ICU được khuyến cáo phối hợp beta-lactam tiêm tĩnh mạch (ceftriaxone, cefotaxime hoặc ampicillin-sulbactam) với macrolide hoặc đơn trị levofloxacin/moxifloxacin; ca vào ICU cần đánh giá nguy cơ Pseudomonas aeruginosa hoặc MRSA để mở rộng phổ kịp thời.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "ceftriaxone",
+        "beta-lactam",
+        "levofloxacin",
+        "nội trú",
+        "viêm phổi"
+      ]
+    }
+  },
+  {
+    "chunk_id": "BYT_CAP_2020_SWITCH_DISCHARGE_16",
+    "source_id": "BYT_VN_CAP_2020",
+    "version": "2020",
+    "target_disease": "COMMUNITY_ACQUIRED_PNEUMONIA",
+    "section_title": "Tiêu chuẩn ổn định lâm sàng chuyển kháng sinh uống và xuất viện",
+    "page_or_section": "Quyết định 4815/QĐ-BYT, Mục 5.4, trang 24",
+    "clinical_category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "evidence_level": null,
+    "text_content": "Bệnh nhân viêm phổi điều trị nội trú đạt ổn định lâm sàng khi hết sốt <= 37.8°C ít nhất 24-48 giờ, mạch <= 100, nhịp thở <= 24, huyết áp tâm thu >= 90 mmHg, SpO2 >= 90% thở khí phòng và ăn uống dung nạp tốt; đủ điều kiện chuyển kháng sinh đường uống và theo dõi tổng thời gian điều trị 5-7 ngày.",
+    "metadata": {
+      "is_paraphrase": true,
+      "source_verified": true,
+      "copyright_policy": "Trích dẫn ngắn & diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn",
+      "keywords": [
+        "ổn định lâm sàng",
+        "chuyển uống",
+        "xuất viện",
+        "viêm phổi"
+      ]
+    }
+  }
+]

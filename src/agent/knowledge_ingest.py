@@ -25,17 +25,32 @@ _shared_qdrant_client: Optional[QdrantClient] = None
 def get_qdrant_client(storage_path: str = "data/vector_store/qdrant") -> QdrantClient:
     """
     Returns a shared singleton QdrantClient to prevent concurrent lock collisions
-    on local embedded directory storage within the same process.
+    on local embedded directory storage within the same process. Automatically
+    initializes and ingests 'clinical_guidelines' from data/guidelines/ if missing.
     """
     global _shared_qdrant_client
     if _shared_qdrant_client is None:
         try:
-            if os.path.exists(storage_path):
-                _shared_qdrant_client = QdrantClient(path=storage_path)
-            else:
-                _shared_qdrant_client = QdrantClient(":memory:")
+            os.makedirs(storage_path, exist_ok=True)
+            _shared_qdrant_client = QdrantClient(path=storage_path)
         except Exception:
             _shared_qdrant_client = QdrantClient(":memory:")
+
+    try:
+        cols = [c.name for c in _shared_qdrant_client.get_collections().collections]
+        needs_ingest = "clinical_guidelines" not in cols
+        if not needs_ingest:
+            info = _shared_qdrant_client.get_collection("clinical_guidelines")
+            needs_ingest = (info.points_count or 0) < 14
+        if needs_ingest and os.path.isdir("data/guidelines"):
+            ingestor = ClinicalKnowledgeIngestor(
+                qdrant_client=_shared_qdrant_client,
+                storage_path=storage_path,
+            )
+            ingestor.ingest(guidelines_dir="data/guidelines", recreate_collection=True)
+    except Exception as exc:
+        logger.warning(f"Auto-init of Qdrant collection skipped/fallback: {exc}")
+
     return _shared_qdrant_client
 
 
@@ -178,14 +193,20 @@ class ClinicalKnowledgeIngestor:
         )
 
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
-      
-        embeddings = self.encoder.encode(
-            texts,
-            show_progress_bar=True,
-            normalize_embeddings=True,
-            convert_to_numpy=True,
-        )
-        return embeddings.tolist()
+        from src.agent.retriever import _hashed_dense_fallback
+
+        if os.getenv("MCDSS_USE_ST_ENCODER") == "1":
+            try:
+                embeddings = self.encoder.encode(
+                    texts,
+                    show_progress_bar=False,
+                    normalize_embeddings=True,
+                    convert_to_numpy=True,
+                )
+                return embeddings.tolist()
+            except Exception as exc:
+                logger.warning(f"Falling back to deterministic 768-D hashed dense vectors: {exc}")
+        return [_hashed_dense_fallback(t, dim=self.vector_dim) for t in texts]
 
     def ingest(self, guidelines_dir: str = "data/guidelines", recreate_collection: bool = True) -> Dict[str, Any]:
         

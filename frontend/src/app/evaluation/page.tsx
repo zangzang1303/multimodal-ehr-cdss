@@ -39,7 +39,10 @@ import {
   FALLBACK_ABLATION_RESULTS,
   getAblationBenchmarks,
   getClinicalEvaluationBenchmark,
+  getResultsRegistry,
+  ResultsRegistryResponse,
 } from "@/lib/api";
+import { ModelCardFooter, ResearchDisclaimerBanner } from "@/components/ResearchBannerAndFooter";
 
 export default function AblationEvaluationPage() {
   const [data, setData] = useState<AblationStudyResponse>(
@@ -47,11 +50,12 @@ export default function AblationEvaluationPage() {
   );
   const [dcaPoints, setDcaPoints] = useState<DCAPoint[]>([]);
   const [dcaStatus, setDcaStatus] = useState<string>("illustrative_simulation_pending_patient_level_predictions");
+  const [registry, setRegistry] = useState<ResultsRegistryResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isDark, setIsDark] = useState<boolean>(true);
   const [mounted, setMounted] = useState<boolean>(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
-  const [activeTab, setActiveTab] = useState<"ablation" | "dca">("ablation");
+  const [activeTab, setActiveTab] = useState<"ablation" | "dca" | "phase3">("ablation");
 
   useEffect(() => {
     setMounted(true);
@@ -73,11 +77,13 @@ export default function AblationEvaluationPage() {
   const loadAblationData = async () => {
     setLoading(true);
     try {
-      const [ablationRes, evalRes] = await Promise.all([
+      const [ablationRes, evalRes, regRes] = await Promise.all([
         getAblationBenchmarks(),
         getClinicalEvaluationBenchmark().catch(() => null),
+        getResultsRegistry().catch(() => null),
       ]);
       setData(ablationRes);
+      setRegistry(regRes);
       if (evalRes?.decision_curve_analysis?.threshold_points?.length) {
         setDcaPoints(evalRes.decision_curve_analysis.threshold_points);
         setDcaStatus(evalRes.evaluation_metadata.dca_status ?? "illustrative_simulation_pending_patient_level_predictions");
@@ -173,6 +179,7 @@ export default function AblationEvaluationPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <ResearchDisclaimerBanner />
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800/80 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -285,9 +292,201 @@ export default function AblationEvaluationPage() {
               Minh họa
             </span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("phase3")}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === "phase3"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>3. Củng Cố Nghiên Cứu Phase 3 (RQ1&ndash;RQ5 &amp; Latency)</span>
+          </button>
         </div>
 
-        {activeTab === "dca" ? (
+        {activeTab === "phase3" ? (
+          <div className="space-y-8 animate-in fade-in duration-200">
+            {/* Provenance Banner */}
+            <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-3">
+              <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <div className="font-bold">Nguồn dữ liệu: results/registry.json (Phase 3 Registry)</div>
+                <p>
+                  Các khối <strong>RQ5 (Đánh giá RAG 60 truy vấn / 64 chunks &amp; Evidence Grounding 50 ca)</strong> và{" "}
+                  <strong>Đo độ trễ Latency (200 requests)</strong> là <strong>số liệu đo thực tế</strong> của Thành viên 3.
+                  Các khối <strong>RQ1 / RQ2 / RQ4 Missing-Modality</strong> hiện đang hiển thị khung dữ liệu mock ({" "}
+                  <code>is_mock = true</code>) chờ Thành viên 1 &amp; 2 chạy đa seed ở Backlog 08&ndash;09.
+                </p>
+              </div>
+            </div>
+
+            {/* Real Section: RQ5 RAG & Grounding */}
+            <div className="p-6 rounded-2xl border border-emerald-500/30 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                  RQ5: Đánh Giá Truy Xuất Phác Đồ &amp; Neo Bằng Chứng (Số Liệu Thực Đo)
+                </h3>
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-semibold">
+                  {registry?.rag?.query_count ?? 60} truy vấn · {registry?.rag?.corpus_size_chunks ?? 70} chunks · Cohen&apos;s κ = {registry?.rag?.cohens_kappa ?? "—"}
+                </span>
+              </div>
+
+              {registry?.rag?.modes && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                        <th className="p-3 font-semibold">Chế độ truy xuất</th>
+                        <th className="p-3 font-mono text-right">Recall@1</th>
+                        <th className="p-3 font-mono text-right">Recall@3</th>
+                        <th className="p-3 font-mono text-right">Recall@5</th>
+                        <th className="p-3 font-mono text-right">MRR</th>
+                        <th className="p-3 font-mono text-right">nDCG@5</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
+                      {Object.entries(registry.rag.modes).map(([mode, m]) => (
+                        <tr key={mode}>
+                          <td className="p-3 font-semibold font-mono">{mode}</td>
+                          <td className="p-3 font-mono text-right">{(m.recall_at_1 * 100).toFixed(1)}%</td>
+                          <td className="p-3 font-mono text-right">{(m.recall_at_3 * 100).toFixed(1)}%</td>
+                          <td className="p-3 font-mono text-right">{(m.recall_at_5 * 100).toFixed(1)}%</td>
+                          <td className="p-3 font-mono text-right">{m.mrr.toFixed(4)}</td>
+                          <td className="p-3 font-mono text-right">{m.ndcg_at_5.toFixed(4)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {registry?.rag?.grounding_audit_50_cases && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-2">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+                    <div className="text-slate-500">Span khớp chuỗi (50 ca):</div>
+                    <div className="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                      {((registry.rag.grounding_audit_50_cases.span_substring_match_rate ?? 0) * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+                    <div className="text-slate-500">Loại bỏ ảo giác giả lập:</div>
+                    <div className="text-lg font-bold font-mono text-indigo-600 dark:text-indigo-400">
+                      {registry.rag.grounding_audit_50_cases.rejected_claims ?? 0}/{registry.rag.grounding_audit_50_cases.cases_tested ?? 50}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+                    <div className="text-slate-500">Kiểm tra ngữ nghĩa (20 spans):</div>
+                    <div className="text-lg font-bold font-mono text-sky-600 dark:text-sky-400">
+                      {((registry.rag.grounding_audit_50_cases.manual_semantic_precision_20_spans ?? 0) * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Real Section: System Latency */}
+            {registry?.latency?.endpoints && (
+              <div className="p-6 rounded-2xl border border-sky-500/30 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Cpu className="w-5 h-5 text-sky-500" />
+                    Đo Độ Trễ Hệ Thống (Cold &amp; 200 Warm Requests — Số Liệu Thực Đo)
+                  </h3>
+                  <span className="text-[11px] font-mono text-slate-500">
+                    {registry.latency.device_info}
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                        <th className="p-3 font-semibold">Endpoint</th>
+                        <th className="p-3 font-mono text-right">Cold (ms)</th>
+                        <th className="p-3 font-mono text-right">p50 (ms)</th>
+                        <th className="p-3 font-mono text-right">p95 (ms)</th>
+                        <th className="p-3 font-mono text-right">p99 (ms)</th>
+                        <th className="p-3 font-mono text-right">Mean (ms)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
+                      {Object.entries(registry.latency.endpoints).map(([ep, l]) => (
+                        <tr key={ep}>
+                          <td className="p-3 font-mono font-semibold">{ep}</td>
+                          <td className="p-3 font-mono text-right">{l.cold_ms.toFixed(2)}</td>
+                          <td className="p-3 font-mono text-right">{l.p50_ms.toFixed(2)}</td>
+                          <td className="p-3 font-mono text-right">{l.p95_ms.toFixed(2)}</td>
+                          <td className="p-3 font-mono text-right">{l.p99_ms.toFixed(2)}</td>
+                          <td className="p-3 font-mono text-right">{l.mean_ms.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Mock Placeholder Panels for RQ2 & RQ4 waiting on Member 1 & 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {registry?.rq2_text_signal_decomposition?.variants && (
+                <div className="p-6 rounded-2xl border border-amber-500/30 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                      RQ2: Phân Rã Tín Hiệu Văn Bản
+                    </h4>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 font-mono font-semibold">
+                      MOCK (Chờ TV1)
+                    </span>
+                  </div>
+                  <div className="w-full h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={registry.rq2_text_signal_decomposition.variants}>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.4} />
+                        <XAxis dataKey="variant" fontSize={11} />
+                        <YAxis domain={[0.4, 1.0]} fontSize={11} />
+                        <Tooltip />
+                        <Legend wrapperStyle={{ fontSize: "11px" }} />
+                        <Bar dataKey="tfidf_lr" name="TF-IDF + LR" fill="#38bdf8" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="clinical_bert" name="Bio_ClinicalBERT" fill="#34d399" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="cross_attention" name="Cross-Attention" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {registry?.rq4_missing_modality?.scenarios && (
+                <div className="p-6 rounded-2xl border border-amber-500/30 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                      RQ4: Độ Bền Khi Khuyết Phương Thức
+                    </h4>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 font-mono font-semibold">
+                      MOCK (Chờ TV2)
+                    </span>
+                  </div>
+                  <div className="w-full h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={registry.rq4_missing_modality.scenarios}>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.4} />
+                        <XAxis dataKey="scenario" fontSize={11} />
+                        <YAxis domain={[0.4, 1.0]} fontSize={11} />
+                        <Tooltip />
+                        <Legend wrapperStyle={{ fontSize: "11px" }} />
+                        <Bar dataKey="cross_attention_auroc" name="Cross-Attention" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="tabular_only_auroc" name="Tabular-only" fill="#38bdf8" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="text_only_auroc" name="Text-only" fill="#34d399" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : activeTab === "dca" ? (
           <div className="space-y-8 animate-in fade-in duration-200">
             {/* Interactive DCA Curve Component */}
             <DCACurveChart points={dcaPoints} isDark={isDark} dcaStatus={dcaStatus} />
@@ -603,15 +802,7 @@ export default function AblationEvaluationPage() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-            <span>M-CDSS Backlog 04 &amp; 06 — Multimodal Core, Ablation Study &amp; Clinical DCA</span>
-          </div>
-          <div>M-CDSS Research Consortium © 2026. Next.js 14 &amp; FastAPI.</div>
-        </div>
-      </footer>
+      <ModelCardFooter />
     </div>
   );
 }

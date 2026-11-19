@@ -1,0 +1,43 @@
+{
+  "is_mock": false,
+  "measured_at": "2026-11-18T16:09:40.473527+00:00",
+  "device_info": "Windows 11 | AMD64 | CPU (16 logical cores)",
+  "note_length_chars": 340,
+  "num_warm_requests": 200,
+  "endpoints": {
+    "/api/v1/agent/explain": {
+      "status_codes_observed": [
+        200
+      ],
+      "cold_ms": 192.54,
+      "mean_ms": 9.46,
+      "p50_ms": 9.15,
+      "p95_ms": 11.46,
+      "p99_ms": 15.08,
+      "cold_status_code": 200
+    },
+    "/api/v1/predict/baseline": {
+      "status_codes_observed": [
+        200
+      ],
+      "cold_ms": 4.19,
+      "mean_ms": 3.75,
+      "p50_ms": 3.66,
+      "p95_ms": 4.74,
+      "p99_ms": 5.4,
+      "cold_status_code": 200
+    },
+    "/api/v1/predict/multimodal": {
+      "status_codes_observed": [
+        503
+      ],
+      "cold_ms": 68.16,
+      "mean_ms": 83.79,
+      "p50_ms": 81.81,
+      "p95_ms": 102.52,
+      "p99_ms": 110.4,
+      "cold_status_code": 503,
+      "note": "HTTP 503 safeguard measured on CPU because local Bio_ClinicalBERT weights are missing from HF cache."
+    }
+  }
+}

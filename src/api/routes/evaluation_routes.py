@@ -6,8 +6,10 @@ Provides quantitative benchmarks comparing Baselines vs Multimodal Core,
 and computes clinical Decision Curve Analysis (DCA) Net Benefit metrics.
 """
 
+import json
+from pathlib import Path
 from typing import Any, Dict
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from src.api.routes.benchmarks import get_ablation_benchmarks
 from src.evaluation.dca_analysis import evaluate_holdout_dca
 
@@ -123,3 +125,21 @@ async def get_clinical_evaluation_benchmark() -> Dict[str, Any]:
         key: "Not independently assessed" for key in result["probast_compliance_summary"]
     }
     return result
+
+
+@router.options("/registry")
+async def options_registry():
+    """Direct OPTIONS handler for evaluation registry endpoint."""
+    return {"status": "ok"}
+
+
+@router.get("/registry")
+async def get_results_registry() -> Dict[str, Any]:
+    """
+    Returns Phase 3 central results registry (results/registry.json) combining
+    real measured RAG/Latency benchmarks (Member 3) and pending multi-seed placeholders.
+    """
+    registry_path = Path(__file__).resolve().parents[3] / "results" / "registry.json"
+    if not registry_path.exists():
+        raise HTTPException(status_code=404, detail="results/registry.json not found")
+    return json.loads(registry_path.read_text(encoding="utf-8"))

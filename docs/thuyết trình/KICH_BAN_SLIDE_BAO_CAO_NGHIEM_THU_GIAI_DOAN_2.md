@@ -1,23 +1,27 @@
-# Báo Cáo Nghiệm Thu Đề Tài (Giai Đoạn 2): Hệ Thống Hỗ Trợ Chẩn Đoán Lâm Sàng Đa Phương Thức (M-CDSS)
-## Bộ Nội Dung Slide Tự Đọc & Kịch Bản Thuyết Trình Chi Tiết
+# Báo Cáo Nghiệm Thu Đề Tài (Cập nhật Giai Đoạn 3 — Research Hardening): Hệ Thống Hỗ Trợ Chẩn Đoán Lâm Sàng Đa Phương Thức (M-CDSS)
+## Bộ Nội Dung Slide Tự Đọc & Kịch Bản Thuyết Trình Chi Tiết (20 Slide)
 
-> **Mục đích tài liệu:** Tài liệu này kết hợp trọn vẹn **Nội dung hiển thị trên từng Slide** (tự đọc độc lập dành cho Giảng viên và Hội đồng đánh giá mà không cần truy cập kho mã nguồn hay chạy phần mềm trực tiếp) và **Lời thuyết trình gợi ý, Điểm cần nhấn, Câu chuyển** cho người báo cáo.  
-> **Thời lượng trình bày gợi ý:** 15 – 18 phút (chưa tính phần thảo luận – hỏi đáp).  
-> **Quy chuẩn số liệu:** Toàn bộ kết quả thực nghiệm được đánh giá khách quan trên tập kiểm thử độc lập gồm **302 hồ sơ bệnh án** (*Strict Hold-out Test Set*, kiểm toán 0% rò rỉ dữ liệu cấp độ bệnh nhân).
+> **Mục đích tài liệu:** Tài liệu tổng hợp trọn vẹn **Nội dung hiển thị trên từng Slide**, **Lời thuyết trình gợi ý**, **Điểm cần nhấn**, và **Phương án dự phòng demo** cho buổi báo cáo bảo vệ.
+>
+> **Thời lượng trình bày gợi ý:** 15 – 18 phút (mỗi thành viên thuyết trình phần mình phụ trách; chưa gồm phần Hỏi – Đáp Q&A).
+>
+> **Cảnh báo phạm vi & dữ liệu:** Bộ dữ liệu 2.000 hồ sơ hiện tại được tổng hợp từ nguồn mở (**Synthea EHR + MTSamples**, đánh chỉ mục tái lập qua `data/DATA_MANIFEST.json`) với tập kiểm thử độc lập **302 hồ sơ** (*Strict Group Split*, 0% rò rỉ). M-CDSS là **nguyên mẫu nghiên cứu học thuật**, tuyệt đối không thay thế quyết định chẩn đoán/điều trị của bác sĩ.
+>
+> **Trạng thái số liệu Phase 3:** Số liệu hệ thống của Thành viên 3 (**RQ5 RAG trên 60 truy vấn / 64 đoạn JSON phác đồ / 50 ca grounding & Độ trễ CPU**) là số đo thực tế từ `results/rag_evaluation_report.json` và `results/latency_report.json`. Các ô `[TODO-TV1]` / `[TODO-TV2]` được giữ nguyên làm khung chờ điền kết quả đa seed RQ1–RQ4 chính thức từ Thành viên 1 và Thành viên 2.
 
 ---
 
-## Bảng Phân Bổ Thời Lượng Trình Bày (20 Slide)
+## Bảng Phân Bổ Thời Lượng Trình Bày (20 Slide — Mạch Research Hardening Phase 3)
 
 | Nhóm nội dung | Slide | Nội dung trọng tâm | Thời lượng gợi ý |
 | :--- | :---: | :--- | :---: |
-| **Mở đầu** | 1 – 2 | Trang bìa & Bố cục tổng thể báo cáo nghiệm thu | 1 phút |
-| **Phần 1: Cơ sở lý thuyết nền tảng** | 3 – 5 | Giải thích các khái niệm cốt lõi: Cross-Attention, Hiệu chuẩn ECE, Agentic RAG, DCA & PROBAST | 2 phút 30 giây |
-| **Phần 2: Khoảng trống & Nền tảng Đợt 1** | 6 – 8 | Khoảng trống y văn JMIR (2024), Bộ dữ liệu 2.000 ca & Điểm mù của các mô hình đơn phương thức | 2 phút 30 giây |
-| **Phần 3: Phương pháp Giai đoạn 2** | 9 – 12 | Kiến trúc Dung hợp Chú ý chéo, Hiệu chuẩn Nhiệt độ & Hệ thống Giải thích Y văn Chống ảo giác | 3 phút 30 giây |
-| **Phần 4: Kết quả thực nghiệm & Case Study** | 13 – 16 | Đối chứng định lượng, Nghiên cứu cắt bỏ (Ablation) & Giải quyết 2 ca bệnh khó (`PT-0044`, `PT-0254`) | 3 phút 30 giây |
-| **Phần 5: Thẩm định lâm sàng mở rộng** | 17 – 18 | Phân tích Lợi ích ròng (DCA Net Benefit) & Đánh giá 4 miền tiêu chuẩn PROBAST | 2 phút |
-| **Phần 6: Tổng kết & Y đức** | 19 – 20 | Giới hạn nghiên cứu, Tuyên bố y đức & Danh mục tài liệu tham khảo chính | 1 phút |
+| **Mở đầu & Bố cục** | 1 – 2 | Trang bìa (kèm cảnh báo dữ liệu tổng hợp) & Tổng quan báo cáo RQ1–RQ5 | 1 phút 30 giây |
+| **1. Cơ sở lý thuyết nền tảng** | 3 – 5 | Cross-Attention, Hiệu chuẩn ECE, Agentic RAG + Grounding, DCA & PROBAST | 2 phút |
+| **2. Khoảng trống, RQ1–RQ5 & Dữ liệu** | 6 – 8 | JMIR (2024), 5 Câu hỏi nghiên cứu (RQ1–RQ5), Dữ liệu chống rò rỉ & Bài học Phase 1 | 3 phút |
+| **3. Phương pháp & An toàn Hệ thống** | 9 – 12 | Kiến trúc dung hợp, Agentic RAG 64/70 chunks, UI Safety Banner, RQ4 Toggle & Độ trễ CPU | 4 phút |
+| **4. Kết quả Thực nghiệm (RQ1–RQ5)** | 13 – 16 | Đối chứng đa seed (RQ1), Phân rã văn bản (RQ2), Case Study & Grounding Audit 50 ca | 3 phút 30 giây |
+| **5. Thẩm định Lâm sàng (DCA & PROBAST)** | 17 – 18 | Phân tích Lợi ích ròng DCA, Kiểm định thiếu phương thức RQ4 & PROBAST 4 miền | 2 phút |
+| **6. Giới hạn, Hướng phát triển & Q&A** | 19 – 20 | Giới hạn trung thực, Lộ trình MIMIC-IV / Khảo sát bác sĩ / LLM ràng buộc & Tài liệu | 1 phút 30 giây |
 
 ---
 
@@ -128,10 +132,12 @@
 * **Thực trạng từ 10.657 công trình được sàng lọc (15 nghiên cứu đạt chuẩn phân tích):**
   * **100% (15/15 nghiên cứu)** chỉ khai thác dữ liệu có cấu trúc dạng bảng (mã ICD, xét nghiệm, sinh hiệu); **bỏ qua hoàn toàn** văn bản ghi chú lâm sàng tự do.
   * **Thẩm định PROBAST:** 60% (9/15) có nguy cơ sai lệch cao; 40% (6/15) không rõ ràng; **0% (0/15 nghiên cứu) đạt mức nguy cơ sai lệch thấp (*Low Risk of Bias*)**.
-* **Ba bài toán cốt lõi đề tài M-CDSS giải quyết:**
-  1. Khai thác đồng thời dữ liệu bảng số và văn bản bệnh án tự do.
-  2. Thiết lập quy trình quản trị dữ liệu 0% rò rỉ và hiệu chuẩn xác suất đạt chuẩn PROBAST.
-  3. Cung cấp lời giải thích minh bạch kèm trích dẫn phác đồ y khoa không ảo giác.
+* **Năm Câu hỏi Nghiên cứu Trọng tâm (RQ1–RQ5):**
+  * **RQ1 (Hiệu năng dung hợp đa seed):** *Cross-Attention Late Fusion* có cải thiện Macro-F1 và AUROC có ý nghĩa thống kê so với đơn phương thức trên đánh giá đa seed ($95\%$ CI)?
+  * **RQ2 (Phân rã tín hiệu văn bản):** Mức độ đóng góp của ghi chú lâm sàng khi giữ nguyên văn phong thực tế so với bản đã khử cụm chẩn đoán gián tiếp?
+  * **RQ3 (Hiệu chuẩn & Lợi ích ròng DCA):** *Temperature Scaling* có đưa $\text{ECE} < 0,05$ và cải thiện *Net Benefit* trên dải ngưỡng $p_t \in [0,10; 0,45]$?
+  * **RQ4 (Độ bền khi thiếu phương thức):** Hiệu năng hệ thống thay đổi ra sao khi khuyết văn bản hoặc sinh hiệu trên lâm sàng?
+  * **RQ5 (Chất lượng RAG & Chống ảo giác):** Kho phác đồ chuẩn hóa và cổng `EvidenceGrounder` đạt độ chính xác truy xuất, tỷ lệ chặn ảo giác và độ trễ CPU như thế nào?
 
 ### Lời nói gợi ý
 > Nhìn lại tổng quan hệ thống của Hunik và cộng sự trên tạp chí JMIR năm 2024, từ 10.657 công trình sàng lọc chỉ có 15 nghiên cứu đủ chuẩn đưa vào phân tích. Đáng chú ý là cả 15 nghiên cứu này đều chỉ dùng dữ liệu bảng mà bỏ quên văn bản bệnh án, và không có nghiên cứu nào đạt mức nguy cơ sai lệch thấp theo PROBAST. Đây chính là động lực để nhóm phát triển hệ thống M-CDSS giải quyết đồng thời cả ba khoảng trống: dung hợp đa phương thức, kiểm soát sai lệch phương pháp luận và giải thích lâm sàng minh bạch.
@@ -234,34 +240,36 @@
 ### Nội dung hiển thị trên Slide
 ![Luồng Hội chẩn Đa tác tử & Kiểm chứng Chống ảo giác](../paper_latex/figures/svg/fig02_multi_agent_rag_flow.svg)
 
-* **Luồng hội chẩn 4 bước tự động hóa (Multi-Agent Diagnostic Workflow):**
-  1. **Tác tử Phân loại (Triage Node):** Nhận diện cặp chẩn đoán phân biệt cạnh tranh sát nhất (Top-1 vs. Top-2) và các chỉ số sinh hiệu vượt ngưỡng bình thường.
-  2. **Truy xuất Y văn Lai (Hybrid Guideline Retriever):** Kết hợp tìm kiếm từ khóa y khoa chính xác (trọng số $0,65$) và tương đồng ngữ nghĩa vector ($0,35$) trên kho phác đồ chính thống (**GINA 2024, GOLD 2024, ESC, Bộ Y tế**).
-  3. **Tác tử Lập luận Lâm sàng (Reasoning Node):** Tổng hợp lập luận chẩn đoán phân biệt và đề xuất các câu trích dẫn chứng cứ từ bệnh án.
-  4. **Cổng Kiểm chứng Chống ảo giác (Deterministic Evidence Grounder – Độ phức tạp $\mathcal{O}(N)$):**
-     * Đối sánh chuỗi con tất định giữa câu trích dẫn và văn bản bệnh án gốc $T$.
-     * Chỉ những câu **tồn tại nguyên vẹn trong bệnh án gốc** ($0 \le \text{start} < \text{end} \le |T|$) mới được cấp tọa độ tô sáng trên màn hình; mọi câu suy diễn ngoài văn bản bị **bác bỏ tức thì 100%**.
+* **Luồng giải trình an toàn mặc định (`reasoning_mode = "deterministic_template"`):**
+  1. **Tác tử Phân loại (Triage Node):** Nhận diện cặp chẩn đoán phân biệt sát nhất (Top-1 vs. Top-2) và các chỉ số sinh hiệu vượt ngưỡng bình thường.
+  2. **Truy xuất Y văn Lai (Hybrid Guideline Retriever — 64 đoạn JSON / 70 vector chỉ mục trong Qdrant `v1.20.0`):** Kết hợp BM25 và vector 768 chiều (Qdrant RRF) trên 4 nguồn chuẩn (**GINA 2024, GOLD 2024, ESC 2023, Bộ Y tế 2020** — bảo toàn `evidence_level = null` cho nguồn Bộ Y tế).
+     * *Kết quả RQ5 (60 truy vấn gán nhãn kép, $\kappa_{\text{Cohen}} = 0,9725$):* `bm25_only` (`R@1 = 0,9500`, `MRR = 0,9750`), `dense_only` fallback ngoại tuyến (`R@1 = 0,7500`, `MRR = 0,8447`), `hybrid_rrf` (`R@1 = 0,8667`, **`R@5 = 1,0000`**, `MRR = 0,9067`).
+  3. **Tác tử Lập luận Lâm sàng (Reasoning Node):** Sinh tóm tắt phân biệt tất định (`deterministic_template`) và đề xuất câu trích dẫn bằng chứng.
+  4. **Cổng Kiểm chứng Chống ảo giác (Deterministic `EvidenceGrounder` – $\mathcal{O}(N)$):**
+     * Đối sánh tọa độ `[start_char, end_char]` trên bệnh án gốc $T$; mọi nhận định không khớp đều bị bác bỏ (`100%` reject trên 50 hallucination probes).
 
 ### Lời nói gợi ý
-> Để giải quyết bài toán minh bạch hóa hộp đen AI mà không rơi vào rủi ro ảo giác của các mô hình ngôn ngữ, nhóm xây dựng luồng hội chẩn đa tác tử gồm 4 bước. Sau khi tác tử phân loại nhận diện hai bệnh lý cần phân biệt sát nhất và truy xuất các điều khoản phác đồ GINA, GOLD bằng cơ chế tìm kiếm lai, mọi câu bằng chứng trích xuất từ bệnh án đều phải đi qua **Cổng kiểm chứng chống ảo giác**. Thuật toán này kiểm tra đối sánh chuỗi con trực tiếp trên văn bản gốc với độ phức tạp tuyến tính: chỉ những câu có thật 100% trong hồ sơ của bác sĩ mới được định vị tọa độ đầu – cuối để tô sáng; bất kỳ thông tin suy diễn nào không khớp văn bản gốc đều bị loại bỏ hoàn toàn.
+> Để minh bạch hóa hộp đen AI mà không rơi vào rủi ro ảo giác của LLM, hệ thống mặc định vận hành ở chế độ `deterministic_template`. Kho phác đồ được mở rộng lên 64 đoạn JSON chuẩn hóa (tổng 70 vector trên `qdrant/qdrant:v1.20.0`), đạt Recall@5 bằng 1,00 trên bộ 60 truy vấn gán nhãn kép ($\kappa = 0,9725$). Nhóm ghi nhận trung thực rằng ở chế độ ngoại tuyến không có trọng số `all-mpnet-base-v2`, nhánh dense dùng băm 768 chiều khiến BM25 đơn lẻ đạt Recall@1 cao hơn (0,9500), trong khi `hybrid_rrf` vẫn bảo toàn Recall@5 tuyệt đối 1,00. Sau đó mọi câu chứng cứ phải đi qua cổng `EvidenceGrounder` để bảo đảm tồn tại nguyên văn trong hồ sơ gốc.
 
 ### Câu chuyển
-> Cơ chế này được thể hiện trực quan trên bàn làm việc của bác sĩ như thế nào? Em xin trình bày ở Slide 12.
+> Cơ chế này được tích hợp cùng các lớp bảo vệ an toàn trên giao diện bác sĩ và hạ tầng kiểm định như thế nào? Em xin trình bày ở Slide 12.
 
 ---
 
-## Slide 12 — Bàn làm việc Hội chẩn Lâm sàng & Đóng gói Triển khai Đồng bộ
+## Slide 12 — Bàn làm việc An toàn, Độ trễ CPU & Đóng gói Tái lập (Phase 3 Hardening)
 
 ### Nội dung hiển thị trên Slide
-* **Thiết kế giao diện hướng tới quy trình khám bệnh thực tế:**
-  * **Khung nhập liệu có kiểm soát biên sinh lý:** Tự động cảnh báo nếu thông số nhập vào nằm ngoài giới hạn sinh tồn (ví dụ $\text{SpO}_2 \notin [50\%, 100\%]$ hoặc huyết áp âm), ngăn ngừa sai sót nhập liệu.
-  * **Thẻ Chẩn đoán Hiệu chuẩn & Đối chứng trực tiếp:** Hiển thị thanh xác suất 4 nhóm bệnh của mô hình đa phương thức đặt cạnh dự đoán của các mô hình đơn phương thức để bác sĩ dễ dàng so sánh.
-  * **Trình Tô sáng Bằng chứng & Ngăn kéo Phác đồ:** Tô sáng trực tiếp cụm từ triệu chứng ngay trong đoạn văn bệnh án và mở ngăn kéo trượt hiển thị nguyên văn điều khoản hướng dẫn điều trị GINA 2024 / GOLD 2024 kèm mức độ chứng cứ (*Evidence Level A*).
-* **Đóng gói chuẩn hóa đảm bảo tính tái lập (Reproducibility):**
-  * Toàn bộ hệ thống 3 tầng (Giao diện Web, Cổng suy luận AI và Cơ sở dữ liệu Vector Y văn) được đóng gói đồng bộ qua công nghệ ảo hóa container, khởi chạy hoàn chỉnh bằng một thao tác duy nhất.
+* **Bàn làm việc lâm sàng chống đánh lừa (UI Safety Hardening):**
+  * **Biểu ngữ Phạm vi & Thẻ Mô hình (`ResearchBannerAndFooter.tsx`):** Gắn cố định trên `/`, `/baselines`, `/evaluation`, hiển thị trạng thái `checkpoint` + `reasoning_mode`. Chế độ mock chỉ bật khi đặt tường minh `NEXT_PUBLIC_DEMO_MOCK=1` kèm thanh cảnh báo đỏ **`MOCK MODE`**.
+  * **Cảnh báo Bất định (`< 55%`) & Công tắc RQ4 Missing-Modality:** Tự động hiện cảnh báo khi Top-1 $< 55\%$; cho phép ẩn văn bản/bảng ngay trên form để minh họa RQ4.
+  * **Tab 3 `/evaluation` (Registry Thống nhất):** Đọc trực tiếp từ `GET /api/v1/evaluation/registry` (`results/registry.json`), phân biệt rõ số liệu thật (`is_mock: false`) với các ô chờ đa seed (`is_mock: true`).
+* **Độ trễ thực tế trên CPU (200 lượt gọi ấm, `scripts/benchmark_latency.py`):**
+  * `POST /api/v1/agent/explain` (HTTP 200): **$p_{50} = 9,15\text{ ms}$** | **$p_{95} = 11,46\text{ ms}$** | Mean = `9,46 ms`.
+  * `POST /api/v1/predict/multimodal`: Trả **HTTP 503** an toàn có cấu trúc ($p_{95} = 102,52\text{ ms}$) khi thiếu cache `Bio_ClinicalBERT` ngoại tuyến.
+* **Kiểm thử & Dự phòng Demo:** Đóng gói Docker ghim `qdrant/qdrant:v1.20.0`, kèm `scripts/smoke_test.ps1` / `.sh` và GitHub Actions CI. **Phương án dự phòng:** Chuẩn bị sẵn video Full HD cục bộ + ảnh chụp UI thật phòng sự cố mạng/GPU khi bảo vệ trực tiếp.
 
 ### Lời nói gợi ý
-> Toàn bộ các thuật toán trên được tích hợp vào một bàn làm việc lâm sàng trực quan, tương thích tốt trên cả máy trạm và máy tính bảng tại buồng bệnh. Bác sĩ có thể quan sát đồng thời thanh xác suất đã hiệu chuẩn, các dòng triệu chứng được tô sáng ngay trên bệnh án gốc và bấm mở ngăn kéo bên phải để đọc nguyên văn điều khoản phác đồ GINA hoặc GOLD. Toàn bộ hệ thống đã được đóng gói container trọn gói để đảm bảo khả năng tái lập nghiên cứu chính xác tuyệt đối.
+> Trên bàn làm việc lâm sàng, mọi trang đều hiển thị cảnh báo nghiên cứu và nguồn checkpoint; hệ thống tắt hoàn toàn cơ chế tự rơi về mock khi mất kết nối trừ khi bật cờ tường minh, đồng thời cảnh báo bất định ngay khi xác suất dưới 55%. Kết quả đo thực tế trên CPU đa nhân cho thấy API giải trình đa tác tử đạt trung vị 9,15 ms và p95 chỉ 11,46 ms, rất khả thi cho máy trạm bệnh viện không cần GPU. Cuối cùng, nhóm chuẩn bị sẵn kịch bản `smoke_test` kiểm tra 8 điểm cuối tự động và phương án video cục bộ dự phòng rủi ro sự cố hạ tầng lúc demo trực tiếp.
 
 ### Câu chuyển
 > Vậy khi đưa kiến trúc M-CDSS này vào thử lửa trên tập kiểm thử độc lập 302 hồ sơ bệnh án, kết quả thực nghiệm đạt được ra sao? Em xin chuyển sang Phần 4.
@@ -353,12 +361,14 @@
   * **Trích dẫn hợp lệ 1:** `"18yo female presenting with acute wheezing"` $\rightarrow$ Tìm thấy chính xác tại vị trí ký tự `[18 : 60]` $\rightarrow$ **Chấp nhận & Tô sáng trên giao diện**.
   * **Trích dẫn hợp lệ 2:** `"using albuterol inhaler PRN"` $\rightarrow$ Tìm thấy chính xác tại vị trí ký tự `[112 : 139]` $\rightarrow$ **Chấp nhận & Tô sáng trên giao diện**.
   * **Câu suy diễn ảo giác giả định:** `"Spirometry confirms FEV1/FVC < 0.70"` $\rightarrow$ Không tồn tại trong văn bản gốc (`find = -1`) $\rightarrow$ **Bị cổng kiểm chứng chặn và loại bỏ tức thì**.
-* **Kết quả kiểm định tính toàn vẹn giải trình:**
-  * **100% câu bằng chứng hiển thị cho bác sĩ** đều khớp nguyên văn với hồ sơ bệnh án gốc ($\text{Hallucination Rate} = 0\%$).
-  * **100% khuyến nghị phác đồ** đều gắn mã định danh điều khoản cụ thể từ kho tri thức chuẩn hóa (GINA 2024, GOLD 2024, ESC, Bộ Y tế).
+* **Kết quả kiểm định thực nghiệm chống ảo giác trên 50 ca lâm sàng (`scripts/eval_rag.py` — `results/rag_evaluation_report.json`):**
+  * **Tỷ lệ neo đúng nhận định thật (`genuine_claim_grounding_rate`):** **100 / 100 (`1,00`)** nhận định thật đều đối sánh chính xác vị trí ký tự (`span_substring_match_rate = 1,00`).
+  * **Tỷ lệ chặn nhận định giả mạo (`hallucination_rejection_rate`):** **50 / 50 (`1,00`)** câu tiêm nhiễu ảo giác bị phát hiện và bác bỏ hoàn toàn trước khi trả ra UI.
+  * **Độ chính xác ngữ nghĩa kiểm tra thủ công:** **20 / 20 (`1,00`)** đoạn trích mẫu giữ nguyên ngữ cảnh bệnh sử (không đảo ngược phủ định).
+  * **Truy xuất y văn gắn nguồn minh bạch:** **64 đoạn JSON phác đồ chuẩn hóa** (cộng 6 đoạn hạt giống = 70 vector chỉ mục) đều gắn `source_id`, `version`, `section_locator`; bảo toàn `evidence_level = null` cho tài liệu Bộ Y tế VN 2020.
 
 ### Lời nói gợi ý
-> Slide 16 minh họa cơ chế bảo vệ an toàn thông tin lâm sàng của hệ thống. Giả sử trong quá trình lập luận, một tác tử ngôn ngữ cố tình suy diễn thêm câu “Đo hô hấp ký cho thấy FEV1/FVC dưới 0,70” dù bác sĩ chưa hề ghi câu này trong bệnh án. Ngay lập tức, bộ kiểm chứng vị trí ký tự sẽ phát hiện chuỗi này không tồn tại trong văn bản gốc và loại bỏ hoàn toàn trước khi trả kết quả về màn hình. Nhờ đó, hệ thống đảm bảo tỷ lệ ảo giác bằng 0% trên mọi bằng chứng được tô sáng.
+> Slide 16 báo cáo kết quả kiểm định định lượng cơ chế chống ảo giác trên 50 ca lâm sàng thực nghiệm. Bộ kiểm định `EvidenceGrounder` neo thành công 100 trên 100 nhận định thật vào đúng tọa độ ký tự trên hồ sơ gốc, đồng thời chặn đứng 50 trên 50 nhận định giả mạo được tiêm nhiễu. Trên 20 đoạn trích kiểm tra thủ công về mặt ngữ nghĩa cũng đạt chính xác 100%, trong khi hệ thống vận hành ở chế độ mặc định `deterministic_template` để loại bỏ hoàn toàn nguy cơ LLM tự bịa triệu chứng mới.
 
 ### Câu chuyển
 > Không chỉ dừng lại ở độ chính xác và khả năng giải thích, hệ thống còn được thẩm định giá trị thực tiễn qua Phân tích đường cong quyết định DCA và tiêu chuẩn PROBAST ở Phần 5.
@@ -420,16 +430,18 @@
 ## Slide 19 — Giới hạn nghiên cứu, Định hướng mở rộng & Tuyên bố Y đức
 
 ### Nội dung hiển thị trên Slide
-* **Các giới hạn khách quan của nghiên cứu hiện tại:**
-  1. **Đặc điểm nguồn dữ liệu:** Bộ dữ liệu 2.000 hồ sơ được chuẩn hóa từ hai nguồn mở quốc tế uy tín (Synthea EHR và MTSamples). Dù đã mô phỏng trung thực tỷ lệ khuyết thiếu xét nghiệm và văn phong lâm sàng, hệ thống vẫn cần được kiểm định ngoại kiểm (*External Validation*) trên dữ liệu bệnh án thực tế đa trung tâm tại các bệnh viện Việt Nam.
-  2. **Phạm vi nhóm bệnh:** Hiện tại hệ thống tập trung phân biệt 4 hội chứng hô hấp – tim mạch cấp tính phổ biến nhất; chưa mở rộng sang bài toán đa nhãn cho bệnh nhân mắc đồng thời nhiều bệnh lý cấp tính chồng lấp.
+* **Giới hạn trung thực của nghiên cứu & hệ thống hiện tại:**
+  1. **Nguồn dữ liệu tổng hợp:** 2.000 hồ sơ được chuẩn hóa từ Synthea EHR + MTSamples (chỉ số tái lập qua `DATA_MANIFEST.json`); chưa ngoại kiểm đa trung tâm trên bệnh án thật.
+  2. **Đơn nhãn & Vận hành ngoại tuyến:** Bài toán mới dừng ở phân loại đơn nhãn 4 hội chứng; khi thiếu trọng số cục bộ `Bio_ClinicalBERT` hoặc `all-mpnet-base-v2`, `/predict/multimodal` chủ động trả HTTP 503 an toàn và truy xuất dense lùi về vector băm 768 chiều (làm `bm25_only` vượt `dense_only` ở Recall@1).
+* **Ba hướng phát triển tiếp theo:**
+  1. Ngoại kiểm (*External Validation*) trên **MIMIC-IV** và dữ liệu bệnh viện thực tế tại Việt Nam.
+  2. Thực hiện **khảo sát bác sĩ lâm sàng** đánh giá tính hữu ích, niềm tin và độ giảm tải thời gian tra cứu.
+  3. Tích hợp **LLM cục bộ có ràng buộc qua `EvidenceGrounder`** bên cạnh chế độ `deterministic_template` hiện tại.
 * **Tuyên bố Ranh giới Lâm sàng & Đạo đức Y sinh (Clinical & Ethical Disclaimer):**
-  * **M-CDSS là nguyên mẫu nghiên cứu học thuật phục vụ hỗ trợ ra quyết định lâm sàng (*Clinical Decision Support Prototype*)**, đóng vai trò cung cấp góc nhìn tham khảo thứ hai có kèm bằng chứng và dẫn chiếu y văn.
-  * Hệ thống **tuyệt đối không thay thế bác sĩ** và không tự động đưa ra quyết định điều trị trên bệnh nhân thực tế. Mọi quyết định y khoa cuối cùng luôn thuộc về thẩm quyền chuyên môn của bác sĩ điều trị.
+  * **M-CDSS là nguyên mẫu nghiên cứu học thuật**, tuyệt đối không thay thế bác sĩ và không tự động ra quyết định điều trị. *(Chuẩn bị sẵn video demo cục bộ + ảnh chụp UI thật làm phương án dự phòng nếu demo trực tiếp gặp sự cố mạng/GPU).*
 
 ### Lời nói gợi ý
-> Nhóm luôn giữ tinh thần nhìn nhận khách quan về các giới hạn của nghiên cứu. Thứ nhất, dữ liệu hiện tại được chuẩn hóa từ nguồn mở Synthea và MTSamples với tập kiểm thử độc lập 302 ca, do đó bước tiếp theo nhóm hướng tới là xin cấp phép thử nghiệm ngoại kiểm trên dữ liệu bệnh án thực tế tại các bệnh viện trong nước và mở rộng sang bài toán đa bệnh lý đồng mắc.  
-> Đặc biệt, về mặt đạo đức y sinh, nhóm xin khẳng định rõ: M-CDSS là công cụ hỗ trợ cung cấp thông tin tham khảo và tra cứu y văn minh bạch cho bác sĩ, tuyệt đối không thay thế quyền quyết định chuyên môn của người thầy thuốc.
+> Nhóm nhìn nhận thẳng thắn ba giới hạn hiện tại: bộ dữ liệu còn là dữ liệu tổng hợp Synthea/MTSamples, bài toán mới giải quyết đơn nhãn 4 bệnh, và trong môi trường ngoại tuyến thiếu cache trọng số thì hệ thống chủ động trả HTTP 503 hoặc dùng fallback tất định thay vì suy đoán ngầm. Ba hướng phát triển rõ ràng tiếp theo là ngoại kiểm trên MIMIC-IV, thực hiện khảo sát đánh giá cùng bác sĩ lâm sàng, và tích hợp mô hình ngôn ngữ cục bộ có ràng buộc chặt qua cổng chống ảo giác. Em xin khẳng định M-CDSS chỉ là nguyên mẫu nghiên cứu hỗ trợ tham khảo, luôn đặt quyết định cuối cùng thuộc về bác sĩ điều trị.
 
 ### Câu chuyển
 > Cuối cùng là danh mục các tài liệu tham khảo học thuật chính được trích dẫn trong đề tài.

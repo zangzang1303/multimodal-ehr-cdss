@@ -40,7 +40,29 @@ Bảng~\ref{tab:rest_endpoints} tổng hợp toàn bộ hệ thống điểm cu�
 \texttt{POST /api/v1/agent/explain} & \texttt{AgentExplainResponse} & Thực thi quy trình giải trình tất định (\texttt{deterministic\_template}), truy xuất lai Qdrant--BM25 và trả về danh sách câu bằng chứng đã xác thực tọa độ ký tự $[\text{start\_char}, \text{end\_char}]$ kèm bản kiểm toán \texttt{ClaimAudit}. \\[0.4em]
 \texttt{GET /api/v1/benchmarks/baselines} & \texttt{BaselineBenchmarkList} & Xuất ma trận chỉ số định lượng của 3 mô hình đơn phương thức trên tập kiểm thử độc lập ($N=302$). \\[0.4em]
 \texttt{GET /api/v1/benchmarks/ablation} & \texttt{AblationBenchmarkList} & Cung cấp kết quả thực nghiệm cắt bỏ thành phần (\textit{Ablation Study}) chứng minh đóng góp của tầng Cross-Attention và Temperature Scaling. \\[0.4em]
-\texttt{GET /api/v1/evaluation/benchmark} & \texttt{EvaluationBenchmark} & Tính toán động tọa độ đường cong quyết định DCA ($p_t \in [0.05, 0.60]$) qua \texttt{dca\_analysis.py} và trả về bảng kiểm 4 miền PROBAST. \\
+\texttt{GET /api/v1/predict/status} & \texttt{CheckpointStatus} & Báo cáo trạng thái nạp checkpoint (\texttt{multimodal\_best.pt}), hệ số nhiệt độ $T$, chữ ký SHA-256 ngắn, \texttt{reasoning\_mode} và thẻ mô hình (\texttt{model\_card}). \\
+\texttt{GET /api/v1/evaluation/benchmark} & \texttt{EvaluationBenchmark} & Tính toán động tọa độ đường cong quyết định DCA ($p_t \in [0.10, 0.45]$ trên giao diện lâm sàng) qua \texttt{dca\_analysis.py} và trả về bảng kiểm 4 miền PROBAST. \\
+\texttt{GET /api/v1/evaluation/registry} & \texttt{ResultsRegistry} & Truy xuất nguồn sự thật duy nhất (\texttt{results/registry.json}) phục vụ đối chiếu RQ1--RQ5 và độ trễ trên giao diện đánh giá. \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\subsection{Đánh giá Độ trễ Hệ thống (\textit{CPU Latency Benchmark})}
+Để kiểm chứng tính khả thi khi triển khai tại phòng khám ngoại trú hoặc khoa cấp cứu không trang bị GPU chuyên dụng, kịch bản \texttt{scripts/benchmark\_latency.py} thực hiện đo 200 lượt gọi ấm (\textit{warm requests}) sau 1 lượt khởi động nguội (\textit{cold request}) với bản ghi lâm sàng dài 340 ký tự trên môi trường CPU đa nhân (\textit{Windows 11, AMD64, 16 logical cores}). Kết quả đo thực tế được tổng hợp trong Bảng~\ref{tab:system_latency}.
+
+\begin{table}[htbp]
+\centering
+\caption{Độ trễ thực thi thực tế của các điểm cuối M-CDSS trên CPU (200 lượt gọi ấm, đơn vị: ms)}
+\label{tab:system_latency}
+\begin{tabularx}{\linewidth}{@{}lrrrrrr@{}}
+\toprule
+\textbf{Điểm cuối / Trạng thái} & \textbf{HTTP} & \textbf{Cold} & \textbf{Mean} & \textbf{p50} & \textbf{p95} & \textbf{p99} \\
+\midrule
+\texttt{POST /api/v1/agent/explain} & 200 & 192.54 & 9.46 & 9.15 & 11.46 & 15.08 \\
+\texttt{POST /api/v1/predict/baseline} (fallback) & 200 & 4.19 & 3.75 & 3.66 & 4.74 & 5.40 \\
+\texttt{POST /api/v1/predict/multimodal} (safeguard) & 503 & 68.16 & 83.79 & 81.81 & 102.52 & 110.40 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Ở chế độ giải trình mặc định \texttt{deterministic\_template}, toàn bộ chuỗi truy xuất Qdrant lai và kiểm chứng tọa độ ký tự trên \texttt{/api/v1/agent/explain} chỉ mất $9.15\,\text{ms}$ ở mức trung vị ($p_{95} = 11.46\,\text{ms}$). Điểm cuối \texttt{/api/v1/predict/multimodal} trả về HTTP 503 an toàn trong $81.81\,\text{ms}$ ($p_{95} = 102.52\,\text{ms}$) trên máy không có bộ nhớ đệm ngoại tuyến của \texttt{emilyalsentzer/Bio\_ClinicalBERT}, thay vì suy đoán ngầm bằng giá trị giả lập. \texttt{[TODO-TV1/TV2: Bổ sung độ trễ suy luận \texttt{HTTP 200} của \texttt{/predict/multimodal} trên máy có đầy đủ cache \texttt{Bio\_ClinicalBERT} và GPU/CPU mục tiêu]}.

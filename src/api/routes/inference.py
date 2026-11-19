@@ -12,6 +12,12 @@ Inference API Endpoints for Baselines
 Multimodal EHR CDSS - Phase 1 / Backlog 02 (Task 3.3)
 """
 
+import hashlib
+import json
+import math
+import os
+from functools import lru_cache
+from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
 from src.api.schemas import (
@@ -23,12 +29,66 @@ from src.api.schemas import (
     TopKPrediction,
 )
 from src.data_pipeline.deidentifier import ClinicalDeidentifier
-from src.api.multimodal_service import predict_checkpoint
+
+
+def predict_checkpoint(tabular_features: dict, deidentified_note: str):
+    """Lazily import PyTorch multimodal inference so lightweight deploy images can boot."""
+    from src.api.multimodal_service import predict_checkpoint as _predict_checkpoint
+
+    return _predict_checkpoint(tabular_features, deidentified_note)
 
 router = APIRouter(prefix="/predict")
 
 # Initialize ClinicalDeidentifier for pre-inference PHI protection
 deidentifier = ClinicalDeidentifier(spacy_model=None, use_ner=False)
+
+
+@lru_cache(maxsize=1)
+def _load_model_card_metadata() -> dict:
+    """Reads checkpoint hash, temperature, and data manifest metadata for transparency UI."""
+    repo_root = Path(__file__).resolve().parents[3]
+    ckpt_path = repo_root / "data" / "checkpoints" / "multimodal_best.pt"
+    manifest_path = repo_root / "data" / "DATA_MANIFEST.json"
+    summary_path = repo_root / "data" / "benchmark_summary.json"
+
+    ckpt_sha = "unavailable"
+    if ckpt_path.is_file():
+        ckpt_sha = hashlib.sha256(ckpt_path.read_bytes()).hexdigest()[:12]
+
+    manifest_sha = "unavailable"
+    if manifest_path.is_file():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest_sha = str(manifest.get("manifest_sha256", "unavailable"))[:12]
+        except Exception:
+            manifest_sha = "unavailable"
+
+    trained_at = "2026-11-05"
+    temperature = 1.3541
+    if summary_path.is_file():
+        try:
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            temperature = float(summary.get("temperature", 1.3541))
+            if summary.get("evaluated_at"):
+                trained_at = str(summary["evaluated_at"])[:10]
+        except Exception:
+            pass
+
+    return {
+        "checkpoint_name": ckpt_path.name,
+        "checkpoint_sha256_short": ckpt_sha,
+        "trained_at": trained_at,
+        "temperature": round(temperature, 4),
+        "data_manifest_sha": manifest_sha,
+    }
+
+
+def _softmax_top(scores: dict[str, float]) -> tuple[str, float]:
+    max_val = max(scores.values())
+    exps = {k: math.exp(v - max_val) for k, v in scores.items()}
+    total = sum(exps.values()) or 1.0
+    best_k = max(exps, key=lambda k: exps[k])
+    return best_k, round(exps[best_k] / total, 4)
 
 
 @router.options("/status")
@@ -39,10 +99,12 @@ async def options_status():
 
 @router.get("/status")
 async def inference_status():
-    """Check inference service status."""
+    """Check inference service status, reasoning mode, and model card provenance."""
     return {
         "status": "inference_service_ready",
         "supported_baselines": ["classical", "tabular_deep", "text_only"],
+        "reasoning_mode": "deterministic_template",
+        "model_card": _load_model_card_metadata(),
     }
 
 
@@ -55,72 +117,43 @@ async def options_baseline():
 @router.post("/baseline", response_model=PatientInferenceResponse)
 async def predict_baseline(request: PatientInferenceRequest) -> PatientInferenceResponse:
     """
-    Mock baseline prediction endpoint returning probability predictions for 3 baseline models:
-    - classical_tabular (e.g. XGBoost)
-    - tabular_deep (e.g. FT-Transformer)
-    - text_only (e.g. Bio_ClinicalBERT)
+    Baseline heuristic fallback prediction endpoint across 3 unimodal baselines
+    until fitted Member 1 baseline artifacts (.cbm / .pt) are registered.
+    Set MCDSS_STRICT_NO_MOCK_BASELINE=1 to return 503 baseline_models_unavailable.
     """
+    if os.getenv("MCDSS_STRICT_NO_MOCK_BASELINE") == "1":
+        raise HTTPException(status_code=503, detail="baseline_models_unavailable")
+
     patient_id = request.patient_id or "PT-001"
     tf = request.tabular_features
 
-    # Sanitize clinical notes using Member 2's De-identification pipeline
     raw_notes = request.clinical_notes or ""
     sanitized_notes = deidentifier.deidentify_text(raw_notes) if raw_notes else ""
     notes_text = sanitized_notes.lower()
 
-    # Case Study exact ground truth / error analysis mapping
-    if patient_id == "PT-0044" or (tf.age == 18 and tf.crp > 20.0):
-        pred_tab = "COPD"
-        conf_tab = 0.7882
-        pred_deep = "COPD"
-        conf_deep = 0.7410
-        pred_text = "ASTHMA"
-        conf_text = 0.8580
-    elif patient_id == "PT-0254" or (tf.age == 65 and ("tracheostomy" in notes_text or "khí quản" in notes_text)):
-        pred_tab = "COPD"
-        conf_tab = 0.7522
-        pred_deep = "COPD"
-        conf_deep = 0.7130
-        pred_text = "HEART_FAILURE"
-        conf_text = 0.5899
-    # Rule-assisted mock prediction matching clinical indications
-    elif (
-        tf.wbc_count > 12.0
-        or tf.crp > 30.0
-        or tf.temperature > 38.0
-        or "sốt" in notes_text
-        or "đờm" in notes_text
-    ):
-        pred_tab = "COMMUNITY_ACQUIRED_PNEUMONIA"
-        conf_tab = 0.76
-        pred_deep = "COMMUNITY_ACQUIRED_PNEUMONIA"
-        conf_deep = 0.74
-        pred_text = "COMMUNITY_ACQUIRED_PNEUMONIA"
-        conf_text = 0.71
-    elif tf.smoking_status in ("FORMER", "CURRENT") and (tf.age >= 50 or tf.spo2 <= 94.0):
-        pred_tab = "COPD"
-        conf_tab = 0.72
-        pred_deep = "COPD"
-        conf_deep = 0.68
-        pred_text = "COPD" if ("khó thở" in notes_text or "copd" in notes_text) else "ASTHMA"
-        conf_text = 0.65
-    elif tf.history_hypertension == 1 and tf.systolic_bp > 140.0 and tf.age > 60:
-        pred_tab = "CONGESTIVE_HEART_FAILURE"
-        conf_tab = 0.70
-        pred_deep = "CONGESTIVE_HEART_FAILURE"
-        conf_deep = 0.69
-        pred_text = "CONGESTIVE_HEART_FAILURE"
-        conf_text = 0.64
-    else:
-        pred_tab = "ASTHMA"
-        conf_tab = 0.71
-        pred_deep = "ASTHMA"
-        conf_deep = 0.67
-        pred_text = "ASTHMA"
-        conf_text = 0.65
+    # Uniform tabular physiological scoring (no hardcoded patient_id branches)
+    tab_scores = {
+        "ASTHMA": 0.4 + (0.9 if tf.age < 40 else 0.0) + (0.4 if tf.smoking_status == "NEVER" else -0.3) + (0.3 if tf.spo2 >= 94 else 0.0),
+        "COPD": 0.4 + (0.9 if tf.smoking_status in ("FORMER", "CURRENT") else 0.0) + (0.6 if tf.age >= 55 else 0.0) + (0.5 if tf.spo2 <= 93.0 else 0.0) + (0.3 if tf.crp > 15.0 else 0.0),
+        "CONGESTIVE_HEART_FAILURE": 0.3 + (0.8 if tf.history_hypertension == 1 else 0.0) + (0.7 if tf.systolic_bp > 140.0 else 0.0) + (0.4 if tf.age > 60 else 0.0),
+        "COMMUNITY_ACQUIRED_PNEUMONIA": 0.2 + (0.9 if tf.temperature > 38.0 else 0.0) + (0.8 if tf.wbc_count > 12.0 else 0.0) + (0.7 if tf.crp > 30.0 else 0.0),
+    }
+    pred_tab, conf_tab = _softmax_top(tab_scores)
+    deep_scores = {k: v * 0.92 for k, v in tab_scores.items()}
+    pred_deep, conf_deep = _softmax_top(deep_scores)
+
+    # Uniform text-token scoring
+    txt_scores = {
+        "ASTHMA": 0.4 + 0.7 * sum(w in notes_text for w in ("wheez", "inhaler", "khò khè", "hen", "asthma")),
+        "COPD": 0.4 + 0.7 * sum(w in notes_text for w in ("copd", "smoking", "hút thuốc", "tracheostomy", "thở rít", "khí quản", "đờm trắng")),
+        "CONGESTIVE_HEART_FAILURE": 0.4 + 0.7 * sum(w in notes_text for w in ("heart failure", "suy tim", "orthopnea", "phù", "bnp", "crackles")),
+        "COMMUNITY_ACQUIRED_PNEUMONIA": 0.4 + 0.7 * sum(w in notes_text for w in ("pneumonia", "viêm phổi", "sốt", "fever", "đờm mủ", "đông đặc")),
+    }
+    pred_text, conf_text = _softmax_top(txt_scores)
 
     return PatientInferenceResponse(
         patient_id=patient_id,
+        prediction_source="heuristic_baseline_fallback_pending_member1_cbm",
         baseline_results={
             "classical_tabular": BaselineModelResult(
                 predicted_class=pred_tab,
@@ -164,7 +197,7 @@ def predict_multimodal(request: PatientInferenceRequest) -> MultimodalMockRespon
         checkpoint, probabilities = predict_checkpoint(
             request.tabular_features.model_dump(), clean_note
         )
-    except (FileNotFoundError, OSError) as exc:
+    except (ImportError, FileNotFoundError, OSError) as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     classes = list(checkpoint["classes"])

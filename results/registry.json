@@ -1,0 +1,312 @@
+{
+  "_mock_notice": "[MOCK / PARTIAL REGISTRY - CÁC MỤC rq1, rq2, calibration, dca, robustness, fairness LÀ DỮ LIỆU MOCK TẠM THỜI CHỜ THÀNH VIÊN 1 & 2; CÁC MỤC rag VÀ latency LÀ SỐ LIỆU ĐO THẬT CỦA THÀNH VIÊN 3]",
+  "metadata": {
+    "registry_version": "1.0.0-phase3-partial",
+    "git_commit": "f828460",
+    "data_manifest_sha": "e3b0c44298fc",
+    "seeds": [
+      13,
+      42,
+      101,
+      2024,
+      7
+    ],
+    "is_mock_for_member1_member2": true
+  },
+  "rq1_multiseed_comparison": {
+    "is_mock": true,
+    "note": "Mock placeholder schema chờ Thành viên 1 chạy lại 5-seed fair comparison + paired bootstrap CI (Backlog 09 Task 1.1 & 1.2).",
+    "models": [
+      {
+        "model": "Logistic Regression (Tabular 9 vars)",
+        "auroc_mean": 0.901,
+        "auroc_sd": 0.008,
+        "auroc_ci95": [
+          0.885,
+          0.917
+        ],
+        "f1_mean": 0.621,
+        "ece_mean": 0.072,
+        "delta_auroc_vs_best_unimodal": -0.068,
+        "holm_adjusted_p": 0.001
+      },
+      {
+        "model": "TF-IDF (1-2 gram) + LR (Text)",
+        "auroc_mean": 0.922,
+        "auroc_sd": 0.009,
+        "auroc_ci95": [
+          0.904,
+          0.94
+        ],
+        "f1_mean": 0.684,
+        "ece_mean": 0.064,
+        "delta_auroc_vs_best_unimodal": -0.047,
+        "holm_adjusted_p": 0.002
+      },
+      {
+        "model": "CatBoost (Tabular)",
+        "auroc_mean": 0.922,
+        "auroc_sd": 0.007,
+        "auroc_ci95": [
+          0.908,
+          0.936
+        ],
+        "f1_mean": 0.608,
+        "ece_mean": 0.066,
+        "delta_auroc_vs_best_unimodal": -0.047,
+        "holm_adjusted_p": 0.002
+      },
+      {
+        "model": "FT-Transformer (Tabular Deep)",
+        "auroc_mean": 0.898,
+        "auroc_sd": 0.011,
+        "auroc_ci95": [
+          0.876,
+          0.919
+        ],
+        "f1_mean": 0.579,
+        "ece_mean": 0.115,
+        "delta_auroc_vs_best_unimodal": -0.071,
+        "holm_adjusted_p": 0.001
+      },
+      {
+        "model": "Bio_ClinicalBERT (Frozen + Linear Head)",
+        "auroc_mean": 0.861,
+        "auroc_sd": 0.014,
+        "auroc_ci95": [
+          0.833,
+          0.889
+        ],
+        "f1_mean": 0.512,
+        "ece_mean": 0.088,
+        "delta_auroc_vs_best_unimodal": -0.108,
+        "holm_adjusted_p": 0.001
+      },
+      {
+        "model": "Bio_ClinicalBERT (Fine-tuned Last Block)",
+        "auroc_mean": 0.969,
+        "auroc_sd": 0.006,
+        "auroc_ci95": [
+          0.957,
+          0.981
+        ],
+        "f1_mean": 0.842,
+        "ece_mean": 0.041,
+        "delta_auroc_vs_best_unimodal": 0.0,
+        "holm_adjusted_p": 1.0
+      },
+      {
+        "model": "Probability Ensemble (CatBoost + BERT)",
+        "auroc_mean": 0.971,
+        "auroc_sd": 0.005,
+        "auroc_ci95": [
+          0.961,
+          0.981
+        ],
+        "f1_mean": 0.851,
+        "ece_mean": 0.039,
+        "delta_auroc_vs_best_unimodal": 0.002,
+        "holm_adjusted_p": 0.42
+      },
+      {
+        "model": "Cross-Attention Fusion (Fine-tuned)",
+        "auroc_mean": 0.962,
+        "auroc_sd": 0.007,
+        "auroc_ci95": [
+          0.948,
+          0.976
+        ],
+        "f1_mean": 0.835,
+        "ece_mean": 0.046,
+        "delta_auroc_vs_best_unimodal": -0.007,
+        "holm_adjusted_p": 0.31
+      }
+    ]
+  },
+  "rq2_text_signal_decomposition": {
+    "is_mock": true,
+    "note": "Mock placeholder schema chờ Thành viên 1 chạy thí nghiệm phân rã 4 biến thể ghi chú (Backlog 09 Task 1.3).",
+    "variants": [
+      {
+        "variant": "full",
+        "label": "Ghi chú gốc (Có sinh hiệu)",
+        "tfidf_lr": 0.922,
+        "clinical_bert": 0.969,
+        "cross_attention": 0.962
+      },
+      {
+        "variant": "num_masked",
+        "label": "Che mọi con số (<NUM>)",
+        "tfidf_lr": 0.553,
+        "clinical_bert": 0.568,
+        "cross_attention": 0.914
+      },
+      {
+        "variant": "no_vitals",
+        "label": "Bỏ khối VITALS / EXAM",
+        "tfidf_lr": 0.548,
+        "clinical_bert": 0.561,
+        "cross_attention": 0.912
+      },
+      {
+        "variant": "narrative_only",
+        "label": "Chỉ Chief Complaint + HPI",
+        "tfidf_lr": 0.539,
+        "clinical_bert": 0.552,
+        "cross_attention": 0.908
+      }
+    ]
+  },
+  "rq4_calibration": {
+    "is_mock": true,
+    "note": "Mock placeholder schema chờ Thành viên 1 chạy so sánh Temperature/Vector/Isotonic scaling (Backlog 09 Task 1.5).",
+    "methods": [
+      {
+        "method": "uncalibrated",
+        "ece": 0.097,
+        "brier": 0.35
+      },
+      {
+        "method": "temperature_scaling",
+        "ece": 0.036,
+        "brier": 0.312
+      },
+      {
+        "method": "vector_scaling",
+        "ece": 0.039,
+        "brier": 0.318
+      },
+      {
+        "method": "isotonic_ovr",
+        "ece": 0.044,
+        "brier": 0.324
+      }
+    ]
+  },
+  "rq4_dca": {
+    "is_mock": true,
+    "target_disease": "HEART_FAILURE",
+    "note": "Mock placeholder schema chờ Thành viên 2 xuất kết quả DCA đa mô hình kèm CI bootstrap từ file .npz (Backlog 09 Task 2.1)."
+  },
+  "rq4_missing_modality": {
+    "is_mock": true,
+    "note": "Mock placeholder schema chờ Thành viên 2 chạy kiểm tra độ bền khi khuyết phương thức (Backlog 09 Task 2.2).",
+    "scenarios": [
+      {
+        "scenario": "full",
+        "label": "Đầy đủ Bảng + Văn bản",
+        "cross_attention_auroc": 0.962,
+        "tabular_only_auroc": 0.898,
+        "text_only_auroc": 0.969
+      },
+      {
+        "scenario": "no_text",
+        "label": "Khuyết Văn bản (Empty)",
+        "cross_attention_auroc": 0.895,
+        "tabular_only_auroc": 0.898,
+        "text_only_auroc": 0.5
+      },
+      {
+        "scenario": "no_tabular",
+        "label": "Khuyết Bảng số (Median)",
+        "cross_attention_auroc": 0.941,
+        "tabular_only_auroc": 0.5,
+        "text_only_auroc": 0.969
+      },
+      {
+        "scenario": "missing_30pct_tabular",
+        "label": "Khuyết 30% biến Bảng",
+        "cross_attention_auroc": 0.948,
+        "tabular_only_auroc": 0.812,
+        "text_only_auroc": 0.969
+      }
+    ]
+  },
+  "rag": {
+    "is_mock": false,
+    "evaluated_at": "2026-11-18T16:08:27.846795+00:00",
+    "corpus_size_chunks": 70,
+    "ingested_guideline_json_chunks": 64,
+    "dense_encoder": "768d_hashed_deterministic_cpu_fallback (all-mpnet-base-v2 offline unavailable)",
+    "query_count": 60,
+    "cohens_kappa": 0.9725,
+    "modes": {
+      "dense_only": {
+        "recall_at_1": 0.75,
+        "recall_at_3": 0.9,
+        "recall_at_5": 0.95,
+        "mrr": 0.8447,
+        "ndcg_at_5": 0.8175
+      },
+      "bm25_only": {
+        "recall_at_1": 0.95,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 0.975,
+        "ndcg_at_5": 0.9563
+      },
+      "hybrid_rrf": {
+        "recall_at_1": 0.8667,
+        "recall_at_3": 0.9,
+        "recall_at_5": 1.0,
+        "mrr": 0.9067,
+        "ndcg_at_5": 0.8723
+      }
+    },
+    "grounding_audit_50_cases": {
+      "cases_tested": 50,
+      "total_genuine_claims": 100,
+      "grounded_claims": 100,
+      "genuine_claim_grounding_rate": 1.0,
+      "injected_hallucination_probes": 50,
+      "rejected_claims": 50,
+      "hallucination_rejection_rate": 1.0,
+      "span_substring_match_rate": 1.0,
+      "manual_semantic_precision_20_spans": 1.0,
+      "sampled_20_spans_checked": 20
+    }
+  },
+  "latency": {
+    "is_mock": false,
+    "measured_at": "2026-11-18T16:09:40.473527+00:00",
+    "device_info": "Windows 11 | AMD64 | CPU (16 logical cores)",
+    "note_length_chars": 340,
+    "num_warm_requests": 200,
+    "endpoints": {
+      "/api/v1/agent/explain": {
+        "status_codes_observed": [
+          200
+        ],
+        "cold_ms": 192.54,
+        "mean_ms": 9.46,
+        "p50_ms": 9.15,
+        "p95_ms": 11.46,
+        "p99_ms": 15.08,
+        "cold_status_code": 200
+      },
+      "/api/v1/predict/baseline": {
+        "status_codes_observed": [
+          200
+        ],
+        "cold_ms": 4.19,
+        "mean_ms": 3.75,
+        "p50_ms": 3.66,
+        "p95_ms": 4.74,
+        "p99_ms": 5.4,
+        "cold_status_code": 200
+      },
+      "/api/v1/predict/multimodal": {
+        "status_codes_observed": [
+          503
+        ],
+        "cold_ms": 68.16,
+        "mean_ms": 83.79,
+        "p50_ms": 81.81,
+        "p95_ms": 102.52,
+        "p99_ms": 110.4,
+        "cold_status_code": 503,
+        "note": "HTTP 503 safeguard measured on CPU because local Bio_ClinicalBERT weights are missing from HF cache."
+      }
+    }
+  }
+}
