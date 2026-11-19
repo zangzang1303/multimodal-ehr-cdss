@@ -1,0 +1,562 @@
+{
+  "confusion_matrix": [
+    [
+      67,
+      1,
+      2,
+      1
+    ],
+    [
+      2,
+      54,
+      14,
+      1
+    ],
+    [
+      1,
+      16,
+      89,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      54
+    ]
+  ],
+  "classes": [
+    "ASTHMA",
+    "COPD",
+    "HEART_FAILURE",
+    "PNEUMONIA"
+  ],
+  "top_3_confusion_pairs": {
+    "ASTHMA <-> COPD (Hội chứng chồng lấp Hen - COPD / ACOS)": [
+      {
+        "patient_id": "PT-01997",
+        "encounter_id": "ENC-01997",
+        "true_disease": "ASTHMA",
+        "predicted_disease": "PNEUMONIA",
+        "confidence": 0.999652624130249,
+        "probabilities": {
+          "ASTHMA": 1.7189911886816844e-05,
+          "COPD": 0.0003232946037314832,
+          "HEART_FAILURE": 6.874197424622253e-06,
+          "PNEUMONIA": 0.999652624130249
+        },
+        "vitals_summary": "HR=90 bpm, BP=118/82 mmHg, SpO2=93.3%, RR=32/min, WBC=11.6 k/uL, CRP=53.7 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL].HCM\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 67\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01946",
+        "encounter_id": "ENC-01946",
+        "true_disease": "ASTHMA",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.998196542263031,
+        "probabilities": {
+          "ASTHMA": 0.0004130490415263921,
+          "COPD": 0.0013452391140162945,
+          "HEART_FAILURE": 0.998196542263031,
+          "PNEUMONIA": 4.5207289076643065e-05
+        },
+        "vitals_summary": "HR=104 bpm, BP=199/87 mmHg, SpO2=91.7%, RR=35/min, WBC=6.7 k/uL, CRP=10.7 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 48\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00713",
+        "encounter_id": "ENC-00713",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9948747754096985,
+        "probabilities": {
+          "ASTHMA": 0.0017808446427807212,
+          "COPD": 0.0029130757320672274,
+          "HEART_FAILURE": 0.9948747754096985,
+          "PNEUMONIA": 0.0004312939418014139
+        },
+        "vitals_summary": "HR=81 bpm, BP=172/85 mmHg, SpO2=90.0%, RR=25/min, WBC=9.4 k/uL, CRP=14.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL].HCM\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 77\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00289",
+        "encounter_id": "ENC-00289",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.989588737487793,
+        "probabilities": {
+          "ASTHMA": 0.004117458593100309,
+          "COPD": 0.006164357531815767,
+          "HEART_FAILURE": 0.989588737487793,
+          "PNEUMONIA": 0.0001293629320571199
+        },
+        "vitals_summary": "HR=105 bpm, BP=148/91 mmHg, SpO2=89.6%, RR=22/min, WBC=8.5 k/uL, CRP=25.6 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 82\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00106",
+        "encounter_id": "ENC-00106",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9901583790779114,
+        "probabilities": {
+          "ASTHMA": 0.008486894890666008,
+          "COPD": 0.0010764033067971468,
+          "HEART_FAILURE": 0.9901583790779114,
+          "PNEUMONIA": 0.0002783285453915596
+        },
+        "vitals_summary": "HR=95 bpm, BP=140/66 mmHg, SpO2=91.9%, RR=24/min, WBC=8.6 k/uL, CRP=2.4 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: OTHER | Tuổi: 79\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00178",
+        "encounter_id": "ENC-00178",
+        "true_disease": "COPD",
+        "predicted_disease": "PNEUMONIA",
+        "confidence": 0.9900328516960144,
+        "probabilities": {
+          "ASTHMA": 9.352671622764319e-05,
+          "COPD": 0.009421519003808498,
+          "HEART_FAILURE": 0.0004520793736446649,
+          "PNEUMONIA": 0.9900328516960144
+        },
+        "vitals_summary": "HR=90 bpm, BP=158/67 mmHg, SpO2=88.2%, RR=22/min, WBC=12.1 k/uL, CRP=39.8 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 61\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01978",
+        "encounter_id": "ENC-01978",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9697731733322144,
+        "probabilities": {
+          "ASTHMA": 0.021322520449757576,
+          "COPD": 0.00874372012913227,
+          "HEART_FAILURE": 0.9697731733322144,
+          "PNEUMONIA": 0.00016060253256000578
+        },
+        "vitals_summary": "HR=83 bpm, BP=132/75 mmHg, SpO2=89.2%, RR=24/min, WBC=9.7 k/uL, CRP=16.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 73\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01602",
+        "encounter_id": "ENC-01602",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9643355011940002,
+        "probabilities": {
+          "ASTHMA": 0.0063855922780931,
+          "COPD": 0.029249094426631927,
+          "HEART_FAILURE": 0.9643355011940002,
+          "PNEUMONIA": 2.9794362490065396e-05
+        },
+        "vitals_summary": "HR=89 bpm, BP=142/88 mmHg, SpO2=93.8%, RR=26/min, WBC=6.4 k/uL, CRP=10.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 70\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00623",
+        "encounter_id": "ENC-00623",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.89580899477005,
+        "probabilities": {
+          "ASTHMA": 0.06941555440425873,
+          "COPD": 0.031002890318632126,
+          "HEART_FAILURE": 0.89580899477005,
+          "PNEUMONIA": 0.003772570053115487
+        },
+        "vitals_summary": "HR=70 bpm, BP=120/88 mmHg, SpO2=94.7%, RR=29/min, WBC=7.2 k/uL, CRP=16.5 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 73\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00539",
+        "encounter_id": "ENC-00539",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9400901794433594,
+        "probabilities": {
+          "ASTHMA": 0.004886914510279894,
+          "COPD": 0.054828763008117676,
+          "HEART_FAILURE": 0.9400901794433594,
+          "PNEUMONIA": 0.00019407100626267493
+        },
+        "vitals_summary": "HR=79 bpm, BP=150/99 mmHg, SpO2=84.1%, RR=17/min, WBC=7.3 k/uL, CRP=13.6 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL].HCM\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 74\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      }
+    ],
+    "HEART_FAILURE <-> PNEUMONIA (Phù phổi suy tim vs Viêm phổi đông đặc)": [
+      {
+        "patient_id": "PT-00148",
+        "encounter_id": "ENC-00148",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.9790834784507751,
+        "probabilities": {
+          "ASTHMA": 0.0032024444080889225,
+          "COPD": 0.9790834784507751,
+          "HEART_FAILURE": 0.01729596219956875,
+          "PNEUMONIA": 0.00041809474350884557
+        },
+        "vitals_summary": "HR=95 bpm, BP=151/81 mmHg, SpO2=97.0%, RR=28/min, WBC=8.3 k/uL, CRP=13.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 54\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01109",
+        "encounter_id": "ENC-01109",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.971473217010498,
+        "probabilities": {
+          "ASTHMA": 0.0011094058863818645,
+          "COPD": 0.971473217010498,
+          "HEART_FAILURE": 0.02680027298629284,
+          "PNEUMONIA": 0.0006170370033942163
+        },
+        "vitals_summary": "HR=65 bpm, BP=153/77 mmHg, SpO2=87.4%, RR=22/min, WBC=11.4 k/uL, CRP=7.1 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 75\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01380",
+        "encounter_id": "ENC-01380",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.9707660675048828,
+        "probabilities": {
+          "ASTHMA": 0.0020606587640941143,
+          "COPD": 0.9707660675048828,
+          "HEART_FAILURE": 0.02707603946328163,
+          "PNEUMONIA": 9.716004569781944e-05
+        },
+        "vitals_summary": "HR=75 bpm, BP=110/78 mmHg, SpO2=88.6%, RR=23/min, WBC=8.2 k/uL, CRP=4.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL].HCM\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 78\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00462",
+        "encounter_id": "ENC-00462",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.970430850982666,
+        "probabilities": {
+          "ASTHMA": 0.0014105425216257572,
+          "COPD": 0.970430850982666,
+          "HEART_FAILURE": 0.02812129445374012,
+          "PNEUMONIA": 3.741254477063194e-05
+        },
+        "vitals_summary": "HR=98 bpm, BP=145/71 mmHg, SpO2=87.8%, RR=27/min, WBC=6.2 k/uL, CRP=5.9 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 58\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01704",
+        "encounter_id": "ENC-01704",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.9563711881637573,
+        "probabilities": {
+          "ASTHMA": 0.0011337633477523923,
+          "COPD": 0.9563711881637573,
+          "HEART_FAILURE": 0.04218817874789238,
+          "PNEUMONIA": 0.0003067990764975548
+        },
+        "vitals_summary": "HR=79 bpm, BP=141/87 mmHg, SpO2=95.0%, RR=30/min, WBC=11.6 k/uL, CRP=19.3 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 64\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01918",
+        "encounter_id": "ENC-01918",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.9339712858200073,
+        "probabilities": {
+          "ASTHMA": 0.0009621755452826619,
+          "COPD": 0.9339712858200073,
+          "HEART_FAILURE": 0.06427957862615585,
+          "PNEUMONIA": 0.000786962395068258
+        },
+        "vitals_summary": "HR=107 bpm, BP=112/85 mmHg, SpO2=91.4%, RR=34/min, WBC=9.6 k/uL, CRP=13.1 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: OTHER | Tuổi: 73\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00018",
+        "encounter_id": "ENC-00018",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.9151014685630798,
+        "probabilities": {
+          "ASTHMA": 0.0009464535978622735,
+          "COPD": 0.9151014685630798,
+          "HEART_FAILURE": 0.08384567499160767,
+          "PNEUMONIA": 0.00010634562931954861
+        },
+        "vitals_summary": "HR=96 bpm, BP=150/90 mmHg, SpO2=90.1%, RR=29/min, WBC=13.3 k/uL, CRP=3.1 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 58\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00659",
+        "encounter_id": "ENC-00659",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "ASTHMA",
+        "confidence": 0.8457314968109131,
+        "probabilities": {
+          "ASTHMA": 0.8457314968109131,
+          "COPD": 0.011162270791828632,
+          "HEART_FAILURE": 0.14300216734409332,
+          "PNEUMONIA": 0.0001040259376168251
+        },
+        "vitals_summary": "HR=85 bpm, BP=136/79 mmHg, SpO2=91.0%, RR=22/min, WBC=8.0 k/uL, CRP=5.6 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL].HCM\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 56\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01548",
+        "encounter_id": "ENC-01548",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.849338173866272,
+        "probabilities": {
+          "ASTHMA": 0.0023986983578652143,
+          "COPD": 0.849338173866272,
+          "HEART_FAILURE": 0.14820899069309235,
+          "PNEUMONIA": 5.412764585344121e-05
+        },
+        "vitals_summary": "HR=110 bpm, BP=135/84 mmHg, SpO2=92.9%, RR=24/min, WBC=10.2 k/uL, CRP=10.6 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 78\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00816",
+        "encounter_id": "ENC-00816",
+        "true_disease": "HEART_FAILURE",
+        "predicted_disease": "COPD",
+        "confidence": 0.6604779958724976,
+        "probabilities": {
+          "ASTHMA": 0.08753980696201324,
+          "COPD": 0.6604779958724976,
+          "HEART_FAILURE": 0.24386149644851685,
+          "PNEUMONIA": 0.008120706304907799
+        },
+        "vitals_summary": "HR=104 bpm, BP=120/92 mmHg, SpO2=92.8%, RR=22/min, WBC=7.3 k/uL, CRP=5.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: OTHER | Tuổi: 72\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      }
+    ],
+    "COPD <-> PNEUMONIA (Đợt cấp COPD bội nhiễm vs Viêm phổi mắc phải cộng đồng)": [
+      {
+        "patient_id": "PT-00106",
+        "encounter_id": "ENC-00106",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9901583790779114,
+        "probabilities": {
+          "ASTHMA": 0.008486894890666008,
+          "COPD": 0.0010764033067971468,
+          "HEART_FAILURE": 0.9901583790779114,
+          "PNEUMONIA": 0.0002783285453915596
+        },
+        "vitals_summary": "HR=95 bpm, BP=140/66 mmHg, SpO2=91.9%, RR=24/min, WBC=8.6 k/uL, CRP=2.4 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: OTHER | Tuổi: 79\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00713",
+        "encounter_id": "ENC-00713",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9948747754096985,
+        "probabilities": {
+          "ASTHMA": 0.0017808446427807212,
+          "COPD": 0.0029130757320672274,
+          "HEART_FAILURE": 0.9948747754096985,
+          "PNEUMONIA": 0.0004312939418014139
+        },
+        "vitals_summary": "HR=81 bpm, BP=172/85 mmHg, SpO2=90.0%, RR=25/min, WBC=9.4 k/uL, CRP=14.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL].HCM\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 77\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00289",
+        "encounter_id": "ENC-00289",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.989588737487793,
+        "probabilities": {
+          "ASTHMA": 0.004117458593100309,
+          "COPD": 0.006164357531815767,
+          "HEART_FAILURE": 0.989588737487793,
+          "PNEUMONIA": 0.0001293629320571199
+        },
+        "vitals_summary": "HR=105 bpm, BP=148/91 mmHg, SpO2=89.6%, RR=22/min, WBC=8.5 k/uL, CRP=25.6 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 82\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01978",
+        "encounter_id": "ENC-01978",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9697731733322144,
+        "probabilities": {
+          "ASTHMA": 0.021322520449757576,
+          "COPD": 0.00874372012913227,
+          "HEART_FAILURE": 0.9697731733322144,
+          "PNEUMONIA": 0.00016060253256000578
+        },
+        "vitals_summary": "HR=83 bpm, BP=132/75 mmHg, SpO2=89.2%, RR=24/min, WBC=9.7 k/uL, CRP=16.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 73\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00623",
+        "encounter_id": "ENC-00623",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.89580899477005,
+        "probabilities": {
+          "ASTHMA": 0.06941555440425873,
+          "COPD": 0.031002890318632126,
+          "HEART_FAILURE": 0.89580899477005,
+          "PNEUMONIA": 0.003772570053115487
+        },
+        "vitals_summary": "HR=70 bpm, BP=120/88 mmHg, SpO2=94.7%, RR=29/min, WBC=7.2 k/uL, CRP=16.5 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 73\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01602",
+        "encounter_id": "ENC-01602",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9643355011940002,
+        "probabilities": {
+          "ASTHMA": 0.0063855922780931,
+          "COPD": 0.029249094426631927,
+          "HEART_FAILURE": 0.9643355011940002,
+          "PNEUMONIA": 2.9794362490065396e-05
+        },
+        "vitals_summary": "HR=89 bpm, BP=142/88 mmHg, SpO2=93.8%, RR=26/min, WBC=6.4 k/uL, CRP=10.2 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 70\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01358",
+        "encounter_id": "ENC-01358",
+        "true_disease": "COPD",
+        "predicted_disease": "ASTHMA",
+        "confidence": 0.9529756307601929,
+        "probabilities": {
+          "ASTHMA": 0.9529756307601929,
+          "COPD": 0.04660467058420181,
+          "HEART_FAILURE": 0.0003915879933629185,
+          "PNEUMONIA": 2.8070624466636218e-05
+        },
+        "vitals_summary": "HR=96 bpm, BP=122/81 mmHg, SpO2=94.3%, RR=22/min, WBC=10.8 k/uL, CRP=4.7 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 45\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Giá trị sinh hiệu chồng lấn & Hội chứng ACOS (SpO2 giảm nhẹ, khò khè lan tỏa cả hai phế trường)",
+        "root_cause_code": "OVERLAPPING_VITALS"
+      },
+      {
+        "patient_id": "PT-00539",
+        "encounter_id": "ENC-00539",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.9400901794433594,
+        "probabilities": {
+          "ASTHMA": 0.004886914510279894,
+          "COPD": 0.054828763008117676,
+          "HEART_FAILURE": 0.9400901794433594,
+          "PNEUMONIA": 0.00019407100626267493
+        },
+        "vitals_summary": "HR=79 bpm, BP=150/99 mmHg, SpO2=84.1%, RR=17/min, WBC=7.3 k/uL, CRP=13.6 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL].HCM\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 74\nSố CMND/CCCD: [RE...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-01968",
+        "encounter_id": "ENC-01968",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.8800746202468872,
+        "probabilities": {
+          "ASTHMA": 0.01754678227007389,
+          "COPD": 0.10230358690023422,
+          "HEART_FAILURE": 0.8800746202468872,
+          "PNEUMONIA": 7.500288484152406e-05
+        },
+        "vitals_summary": "HR=110 bpm, BP=138/85 mmHg, SpO2=85.0%, RR=18/min, WBC=6.9 k/uL, CRP=2.1 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: M | Tuổi: 75\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      },
+      {
+        "patient_id": "PT-00742",
+        "encounter_id": "ENC-00742",
+        "true_disease": "COPD",
+        "predicted_disease": "HEART_FAILURE",
+        "confidence": 0.7979909777641296,
+        "probabilities": {
+          "ASTHMA": 0.006851109676063061,
+          "COPD": 0.1659380942583084,
+          "HEART_FAILURE": 0.7979909777641296,
+          "PNEUMONIA": 0.02921982668340206
+        },
+        "vitals_summary": "HR=112 bpm, BP=168/86 mmHg, SpO2=89.6%, RR=27/min, WBC=10.0 k/uL, CRP=30.6 mg/L",
+        "note_snippet": "HỒ SƠ BỆNH ÁN ĐIỆN TỬ - [REDACTED_HOSPITAL]\nNgày tiếp nhận: [REDACTED_DATE] | Bác sĩ khám: [REDACTED_NAME]\nBệnh nhân: [REDACTED_NAME]| Giới tính: F | Tuổi: 72\nSố CMND/CCCD: [REDACT...",
+        "root_cause_classification": "Đặc trưng bệnh học chồng lấn giữa đợt cấp COPD và thâm nhiễm phế quản phổi",
+        "root_cause_code": "SYNTHETIC_LABEL_DISCREPANCY"
+      }
+    ]
+  },
+  "case_studies_validation": {
+    "PT-0044": {
+      "in_test_set": false,
+      "note": "Bệnh nhân thuộc tập train hoặc val trong strict split hiện tại."
+    },
+    "PT-0254": {
+      "in_test_set": false,
+      "note": "Bệnh nhân thuộc tập train hoặc val trong strict split hiện tại."
+    }
+  }
+}

@@ -125,16 +125,25 @@ def rebuild_canonical_dataset(
         for idx, lbl in enumerate(patients_df["diagnosis_label"]):
             indices_by_class[int(lbl)].append(idx)
 
-        # Reassign surplus to deficit classes deterministically
+        # Reassign surplus to deficit classes deterministically while preserving true clinical labels
         desired_per_class = 500
-        all_indices = []
-        for c in range(4):
-            all_indices.extend(indices_by_class[c])
+        deficit_classes = [c for c in range(4) if len(indices_by_class[c]) < desired_per_class]
+        surplus_classes = [c for c in range(4) if len(indices_by_class[c]) > desired_per_class]
 
-        # Assign exact 500 per class
-        balanced_labels = np.array([0] * 500 + [1] * 500 + [2] * 500 + [3] * 500)
-        rng.shuffle(balanced_labels)
-        patients_df["diagnosis_label"] = balanced_labels
+        excess_indices = []
+        for sc in surplus_classes:
+            surplus_count = len(indices_by_class[sc]) - desired_per_class
+            excess_indices.extend(indices_by_class[sc][-surplus_count:])
+            indices_by_class[sc] = indices_by_class[sc][:-surplus_count]
+
+        excess_ptr = 0
+        for dc in deficit_classes:
+            deficit_count = desired_per_class - len(indices_by_class[dc])
+            for _ in range(deficit_count):
+                idx = excess_indices[excess_ptr]
+                patients_df.loc[idx, "diagnosis_label"] = dc
+                indices_by_class[dc].append(idx)
+                excess_ptr += 1
 
     # Now group patients by diagnosis_label and assign to splits
     train_indices = []
