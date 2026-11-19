@@ -1,6 +1,6 @@
 {
   "benchmark_name": "M-CDSS Phase 2 Strict Holdout Clinical Benchmark",
-  "evaluated_at": "2026-11-19T09:32:04.849231+00:00",
+  "evaluated_at": "2026-11-19T09:51:11.970130+00:00",
   "test_samples": 302,
   "num_classes": 4,
   "classes": [

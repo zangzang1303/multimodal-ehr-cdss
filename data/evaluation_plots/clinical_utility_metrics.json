@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "evaluation_timestamp": "2026-11-19T09:32:04.849231+00:00",
+    "evaluation_timestamp": "2026-11-19T09:51:11.970130+00:00",
     "model_path": "data\\checkpoints\\multimodal_best.pt",
     "test_data_path": "data\\processed_rebuilt_strict\\test.parquet",
     "test_sample_count": 302,

@@ -1,0 +1,95 @@
+% ==============================================================================
+% Hình: Sơ đồ dòng đối tượng theo chuẩn TRIPOD-AI (Flow Diagram of Study Participants)
+% M-CDSS Phase 3 / Backlog 10 - Nhiệm vụ 2.1 (Thành viên 2)
+% ==============================================================================
+\begin{figure}[htbp]
+\centering
+\resizebox{0.92\textwidth}{!}{%
+\begin{tikzpicture}[
+    node distance=1.1cm and 1.4cm,
+    font=\footnotesize\sffamily,
+    >=Stealth
+]
+
+    % --- KHỐI NGUỒN DỮ LIỆU ---
+    \node[mcdssBox, text width=5.2cm, fill=blue!5] (src_synthea) {
+        \textbf{Synthea EHR Simulation}\\
+        $N_1 = 2.450$ hồ sơ bệnh nhân tổng hợp\\
+        \scriptsize (Dữ liệu bảng: nhân khẩu, sinh hiệu, lab)
+    };
+    
+    \node[mcdssBox, text width=5.2cm, fill=teal!5, right=1.2cm of src_synthea] (src_mtsamples) {
+        \textbf{MTSamples Repository}\\
+        $N_2 = 4.999$ ghi chú lâm sàng thực tế\\
+        \scriptsize (Văn bản tự do: bệnh sử, khám thực thể)
+    };
+
+    % --- KHỐI LOẠI TRỪ & LỌC ---
+    \node[mcdssBox, text width=4.6cm, draw=mcdssDanger, fill=red!4, below right=0.9cm and -1.8cm of src_synthea] (filter_box) {
+        \textbf{Tiêu chí Loại trừ \& Lọc chất lượng}\\
+        \scriptsize
+        $\bullet$ Bệnh ngoài 4 nhóm mục tiêu ($n = 450$)\\
+        $\bullet$ Ghi chú chuyên khoa không khớp ($n = 3.999$)\\
+        $\bullet$ Ngoại lai sinh lý vượt ngưỡng can thiệp\\
+        $\bullet$ Cấm xét nghiệm tiêu chuẩn vàng: $FEV_1/FVC$, siêu âm tim $LVEF$, cấy đờm vi sinh\\
+        $\bullet$ Che từ khóa nhãn (\texttt{[REDACTED\_DIAGNOSIS]})\\
+        $\bullet$ Thêm PHI giả lập để kiểm thử de-ID
+    };
+
+    % --- KHỐI ĐOÀN HỆ CHUẨN HÓA ---
+    \node[mcdssService, text width=7.2cm, fill=mcdssBgLight, below=2.6cm of filter_box] (canonical_cohort) {
+        \textbf{Đoàn Hệ Lâm Sàng Chuẩn Hóa M-CDSS ($N = 2.000$)}\\
+        \normalfont\scriptsize Cân bằng 4 nhóm bệnh ($25\%$ mỗi nhóm, $n = 500$ ca/bệnh):\\
+        Hen phế quản ($500$), COPD ($500$), Suy tim ($500$), Viêm phổi ($500$)
+    };
+
+    % --- KHỐI PHÂN CHIA STRICT SPLIT ---
+    \node[mcdssBox, text width=3.8cm, fill=green!6, below left=1.2cm and 0.4cm of canonical_cohort] (split_train) {
+        \textbf{Tập Huấn Luyện (Train)}\\
+        $N_{\text{train}} = 1.425$ ($71,25\%$)\\
+        \scriptsize
+        Hen: $358$ | COPD: $358$\\
+        Suy tim: $340$ | Viêm phổi: $369$\\
+        \textit{Khớp tham số mô hình \& MICE}
+    };
+
+    \node[mcdssBox, text width=3.8cm, fill=orange!6, below=1.2cm of canonical_cohort] (split_val) {
+        \textbf{Tập Hiệu Chuẩn (Val)}\\
+        $N_{\text{val}} = 273$ ($13,65\%$)\\
+        \scriptsize
+        Hen: $71$ | COPD: $71$\\
+        Suy tim: $54$ | Viêm phổi: $77$\\
+        \textit{Early stopping \& Temperature $T$}
+    };
+
+    \node[mcdssBox, text width=3.8cm, fill=purple!6, below right=1.2cm and 0.4cm of canonical_cohort] (split_test) {
+        \textbf{Tập Kiểm Thử (Test)}\\
+        $N_{\text{test}} = 302$ ($15,10\%$)\\
+        \scriptsize
+        Hen: $71$ | COPD: $71$\\
+        Suy tim: $106$ | Viêm phổi: $54$\\
+        \textit{Đánh giá độc lập: AUROC, DCA}
+    };
+
+    % --- ĐƯỜNG KẾT NỐI ---
+    \coordinate (merge_pt) at ($(src_synthea.south)!0.5!(src_mtsamples.south)$);
+    \draw[mcdssArrow] (src_synthea.south) |- (merge_pt) -- (filter_box.north);
+    \draw[mcdssArrow] (src_mtsamples.south) |- (merge_pt);
+    
+    \draw[mcdssArrow] (filter_box.south) -- (canonical_cohort.north);
+
+    \draw[mcdssArrow] (canonical_cohort.south) -| (split_train.north);
+    \draw[mcdssArrow] (canonical_cohort.south) -- (split_val.north);
+    \draw[mcdssArrow] (canonical_cohort.south) -| (split_test.north);
+
+    % --- KHUNG BAO CHỨNG NHẬN KHÔNG RÒ RỈ ---
+    \begin{scope}[on background layer]
+        \node[mcdssGroup, fill=gray!3, fit=(split_train) (split_val) (split_test), 
+              label={[font=\scriptsize\bfseries\color{mcdssPrimary}]below:Stratified Group Split theo \texttt{patient\_id} \& \texttt{source\_note\_group} (Kiểm toán 0\% rò rỉ: $\mathcal{P}_{\text{train}} \cap \mathcal{P}_{\text{val}} \cap \mathcal{P}_{\text{test}} = \emptyset$)}] (split_group) {};
+    \end{scope}
+
+\end{tikzpicture}%
+}
+\caption{Sơ đồ dòng thiết kế đoàn hệ và phân chia tập dữ liệu M-CDSS theo chuẩn TRIPOD-AI.}
+\label{fig:tripod_flow}
+\end{figure}

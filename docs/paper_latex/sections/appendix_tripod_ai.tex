@@ -1,0 +1,50 @@
+% ==============================================================================
+% Phụ lục A: Bảng kiểm Báo cáo Minh bạch Nghiên cứu Dự đoán AI (TRIPOD+AI Checklist)
+% Tham chiếu: Collins et al., The BMJ / Nature Medicine 2024 (27 tiêu chuẩn)
+% Tác giả phụ trách: Thành viên 2 (Biomedical Data Engineer & Privacy) - Backlog 10 Nhiệm vụ 2.2
+% ==============================================================================
+\section{Phụ Lục: Bảng Kiểm Báo Cáo Minh Bạch TRIPOD+AI (27 Mục Tiêu Chuẩn)}
+\label{sec:appendix_tripod_ai}
+
+Bảng~\ref{tab:tripod_ai_checklist} trình bày việc đối chiếu chi tiết 27 tiêu chuẩn của hướng dẫn báo cáo quốc tế \textbf{TRIPOD+AI} (\textit{Transparent Reporting of a multivariable prediction model of an individual's prognosis or diagnosis using Artificial Intelligence}) \cite{collins2024tripod,moons2024tripod}, xác định rõ vị trí trình bày trong bài báo và giải trình khoa học minh bạch.
+
+\begin{table}[htbp]
+\centering
+\caption{Bảng kiểm 27 tiêu chuẩn TRIPOD+AI áp dụng trong nghiên cứu M-CDSS.}
+\label{tab:tripod_ai_checklist}
+\tiny
+\begin{tabularx}{\textwidth}{@{}cp{2.4cm}p{4.2cm}p{1.8cm}X@{}}
+\toprule
+\textbf{Mục} & \textbf{Chủ đề} & \textbf{Tiêu chuẩn báo cáo TRIPOD+AI} & \textbf{Vị trí bài báo} & \textbf{Ghi chú thực thi lâm sàng \& Kỹ thuật trong M-CDSS} \\
+\midrule
+1 & Tiêu đề (\textit{Title}) & Nêu rõ mục tiêu phát triển/kiểm định mô hình dự đoán, bệnh lý mục tiêu và việc sử dụng AI. & Tiêu đề bài báo (Trang 1) & Nêu rõ mô hình hỗ trợ chẩn đoán đa phương thức kết hợp Attention, Hiệu chuẩn và RAG. \\
+2 & Tóm tắt (\textit{Abstract}) & Tóm tắt có cấu trúc: Đặt vấn đề, Mục tiêu, Phương pháp, Kết quả, Kết luận. & Phân mục 0 & Cấu trúc theo chuẩn bài báo y sinh; báo cáo số liệu AUROC, ECE, DCA thật. \\
+3a & Bối cảnh (\textit{Background}) & Mô tả bối cảnh lâm sàng, phương pháp hiện tại và lý do cần phát triển mô hình AI. & Phân mục 1 & Trích dẫn tổng quan JMIR \cite{hunik2024diagnostic} về khoảng trống rò rỉ dữ liệu và thiếu hiệu chuẩn. \\
+3b & Mục tiêu (\textit{Objectives}) & Xác định rõ câu hỏi nghiên cứu, mô hình nhằm phát triển hay kiểm định. & Phân mục 1 & 5 câu hỏi nghiên cứu RQ1--RQ5 giải quyết sự bổ trợ đa phương thức và tính tin cậy. \\
+4a & Nguồn dữ liệu (\textit{Data source}) & Mô tả nguồn dữ liệu (EHR, đăng ký thử nghiệm, thời gian thu thập, thiết kế hồi cứu/tiến cứu). & Phân mục 2.1 & Bán tổng hợp từ Synthea EHR \cite{walonoski2018synthea} và ghi chú lâm sàng MTSamples \cite{mtsamples2012}. \\
+4b & Đối tượng (\textit{Participants}) & Tiêu chí thu nhận, loại trừ người bệnh; bối cảnh chăm sóc ban đầu. & Phân mục 2.1 & Bệnh nhân người lớn khó thở cấp/mạn tính; cân bằng 4 bệnh lý (500 ca/bệnh). \\
+5a & Kết cục (\textit{Outcome}) & Định nghĩa rõ ràng kết cục chẩn đoán, tiêu chuẩn vàng đối chiếu. & Phân mục 2.1, 2.4 & 4 nhóm bệnh: Hen, COPD, Suy tim, Viêm phổi theo mã ICD-10 và hướng dẫn GINA, GOLD, ESC, BYT. \\
+5b & Thời điểm kết cục & Thời điểm xác lập kết cục và làm mù với biến dự báo. & Phân mục 2.4 & Nhãn kết cục tại mốc $t_{\text{diag}}$ độc lập với biến số đầu vào. \\
+6a & Biến dự báo (\textit{Predictors}) & Định nghĩa và đơn vị đo của mọi biến số đầu vào, thời điểm thu thập. & Phân mục 2.1, Bảng 1 & 13 biến số bảng (nhân khẩu, 6 sinh hiệu, 2 xét nghiệm pha cấp, 3 tiền sử) và văn bản tự do. \\
+6b & Làm mù biến dự báo & Đảm bảo người thu thập biến dự báo không biết kết cục. & Phân mục 2.4 & Tách biệt qua biến số đầu vào tiếp nhận ($t < t_{\text{diag}}$); cấm tiêu chuẩn vàng. \\
+7 & Cỡ mẫu (\textit{Sample size}) & Cơ sở lựa chọn cỡ mẫu, tỷ lệ biến cố trên mỗi biến số (Events Per Variable - EPV). & Phân mục 2.1 & $N=2.000$, $\text{EPV} \ge 38$, vượt ngưỡng khuyến nghị tối thiểu $\ge 10-20$. \\
+8 & Dữ liệu khuyết (\textit{Missing data}) & Tỷ lệ khuyết thiếu của từng biến và phương pháp xử lý dữ liệu khuyết. & Phân mục 2.6, Bảng 1 & Báo cáo tỷ lệ khuyết WBC 14.4\%, CRP 19.1\%; dùng MICE chỉ fit trên Train kèm chỉ báo khuyết. \\
+9a & Tiền xử lý \& Kỹ thuật AI & Mô tả kiến trúc mô hình, chuẩn hóa dữ liệu, chọn lọc đặc trưng. & Phân mục 3.1--3.3 & FT-Transformer, Bio\_ClinicalBERT, Cross-Attention Late Fusion và LayerNorm. \\
+9b & Tối ưu siêu tham số & Không gian tìm kiếm, hàm mất mát, stopping criteria, phần cứng. & Phân mục 3.4 & Tối ưu bằng AdamW, Focal/CE Loss, early stopping trên Val; GPU NVIDIA / PyTorch. \\
+10a & Chiến lược kiểm định & Phân tách tập dữ liệu: phân chia ngẫu nhiên, theo cụm hay theo thời gian. & Phân mục 2.5 & Stratified Group Split theo \texttt{patient\_id} (Train 1425, Val 273, Test 302); 0\% rò rỉ. \\
+10b & Hiệu chuẩn xác suất & Phương pháp đánh giá và hiệu chỉnh độ tin cậy xác suất dự đoán. & Phân mục 3.5 & Temperature Scaling tối ưu trên tập Validation ($T \approx 1.35$), đo bằng ECE và Calibration Curve. \\
+11a & Đo lường hiệu năng & Các chỉ số phân biệt, hiệu chuẩn, và tiện ích lâm sàng. & Phân mục 3.6, 7 & Macro-AUROC, Macro-AUPRC, F1-macro, ECE, Brier Score, và Net Benefit (DCA). \\
+11b & Khoảng tin cậy & Báo cáo độ bất định qua bootstrap hoặc cross-validation. & Phân mục 7 & Báo cáo toàn bộ metric kèm khoảng tin cậy 95\% Bootstrap (2.000 lần lặp) và hiệu chỉnh Holm. \\
+12 & Phân tích nhóm con & Đánh giá công bằng (fairness) trên các nhóm nhân khẩu học. & Phân mục 7.4 & Đánh giá 7 nhóm: giới tính Nam/Nữ, tuổi $\ge 65 / < 65$, tiền sử hút thuốc. \\
+13 & Dòng người tham gia & Sơ đồ dòng đối tượng (Flow diagram): tiếp nhận, loại trừ, phân chia. & Hình 1 (Hình~\ref{fig:tripod_flow}) & Sơ đồ chuẩn TRIPOD thể hiện rõ các bước lọc, gộp và phân chia nhóm. \\
+14 & Đặc điểm ban đầu & Bảng mô tả đối tượng nghiên cứu theo từng tập dữ liệu và nhóm bệnh. & Bảng~\ref{tab:cohort_characteristics} & Báo cáo Trung vị [IQR], tỷ lệ phần trăm và tỷ lệ khuyết thiếu chuẩn xác. \\
+15 & Đặc tả mô hình cuối & Cung cấp cấu trúc, số lượng tham số, trọng số mô hình. & Phân mục 3, MODEL\_CARD & Mô hình lưu tại checkpoint định dạng \texttt{.pt}, cung cấp Model Card chuẩn. \\
+16 & Kết quả thực nghiệm & Trình bày đầy đủ kết quả theo từng câu hỏi nghiên cứu, có đối chứng baseline. & Phân mục 7 & So sánh toàn diện Fusion vs CatBoost, Bio\_ClinicalBERT, MLP và Ensemble. \\
+17 & Độ bền \& Dư thừa & Thử nghiệm thiếu phương thức (Missing modality) và rò rỉ thông tin. & Phân mục 7.2, 7.3 & RQ2 (phân rã văn bản / che số) và kiểm định suy thoái khi khuyết văn bản/bảng. \\
+18 & Ngoại kiểm độc lập & Ngoại kiểm địa lý / thời gian trên quần thể bệnh nhân bên ngoài. & \textbf{N/A (Chưa thực hiện)} & \textbf{N/A:} Chưa ngoại kiểm trên bệnh viện thực tế tại VN; minh bạch là giới hạn cốt lõi. \\
+19 & Giải trình y văn & Khả năng giải thích quyết định dựa trên bằng chứng lâm sàng. & Phân mục 5 & Module Multi-Agent RAG truy xuất phác đồ và neo chứng cứ ký tự 100\% chính xác. \\
+20 & Thảo luận \& Hạn chế & Thảo luận trung thực các rủi ro, so sánh với y văn, ranh giới đạo đức. & Phân mục 8 & Thừa nhận dữ liệu bán tổng hợp, shortcut learning và nguy cơ dư thừa phương thức. \\
+21 & Khả năng tiếp cận & Khả năng tái lập nghiên cứu: mã nguồn, dữ liệu, tệp manifest. & Phân mục 8.3 & Toàn bộ mã nguồn trên Git, dữ liệu kiểm soát qua \texttt{DATA\_MANIFEST.json}. \\
+\bottomrule
+\end{tabularx}
+\end{table}

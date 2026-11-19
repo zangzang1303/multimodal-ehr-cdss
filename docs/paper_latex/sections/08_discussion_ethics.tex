@@ -1,43 +1,78 @@
 % ==============================================================================
-% Phân mục 08: Thảo luận, Bảng kiểm PROBAST+AI & Tuyên bố Y đức (Discussion & Ethics)
-% Tác giả phụ trách: Thành viên 2 (Data Engineer & Privacy) - Backlog 07 Nhiệm vụ 2.2 & 2.3
+% Phân mục 08: Thảo luận, Thẩm định PROBAST+AI, Kiểm toán PHI & Y đức (Discussion, Ethics)
+% Tác giả phụ trách: Thành viên 2 (Data Engineer & Privacy) - Backlog 10 Nhiệm vụ 2.1
 % ==============================================================================
 \section{Thảo Luận, Thẩm Định PROBAST+AI và Tuyên Bố Y Đức (Discussion, PROBAST+AI \& Ethics)}
 \label{sec:discussion_ethics}
 
-\subsection{Đối chiếu Tiêu chuẩn Nguy cơ Sai lệch Quốc tế PROBAST+AI}
-Khác với 15 nghiên cứu tiền nhiệm trong tổng quan hệ thống của Hunik và cộng sự \cite{hunik2024diagnostic} đều rơi vào mức nguy cơ sai lệch cao hoặc không rõ ràng, quy trình phát triển và kiểm định M-CDSS được thiết kế ngay từ đầu để đáp ứng cả 4 miền tiêu chuẩn của công cụ \textbf{PROBAST+AI} \cite{probastai2024bmj,collins2021protocol}. Bảng~\ref{tab:probast_summary} tổng hợp kết quả tự kiểm toán độc lập về cả hai khía cạnh: Nguy cơ Sai lệch (\textit{Risk of Bias}) và Mối lo ngại về Tính áp dụng thực tế (\textit{Applicability Concerns}).
+\subsection{Đối Chiếu Tiêu Chuẩn Nguy Cơ Sai Lệch Quốc Tế PROBAST+AI}
+Khác với 15 nghiên cứu tiền nhiệm trong tổng quan hệ thống của Hunik và cộng sự \cite{hunik2024diagnostic} đều rơi vào mức nguy cơ sai lệch cao hoặc không rõ ràng nhưng không được thảo luận minh bạch, quy trình phát triển và kiểm định M-CDSS áp dụng công cụ \textbf{PROBAST+AI} \cite{probastai2024bmj,moons2025probast} với tinh thần liêm chính học thuật cao nhất. 
+
+Thay vì tự xếp loại ``Nguy cơ thấp'' hình thức, nhóm nghiên cứu phân định rạch ròi giữa \textit{tính nghiêm ngặt trong phân tích nội bộ (Internal Analytical Rigor)} và \textit{giới hạn cố hữu của dữ liệu bán tổng hợp (Synthetic Data Boundary)}. Bảng~\ref{tab:probast_summary} tổng hợp kết quả tự kiểm toán độc lập về cả hai khía cạnh: Nguy cơ Sai lệch (\textit{Risk of Bias}) và Mối lo ngại về Tính áp dụng thực tế (\textit{Applicability Concerns}).
 
 \begin{table}[htbp]
 \centering
-\caption{Tóm tắt kết quả tự kiểm toán nguy cơ sai lệch và tính áp dụng thực tiễn theo 4 miền tiêu chuẩn PROBAST+AI \cite{probastai2024bmj}.}
+\caption{Tóm tắt kết quả tự kiểm toán nguy cơ sai lệch và tính áp dụng thực tiễn theo 4 miền tiêu chuẩn PROBAST+AI \cite{probastai2024bmj,moons2025probast}.}
 \label{tab:probast_summary}
 \footnotesize
 \begin{tabularx}{\textwidth}{@{}lccX@{}}
 \toprule
-\textbf{Miền Đánh giá (Domain)} & \textbf{Nguy cơ Sai lệch} & \textbf{Tính Áp dụng} & \textbf{Bằng chứng Thực thi Kỹ thuật trong Dự án M-CDSS} \\
+\textbf{Miền Đánh giá (Domain)} & \textbf{Nguy cơ Sai lệch} & \textbf{Tính Áp dụng} & \textbf{Bằng chứng Thực thi Kỹ thuật \& Giới hạn Minh bạch trong M-CDSS} \\
 \midrule
-1. Đối tượng (\textit{Participants}) & \textbf{Thấp (\textit{Low})} & \textbf{Chưa rõ (\textit{Unclear})} & Đoàn hệ 2.000 hồ sơ chuẩn hóa từ Synthea EHR \cite{walonoski2018synthea} và MTSamples, cân bằng 4 nhóm bệnh ($25\%$ mỗi nhóm); phân chia nghiêm ngặt theo định danh bệnh nhân (\textit{Strict Group Split}), kiểm toán tự động xác nhận $0$ trường hợp rò rỉ bệnh nhân giữa Train/Val/Test. \textit{Giới hạn tính áp dụng:} Chưa được ngoại kiểm trên bệnh nhân thực tế tại các bệnh viện Việt Nam. \\[0.4em]
-2. Biến dự báo (\textit{Predictors}) & \textbf{Thấp (\textit{Low})} & \textbf{Thấp (\textit{Low})} & Áp dụng khóa chuỗi thời gian quan sát $t < t_{\text{diag}}$ qua \texttt{TemporalAligner} và danh sách đen loại trừ toàn bộ xét nghiệm tiêu chuẩn vàng ($FEV_1/FVC$, Siêu âm tim Doppler, Cấy đờm vi sinh), thay thế từ khóa lộ nhãn bằng \texttt{[REDACTED\_DIAGNOSIS]}. Mọi biến số đều có sẵn tại tuyến khám ban đầu. \\[0.4em]
-3. Kết cục (\textit{Outcome}) & \textbf{Thấp (\textit{Low})} & \textbf{Thấp (\textit{Low})} & Nhãn chẩn đoán xác định dựa trên mã chuẩn hóa ICD-10 và đối chiếu nhất quán với tiêu chuẩn vàng trong hướng dẫn GINA 2024, GOLD 2024, ESC 2023 và Bộ Y tế. Người xác định kết cục độc lập trước khi nghiên cứu AI được tiến hành. \\[0.4em]
-4. Phân tích (\textit{Analysis}) & \textbf{Thấp (\textit{Low})} & \textbf{Thấp (\textit{Low})} & Xử lý dữ liệu khuyết thiếu (WBC khuyết 20.5\%, CRP khuyết 22.4\%) bằng thuật toán MICE kèm biến chỉ báo khuyết thiếu chỉ khớp (\textit{fit}) trên tập Train; hiệu chuẩn xác suất bằng Temperature Scaling ($T \approx 1.35$, ECE kiểm thử thực nghiệm: Bio\_ClinicalBERT đạt $0.0373$, M-CDSS dung hợp đạt $0.0973$ trên hold-out test set); lượng hóa lợi ích ròng lâm sàng bằng Decision Curve Analysis (DCA). \\
+1. Đối tượng (\textit{Participants}) & \textbf{Cao (\textit{High})} & \textbf{Cao (\textit{High})} & Đoàn hệ 2.000 hồ sơ kết hợp bán tổng hợp từ Synthea EHR \cite{walonoski2018synthea} và MTSamples \cite{mtsamples2012}. Dù phân chia kiểm soát 0\% rò rỉ bệnh nhân, dữ liệu chưa đại diện cho biến thiên dịch tễ và bệnh nhân thực tế tại các bệnh viện Việt Nam. \\[0.4em]
+2. Biến dự báo (\textit{Predictors}) & \textbf{Thấp / Chưa rõ} & \textbf{Chưa rõ (\textit{Unclear})} & Khóa chuỗi thời gian $t < t_{\text{diag}}$ qua \texttt{TemporalAligner} và cấm tuyệt đối các xét nghiệm tiêu chuẩn vàng ($FEV_1/FVC$, Siêu âm $EF$, Cấy đờm vi sinh). \textit{Cảnh báo:} Khối sinh hiệu chèn vào ghi chú theo template tạo ra dư thừa phương thức và nguy cơ shortcut learning (RQ2). \\[0.4em]
+3. Kết cục (\textit{Outcome}) & \textbf{Cao (\textit{High})} & \textbf{Cao (\textit{High})} & Nhãn chẩn đoán quy đổi từ mã mô phỏng Synthea; các đoạn trích tự sự MTSamples được ghép mà không có mối liên kết bệnh học trực tiếp từ cùng một bệnh nhân thực tế. \\[0.4em]
+4. Phân tích (\textit{Analysis}) & \textbf{Thấp (\textit{Low})} & \textbf{Thấp (\textit{Low})} & Khắc phục hoàn toàn các khiếm khuyết phân tích: kiểm toán $0\%$ rò rỉ bệnh nhân ($N_{\text{test}} = 302$); gán MICE kèm chỉ báo khuyết thiếu chỉ fit trên Train; báo cáo khoảng tin cậy 95\% Bootstrap (2.000 lần lặp) kèm hiệu chỉnh Holm; kiểm định độ bền khi khuyết phương thức; kiểm tra tổng quát hóa thời gian nội bộ ($N_{\text{test}}=600$, AUROC $0.9884$); phân tích lợi ích ròng lâm sàng DCA và công bằng phân nhóm (Fairness). \\
+\midrule
+\multicolumn{4}{@{}l}{\textbf{Đánh giá tổng thể:} \textbf{High Risk of Bias / High Applicability Concern} (Đúng bản chất của nghiên cứu phương pháp luận bán tổng hợp).} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Báo cáo Thẩm định Toàn diện 20 Tiêu chí PROBAST+AI:} Chi tiết giải trình từng câu hỏi tín hiệu (\textit{signaling questions}) được ghi nhận đầy đủ tại tài liệu kiểm toán \texttt{docs/08\_PROBAST\_AI\_AUDIT\_REPORT.md}.
-    \item \textbf{Báo cáo Kiểm toán Bảo mật PHI và Giấy phép Phần mềm:} Toàn bộ kho lưu trữ mã nguồn, dữ liệu mẫu, cấu hình và lịch sử Git commit đã trải qua đợt rà quét bảo mật chuyên sâu (báo cáo chi tiết tại \texttt{docs/09\_PHI\_AND_LICENSE_AUDIT_REPORT.md}), xác nhận không có khóa bí mật (API secret keys) hoặc thông tin định danh bệnh nhân thực tế bị lưu trữ trái phép.
-\end{itemize}
+Báo cáo thẩm định chi tiết 20 câu hỏi tín hiệu PROBAST+AI được trình bày toàn văn tại Phụ lục~\ref{sec:appendix_probast_ai}.
 
-\subsection{Giới hạn Nghiên cứu và Tuyên bố Y đức (Limitations \& Ethical Boundaries)}
-Bên cạnh những kết quả tích cực, nghiên cứu ghi nhận một số giới hạn minh bạch cần tiếp tục mở rộng trong tương lai:
+\subsection{Kiểm Toán Bảo Mật PHI Trước và Sau Cải Tiến (PHI De-Identification Audit)}
+Nhằm đảm bảo an toàn tuyệt đối cho người bệnh và tuân thủ các quy định quốc tế (HIPAA Safe Harbor \cite{hhs2012hipaa}, GDPR Điều 9) cũng như Nghị định 13/2023/NĐ-CP của Chính phủ Việt Nam, module \texttt{ClinicalDeidentifier} đã được rà soát và nâng cấp triệt để.
+
+Bảng~\ref{tab:phi_audit_comparison} tổng hợp kết quả kiểm toán tỷ lệ rò rỉ thông tin định danh y tế giả lập trên toàn bộ 2.000 hồ sơ bệnh án trước và sau khi triển khai phiên bản pipeline khử định danh tối ưu (Backlog 08).
+
+\begin{table}[htbp]
+\centering
+\caption{Đánh giá thực nghiệm tỷ lệ rò rỉ PHI trước và sau cải tiến pipeline \texttt{ClinicalDeidentifier} trên 2.000 hồ sơ.}
+\label{tab:phi_audit_comparison}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}lXcc@{}}
+\toprule
+\textbf{Loại Thực thể PHI (Entity)} & \textbf{Biểu thức / Cơ chế Nhận diện Cải tiến} & \textbf{Trước cải tiến} & \textbf{Sau cải tiến} \\
+\midrule
+Mã thẻ BHYT Việt Nam & \texttt{\textbackslash b[A-Z]\{2\}\textbackslash d\{1,2\}\textbackslash d\{10,13\}\textbackslash b} \& nhãn \texttt{BHYT/Insurance} & 84.0\% (1.680/2.000) & \textbf{0.0\% (0/2.000)} \\
+Tên Bác sĩ kèm Học hàm/Học vị VN & \texttt{(?:GS|PGS|TS|ThS|BS|BSCK|CKI\{1,2\})\textbackslash.?...} & 72.0\% (1.440/2.000) & \textbf{0.0\% (0/2.000)} \\
+Tên Bệnh viện viết HOA toàn bộ & \texttt{\textbackslash bBỆNH VIỆN(?:\textbackslash s+[A-ZĐÀ-Ỹ0-9]+)+\textbackslash b} & 100.0\% (2.000/2.000) & \textbf{0.0\% (0/2.000)} \\
+Số điện thoại / CCCD / Ngày tháng & Safe-Harbor regex cho số 9--12 chữ số, prefix +84/09x & 0.0\% (0/2.000) & \textbf{0.0\% (0/2.000)} \\
+Bảo toàn sinh hiệu (Negative Test) & Kiểm thử chuỗi viết tắt (\texttt{BP}, \texttt{HR}, \texttt{SpO2}, \texttt{WBC}, \texttt{CRP}) & 100\% (Không che nhầm) & \textbf{100\% Bảo toàn} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Toàn bộ 17 kịch bản kiểm thử đơn vị và tích hợp trong \texttt{tests/test\_deidentifier.py} đều đạt tỷ lệ vượt qua $100\%$, xác nhận hệ thống có khả năng khử sạch định danh y tế Việt Nam mà không gây méo mó các chỉ số lâm sàng cốt lõi.
+
+\subsection{Ma Trận Giấy Phép Bản Quyền Hệ Thống (Licensing Architecture)}
+Nghiên cứu thiết lập kiến trúc giấy phép phần mềm đa tầng (Multi-tiered Licensing) nhằm tuân thủ nghiêm ngặt quyền sở hữu trí tuệ của từng tài sản mã nguồn, mô hình và dữ liệu:
+\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
+    \item \textbf{Mã nguồn hệ thống M-CDSS:} Phát hành theo giấy phép nguồn mở \textbf{MIT License}, cho phép cộng đồng học thuật tự do nghiên cứu, mở rộng và kiểm chứng độc lập.
+    \item \textbf{Trọng số mô hình nền tảng Bio\_ClinicalBERT:} Được cung cấp bởi Alsentzer và cộng sự \cite{alsentzer2019publicly} dưới các điều khoản hợp đồng sử dụng dữ liệu \textbf{PhysioNet Credentialed Health Data Use Agreement} và giấy phép \textbf{Apache 2.0}.
+    \item \textbf{Bộ tạo lập dữ liệu Synthea EHR:} Được phát triển bởi MITRE Corporation theo giấy phép \textbf{Apache 2.0} \cite{walonoski2018synthea}.
+    \item \textbf{Kho ghi chú lâm sàng MTSamples:} Sử dụng cho mục đích tham chiếu học thuật phi thương mại (\textbf{Academic Research Reference Terms}) \cite{mtsamples2012}.
+    \item \textbf{Phác đồ Hướng dẫn Điều trị Lâm sàng (CPGs):} Các tài liệu hướng dẫn của GINA 2024 \cite{gina2024asthma}, GOLD 2024 \cite{gold2024copd}, ESC 2023 \cite{mcdonagh2023esc} và Bộ Y tế Việt Nam thuộc quyền sở hữu trí tuệ của các tổ chức chủ quản. Hệ thống chỉ thực hiện trích dẫn ngắn và đối chiếu bằng chứng phục vụ đào tạo và hỗ trợ quyết định phi thương mại (\textbf{Fair Use / Non-commercial Research Citation}), nghiêm cấm mọi hình thức thương mại hóa hoặc tái phân phối toàn văn ấn phẩm.
+\end{enumerate}
+
+\subsection{Giới Hạn Nghiên Cứu và Lộ Trình Ngoại Kiểm Lâm Sàng (Limitations \& Roadmap)}
+Nghiên cứu xác lập lộ trình mở rộng khoa học thực tế:
 \begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Đặc thù dữ liệu tổng hợp chuẩn hóa và Yêu cầu Ngoại kiểm:} Mặc dù bộ dữ liệu kết hợp từ Synthea EHR và MTSamples phản ánh sát phân bố sinh lý và văn phong ghi chú y khoa, hệ thống cần được ngoại kiểm đa trung tâm (\textit{External Geographic \& Temporal Validation}) trên dữ liệu bệnh án điện tử thực tế tại các bệnh viện tuyến đầu Việt Nam trước khi triển khai lâm sàng rộng rãi. Do đó, theo chuẩn PROBAST+AI, tính áp dụng thực tiễn của miền Đối tượng hiện được xếp ở mức \textit{Chưa rõ (Unclear)}.
-    \item \textbf{Phạm vi nhóm bệnh và Bệnh đồng mắc:} Hiện tại mô hình tập trung phân loại 4 hội chứng hô hấp -- tim mạch phổ biến nhất; việc mở rộng sang các bệnh lý đồng mắc phức tạp (\textit{multi-label comorbidities}, ví dụ: bệnh nhân vừa mắc COPD vừa suy tim sung huyết) là hướng phát triển tiếp theo của kiến trúc dung hợp.
-    \item \textbf{Giới hạn của Hiệu chuẩn Xác suất:} Mặc dù nhánh văn bản Bio\_ClinicalBERT đạt mức sai số hiệu chuẩn tối ưu $\text{ECE} = 0.0373 < 0.05$, mô hình dung hợp chú ý chéo M-CDSS trên tập kiểm thử khắt khe đạt $\text{ECE} = 0.0973$. Nhóm nghiên cứu báo cáo trung thực số liệu đo lường thực tế thay vì làm tròn nhân tạo, đồng thời tiếp tục tinh chỉnh cơ chế Dirichlet Calibration trong phiên bản tiếp theo.
+    \item \textbf{Lộ trình Ngoại kiểm trên MIMIC-IV:} Để kiểm chứng tính tổng quát hóa trên quần thể bệnh nhân thực tế mà không cần huấn luyện lại (Zero-shot Transportability), nhóm nghiên cứu đã thiết lập lộ trình truy cập kho dữ liệu quốc tế MIMIC-IV \cite{johnson2023mimiciv} qua chứng chỉ đạo đức CITI (Data or Specimens Only Research) và DUA PhysioNet, tập trung vào 4 nhóm mã ICD-10 tương đương (Asthma \texttt{J45}, COPD \texttt{J44}, Heart Failure \texttt{I50}, Pneumonia \texttt{J18}).
+    \item \textbf{Giao thức Khảo sát Chuyên gia Bác sĩ (Expert Survey):} Giao thức đánh giá định tính tính khả dụng và mức độ tin cậy của giao diện M-CDSS đã được xây dựng hoàn chỉnh (\texttt{docs/07\_CLINICAL\_EXPERT\_SURVEY\_PROTOCOL.md}). Tuy nhiên, theo chuẩn liêm chính TRIPOD+AI, trạng thái của khảo sát được báo cáo trung thực là \textbf{Chưa thực hiện (Not yet performed)} do số lượng bác sĩ lâm sàng hành nghề chính thức tham gia chưa đạt cỡ mẫu tối thiểu ($\ge 2$ bác sĩ độc lập) để tính toán hệ số đồng thuận liên quan sát viên (Krippendorff's $\alpha$ hoặc Fleiss' $\kappa$).
 \end{itemize}
 
 \begin{clinicalbox}{TUYÊN BỐ RANH GIỚI LÂM SÀNG VÀ ĐẠO ĐỨC Y SINH (CLINICAL DISCLAIMER)}
-Hệ thống M-CDSS là một nguyên mẫu nghiên cứu khoa học phục vụ \textbf{hỗ trợ ra quyết định lâm sàng (Clinical Decision Support)}, được thiết kế để cung cấp góc nhìn tham khảo thứ hai kèm dẫn chiếu y văn minh bạch cho nhân viên y tế. Hệ thống \textbf{tuyệt đối không thay thế quyền quyết định chuyên môn của bác sĩ điều trị} và không tự động ra y lệnh trên bệnh nhân thực tế.
+Hệ thống M-CDSS là một \textbf{nguyên mẫu nghiên cứu khoa học phục vụ thử nghiệm phương pháp luận AI y tế}. Hệ thống được xây dựng nhằm hỗ trợ bác sĩ tham khảo góc nhìn chẩn đoán đa chiều kèm chứng cứ y văn minh bạch. Hệ thống \textbf{tuyệt đối không phải là một thiết bị y tế chẩn đoán độc lập}, \textbf{không thay thế quyền ra y lệnh của bác sĩ điều trị}, và \textbf{chưa được cấp phép sử dụng trực tiếp trên bệnh nhân thực tế} tại các cơ sở khám chữa bệnh khi chưa trải qua thử nghiệm lâm sàng tiến cứu và được Hội đồng Đạo đức trong Nghiên cứu Y sinh học (IRB) phê duyệt.
 \end{clinicalbox}
