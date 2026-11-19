@@ -93,19 +93,19 @@ export default function DCACurveChart({
               : "Đường cong tính từ dự đoán từng bệnh nhân trong tập hold-out; đây chưa phải bằng chứng về lợi ích lâm sàng."}
           </p>
           <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-            Phân tích macro One-vs-Rest trên bốn nhãn bệnh; ngưỡng là giả định nghiên cứu và cần được xác nhận lâm sàng.
+            Phân tích macro One-vs-Rest trung bình trên bốn nhãn bệnh; hành động lâm sàng đơn bệnh (ví dụ siêu âm tim / NT-proBNP cho suy tim) cần đường cong OvR riêng từng lớp trên dự đoán hold-out thật của TV1/TV2.
           </p>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
           <span className="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 font-medium">
-            Bệnh đích OvR: <strong>HEART_FAILURE / Macro 4 lớp</strong>
+            Phương pháp DCA: <strong>Macro One-vs-Rest (trung bình 4 lớp)</strong>
           </span>
           <span className="px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 font-medium">
-            Hành động giả định: <strong>Siêu âm tim Doppler &amp; NT-proBNP</strong>
+            Phạm vi đánh giá: <strong>Tổng hợp 4 bệnh hô hấp–tim mạch (chưa tách riêng từng bệnh)</strong>
           </span>
           <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-medium">
-            Tỷ lệ hiện mắc (Prevalence): <strong>35.1% HF (Macro 25.0%)</strong>
+            Tỷ lệ hiện mắc Macro: <strong>25.0% (trung bình 4 lớp)</strong>
           </span>
           <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20 font-medium">
             Dải ngưỡng hợp lệ: <strong>pt ∈ [10%, 45%]</strong>

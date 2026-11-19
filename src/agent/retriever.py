@@ -10,12 +10,15 @@ Supports both live Qdrant Vector DB connection and local In-Memory Fallback.
 
 import hashlib
 import json
+import logging
 import math
 import os
 import re
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 # Authoritative Clinical Practice Guideline Chunks with deep clinical metadata
@@ -136,16 +139,14 @@ STANDARD_GUIDELINE_CORPUS: List[Dict[str, Any]] = [
 
 def load_extended_guideline_corpus(base_corpus: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
     """
-    Loads STANDARD_GUIDELINE_CORPUS merged with validated JSON chunks in data/guidelines/*.json.
+    Loads validated JSON guideline chunks in data/guidelines/*.json (64 canonical chunks)
+    so disk, in-memory BM25 corpus, and Qdrant index remain strictly aligned.
+    Falls back to STANDARD_GUIDELINE_CORPUS only when base_corpus is passed explicitly
+    or when data/guidelines/*.json is unavailable.
     """
     repo_root = Path(__file__).resolve().parents[2]
     guidelines_dir = repo_root / "data" / "guidelines"
-    merged_by_id: Dict[str, Dict[str, Any]] = {}
-
-    for chunk in (base_corpus or STANDARD_GUIDELINE_CORPUS):
-        item = dict(chunk)
-        item.setdefault("source_verified", False)
-        merged_by_id[item["chunk_id"]] = item
+    json_chunks: Dict[str, Dict[str, Any]] = {}
 
     if guidelines_dir.exists():
         for json_file in sorted(guidelines_dir.glob("*.json")):
@@ -173,11 +174,20 @@ def load_extended_guideline_corpus(base_corpus: Optional[List[Dict[str, Any]]] =
                         "is_paraphrase": bool(meta.get("is_paraphrase", True)),
                         "keywords": meta.get("keywords", []),
                     }
-                    merged_by_id[normalized["chunk_id"]] = normalized
-            except Exception:
+                    json_chunks[normalized["chunk_id"]] = normalized
+            except Exception as exc:
+                logger.warning("Failed to load guideline file %s: %s", json_file, exc)
                 continue
 
-    return list(merged_by_id.values())
+    if base_corpus is not None:
+        merged_by_id = {c["chunk_id"]: {**c, "source_verified": c.get("source_verified", False)} for c in base_corpus}
+        merged_by_id.update(json_chunks)
+        return list(merged_by_id.values())
+
+    if json_chunks:
+        return list(json_chunks.values())
+
+    return [{**chunk, "source_verified": chunk.get("source_verified", False)} for chunk in STANDARD_GUIDELINE_CORPUS]
 
 
 def _hashed_dense_fallback(text: str, dim: int = 768) -> List[float]:
@@ -210,11 +220,14 @@ class HybridGuidelineRetriever:
         qdrant_client: Optional[Any] = None,
         collection_name: str = "clinical_guidelines",
         embedding_fn: Optional[Any] = None,
+        strict_qdrant: bool = False,
     ):
         self.corpus = list(corpus) if corpus is not None else load_extended_guideline_corpus()
         self.qdrant_client = qdrant_client
         self.collection_name = collection_name
         self.embedding_fn = embedding_fn
+        self.strict_qdrant = strict_qdrant
+        self.last_retrieval_metadata: Dict[str, Any] = {}
         if self.qdrant_client is None and os.getenv("QDRANT_URL"):
             from qdrant_client import QdrantClient
 
@@ -261,9 +274,16 @@ class HybridGuidelineRetriever:
     @staticmethod
     def _with_provenance(chunk: Dict[str, Any]) -> Dict[str, Any]:
         item = dict(chunk)
-        item.setdefault("source_id", item.get("guideline_source", ""))
-        item.setdefault("version", item.get("guideline_source", "").rsplit("_", 1)[-1])
-        item.setdefault("section_locator", item.get("section_title", ""))
+        src_id = item.get("source_id") or item.get("guideline_source", "")
+        item.setdefault("source_id", src_id)
+        if not item.get("source_id") and src_id:
+            item["source_id"] = src_id
+        item["guideline_source"] = item.get("guideline_source") or src_id
+        if "disease_entity" not in item and "target_disease" in item:
+            item["disease_entity"] = item["target_disease"]
+        item.setdefault("version", str(item.get("version") or item.get("guideline_source", "").rsplit("_", 1)[-1]))
+        section_loc = item.get("section_locator") or item.get("page_or_section") or item.get("section_title", "")
+        item["section_locator"] = section_loc
         item.setdefault("source_verified", False)
         return item
 
@@ -286,6 +306,7 @@ class HybridGuidelineRetriever:
         ]
         sparse = self._bm25_rank(query, candidates)
         dense = []
+        dense_error: Optional[str] = None
         if self.qdrant_client is not None and self.embedding_fn is not None:
             try:
                 response = self.qdrant_client.query_points(
@@ -301,9 +322,20 @@ class HybridGuidelineRetriever:
                     if target and target not in payload.get("disease_entity", "").upper() and payload.get("disease_entity") != "ALL_RESPIRATORY_CARDIAC":
                         continue
                     dense.append(payload)
-            except Exception:
-                # A failed vector store does not make the local research corpus authoritative.
+            except Exception as exc:
+                dense_error = str(exc)
+                logger.warning("Qdrant dense retrieval failed, falling back to BM25-only: %s", exc)
+                if self.strict_qdrant:
+                    raise
+                # Keep sparse fallback resilient only when strict_qdrant=False
                 dense = []
+
+        self.last_retrieval_metadata = {
+            "mode": "hybrid_rrf" if dense else ("bm25_fallback_on_error" if dense_error else "bm25_only"),
+            "qdrant_configured": self.qdrant_client is not None,
+            "dense_hit_count": len(dense),
+            "dense_error": dense_error,
+        }
 
         merged = {}
         for ranking in (sparse, dense):

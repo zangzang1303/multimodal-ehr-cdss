@@ -57,8 +57,13 @@ export function ModelCardFooter() {
           <span className="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 font-mono text-[11px]">
             Temp T: {mc?.temperature ?? "—"}
           </span>
-          <span className="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 font-mono text-[11px]">
-            Manifest SHA: {mc?.data_manifest_sha ?? "—"}
+          <span className="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 font-mono text-[11px] inline-flex items-center gap-1.5">
+            <span>Manifest SHA: {mc?.data_manifest_sha ?? "—"}</span>
+            {mc?.data_manifest_is_mock && (
+              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                MOCK — chờ TV2
+              </span>
+            )}
           </span>
           <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 font-mono text-[11px]">
             Explain Mode: {statusData?.reasoning_mode ?? "deterministic_template"}

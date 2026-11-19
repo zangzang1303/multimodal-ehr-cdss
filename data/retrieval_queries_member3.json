@@ -5,15 +5,12 @@
     "category": "DIAGNOSTIC_CRITERIA",
     "query": "COPD hút thuốc khó thở FEV1/FVC",
     "relevant_chunk_ids": [
-      "GOLD_2024_DIAG_CRITERIA_01",
       "GOLD_2024_DIAG_01"
     ],
     "annotator_1_chunk_ids": [
-      "GOLD_2024_DIAG_CRITERIA_01",
       "GOLD_2024_DIAG_01"
     ],
     "annotator_2_chunk_ids": [
-      "GOLD_2024_DIAG_CRITERIA_01",
       "GOLD_2024_DIAG_01"
     ]
   },
@@ -23,16 +20,14 @@
     "category": "DIAGNOSTIC_CRITERIA",
     "query": "hen thở rít dị ứng gắng sức",
     "relevant_chunk_ids": [
-      "GINA_2024_ASTHMA_CRITERIA_01",
       "GINA_2024_DIAG_01",
       "GINA_2024_EIB_12"
     ],
     "annotator_1_chunk_ids": [
-      "GINA_2024_ASTHMA_CRITERIA_01",
       "GINA_2024_DIAG_01"
     ],
     "annotator_2_chunk_ids": [
-      "GINA_2024_ASTHMA_CRITERIA_01",
+      "GINA_2024_DIAG_01",
       "GINA_2024_EIB_12"
     ]
   },
@@ -42,15 +37,12 @@
     "category": "DIAGNOSTIC_CRITERIA",
     "query": "suy tim orthopnea phù NT-proBNP",
     "relevant_chunk_ids": [
-      "ESC_2023_HEART_FAILURE_01",
       "ESC_2023_DIAG_01"
     ],
     "annotator_1_chunk_ids": [
-      "ESC_2023_HEART_FAILURE_01",
       "ESC_2023_DIAG_01"
     ],
     "annotator_2_chunk_ids": [
-      "ESC_2023_HEART_FAILURE_01",
       "ESC_2023_DIAG_01"
     ]
   },
@@ -60,16 +52,16 @@
     "category": "DIAGNOSTIC_CRITERIA",
     "query": "viêm phổi sốt đờm mủ bạch cầu CRP",
     "relevant_chunk_ids": [
-      "BYT_2020_COMMUNITY_PNEUMONIA_01",
+      "BYT_VN_CAP_DIAG_01",
       "BYT_CAP_2020_INFECTIOUS_SIGN_04",
       "BYT_CAP_2020_LAB_INFLAMMATION_06"
     ],
     "annotator_1_chunk_ids": [
-      "BYT_2020_COMMUNITY_PNEUMONIA_01",
+      "BYT_VN_CAP_DIAG_01",
       "BYT_CAP_2020_INFECTIOUS_SIGN_04"
     ],
     "annotator_2_chunk_ids": [
-      "BYT_2020_COMMUNITY_PNEUMONIA_01",
+      "BYT_VN_CAP_DIAG_01",
       "BYT_CAP_2020_LAB_INFLAMMATION_06"
     ]
   },
@@ -131,15 +123,15 @@
     "query": "chẩn đoán phân biệt Hen khởi phát trẻ và COPD hút thuốc bao năm",
     "relevant_chunk_ids": [
       "GINA_2024_DIFF_02",
-      "GOLD_GINA_DIFFERENTIAL_02"
+      "GOLD_2024_DIFF_02"
     ],
     "annotator_1_chunk_ids": [
       "GINA_2024_DIFF_02",
-      "GOLD_GINA_DIFFERENTIAL_02"
+      "GOLD_2024_DIFF_02"
     ],
     "annotator_2_chunk_ids": [
       "GINA_2024_DIFF_02",
-      "GOLD_GINA_DIFFERENTIAL_02"
+      "GOLD_2024_DIFF_02"
     ]
   },
   {
@@ -260,7 +252,7 @@
     ],
     "annotator_2_chunk_ids": [
       "GINA_2024_ACOS_13",
-      "ASTHMA_ALT_REVIEW"
+      "GINA_2024_DIFF_02"
     ]
   },
   {
@@ -291,7 +283,7 @@
     ],
     "annotator_2_chunk_ids": [
       "GINA_2024_ADHERENCE_16",
-      "ASTHMA_ALT_REVIEW"
+      "GINA_2024_TRACK1_10"
     ]
   },
   {
@@ -421,15 +413,15 @@
     "query": "tiền sử hút thuốc bao-năm khói sinh khối bụi nghề nghiệp cai thuốc",
     "relevant_chunk_ids": [
       "GOLD_2024_SMOKING_RISK_13",
-      "GOLD_2024_DIAG_CRITERIA_01"
+      "GOLD_2024_DIAG_01"
     ],
     "annotator_1_chunk_ids": [
       "GOLD_2024_SMOKING_RISK_13",
-      "GOLD_2024_DIAG_CRITERIA_01"
+      "GOLD_2024_DIAG_01"
     ],
     "annotator_2_chunk_ids": [
       "GOLD_2024_SMOKING_RISK_13",
-      "GOLD_2024_DIAG_CRITERIA_01"
+      "GOLD_2024_DIAG_01"
     ]
   },
   {
@@ -460,7 +452,7 @@
     ],
     "annotator_2_chunk_ids": [
       "GOLD_2024_IMAGING_HRCT_15",
-      "COPD_ALT_REVIEW"
+      "GOLD_2024_DIFF_CAP_08"
     ]
   },
   {
@@ -484,15 +476,15 @@
     "category": "DIFFERENTIAL_DIAGNOSIS",
     "query": "so sánh đáp ứng giãn phế quản cố định COPD với biến thiên của hen",
     "relevant_chunk_ids": [
-      "GOLD_GINA_DIFFERENTIAL_02",
+      "GOLD_2024_DIFF_02",
       "GINA_2024_DIFF_02"
     ],
     "annotator_1_chunk_ids": [
-      "GOLD_GINA_DIFFERENTIAL_02",
+      "GOLD_2024_DIFF_02",
       "GINA_2024_DIFF_02"
     ],
     "annotator_2_chunk_ids": [
-      "GOLD_GINA_DIFFERENTIAL_02",
+      "GOLD_2024_DIFF_02",
       "GINA_2024_DIFF_02"
     ]
   },
@@ -502,15 +494,15 @@
     "category": "RED_FLAG",
     "query": "dấu hiệu cờ đỏ cấp cứu khó thở tím tái co kéo cơ hô hấp phụ SpO2 < 88%",
     "relevant_chunk_ids": [
-      "GLOBAL_RED_FLAG_EMERGENCY_01",
+      "GOLD_2024_REDFLAGS_03",
       "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
     ],
     "annotator_1_chunk_ids": [
-      "GLOBAL_RED_FLAG_EMERGENCY_01",
+      "GOLD_2024_REDFLAGS_03",
       "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
     ],
     "annotator_2_chunk_ids": [
-      "GLOBAL_RED_FLAG_EMERGENCY_01",
+      "GOLD_2024_REDFLAGS_03",
       "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
     ]
   },
@@ -551,15 +543,15 @@
     "query": "dấu hiệu ứ dịch thực thể tĩnh mạch cổ nổi phản hồi gan tĩnh mạch cổ tiếng T3",
     "relevant_chunk_ids": [
       "ESC_2023_CONGESTION_SIGNS_06",
-      "ESC_2023_HEART_FAILURE_01"
+      "ESC_2023_DIAG_01"
     ],
     "annotator_1_chunk_ids": [
       "ESC_2023_CONGESTION_SIGNS_06",
-      "ESC_2023_HEART_FAILURE_01"
+      "ESC_2023_DIAG_01"
     ],
     "annotator_2_chunk_ids": [
       "ESC_2023_CONGESTION_SIGNS_06",
-      "ESC_2023_HEART_FAILURE_01"
+      "ESC_2023_DIAG_01"
     ]
   },
   {
@@ -695,7 +687,7 @@
     ],
     "annotator_2_chunk_ids": [
       "ESC_2023_IRON_DEFICIENCY_15",
-      "HEART_FAILURE_ALT_REVIEW"
+      "ESC_2023_ECHO_WORKUP_12"
     ]
   },
   {
@@ -719,15 +711,15 @@
     "category": "DIAGNOSTIC_CRITERIA",
     "query": "khó thở khi nằm orthopnea kịch phát về đêm phù hai chân ran ẩm đáy phổi",
     "relevant_chunk_ids": [
-      "ESC_2023_HEART_FAILURE_01",
+      "ESC_2023_DIAG_01",
       "ESC_2023_CONGESTION_SIGNS_06"
     ],
     "annotator_1_chunk_ids": [
-      "ESC_2023_HEART_FAILURE_01",
+      "ESC_2023_DIAG_01",
       "ESC_2023_CONGESTION_SIGNS_06"
     ],
     "annotator_2_chunk_ids": [
-      "ESC_2023_HEART_FAILURE_01",
+      "ESC_2023_DIAG_01",
       "ESC_2023_CONGESTION_SIGNS_06"
     ]
   },
@@ -738,15 +730,15 @@
     "query": "khởi phát sốt cao rét run ho đờm màu gỉ sắt đau ngực màng phổi",
     "relevant_chunk_ids": [
       "BYT_CAP_2020_INFECTIOUS_SIGN_04",
-      "BYT_2020_COMMUNITY_PNEUMONIA_01"
+      "BYT_VN_CAP_DIAG_01"
     ],
     "annotator_1_chunk_ids": [
       "BYT_CAP_2020_INFECTIOUS_SIGN_04",
-      "BYT_2020_COMMUNITY_PNEUMONIA_01"
+      "BYT_VN_CAP_DIAG_01"
     ],
     "annotator_2_chunk_ids": [
       "BYT_CAP_2020_INFECTIOUS_SIGN_04",
-      "BYT_2020_COMMUNITY_PNEUMONIA_01"
+      "BYT_VN_CAP_DIAG_01"
     ]
   },
   {
@@ -927,7 +919,7 @@
     ],
     "annotator_2_chunk_ids": [
       "BYT_CAP_2020_SWITCH_DISCHARGE_16",
-      "PNEUMONIA_ALT_REVIEW"
+      "BYT_CAP_2020_ABX_INPATIENT_15"
     ]
   },
   {
@@ -936,15 +928,15 @@
     "category": "RED_FLAG",
     "query": "suy hô hấp cấp SpO2 < 88% huyết áp tâm thu < 90 mmHg rối loạn tri giác",
     "relevant_chunk_ids": [
-      "GLOBAL_RED_FLAG_EMERGENCY_01",
+      "BYT_VN_CAP_REDFLAGS_03",
       "BYT_CAP_2020_SEPSIS_REDFLAG_10"
     ],
     "annotator_1_chunk_ids": [
-      "GLOBAL_RED_FLAG_EMERGENCY_01",
+      "BYT_VN_CAP_REDFLAGS_03",
       "BYT_CAP_2020_SEPSIS_REDFLAG_10"
     ],
     "annotator_2_chunk_ids": [
-      "GLOBAL_RED_FLAG_EMERGENCY_01",
+      "BYT_VN_CAP_REDFLAGS_03",
       "BYT_CAP_2020_SEPSIS_REDFLAG_10"
     ]
   }

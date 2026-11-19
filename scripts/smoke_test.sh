@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 # End-to-End Smoke Test for M-CDSS Stack (Phase 3 - Backlog 10 Task 3.1).
-# Tests:
-#   1. GET  /health (HTTP 200)
-#   2. GET  /api/v1/predict/status (HTTP 200)
-#   3. POST /api/v1/predict/multimodal (HTTP 200 or explicit HTTP 503 structured safeguard)
-#   4. POST /api/v1/agent/explain (HTTP 200 with non-empty verified_spans)
-#   5. GET  /api/v1/evaluation/benchmark (HTTP 200)
-#   6. GET  /api/v1/evaluation/registry (HTTP 200)
-#   7. GET  / (Frontend HTTP 200)
-#   8. GET  /evaluation (Frontend HTTP 200)
+# By default, requires HTTP 200 on POST /api/v1/predict/multimodal.
+# Pass --allow-lightweight-no-torch to check fail-safe mode separately (marked [FAIL-SAFE ONLY], never [PASS]).
 
 set -u
 
@@ -17,11 +10,23 @@ FRONTEND_BASE_URL="${FRONTEND_BASE_URL:-http://127.0.0.1:3000}"
 API_BASE_URL="${API_BASE_URL%/}"
 FRONTEND_BASE_URL="${FRONTEND_BASE_URL%/}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-20}"
+ALLOW_LIGHTWEIGHT_NO_TORCH=0
+
+for arg in "$@"; do
+    if [ "$arg" = "--allow-lightweight-no-torch" ]; then
+        ALLOW_LIGHTWEIGHT_NO_TORCH=1
+    fi
+done
 
 FAILURES=0
+MULTIMODAL_FAILSAFE=0
 
 pass_check() {
     echo "[PASS] $1 - $2"
+}
+
+failsafe_check() {
+    echo "[FAIL-SAFE ONLY] $1 - $2"
 }
 
 fail_check() {
@@ -37,6 +42,7 @@ json_check() {
 echo "=== M-CDSS Smoke Test (Backlog 10 Task 3.1) ==="
 echo "API Base URL      : ${API_BASE_URL}"
 echo "Frontend Base URL : ${FRONTEND_BASE_URL}"
+echo "Strict Multimodal : $((1 - ALLOW_LIGHTWEIGHT_NO_TORCH))"
 echo ""
 
 # 1. GET /health
@@ -55,7 +61,7 @@ else
     fail_check "GET /api/v1/predict/status" "HTTP ${code}"
 fi
 
-# 3. POST /api/v1/predict/multimodal (200 or explicit 503 structured error)
+# 3. POST /api/v1/predict/multimodal
 read -r -d '' PREDICT_PAYLOAD <<'EOF' || true
 {
   "patient_id": "PT-SMOKE-001",
@@ -82,12 +88,18 @@ code=$(curl -sS -m "${TIMEOUT_SECONDS}" -X POST -H "Content-Type: application/js
 if [ "$code" = "200" ]; then
     pass_check "POST /api/v1/predict/multimodal" "HTTP 200"
 elif [ "$code" = "503" ] && json_check "import json; d=json.load(open('/tmp/mcdss_multi.json')); assert bool(str(d.get('detail', '')).strip())"; then
-    pass_check "POST /api/v1/predict/multimodal" "HTTP 503 explicit structured safeguard (missing offline HF cache)"
+    detail_msg=$(python3 -c "import json; print(json.load(open('/tmp/mcdss_multi.json')).get('detail',''))" 2>/dev/null)
+    if [ "${ALLOW_LIGHTWEIGHT_NO_TORCH}" = "1" ]; then
+        failsafe_check "POST /api/v1/predict/multimodal" "HTTP 503 (${detail_msg}) - multimodal inference NOT verified"
+        MULTIMODAL_FAILSAFE=1
+    else
+        fail_check "POST /api/v1/predict/multimodal" "HTTP 503 (${detail_msg}); multimodal inference required HTTP 200"
+    fi
 else
     fail_check "POST /api/v1/predict/multimodal" "HTTP ${code}"
 fi
 
-# 4. POST /api/v1/agent/explain (200 with non-empty verified_spans)
+# 4. POST /api/v1/agent/explain
 read -r -d '' EXPLAIN_PAYLOAD <<'EOF' || true
 {
   "patient_id": "PT-SMOKE-001",
@@ -141,5 +153,9 @@ if [ "${FAILURES}" -gt 0 ]; then
     echo "Smoke test finished with ${FAILURES} failure(s)."
     exit 1
 fi
-echo "All 8 smoke test checks passed."
+if [ "${MULTIMODAL_FAILSAFE}" -eq 1 ]; then
+    echo "Lightweight fail-safe smoke check completed (7 PASS + 1 FAIL-SAFE ONLY on /predict/multimodal)."
+else
+    echo "All 8 smoke test checks passed."
+fi
 exit 0

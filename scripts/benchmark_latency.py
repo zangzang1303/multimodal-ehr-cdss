@@ -1,14 +1,18 @@
 """
 System Latency Benchmark Script (Backlog 09 - Task 3.4 [CORE], Member 3)
 
-Measures cold-start and 200 warm-request p50/p95/p99/mean latencies (in milliseconds)
-for /api/v1/agent/explain, /api/v1/predict/baseline, and /api/v1/predict/multimodal,
-along with CPU/RAM/note-length specs.
-Writes real metrics to results/latency_report.json and results/registry.json["latency"].
+Supports BOTH:
+  - End-to-end HTTP benchmarking over Docker/TCP via `--base-url http://127.0.0.1:8000`
+    (`measurement_mode = "http_docker_end_to_end"`)
+  - In-process ASGI FastAPI TestClient benchmarking when `--base-url` is omitted
+    (`measurement_mode = "in_process_asgi_testclient"`)
+Writes explicit measurement_mode and status_codes_observed into
+results/latency_report.json and results/registry.json["latency"].
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import platform
@@ -18,9 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
-from fastapi.testclient import TestClient
-
-from src.api.main import app
+import httpx
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -77,17 +79,15 @@ def percentile(sorted_vals: List[float], pct: float) -> float:
 
 
 def benchmark_endpoint(
-    client: TestClient,
+    client: Any,
     path: str,
     payload: Dict[str, Any],
     n_warm: int = 200,
 ) -> Dict[str, Any]:
-    # Cold call
     t0 = time.perf_counter()
     cold_resp = client.post(path, json=payload)
     cold_ms = (time.perf_counter() - t0) * 1000.0
 
-    # 200 warm calls
     warm_times: List[float] = []
     status_codes = set()
     for _ in range(n_warm):
@@ -109,35 +109,61 @@ def benchmark_endpoint(
 
 
 def main() -> None:
-    client = TestClient(app)
-    explain_stats = benchmark_endpoint(
-        client, "/api/v1/agent/explain", SAMPLE_EXPLAIN_PAYLOAD, n_warm=200
+    parser = argparse.ArgumentParser(description="Benchmark M-CDSS API latency.")
+    parser.add_argument(
+        "--base-url",
+        default=None,
+        help="Optional live HTTP URL (e.g. http://127.0.0.1:8000) to measure Docker end-to-end latency.",
     )
-    baseline_stats = benchmark_endpoint(
-        client, "/api/v1/predict/baseline", SAMPLE_INFER_PAYLOAD, n_warm=200
-    )
+    parser.add_argument("--warm-requests", type=int, default=200)
+    args = parser.parse_args()
 
-    # Check if /predict/multimodal has HF offline weights available or returns 503
-    mm_probe = client.post("/api/v1/predict/multimodal", json=SAMPLE_INFER_PAYLOAD)
-    if mm_probe.status_code == 200:
-        multimodal_stats = benchmark_endpoint(
-            client, "/api/v1/predict/multimodal", SAMPLE_INFER_PAYLOAD, n_warm=200
-        )
-        multimodal_stats["note"] = "Checkpoint + local Bio_ClinicalBERT inference measured on host CPU."
+    if args.base_url:
+        target_url = args.base_url.rstrip("/")
+        measurement_mode = "http_docker_end_to_end"
+        client = httpx.Client(base_url=target_url, timeout=30.0)
     else:
+        from fastapi.testclient import TestClient
+        from src.api.main import app
+
+        target_url = "in-process://fastapi.TestClient"
+        measurement_mode = "in_process_asgi_testclient"
+        client = TestClient(app)
+
+    try:
+        explain_stats = benchmark_endpoint(
+            client, "/api/v1/agent/explain", SAMPLE_EXPLAIN_PAYLOAD, n_warm=args.warm_requests
+        )
+        baseline_stats = benchmark_endpoint(
+            client, "/api/v1/predict/baseline", SAMPLE_INFER_PAYLOAD, n_warm=args.warm_requests
+        )
+        baseline_stats["note"] = (
+            "HTTP 503 baseline_models_unavailable safeguard (default when Member 1 fitted baseline models are absent)."
+            if baseline_stats["cold_status_code"] == 503
+            else "Heuristic baseline fallback executed (MCDSS_ALLOW_HEURISTIC_BASELINE=1)."
+        )
+
         multimodal_stats = benchmark_endpoint(
-            client, "/api/v1/predict/multimodal", SAMPLE_INFER_PAYLOAD, n_warm=200
+            client, "/api/v1/predict/multimodal", SAMPLE_INFER_PAYLOAD, n_warm=args.warm_requests
         )
-        multimodal_stats["note"] = (
-            "HTTP 503 safeguard measured on CPU because local Bio_ClinicalBERT weights are missing from HF cache."
-        )
+        if multimodal_stats["cold_status_code"] == 200:
+            multimodal_stats["note"] = "Checkpoint + Bio_ClinicalBERT multimodal inference measured (HTTP 200)."
+        else:
+            multimodal_stats["note"] = (
+                "HTTP 503 safeguard measured (multimodal inference NOT exercised: missing torch in deploy image or missing Bio_ClinicalBERT cache)."
+            )
+    finally:
+        if args.base_url:
+            client.close()
 
     latency_report = {
         "is_mock": False,
         "measured_at": datetime.now(timezone.utc).isoformat(),
+        "measurement_mode": measurement_mode,
+        "target_url": target_url,
         "device_info": f"{platform.system()} {platform.release()} | {platform.machine()} | CPU ({os.cpu_count()} logical cores)",
         "note_length_chars": len(SAMPLE_NOTE),
-        "num_warm_requests": 200,
+        "num_warm_requests": args.warm_requests,
         "endpoints": {
             "/api/v1/agent/explain": explain_stats,
             "/api/v1/predict/baseline": baseline_stats,

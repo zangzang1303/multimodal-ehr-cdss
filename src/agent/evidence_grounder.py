@@ -2,9 +2,10 @@
 Evidence Grounder Engine
 M-CDSS Phase 2 / Backlog 05 (Task 3.2 & 3.3)
 
-Locates LLM-generated evidence claims within raw de-identified clinical notes
-using exact and flexible character offset mapping. Enforces strict zero-hallucination
-filtering: any claim not grounded in patient notes is rejected.
+Locates candidate evidence claims within raw de-identified clinical notes
+using exact and flexible character offset mapping. Enforces deterministic
+character-offset matching: any claim without a verbatim/normalized span match in
+the patient note is rejected (does not validate semantic correctness).
 """
 
 import difflib

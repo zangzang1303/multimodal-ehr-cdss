@@ -1,6 +1,8 @@
 {
   "is_mock": false,
-  "measured_at": "2026-11-18T16:09:40.473527+00:00",
+  "measured_at": "2026-11-19T03:33:53.482548+00:00",
+  "measurement_mode": "http_docker_end_to_end",
+  "target_url": "http://127.0.0.1:8000",
   "device_info": "Windows 11 | AMD64 | CPU (16 logical cores)",
   "note_length_chars": 340,
   "num_warm_requests": 200,
@@ -9,35 +11,36 @@
       "status_codes_observed": [
         200
       ],
-      "cold_ms": 192.54,
-      "mean_ms": 9.46,
-      "p50_ms": 9.15,
-      "p95_ms": 11.46,
-      "p99_ms": 15.08,
+      "cold_ms": 169.03,
+      "mean_ms": 63.49,
+      "p50_ms": 62.92,
+      "p95_ms": 84.23,
+      "p99_ms": 92.25,
       "cold_status_code": 200
     },
     "/api/v1/predict/baseline": {
       "status_codes_observed": [
-        200
+        503
       ],
-      "cold_ms": 4.19,
-      "mean_ms": 3.75,
-      "p50_ms": 3.66,
-      "p95_ms": 4.74,
-      "p99_ms": 5.4,
-      "cold_status_code": 200
+      "cold_ms": 32.76,
+      "mean_ms": 47.57,
+      "p50_ms": 47.77,
+      "p95_ms": 51.24,
+      "p99_ms": 52.4,
+      "cold_status_code": 503,
+      "note": "HTTP 503 baseline_models_unavailable safeguard (default when Member 1 fitted baseline models are absent)."
     },
     "/api/v1/predict/multimodal": {
       "status_codes_observed": [
         503
       ],
-      "cold_ms": 68.16,
-      "mean_ms": 83.79,
-      "p50_ms": 81.81,
-      "p95_ms": 102.52,
-      "p99_ms": 110.4,
+      "cold_ms": 54.87,
+      "mean_ms": 48.3,
+      "p50_ms": 48.16,
+      "p95_ms": 50.55,
+      "p99_ms": 52.45,
       "cold_status_code": 503,
-      "note": "HTTP 503 safeguard measured on CPU because local Bio_ClinicalBERT weights are missing from HF cache."
+      "note": "HTTP 503 safeguard measured (multimodal inference NOT exercised: missing torch in deploy image or missing Bio_ClinicalBERT cache)."
     }
   }
 }

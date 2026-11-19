@@ -73,6 +73,8 @@ export interface ModelCardMetadata {
   trained_at: string;
   temperature: number;
   data_manifest_sha: string;
+  data_manifest_is_mock?: boolean;
+  data_manifest_version?: string;
 }
 
 export interface InferenceStatusResponse {
@@ -646,7 +648,20 @@ export interface ResultsRegistryResponse {
   };
   rag?: {
     is_mock?: boolean;
+    qdrant_target?: string;
+    qdrant_points_count?: number;
+    qdrant_vector_dim_verified?: number;
+    qdrant_corpus_sync_verified?: boolean;
+    qdrant_chunk_id_match_count?: number;
+    qdrant_content_sha256_match_count?: number;
+    qdrant_metadata_match_count?: number;
+    qdrant_checked_metadata_fields?: string[];
+    qdrant_vector_semantics_verified?: boolean;
+    qdrant_sync_scope_note?: string;
     corpus_size_chunks?: number;
+    dense_encoder?: string;
+    dense_encoder_is_semantic_model?: boolean;
+    retrieval_scope_note?: string;
     query_count?: number;
     cohens_kappa?: number;
     modes?: Record<
@@ -660,26 +675,45 @@ export interface ResultsRegistryResponse {
       }
     >;
     grounding_audit_50_cases?: {
+      audit_status?: string;
+      audit_method?: string;
+      audit_scope_limitation?: string;
+      notes_source_path?: string;
+      notes_source_is_canonical_strict_302?: boolean;
+      dataset_total_rows?: number;
+      notes_from_dataset_count?: number;
+      notes_from_fallback_template_count?: number;
       cases_tested?: number;
       total_claims?: number;
+      total_genuine_claims?: number;
       grounded_claims?: number;
-      rejected_claims?: number;
+      injected_out_of_note_probes?: number;
+      rejected_out_of_note_probes?: number;
+      out_of_note_probe_rejection_rate?: number;
       span_substring_match_rate?: number;
-      manual_semantic_precision_20_spans?: number;
+      manual_semantic_precision_20_spans?: number | null;
+      manual_semantic_audit_status?: string;
+      manual_audit_sample_file?: string;
+      exported_samples_for_review?: number;
     };
   };
   latency?: {
     is_mock?: boolean;
+    measurement_mode?: string;
+    target_url?: string;
     device_info?: string;
     num_warm_requests?: number;
     endpoints?: Record<
       string,
       {
+        status_codes_observed?: number[];
+        cold_status_code?: number;
         cold_ms: number;
         mean_ms: number;
         p50_ms: number;
         p95_ms: number;
         p99_ms: number;
+        note?: string;
       }
     >;
   };

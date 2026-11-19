@@ -315,7 +315,7 @@ export default function AblationEvaluationPage() {
               <div className="space-y-1">
                 <div className="font-bold">Nguồn dữ liệu: results/registry.json (Phase 3 Registry)</div>
                 <p>
-                  Các khối <strong>RQ5 (Đánh giá RAG 60 truy vấn / 64 chunks &amp; Evidence Grounding 50 ca)</strong> và{" "}
+                  Các khối <strong>RQ5 (Đánh giá RAG 60 truy vấn / 64 chunks &amp; kiểm tra khớp chuỗi sơ bộ 50 ca)</strong> và{" "}
                   <strong>Đo độ trễ Latency (200 requests)</strong> là <strong>số liệu đo thực tế</strong> của Thành viên 3.
                   Các khối <strong>RQ1 / RQ2 / RQ4 Missing-Modality</strong> hiện đang hiển thị khung dữ liệu mock ({" "}
                   <code>is_mock = true</code>) chờ Thành viên 1 &amp; 2 chạy đa seed ở Backlog 08&ndash;09.
@@ -331,8 +331,23 @@ export default function AblationEvaluationPage() {
                   RQ5: Đánh Giá Truy Xuất Phác Đồ &amp; Neo Bằng Chứng (Số Liệu Thực Đo)
                 </h3>
                 <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 font-semibold">
-                  {registry?.rag?.query_count ?? 60} truy vấn · {registry?.rag?.corpus_size_chunks ?? 70} chunks · Cohen&apos;s κ = {registry?.rag?.cohens_kappa ?? "—"}
+                  {registry?.rag?.query_count ?? 60} truy vấn · {registry?.rag?.corpus_size_chunks ?? 64} chunks (Qdrant:{" "}
+                  {registry?.rag?.qdrant_points_count ?? 64}) · Cohen&apos;s κ = {registry?.rag?.cohens_kappa ?? "—"}
                 </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                <strong>Phạm vi Qdrant &amp; Encoder:</strong>{" "}
+                Đã xác minh đọc-chỉ{" "}
+                <span className="font-mono font-semibold">
+                  {registry?.rag?.qdrant_chunk_id_match_count ?? 64}/{registry?.rag?.corpus_size_chunks ?? 64}
+                </span>{" "}
+                (chiều <span className="font-mono">{registry?.rag?.qdrant_vector_dim_verified ?? 768}</span>,{" "}
+                <code>chunk_id</code>, <code>SHA-256 text_content</code> và{" "}
+                {registry?.rag?.qdrant_checked_metadata_fields?.length ?? 8} trường metadata),{" "}
+                <strong>nhưng chưa xác nhận chất lượng ngữ nghĩa của vector</strong> vì các chỉ số Recall/MRR/nDCG dưới đây đo bằng{" "}
+                <strong className="font-mono">vector băm 768-D tất định</strong> (chưa phải encoder ngữ nghĩa thật{" "}
+                <code>all-mpnet-base-v2</code>).
               </div>
 
               {registry?.rag?.modes && (
@@ -365,23 +380,48 @@ export default function AblationEvaluationPage() {
               )}
 
               {registry?.rag?.grounding_audit_50_cases && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-2">
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-                    <div className="text-slate-500">Span khớp chuỗi (50 ca):</div>
-                    <div className="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">
-                      {((registry.rag.grounding_audit_50_cases.span_substring_match_rate ?? 0) * 100).toFixed(1)}%
+                <div className="space-y-2 pt-2">
+                  {!registry.rag.grounding_audit_50_cases.notes_source_is_canonical_strict_302 && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-[11px] font-semibold">
+                      Đánh giá sơ bộ (chưa phải tập hold-out strict N=302)
                     </div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-                    <div className="text-slate-500">Loại bỏ ảo giác giả lập:</div>
-                    <div className="text-lg font-bold font-mono text-indigo-600 dark:text-indigo-400">
-                      {registry.rag.grounding_audit_50_cases.rejected_claims ?? 0}/{registry.rag.grounding_audit_50_cases.cases_tested ?? 50}
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+                      <div className="text-slate-500">Khớp tọa độ cắt chuỗi (50 ca — sơ bộ):</div>
+                      <div className="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                        {((registry.rag.grounding_audit_50_cases.span_substring_match_rate ?? 0) * 100).toFixed(1)}%
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-1">
+                        Nguồn: {registry.rag.grounding_audit_50_cases.notes_from_dataset_count ?? 50}/50 ca từ{" "}
+                        <code>{registry.rag.grounding_audit_50_cases.notes_source_path ?? "data/processed/test.parquet"}</code>{" "}
+                        ({registry.rag.grounding_audit_50_cases.notes_source_is_canonical_strict_302 ? "strict 302" : `N=${registry.rag.grounding_audit_50_cases.dataset_total_rows ?? 287}, chưa phải strict 302`})
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
-                    <div className="text-slate-500">Kiểm tra ngữ nghĩa (20 spans):</div>
-                    <div className="text-lg font-bold font-mono text-sky-600 dark:text-sky-400">
-                      {((registry.rag.grounding_audit_50_cases.manual_semantic_precision_20_spans ?? 0) * 100).toFixed(1)}%
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+                      <div className="text-slate-500">Từ chối chuỗi ngoài văn bản (probe):</div>
+                      <div className="text-lg font-bold font-mono text-indigo-600 dark:text-indigo-400">
+                        {registry.rag.grounding_audit_50_cases.rejected_out_of_note_probes ?? 0}/
+                        {registry.rag.grounding_audit_50_cases.injected_out_of_note_probes ?? 50}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-1">
+                        Chỉ kiểm tra từ chối chuỗi không nằm trong ghi chú; chưa chứng minh độ đúng ngữ nghĩa.
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+                      <div className="text-slate-500">Kiểm tra ngữ nghĩa (20 spans):</div>
+                      {registry.rag.grounding_audit_50_cases.manual_semantic_precision_20_spans != null ? (
+                        <div className="text-lg font-bold font-mono text-sky-600 dark:text-sky-400">
+                          {(registry.rag.grounding_audit_50_cases.manual_semantic_precision_20_spans * 100).toFixed(1)}%
+                        </div>
+                      ) : (
+                        <div className="text-sm font-bold text-amber-600 dark:text-amber-400 mt-1">
+                          Chờ chấm tay ({registry.rag.grounding_audit_50_cases.exported_samples_for_review ?? 20} mẫu)
+                        </div>
+                      )}
+                      <div className="text-[10px] text-slate-500 mt-1">
+                        Cần con người rà soát nghĩa phủ định và sự phù hợp lâm sàng.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -394,17 +434,23 @@ export default function AblationEvaluationPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                   <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Cpu className="w-5 h-5 text-sky-500" />
-                    Đo Độ Trễ Hệ Thống (Cold &amp; 200 Warm Requests — Số Liệu Thực Đo)
+                    Đo Độ Trễ Hệ Thống (Cold &amp; 200 Warm Requests)
                   </h3>
-                  <span className="text-[11px] font-mono text-slate-500">
-                    {registry.latency.device_info}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] px-2 py-0.5 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 font-mono">
+                      {registry.latency.measurement_mode ?? "in_process_asgi_testclient"}
+                    </span>
+                    <span className="text-[11px] font-mono text-slate-500">
+                      {registry.latency.device_info}
+                    </span>
+                  </div>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
                         <th className="p-3 font-semibold">Endpoint</th>
+                        <th className="p-3 font-mono text-center">HTTP</th>
                         <th className="p-3 font-mono text-right">Cold (ms)</th>
                         <th className="p-3 font-mono text-right">p50 (ms)</th>
                         <th className="p-3 font-mono text-right">p95 (ms)</th>
@@ -416,6 +462,17 @@ export default function AblationEvaluationPage() {
                       {Object.entries(registry.latency.endpoints).map(([ep, l]) => (
                         <tr key={ep}>
                           <td className="p-3 font-mono font-semibold">{ep}</td>
+                          <td className="p-3 font-mono text-center">
+                            <span
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                (l.cold_status_code ?? 200) === 200
+                                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                                  : "bg-amber-500/15 text-amber-800 dark:text-amber-300"
+                              }`}
+                            >
+                              {l.status_codes_observed?.join(",") ?? l.cold_status_code ?? 200}
+                            </span>
+                          </td>
                           <td className="p-3 font-mono text-right">{l.cold_ms.toFixed(2)}</td>
                           <td className="p-3 font-mono text-right">{l.p50_ms.toFixed(2)}</td>
                           <td className="p-3 font-mono text-right">{l.p95_ms.toFixed(2)}</td>

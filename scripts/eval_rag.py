@@ -2,22 +2,22 @@
 Empirical Evaluation Script for Agentic RAG & Evidence Grounding (RQ5)
 M-CDSS Phase 3 / Backlog 09 - Task 3.1 (Member 3)
 
-Evaluates:
-1. Inter-annotator agreement (Cohen's kappa) on 60 labeled clinical retrieval queries.
-2. Retrieval metrics (Recall@1, Recall@3, Recall@5, MRR, nDCG@5) comparing
-   Dense-only (Cosine), Sparse-only (Okapi BM25), and Hybrid (RRF) modes.
-3. EvidenceGrounder verification over 50 hold-out clinical notes (claims grounded %,
-   fabricated/hallucinated claims rejected %, substring invariant rate, and 20-span
-   semantic entailment audit).
-Writes metrics into results/rag_evaluation_report.json and results/registry.json["rag"].
+Strictly READ-ONLY when connected to a remote Qdrant server via QDRANT_URL / --qdrant-url:
+1. Verifies Qdrant collection vector dim (768), exact chunk_id set alignment, and
+   exact text_content SHA-256 parity against data/guidelines/*.json (raises if out of sync).
+2. Evaluates Cohen's kappa and Retrieval metrics (Recall@1/3/5, MRR, nDCG@5) over 60 queries.
+3. Audits explain_clinical_case() character-offset grounding and out-of-note string probe
+   rejection over 50 hold-out notes, recording exact dataset provenance and exporting
+   20 real pipeline spans for manual human semantic audit.
 """
 
 from __future__ import annotations
 
+import argparse
+import hashlib
 import json
 import math
 import os
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
@@ -28,9 +28,133 @@ from qdrant_client import QdrantClient
 from src.agent.evidence_grounder import EvidenceGrounder
 from src.agent.knowledge_ingest import ClinicalKnowledgeIngestor
 from src.agent.retriever import HybridGuidelineRetriever, _hashed_dense_fallback, load_extended_guideline_corpus
+from src.api.routes.agent_chat import explain_clinical_case
+from src.api.schemas import AgentExplainRequest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+FABRICATED_PROBES = [
+    "Hồ sơ ghi nhận tiền sử phẫu thuật bắc cầu mạch vành và xơ gan cổ trướng mức độ 4.",
+    "CT sọ não cấp cứu phát hiện khối u nguyên bào thần kinh đệm vùng trán phải.",
+    "Bệnh nhân đang lọc máu chu kỳ 3 lần/tuần do bệnh thận mạn giai đoạn cuối và tăng kali máu.",
+    "Xét nghiệm Troponin I siêu nhạy tăng gấp 20 lần kèm ST chênh lên ở chuyển đạo trước ngực.",
+    "Chẩn đoán sản giật nặng trên thai phụ 36 tuần kèm hội chứng HELLP và suy gan cấp.",
+]
+
+
+CHECKED_METADATA_FIELDS = [
+    "source_id",
+    "version",
+    "target_disease",
+    "section_title",
+    "page_or_section",
+    "clinical_category",
+    "evidence_level",
+    "source_verified",
+]
+
+
+def _sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def verify_qdrant_collection_sync(
+    qdrant_client: QdrantClient,
+    collection_name: str,
+    corpus: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """
+    Read-only verification of collection dim (768), chunk_id set parity,
+    text_content SHA-256 parity, and 8 provenance metadata fields against data/guidelines/*.json.
+    Does NOT verify semantic embedding quality when deterministic hashed fallback vectors are active.
+    """
+    info = qdrant_client.get_collection(collection_name)
+    vec_dim = getattr(getattr(getattr(info, "config", None), "params", None), "vectors", None)
+    actual_dim = getattr(vec_dim, "size", None)
+    if actual_dim != 768:
+        raise RuntimeError(
+            f"Qdrant collection '{collection_name}' has vector size {actual_dim} != 768. "
+            "Run `python src/agent/knowledge_ingest.py` explicitly to rebuild."
+        )
+
+    qdrant_by_id: Dict[str, str] = {}
+    qdrant_payloads: Dict[str, Dict[str, Any]] = {}
+    next_offset = None
+    while True:
+        records, next_offset = qdrant_client.scroll(
+            collection_name=collection_name,
+            limit=100,
+            offset=next_offset,
+            with_payload=True,
+            with_vectors=False,
+        )
+        for rec in records:
+            payload = rec.payload or {}
+            cid = payload.get("chunk_id")
+            if cid is not None:
+                cid_str = str(cid)
+                qdrant_by_id[cid_str] = _sha256_text(str(payload.get("text_content", "")))
+                qdrant_payloads[cid_str] = payload
+        if next_offset is None:
+            break
+
+    ingestor = ClinicalKnowledgeIngestor(qdrant_client=qdrant_client)
+    disk_payloads = {
+        str(c.chunk_id): c.to_payload()
+        for c in ingestor.load_guidelines_from_dir(str(REPO_ROOT / "data" / "guidelines"))
+    }
+    disk_by_id = {
+        str(c["chunk_id"]): _sha256_text(str(c.get("text_content", "")))
+        for c in corpus
+    }
+    missing_in_qdrant = sorted(set(disk_by_id) - set(qdrant_by_id))
+    extra_in_qdrant = sorted(set(qdrant_by_id) - set(disk_by_id))
+    content_mismatches = sorted(
+        cid for cid in set(disk_by_id).intersection(qdrant_by_id)
+        if disk_by_id[cid] != qdrant_by_id[cid]
+    )
+    metadata_mismatches = [
+        (cid, field, disk_payloads[cid].get(field), qdrant_payloads[cid].get(field))
+        for cid in sorted(set(disk_payloads).intersection(qdrant_payloads))
+        for field in CHECKED_METADATA_FIELDS
+        if disk_payloads[cid].get(field) != qdrant_payloads[cid].get(field)
+    ]
+
+    if (
+        (info.points_count or 0) != len(disk_by_id)
+        or missing_in_qdrant
+        or extra_in_qdrant
+        or content_mismatches
+        or metadata_mismatches
+    ):
+        raise RuntimeError(
+            f"Qdrant collection '{collection_name}' is NOT synchronized with data/guidelines/*.json "
+            f"(qdrant_points={info.points_count}, disk_chunks={len(disk_by_id)}, "
+            f"missing={missing_in_qdrant[:5]}, extra={extra_in_qdrant[:5]}, "
+            f"content_hash_mismatches={content_mismatches[:5]}, "
+            f"metadata_mismatches={metadata_mismatches[:5]}). "
+            "eval_rag.py is strictly read-only on remote Qdrant; run `python src/agent/knowledge_ingest.py` explicitly."
+        )
+
+    metadata_matched_chunks = len(set(disk_payloads).intersection(qdrant_payloads))
+    return {
+        "qdrant_points_count": info.points_count,
+        "qdrant_vector_dim": actual_dim,
+        "qdrant_vector_dim_verified": actual_dim,
+        "qdrant_corpus_sync_verified": True,
+        "qdrant_chunk_id_match_count": len(disk_by_id),
+        "qdrant_content_sha256_match_count": len(disk_by_id) - len(content_mismatches),
+        "qdrant_metadata_match_count": metadata_matched_chunks,
+        "qdrant_checked_metadata_fields": CHECKED_METADATA_FIELDS,
+        "qdrant_vector_semantics_verified": False,
+        "qdrant_sync_scope_note": (
+            "Read-only check verified 768-D vector dimension, chunk_id set, text_content SHA-256, "
+            "and 8 provenance metadata fields against data/guidelines/*.json; it does NOT verify "
+            "semantic embedding quality because offline deterministic 768-D hashed fallback vectors "
+            "are active instead of all-mpnet-base-v2."
+        ),
+    }
 
 
 def compute_cohens_kappa(queries: List[Dict[str, Any]], all_chunk_ids: List[str]) -> float:
@@ -79,12 +203,10 @@ def compute_ranking_metrics(
             r3 += 1.0
         if top5.intersection(gt):
             r5 += 1.0
-        # MRR
         for rank_idx, cid in enumerate(ranked, start=1):
             if cid in gt:
                 mrr += 1.0 / rank_idx
                 break
-        # nDCG@5
         dcg = 0.0
         for rank_idx, cid in enumerate(ranked[:5], start=1):
             if cid in gt:
@@ -119,94 +241,157 @@ def dense_only_retrieve(
     return [pt.payload["chunk_id"] for pt in resp.points if pt.payload and "chunk_id" in pt.payload]
 
 
-def evaluate_grounding_on_test_notes(n_cases: int = 50) -> Dict[str, Any]:
+def evaluate_grounding_on_test_notes(
+    n_cases: int = 50,
+    allow_synthetic_note_fallback: bool = False,
+) -> tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    """
+    Checks substring/character-offset invariants of explain_clinical_case() and out-of-note
+    string probe rejection via EvidenceGrounder. Records exact hold-out dataset provenance and
+    never silently pads with synthetic template notes unless --allow-synthetic-note-fallback is set.
+    """
     grounder = EvidenceGrounder(fuzzy_threshold=0.88)
-    test_parquet = REPO_ROOT / "data" / "processed" / "test.parquet"
-    notes: List[str] = []
-    if test_parquet.exists():
-        df = pd.read_parquet(test_parquet)
-        note_col = next(
-            (c for c in ("clinical_note", "note_text", "raw_text", "text") if c in df.columns),
-            None,
-        )
-        if note_col is not None:
-            notes = [str(val) for val in df[note_col].dropna().tolist()[:n_cases]]
+    strict_parquet = REPO_ROOT / "data" / "processed_rebuilt_strict" / "test.parquet"
+    legacy_parquet = REPO_ROOT / "data" / "processed" / "test.parquet"
 
-    if len(notes) < n_cases:
-        # Supplement deterministically if test parquet has fewer rows or lacks note column
+    if strict_parquet.exists():
+        notes_path = strict_parquet
+        is_canonical_strict = True
+    elif legacy_parquet.exists():
+        notes_path = legacy_parquet
+        is_canonical_strict = False
+    else:
+        raise FileNotFoundError("Neither data/processed_rebuilt_strict/test.parquet nor data/processed/test.parquet found.")
+
+    df = pd.read_parquet(notes_path)
+    dataset_total_rows = int(len(df))
+    note_col = next(
+        (c for c in ("clinical_note", "note_text", "raw_text", "text") if c in df.columns),
+        None,
+    )
+    if note_col is None:
+        raise KeyError(f"No clinical note column found in {notes_path}")
+
+    dataset_notes = [str(val) for val in df[note_col].dropna().tolist()[:n_cases]]
+    notes_from_dataset_count = len(dataset_notes)
+    notes_from_fallback_template_count = 0
+
+    if len(dataset_notes) < n_cases:
+        if not allow_synthetic_note_fallback:
+            raise RuntimeError(
+                f"{notes_path} yielded only {len(dataset_notes)} non-null notes (< {n_cases}). "
+                "Pass --allow-synthetic-note-fallback explicitly if synthetic padding is intended."
+            )
         base_template = (
             "CHIEF COMPLAINT: Patient {idx} presents with acute dyspnea and wheezing.\n"
             "HISTORY OF PRESENT ILLNESS: Cough and shortness of breath worsening over 4 days.\n"
             "PHYSICAL EXAMINATION: BP: 124/78 mmHg, HR: 84 bpm, SpO2: 94%. Auscultation reveals expiratory wheezes.\n"
             "MEDICATIONS: Albuterol inhaler PRN and corticosteroid taper."
         )
-        while len(notes) < n_cases:
-            notes.append(base_template.format(idx=len(notes) + 1))
+        while len(dataset_notes) < n_cases:
+            dataset_notes.append(base_template.format(idx=len(dataset_notes) + 1))
+            notes_from_fallback_template_count += 1
 
-    total_genuine_claims = 0
-    grounded_genuine_claims = 0
-    total_fabricated_claims = 0
-    rejected_fabricated_claims = 0
+    total_pipeline_claims = 0
+    grounded_pipeline_claims = 0
     invariant_matches = 0
-    audited_sample_spans: List[Dict[str, Any]] = []
+    total_fabricated_probes = 0
+    rejected_fabricated_probes = 0
+    manual_audit_samples: List[Dict[str, Any]] = []
 
-    fabricated_probe = "Hồ sơ ghi nhận tiền sử phẫu thuật bắc cầu mạch vành và xơ gan cổ trướng mức độ 4."
-
-    for note in notes[:n_cases]:
-        # Extract up to 2 genuine sentences/clauses directly from the note
-        clauses = [
-            s.strip()
-            for s in re.split(r"(?:\r?\n|(?<!\d)\.(?!\d))", note)
-            if 15 <= len(s.strip()) <= 160
-        ]
-        selected_genuine = clauses[:2] if clauses else [note[:40].strip()]
-        claims_payload = [
-            {"text": c, "category": "supporting", "label": "Evidence claim"}
-            for c in selected_genuine
-        ]
-        claims_payload.append(
-            {"text": fabricated_probe, "category": "counter", "label": "Injected hallucination probe"}
+    for idx, note in enumerate(dataset_notes[:n_cases]):
+        req = AgentExplainRequest(
+            patient_id=f"PT-AUDIT-{idx + 1:03d}",
+            clinical_notes=note,
         )
+        resp = explain_clinical_case(req)
 
-        total_genuine_claims += len(selected_genuine)
-        total_fabricated_claims += 1
-
-        spans, rejected_count = grounder.ground_evidence_claims(note, claims_payload)
-        grounded_genuine_claims += len(spans)
-        # Fabricated probe must never appear in grounded spans
-        probe_leaked = any(s["text"] == fabricated_probe for s in spans)
-        if not probe_leaked and rejected_count >= 1:
-            rejected_fabricated_claims += 1
-
-        for s in spans:
-            if note[s["start_char"] : s["end_char"]] == s["text"]:
+        total_pipeline_claims += len(resp.claim_audits)
+        grounded_pipeline_claims += len(resp.verified_spans)
+        for sp in resp.verified_spans:
+            if resp.display_note[sp.start_char : sp.end_char] == sp.text:
                 invariant_matches += 1
-            if len(audited_sample_spans) < 20:
-                audited_sample_spans.append(
+            if len(manual_audit_samples) < 20:
+                manual_audit_samples.append(
                     {
-                        "span_text": s["text"][:80],
-                        "start_char": s["start_char"],
-                        "end_char": s["end_char"],
-                        "semantically_relevant": len(s["text"].split()) >= 3,
+                        "sample_id": len(manual_audit_samples) + 1,
+                        "patient_id": resp.patient_id,
+                        "primary_diagnosis": resp.primary_diagnosis,
+                        "reasoning_mode": resp.reasoning_mode,
+                        "span_text": sp.text,
+                        "start_char": sp.start_char,
+                        "end_char": sp.end_char,
+                        "note_excerpt": resp.display_note[
+                            max(0, sp.start_char - 40) : min(len(resp.display_note), sp.end_char + 40)
+                        ],
+                        "human_verified": None,
+                        "auditor_comment": "",
                     }
                 )
 
-    semantic_ok = sum(1 for a in audited_sample_spans if a["semantically_relevant"])
-    return {
+        # Out-of-note string probe check (does NOT measure semantic/negation hallucination)
+        probe = FABRICATED_PROBES[idx % len(FABRICATED_PROBES)]
+        probe_claims = [{"text": probe, "category": "counter", "label": "Out-of-note string probe"}]
+        if resp.verified_spans:
+            probe_claims.append(
+                {"text": resp.verified_spans[0].text, "category": "supporting", "label": "Baseline note clause"}
+            )
+        spans, rejected_count = grounder.ground_evidence_claims(resp.display_note, probe_claims)
+        total_fabricated_probes += 1
+        if not any(s["text"] == probe for s in spans) and rejected_count >= 1:
+            rejected_fabricated_probes += 1
+
+    is_strict_302 = is_canonical_strict and dataset_total_rows == 302
+    audit_status = "canonical_strict_holdout" if is_strict_302 else "preliminary_non_strict_holdout"
+    scope_dataset_note = (
+        "Evaluated on canonical strict N=302 hold-out split."
+        if is_strict_302
+        else (
+            f"PRELIMINARY non-strict hold-out audit only: sourced from data/processed/test.parquet "
+            f"(N={dataset_total_rows}), NOT an official evaluation on the pending canonical strict N=302 split."
+        )
+    )
+
+    audit_summary = {
+        "audit_status": audit_status,
+        "audit_method": "pipeline_offset_invariant_and_out_of_note_string_rejection_only",
+        "audit_scope_limitation": (
+            "Automatic metrics verify character-offset substring matching on display_note and rejection "
+            "of out-of-note probe strings only; they do NOT establish semantic correctness, negation "
+            f"fidelity, or clinical validity. {scope_dataset_note}"
+        ),
+        "notes_source_path": str(notes_path.relative_to(REPO_ROOT)).replace("\\", "/"),
+        "notes_source_is_canonical_strict_302": is_strict_302,
+        "dataset_total_rows": dataset_total_rows,
         "cases_tested": n_cases,
-        "total_genuine_claims": total_genuine_claims,
-        "grounded_claims": grounded_genuine_claims,
-        "genuine_claim_grounding_rate": round(grounded_genuine_claims / max(total_genuine_claims, 1), 4),
-        "injected_hallucination_probes": total_fabricated_claims,
-        "rejected_claims": rejected_fabricated_claims,
-        "hallucination_rejection_rate": round(rejected_fabricated_claims / max(total_fabricated_claims, 1), 4),
-        "span_substring_match_rate": round(invariant_matches / max(grounded_genuine_claims, 1), 4),
-        "manual_semantic_precision_20_spans": round(semantic_ok / max(len(audited_sample_spans), 1), 4),
-        "sampled_20_spans_checked": len(audited_sample_spans),
+        "notes_from_dataset_count": notes_from_dataset_count,
+        "notes_from_fallback_template_count": notes_from_fallback_template_count,
+        "total_genuine_claims": total_pipeline_claims,
+        "grounded_claims": grounded_pipeline_claims,
+        "genuine_claim_grounding_rate": round(grounded_pipeline_claims / max(total_pipeline_claims, 1), 4),
+        "injected_out_of_note_probes": total_fabricated_probes,
+        "rejected_out_of_note_probes": rejected_fabricated_probes,
+        "out_of_note_probe_rejection_rate": round(rejected_fabricated_probes / max(total_fabricated_probes, 1), 4),
+        "span_substring_match_rate": round(invariant_matches / max(grounded_pipeline_claims, 1), 4),
+        "manual_semantic_precision_20_spans": None,
+        "manual_semantic_audit_status": "pending_human_review",
+        "manual_audit_sample_file": "results/grounding_manual_audit_20_samples.json",
+        "sampled_20_spans_checked": 0,
+        "exported_samples_for_review": len(manual_audit_samples),
     }
+    return audit_summary, manual_audit_samples
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Read-only evaluation of Agentic RAG & Grounding (RQ5).")
+    parser.add_argument("--qdrant-url", default=None, help="Live Qdrant HTTP URL (defaults to QDRANT_URL env).")
+    parser.add_argument(
+        "--allow-synthetic-note-fallback",
+        action="store_true",
+        help="Explicit opt-in if dataset parquet has fewer than 50 notes.",
+    )
+    args = parser.parse_args()
+
     os.environ.pop("MCDSS_USE_ST_ENCODER", None)
     queries_path = REPO_ROOT / "data" / "retrieval_queries_member3.json"
     queries = json.loads(queries_path.read_text(encoding="utf-8"))
@@ -214,45 +399,91 @@ def main() -> None:
     corpus = load_extended_guideline_corpus()
     all_chunk_ids = [c["chunk_id"] for c in corpus]
 
-    # Build in-memory Qdrant vector store with full corpus so dense retrieval covers all chunks
-    qdrant_mem = QdrantClient(":memory:")
-    ingestor = ClinicalKnowledgeIngestor(qdrant_client=qdrant_mem)
-    ingest_summary = ingestor.ingest(guidelines_dir="data/guidelines", recreate_collection=True)
+    resolved_url = args.qdrant_url or os.getenv("QDRANT_URL")
+    if resolved_url:
+        qdrant_client = QdrantClient(url=resolved_url, timeout=5)
+        qdrant_target = resolved_url
+        sync_info = verify_qdrant_collection_sync(qdrant_client, "clinical_guidelines", corpus)
+    else:
+        qdrant_client = QdrantClient(":memory:")
+        qdrant_target = "in_memory_ephemeral"
+        ingestor = ClinicalKnowledgeIngestor(qdrant_client=qdrant_client)
+        ingestor.ingest(guidelines_dir="data/guidelines", recreate_collection=True)
+        sync_info = verify_qdrant_collection_sync(qdrant_client, "clinical_guidelines", corpus)
 
-    # Dense-only retriever
     dense_fn = lambda txt: _hashed_dense_fallback(txt, dim=768)
     dense_lists = [
-        dense_only_retrieve(qdrant_mem, "clinical_guidelines", q["query"], dense_fn, top_k=10)
+        dense_only_retrieve(qdrant_client, "clinical_guidelines", q["query"], dense_fn, top_k=10)
         for q in queries
     ]
 
-    # Sparse BM25-only retriever
     sparse_retriever = HybridGuidelineRetriever(corpus=corpus, qdrant_client=None)
     bm25_lists = [
         [r["chunk_id"] for r in sparse_retriever.retrieve(q["query"], top_k=10)]
         for q in queries
     ]
 
-    # Hybrid (BM25 + Dense via RRF) retriever
     hybrid_retriever = HybridGuidelineRetriever(
-        corpus=corpus, qdrant_client=qdrant_mem, embedding_fn=dense_fn
+        corpus=corpus,
+        qdrant_client=qdrant_client,
+        embedding_fn=dense_fn,
+        strict_qdrant=True,
     )
-    hybrid_lists = [
-        [r["chunk_id"] for r in hybrid_retriever.retrieve(q["query"], top_k=10)]
-        for q in queries
-    ]
+    hybrid_lists = []
+    for q in queries:
+        rows = hybrid_retriever.retrieve(q["query"], top_k=10)
+        meta = hybrid_retriever.last_retrieval_metadata
+        if meta.get("dense_hit_count", 0) <= 0:
+            raise RuntimeError(f"Hybrid Qdrant returned 0 dense hits for {q['query_id']}: {meta}")
+        hybrid_lists.append([r["chunk_id"] for r in rows])
 
     gt_sets = [set(q["relevant_chunk_ids"]) for q in queries]
-
     kappa = compute_cohens_kappa(queries, all_chunk_ids)
-    grounding_audit = evaluate_grounding_on_test_notes(n_cases=50)
+    grounding_audit, manual_samples = evaluate_grounding_on_test_notes(
+        n_cases=50,
+        allow_synthetic_note_fallback=args.allow_synthetic_note_fallback,
+    )
+
+    results_dir = REPO_ROOT / "results"
+    results_dir.mkdir(parents=True, exist_ok=True)
+    manual_audit_path = results_dir / "grounding_manual_audit_20_samples.json"
+    manual_audit_path.write_text(
+        json.dumps(
+            {
+                "instructions": (
+                    "Review each grounded span from explain_clinical_case() against note_excerpt and "
+                    "set human_verified=true/false manually before reporting manual semantic precision."
+                ),
+                "samples": manual_samples,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
     rag_report = {
         "is_mock": False,
         "evaluated_at": datetime.now(timezone.utc).isoformat(),
+        "qdrant_target": qdrant_target,
+        "qdrant_points_count": sync_info["qdrant_points_count"],
+        "qdrant_vector_dim_verified": sync_info["qdrant_vector_dim_verified"],
+        "qdrant_corpus_sync_verified": sync_info["qdrant_corpus_sync_verified"],
+        "qdrant_chunk_id_match_count": sync_info["qdrant_chunk_id_match_count"],
+        "qdrant_content_sha256_match_count": sync_info["qdrant_content_sha256_match_count"],
+        "qdrant_metadata_match_count": sync_info["qdrant_metadata_match_count"],
+        "qdrant_checked_metadata_fields": sync_info["qdrant_checked_metadata_fields"],
+        "qdrant_vector_semantics_verified": sync_info["qdrant_vector_semantics_verified"],
+        "qdrant_sync_scope_note": sync_info["qdrant_sync_scope_note"],
         "corpus_size_chunks": len(corpus),
-        "ingested_guideline_json_chunks": ingest_summary["total_chunks"],
+        "ingested_guideline_json_chunks": sync_info["qdrant_points_count"],
         "dense_encoder": "768d_hashed_deterministic_cpu_fallback (all-mpnet-base-v2 offline unavailable)",
+        "dense_encoder_is_semantic_model": False,
+        "retrieval_scope_note": (
+            "Recall/MRR/nDCG metrics reflect live Qdrant RRF using deterministic 768-D hashed "
+            "fallback vectors (all-mpnet-base-v2 offline unavailable), NOT a real semantic encoder."
+        ),
         "query_count": len(queries),
         "cohens_kappa": kappa,
         "modes": {
@@ -263,8 +494,6 @@ def main() -> None:
         "grounding_audit_50_cases": grounding_audit,
     }
 
-    results_dir = REPO_ROOT / "results"
-    results_dir.mkdir(parents=True, exist_ok=True)
     report_path = results_dir / "rag_evaluation_report.json"
     report_path.write_text(json.dumps(rag_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

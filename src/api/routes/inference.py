@@ -56,12 +56,22 @@ def _load_model_card_metadata() -> dict:
         ckpt_sha = hashlib.sha256(ckpt_path.read_bytes()).hexdigest()[:12]
 
     manifest_sha = "unavailable"
+    manifest_is_mock = True
+    manifest_version = "unavailable"
     if manifest_path.is_file():
         try:
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             manifest_sha = str(manifest.get("manifest_sha256", "unavailable"))[:12]
+            manifest_version = str(manifest.get("manifest_version", "unknown"))
+            manifest_is_mock = (
+                "_mock_notice" in manifest
+                or "mock" in manifest_version.lower()
+                or "mock" in str(manifest.get("generated_by", "")).lower()
+            )
         except Exception:
             manifest_sha = "unavailable"
+            manifest_is_mock = True
+            manifest_version = "unavailable"
 
     trained_at = "2026-11-05"
     temperature = 1.3541
@@ -80,6 +90,8 @@ def _load_model_card_metadata() -> dict:
         "trained_at": trained_at,
         "temperature": round(temperature, 4),
         "data_manifest_sha": manifest_sha,
+        "data_manifest_is_mock": manifest_is_mock,
+        "data_manifest_version": manifest_version,
     }
 
 
@@ -117,11 +129,12 @@ async def options_baseline():
 @router.post("/baseline", response_model=PatientInferenceResponse)
 async def predict_baseline(request: PatientInferenceRequest) -> PatientInferenceResponse:
     """
-    Baseline heuristic fallback prediction endpoint across 3 unimodal baselines
-    until fitted Member 1 baseline artifacts (.cbm / .pt) are registered.
-    Set MCDSS_STRICT_NO_MOCK_BASELINE=1 to return 503 baseline_models_unavailable.
+    Requires fitted Member 1 baseline artifacts (.cbm / .pt).
+    By default returns HTTP 503 baseline_models_unavailable so no heuristic numbers
+    masquerade as fitted model predictions. Set MCDSS_ALLOW_HEURISTIC_BASELINE=1
+    explicitly if local UI fallback testing is needed.
     """
-    if os.getenv("MCDSS_STRICT_NO_MOCK_BASELINE") == "1":
+    if os.getenv("MCDSS_ALLOW_HEURISTIC_BASELINE") != "1" or os.getenv("MCDSS_STRICT_NO_MOCK_BASELINE") == "1":
         raise HTTPException(status_code=503, detail="baseline_models_unavailable")
 
     patient_id = request.patient_id or "PT-001"

@@ -91,6 +91,8 @@ def test_inference_status_endpoint(client):
     data = response.json()
     assert data["status"] == "inference_service_ready"
     assert "classical" in data["supported_baselines"]
+    assert "data_manifest_is_mock" in data["model_card"]
+    assert isinstance(data["model_card"]["data_manifest_is_mock"], bool)
 
 
 def test_tabular_features_schema_valid():
@@ -194,10 +196,11 @@ def test_baseline_prediction_result_schema():
         )
 
 
-def test_predict_baseline_endpoint(client):
+def test_predict_baseline_endpoint(client, monkeypatch):
     """
-    Verify POST /api/v1/predict/baseline accepts PatientInferenceRequest
-    and returns predictions for all 3 baselines (Task 3.3).
+    Verify POST /api/v1/predict/baseline defaults to HTTP 503 baseline_models_unavailable
+    when fitted Member 1 artifacts are absent, and supports explicit heuristic fallback
+    only when MCDSS_ALLOW_HEURISTIC_BASELINE=1 is set.
     """
     payload = {
         "patient_id": "PT-001",
@@ -219,6 +222,12 @@ def test_predict_baseline_endpoint(client):
         "clinical_notes": "Bệnh nhân nam 64 tuổi có tiền sử hút thuốc lá, khó thở tăng dần khi gắng sức.",
     }
 
+    monkeypatch.delenv("MCDSS_ALLOW_HEURISTIC_BASELINE", raising=False)
+    strict_response = client.post("/api/v1/predict/baseline", json=payload)
+    assert strict_response.status_code == 503
+    assert strict_response.json()["detail"] == "baseline_models_unavailable"
+
+    monkeypatch.setenv("MCDSS_ALLOW_HEURISTIC_BASELINE", "1")
     response = client.post("/api/v1/predict/baseline", json=payload)
     assert response.status_code == 200
     data = response.json()
