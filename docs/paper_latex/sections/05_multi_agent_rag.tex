@@ -1,51 +1,57 @@
 % ==============================================================================
-% Phân mục 05 [TRỌNG TÂM NHIỆM VỤ 3.2]: Hệ thống Đa tác tử & Chống ảo giác
+% Phân mục 05 [TRỌNG TÂM NHIỆM VỤ 3.2]: Hệ thống Đa tác tử & Neo bằng chứng
 % ==============================================================================
-\section{Hiện Thực Hệ Thống Đa Tác Tử và Cơ Chế Neo Bằng Chứng Chống Ảo Giác (Multi-Agent RAG \& Evidence Grounding)}
+\section{Hiện Thực Quy Trình Truy Xuất Phác Đồ và Neo Bằng Chứng Ký Tự (Guideline RAG \& Character-Offset Grounding)}
 \label{sec:multi_agent_rag}
 
-Một trong những yêu cầu khắt khe nhất của y học chứng cứ (\textit{Evidence-Based Medicine}) là mọi gợi ý chẩn đoán phân biệt phải truy nguyên được về hai nguồn căn cứ độc lập: (1) triệu chứng cụ thể ghi nhận trên chính bệnh nhân đó, và (2) điều khoản tương ứng trong hướng dẫn thực hành lâm sàng chính thống. Để đáp ứng yêu cầu này mà không rơi vào bẫy ``ảo giác ngôn ngữ'' (\textit{LLM Hallucination}), chúng tôi hiện thực hóa đồ thị trạng thái hội chẩn \texttt{DiagnosticStateGraph} kết hợp bộ truy xuất lai Qdrant--BM25 và bộ kiểm chứng tất định, được minh họa tại Hình~\ref{fig:multi_agent_rag_flow}.
+Một trong những yêu cầu khắt khe nhất của y học chứng cứ (\textit{Evidence-Based Medicine}) là mọi gợi ý chẩn đoán phân biệt phải truy nguyên được về hai nguồn căn cứ độc lập: (1) triệu chứng cụ thể ghi nhận trên chính bệnh nhân đó, và (2) điều khoản tương ứng trong hướng dẫn thực hành lâm sàng chính thống. Để giảm nguy cơ sinh trích dẫn không có căn cứ từ bệnh án, chúng tôi hiện thực hóa quy trình giải trình lâm sàng tất định kết hợp bộ truy xuất lai Qdrant--BM25 và bộ kiểm chứng tọa độ ký tự, được minh họa tại Hình~\ref{fig:multi_agent_rag_flow}.
 
 \input{figures/fig02_multi_agent_rag_flow}
 
-\subsection{Đồ thị Trạng thái Hội chẩn 4 Nút (\texttt{DiagnosticStateGraph})}
-Luồng suy luận giải trình trong module \texttt{src/agent/diagnostic\_graph.py} được điều phối qua lớp máy trạng thái hữu hạn có hướng \texttt{DiagnosticStateGraph}, truyền đối tượng trạng thái \texttt{DiagnosticGraphState} tuần tự qua 4 nút xử lý:
+\subsection{Kiến trúc Quy trình Giải trình \& Kiểm chứng Hiện thực (\texttt{agent\_chat.py})}
+Luồng suy luận giải trình tại điểm cuối \texttt{POST /api/v1/agent/explain} (\texttt{src/api/routes/agent\_chat.py}) vận hành ở chế độ \texttt{reasoning\_mode = "deterministic\_template"} phối hợp với bộ truy xuất phác đồ lai và cổng kiểm chứng tọa độ ký tự qua 4 bước tuần tự:
 \begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Nút Phân loại \& Lập truy vấn (\texttt{triage\_and\_query\_node}):} Tiếp nhận bệnh án gốc, thực thi ẩn danh hóa thông tin định danh cá nhân qua \texttt{ClinicalDeidentifier}, xác định cặp chẩn đoán cạnh tranh sát nhất (Top-1 và Top-2, ví dụ: \texttt{ASTHMA} so với \texttt{COPD} ở ca \texttt{PT-0044}), rà quét các dấu hiệu cờ đỏ cấp cứu (\textit{Red Flags}) và khởi tạo câu truy vấn y khoa chuyên biệt.
-    \item \textbf{Nút Truy xuất Tri thức Lai (\texttt{hybrid\_guideline\_retrieval\_node} --- \texttt{src/agent/retriever.py}):} Thực hiện tìm kiếm kết hợp thông qua lớp \texttt{HybridGuidelineRetriever}. Kiến trúc hỗ trợ truyền hàm mã hóa nhúng tùy chỉnh (\texttt{embedding\_fn}, chẳng hạn mô hình \texttt{sentence-transformers/all-mpnet-base-v2} theo cấu hình của nhánh Modeling); ở chế độ triển khai container CPU độc lập mặc định, module sử dụng hàm chiếu đặc trưng tất định \texttt{\_encode\_text} kết hợp 16 cụm khái niệm y sinh (\textit{biomedical concept clusters}) và 48 chiều băm $n$-gram từ/ký tự chuẩn hóa $L_2$ ($\mathbb{R}^{64}$). Khi khởi tạo, kho tri thức nạp 6 phân đoạn phác đồ chuẩn cốt lõi (\texttt{DEFAULT\_GUIDELINE\_CHUNKS} đại diện cho \texttt{GOLD\_2024}, \texttt{GINA\_2024}, \texttt{ESC\_2023}, \texttt{BYT\_2020}, \texttt{ATS\_IDSA\_2019}, \texttt{SSC\_2021}) cùng toàn bộ các tệp phân mảnh mở rộng tại \texttt{data/guidelines/*.json} vào bộ sưu tập \texttt{clinical\_guidelines} của cơ sở dữ liệu vector \textbf{Qdrant} (\texttt{QdrantClient} với độ đo \texttt{Distance.COSINE}) bằng cấu trúc \texttt{PointStruct}.
-    \begin{itemize}[leftmargin=1.5em, itemsep=0.15em]
-        \item \textit{Đánh giá mô hình nhúng ngữ nghĩa (Chờ bổ sung):} \texttt{[TODO-TV1 (Backlog 05 Task 1.1): Điền kết quả thử nghiệm độ tương đồng ngữ nghĩa của sentence-transformers/all-mpnet-base-v2 (vector\_dim=768, similarity\_threshold=0.72) từ configs/rag\_config.yaml]}.
-        \item \textit{Quy mô kho tri thức phác đồ sau phân mảnh đầy đủ (Chờ bổ sung):} \texttt{[TODO-TV2 (Backlog 05 Task 2.1 \& Backlog 07 Task 2.1): Điền tổng số chunks phác đồ thực tế (>= 100 chunks) và phân bố theo từng nguồn GINA 2024 / GOLD 2024 / ESC 2023 / Bộ Y tế sau khi chạy src/agent/knowledge\_ingest.py]}.
-    \end{itemize}
-    Tại thời điểm truy vấn $q$, điểm xếp hạng của mỗi phân đoạn phác đồ $d_k$ là tổ hợp lồi giữa điểm từ khóa \textbf{Okapi BM25} chuẩn hóa ($S_{\text{bm25\_norm}}$, với tham số $k_1 = 1.5, b = 0.75$) và độ tương đồng \textbf{Cosine Vector} truy xuất từ Qdrant ($S_{\text{cosine}}$):
+    \item \textbf{Khử định danh \& Xác định cặp giả thuyết:} Tiếp nhận bệnh án gốc, thực thi ẩn danh hóa qua \texttt{ClinicalDeidentifier}, ưu tiên cặp chẩn đoán cạnh tranh cao nhất (Top-1 và Top-2) từ vector xác suất đã hiệu chuẩn (\texttt{calibrated\_probabilities}), đồng thời rà quét các dấu hiệu cờ đỏ (\textit{Red Flags}).
+    \item \textbf{Truy xuất Tri thức Lai Qdrant--BM25 (\texttt{HybridGuidelineRetriever} --- \texttt{src/agent/retriever.py}):} Kết hợp tìm kiếm từ khóa thưa \textbf{BM25} trên kho 64 phân mảnh JSON chuẩn hóa (\texttt{data/guidelines/*.json}; lớp hạt giống nội bộ \texttt{STANDARD\_GUIDELINE\_CORPUS} chỉ dùng làm dự phòng khi thư mục JSON rỗng) và truy vấn vector dày đặc qua \textbf{Qdrant} (\texttt{query\_points}, 768 chiều với mô hình \texttt{sentence-transformers/all-mpnet-base-v2} theo \texttt{configs/rag\_config.yaml} hoặc hàm băm tất định $L_2$ khi chạy offline; cảnh báo rõ và hỗ trợ \texttt{strict\_qdrant=True} không nuốt lỗi khi Qdrant lỗi). Hai danh sách xếp hạng được hợp nhất bằng kỹ thuật \textbf{Reciprocal Rank Fusion (RRF)}:
     \begin{equation}
-        S_{\text{hybrid}}(q, d_k) = \alpha \cdot S_{\text{bm25\_norm}}(q, d_k) + (1 - \alpha) \cdot S_{\text{cosine}}(q, d_k), \quad \text{với } \alpha = 0.65
+        S_{\text{RRF}}(q, d_k) = \sum_{r \in \{\text{BM25}, \text{Dense}\}} \frac{1}{60 + \text{rank}_r(q, d_k)}
     \end{equation}
-    trong đó thành phần Okapi BM25 được tính theo công thức chuẩn:
+    trong đó thành phần BM25 trên tập ứng viên được tính theo công thức chuẩn:
     \begin{equation}
-        \text{BM25}(q, d_k) = \sum_{t \in q} \ln\!\left(1 + \frac{N_{\text{doc}} - \text{df}(t) + 0.5}{\text{df}(t) + 0.5}\right) \cdot \frac{\text{tf}(t, d_k) \cdot (k_1 + 1)}{\text{tf}(t, d_k) + k_1 \cdot \left(1 - b + b \cdot \frac{|d_k|}{\text{avgdl}}\right)}
+        \text{BM25}(q, d_k) = \sum_{t \in q} \ln\!\left(1 + \frac{N_{\text{doc}} - \text{df}(t) + 0.5}{\text{df}(t) + 0.5}\right) \cdot \frac{\text{tf}(t, d_k) \cdot (k_1 + 1)}{\text{tf}(t, d_k) + k_1 \cdot \left(1 - b + b \cdot \frac{|d_k|}{\text{avgdl}}\right)}, \quad k_1 = 1.2,\; b = 0.75
     \end{equation}
-    \item \textbf{Nút Lập luận Lâm sàng (\texttt{clinical\_reasoning\_node}):} Đối chiếu các phân đoạn phác đồ Top-$k$ thu được với hồ sơ bệnh nhân để tổng hợp báo cáo giải trình chẩn đoán phân biệt ($H_1$ so với $H_2$), đề xuất cận lâm sàng cần làm thêm và trích xuất danh sách các câu bằng chứng ứng viên $\{s_1, s_2, \dots, s_m\}$.
     \begin{itemize}[leftmargin=1.5em, itemsep=0.15em]
-        \item \textit{Tích hợp Prompt Chain-of-Thought Đối kháng (Chờ bổ sung):} \texttt{[TODO-TV1 (Backlog 05 Task 1.2): Điền thông số mô hình LLM và kết quả thực nghiệm của module Prompt CoT đối kháng trong src/agent/diagnostic\_agent.py]}.
+        \item \textit{Quy mô kho tri thức phác đồ đã chuẩn hóa:} Hệ thống \texttt{knowledge\_ingest.py} đã mở rộng và xác minh đồng bộ ở chế độ chỉ đọc (\textit{read-only verify} chiều vector \texttt{768}, tập \texttt{chunk\_id}, mã băm SHA-256 của \texttt{text\_content} và 8 trường metadata truy nguyên theo tỷ lệ \texttt{64/64}; \textbf{không} xác nhận chất lượng ngữ nghĩa của các vector băm ngoại tuyến) kho tri thức gồm \textbf{64 đoạn chuẩn hóa} (trên đĩa \texttt{data/guidelines/*.json} $=$ trong RAM BM25 $=$ trong Qdrant sống \texttt{clinical\_guidelines}), phân bổ đều 16 đoạn/bệnh lý từ GINA 2024, GOLD 2024, ESC 2023 và Bộ Y tế Việt Nam 2020; bảo toàn \texttt{evidence\_level = null} cho tài liệu Bộ Y tế Việt Nam 2020.
+        \item \textit{Đánh giá mô hình nhúng \& Truy xuất RAG (RQ5 --- Thực nghiệm đo đạc trực tiếp trên Qdrant Docker sống với 60 truy vấn bằng vector băm 768-D ngoại tuyến):} Bộ kiểm định chỉ đọc \texttt{scripts/eval\_rag.py} đánh giá qua Qdrant HTTP thực tế (\texttt{http://127.0.0.1:6333}, \texttt{strict\_qdrant=True}) trên 60 truy vấn lâm sàng gán nhãn kép độc lập quy chiếu toàn bộ vào 64 chunk chuẩn hóa (15 truy vấn/bệnh, hệ số đồng thuận $\kappa_{\text{Cohen}} = 0.9449$). Kết quả so sánh 3 cấu hình được trình bày ở Bảng~\ref{tab:rag_eval}. Cần nhấn mạnh rằng toàn bộ kết quả Recall/MRR/nDCG hiện tại đo trong cấu hình chạy ngoại tuyến thiếu trọng số \texttt{all-mpnet-base-v2}, tức nhánh dense dùng bộ mã hóa băm tất định 768 chiều (\textit{768d\_hashed\_deterministic\_cpu\_fallback}, chưa đại diện cho chất lượng encoder ngữ nghĩa thật đang ở trạng thái chờ): \texttt{dense\_only} đạt $R@1 = 0.7833$ và $R@3 = 0.9167$, trong khi \texttt{hybrid\_rrf} hợp nhất với BM25 đạt $R@1 = 0.9000$, $R@3 = 0.9500$, $R@5 = 1.0000$ và $\text{MRR} = 0.9319$. Chế độ sinh lập luận tùy chọn qua LLM cục bộ khi bật thêm sau này: \texttt{[TODO-TV1: Đánh giá bổ sung chế độ LLM CoT nếu kích hoạt]}.
     \end{itemize}
-    \item \textbf{Nút Kiểm chứng Chống ảo giác (\texttt{evidence\_grounding\_node} --- \texttt{src/agent/evidence\_grounder.py}):} Đóng vai trò cổng kiểm duyệt bắt buộc (\textit{Hard Verification Gate}) trước khi xuất kết quả ra điểm cuối \texttt{POST /api/v1/agent/explain}.
+
+\begin{table}[htbp]
+\centering
+\caption{Kết quả thực nghiệm truy xuất phác đồ RAG trên 60 truy vấn gán nhãn kép ($\kappa = 0.9449$, 64 đoạn xác minh đọc-chỉ chiều 768/ID/SHA-256/8 metadata trong Qdrant sống; \textbf{dùng vector băm 768-D ngoại tuyến, chưa dùng encoder ngữ nghĩa \texttt{all-mpnet-base-v2}})}
+\label{tab:rag_eval}
+\begin{tabularx}{\linewidth}{@{}lrrrrr@{}}
+\toprule
+\textbf{Cấu hình truy xuất} & \textbf{Recall@1} & \textbf{Recall@3} & \textbf{Recall@5} & \textbf{MRR} & \textbf{nDCG@5} \\
+\midrule
+\texttt{dense\_only} (768-D hash fallback --- chờ \texttt{mpnet}) & 0.7833 & 0.9167 & 0.9833 & 0.8688 & 0.8729 \\
+\texttt{bm25\_only} & 0.9000 & 0.9500 & 1.0000 & 0.9319 & 0.9354 \\
+\texttt{hybrid\_rrf} (Qdrant hash + BM25 RRF --- chờ \texttt{mpnet}) & 0.9000 & 0.9500 & 1.0000 & 0.9319 & 0.9354 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Kiểm tra sơ bộ bất biến tọa độ và từ chối chuỗi ngoài văn bản trên 50 bệnh án (\textit{Preliminary 50-Case Offset \& Out-of-Note Probe Audit}):} Thực hiện qua \texttt{eval\_rag.py} trên 50 ghi chú lâm sàng lấy hoàn toàn ($50/50$) từ \texttt{data/processed/test.parquet} (tổng $N=287$, trạng thái \texttt{preliminary\_non\_strict\_holdout} --- đây chỉ là kết quả kiểm tra sơ bộ trên split cũ, \textbf{không} trình bày như đánh giá chính thức trên tập \textit{strict hold-out} $N=302$ đang chờ Thành viên 2; không dùng bản ghi mẫu tổng hợp). Khi chạy luồng \texttt{explain\_clinical\_case()}, $200/200$ đoạn ứng viên thỏa mãn bất biến cắt chuỗi $T[\text{start}:\text{end}] \equiv \text{text}$ ($1.00$), và bộ kiểm tra từ chối $50/50$ đầu dò chuỗi không tồn tại trong bệnh án (\texttt{out\_of\_note\_probe\_rejection\_rate} $= 1.00$). \textit{Giới hạn phạm vi kiểm định:} Các chỉ số tự động này chỉ chứng minh tính nhất quán vị trí ký tự và khả năng lọc chuỗi nằm ngoài ghi chú; chúng \textbf{không} đo khả năng chống ảo giác theo nghĩa ngữ nghĩa, xử lý câu phủ định hay giá trị xác nhận lâm sàng. Nhóm đã xuất 20 đoạn trích thực tế sang \texttt{results/grounding\_manual\_audit\_20\_samples.json} ở trạng thái chờ đánh giá thủ công: \texttt{[TODO-HUMAN-REVIEW: Thực hiện đánh giá ngữ nghĩa thủ công 20 mẫu span trước khi công bố chỉ số manual\_semantic\_precision]}.
+    \item \textbf{Tổng hợp Lập luận Theo Mẫu Tất định (\textit{Deterministic Template Reasoning}):} Sinh câu đối chiếu chẩn đoán $H_1$ so với $H_2$, kèm theo thông báo rõ trạng thái xác minh nguồn (\texttt{source\_id}, \texttt{version}, \texttt{section\_locator}, \texttt{source\_verified}) của phác đồ trích dẫn và danh sách các câu ứng viên $\{s_1, s_2, \dots, s_m\}$. \texttt{[TODO-TV1: Tích hợp chế độ LLM CoT tùy chọn trong src/agent/diagnostic\_agent.py ở Giai đoạn 3 nếu có]}.
+    \item \textbf{Cổng Kiểm chứng Tọa độ Ký tự (\texttt{EvidenceGrounder} --- \texttt{src/agent/evidence\_grounder.py}):} Thực thi kiểm duyệt vị trí ký tự đối với toàn bộ câu ứng viên trước khi phản hồi xuống Frontend.
 \end{enumerate}
 
 \subsection{Thuật toán Neo Bằng chứng Ký tự $\mathcal{O}(N)$ (Character-Offset Evidence Grounding)}
-Để triệt tiêu hoàn toàn khả năng tác tử tự suy diễn hoặc trích dẫn sai lệch nội dung bệnh án, module \texttt{EvidenceGrounder} thực thi thuật toán đối sánh chuỗi con tất định có độ phức tạp thời gian tuyến tính $\mathcal{O}(N)$ theo độ dài văn bản gốc $N = |T|$ (Hình~\ref{fig:evidence_grounding}).
+Để hạn chế giao diện tô sáng các câu trích dẫn không tồn tại nguyên văn trong hồ sơ bệnh án đã khử định danh (\texttt{display\_note}), module \texttt{EvidenceGrounder} thực thi đối sánh chuỗi con tất định 3 tầng (khớp chính xác, không phân biệt hoa/thường, chuẩn hóa khoảng trắng), loại bỏ các đoạn chồng lấn (\texttt{resolve\_overlapping\_spans}), và trả về kiểm toán chi tiết \texttt{ClaimAudit} tách biệt giữa \textit{vị trí span khớp chuỗi} với \textit{nhận định lâm sàng cần bác sĩ kiểm chứng độc lập} (Hình~\ref{fig:evidence_grounding}).
 
 \input{figures/fig03_evidence_grounding}
 
-Với mỗi câu trích dẫn ứng viên $s_j$ do tác tử đề xuất, hàm \texttt{locate\_claim\_in\_note}$(T, s_j)$ thực hiện quy trình kiểm chứng 3 tầng:
-\begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Đối sánh chính xác tuyệt đối (\textit{Exact Substring Search}):} Tìm vị trí xuất hiện đầu tiên $p = T.\text{find}(s_j)$. Nếu $p \ge 0$, trả về cặp chỉ số ký tự $[\text{start\_char}, \text{end\_char}] = [p, p + |s_j|]$.
-    \item \textbf{Đối sánh bất biến chữ hoa/thường (\textit{Case-Insensitive Fallback}):} Nếu bước 1 không khớp do khác biệt viết hoa đầu câu, thực hiện tìm kiếm trên chuỗi chữ thường $p = \text{lower}(T).\text{find}(\text{lower}(s_j))$ nhưng vẫn trích xuất chuỗi gốc $T[p : p + |s_j|]$ để bảo toàn nguyên trạng văn bản bác sĩ viết.
-    \item \textbf{Đối sánh chuẩn hóa khoảng trắng (\textit{Whitespace-Normalized Regex Alignment}):} Trong trường hợp văn bản bệnh án có ký tự xuống dòng hoặc nhiều dấu cách liên tiếp, thuật toán biên dịch biểu thức chính quy thoát ký tự đặc biệt $\text{pattern} = \texttt{\textbackslash s+}.\text{join}(\text{escape}(w) \text{ for } w \in s_j.\text{split}())$ và ánh xạ ngược lại vị trí $[m.\text{start}(), m.\text{end}()]$ trên văn bản gốc $T$.
-\end{enumerate}
-
-Mọi ứng viên $s_j$ không vượt qua được quy trình kiểm chứng đều bị bác bỏ tức thì và ghi nhận vào bộ đếm kiểm toán \texttt{hallucination\_filtered\_count}. Nhờ cơ chế này, mọi đối tượng \texttt{EvidenceSpan} được gửi xuống giao diện \texttt{EvidenceViewer.tsx} đều thỏa mãn bất biến toán học:
+Nhờ cơ chế đối sánh tất định này, mọi đối tượng \texttt{EvidenceSpan} gửi xuống thành phần \texttt{EvidenceViewer.tsx} đều thỏa mãn bất biến cắt chuỗi trên văn bản đã khử định danh $T = \texttt{display\_note}$:
 \begin{equation}
     0 \le \text{start\_char} < \text{end\_char} \le |T| \quad \text{và} \quad T[\text{start\_char}:\text{end\_char}] \equiv \text{text}
 \end{equation}
-đảm bảo độ tin cậy tuyệt đối (100\% \textit{Hallucination-Free Grounding}) khi bác sĩ rà soát hồ sơ.
+giúp mỗi cụm từ tô sáng trên giao diện đều truy nguyên được vị trí xuất hiện trong bệnh án hiển thị (các ứng viên không khớp chuỗi bị gắn trạng thái \texttt{unverified} hoặc loại bỏ qua \texttt{hallucination\_filtered\_count}); tuy nhiên cơ chế này không bảo đảm loại bỏ sai lệch ngữ nghĩa hoặc lỗi diễn giải y khoa.

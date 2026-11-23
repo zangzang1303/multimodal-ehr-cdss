@@ -1,6 +1,943 @@
 [
-  {"query": "COPD hút thuốc khó thở FEV1/FVC", "relevant_chunk_ids": ["GOLD_2024_DIAG_CRITERIA_01"]},
-  {"query": "hen thở rít dị ứng gắng sức", "relevant_chunk_ids": ["GINA_2024_ASTHMA_CRITERIA_01"]},
-  {"query": "suy tim orthopnea phù NT-proBNP", "relevant_chunk_ids": ["ESC_2023_HEART_FAILURE_01"]},
-  {"query": "viêm phổi sốt đờm mủ bạch cầu CRP", "relevant_chunk_ids": ["BYT_2020_COMMUNITY_PNEUMONIA_01"]}
+  {
+    "query_id": "Q01_COPD_LEGACY",
+    "disease": "COPD",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "COPD hút thuốc khó thở FEV1/FVC",
+    "relevant_chunk_ids": [
+      "GOLD_2024_DIAG_01"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_DIAG_01"
+    ]
+  },
+  {
+    "query_id": "Q02_ASTHMA_LEGACY",
+    "disease": "ASTHMA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "hen thở rít dị ứng gắng sức",
+    "relevant_chunk_ids": [
+      "GINA_2024_DIAG_01",
+      "GINA_2024_EIB_12"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_DIAG_01",
+      "GINA_2024_EIB_12"
+    ]
+  },
+  {
+    "query_id": "Q03_HF_LEGACY",
+    "disease": "HEART_FAILURE",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "suy tim orthopnea phù NT-proBNP",
+    "relevant_chunk_ids": [
+      "ESC_2023_DIAG_01"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_DIAG_01"
+    ]
+  },
+  {
+    "query_id": "Q04_CAP_LEGACY",
+    "disease": "PNEUMONIA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "viêm phổi sốt đờm mủ bạch cầu CRP",
+    "relevant_chunk_ids": [
+      "BYT_VN_CAP_DIAG_01",
+      "BYT_CAP_2020_INFECTIOUS_SIGN_04",
+      "BYT_CAP_2020_LAB_INFLAMMATION_06"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_VN_CAP_DIAG_01",
+      "BYT_CAP_2020_INFECTIOUS_SIGN_04"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_VN_CAP_DIAG_01",
+      "BYT_CAP_2020_LAB_INFLAMMATION_06"
+    ]
+  },
+  {
+    "query_id": "Q05_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "khò khè nặng ngực về đêm gần sáng không khí lạnh",
+    "relevant_chunk_ids": [
+      "GINA_2024_SYMPTOMS_05",
+      "GINA_2024_DIAG_01"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_SYMPTOMS_05",
+      "GINA_2024_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_SYMPTOMS_05",
+      "GINA_2024_DIAG_01"
+    ]
+  },
+  {
+    "query_id": "Q06_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "nghiệm pháp hồi phục giãn phế quản FEV1 tăng 12% 200 mL salbutamol",
+    "relevant_chunk_ids": [
+      "GINA_2024_SPIROMETRY_06",
+      "GINA_2024_DIAG_01"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_SPIROMETRY_06",
+      "GINA_2024_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_SPIROMETRY_06",
+      "GINA_2024_DIAG_01"
+    ]
+  },
+  {
+    "query_id": "Q07_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "hô hấp ký ngoài cơn bình thường nghiệm pháp kích thích methacholine",
+    "relevant_chunk_ids": [
+      "GINA_2024_CHALLENGE_07"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_CHALLENGE_07"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_CHALLENGE_07"
+    ]
+  },
+  {
+    "query_id": "Q08_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "chẩn đoán phân biệt Hen khởi phát trẻ và COPD hút thuốc bao năm",
+    "relevant_chunk_ids": [
+      "GINA_2024_DIFF_02",
+      "GOLD_2024_DIFF_02"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_DIFF_02",
+      "GOLD_2024_DIFF_02"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_DIFF_02",
+      "GOLD_2024_DIFF_02"
+    ]
+  },
+  {
+    "query_id": "Q09_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "phân biệt cơn hen phế quản với hen tim suy tim NT-proBNP",
+    "relevant_chunk_ids": [
+      "GINA_2024_DIFF_HF_08"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_DIFF_HF_08"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_DIFF_HF_08"
+    ]
+  },
+  {
+    "query_id": "Q10_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "phân biệt đợt cấp hen với viêm phổi sốt cao CRP tăng",
+    "relevant_chunk_ids": [
+      "GINA_2024_DIFF_CAP_09"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_DIFF_CAP_09"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_DIFF_CAP_09"
+    ]
+  },
+  {
+    "query_id": "Q11_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "RED_FLAG",
+    "query": "dấu hiệu cờ đỏ cơn hen nguy kịch silent chest lồng ngực im lặng SpO2 < 90%",
+    "relevant_chunk_ids": [
+      "GINA_2024_REDFLAGS_03"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_REDFLAGS_03"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_REDFLAGS_03"
+    ]
+  },
+  {
+    "query_id": "Q12_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "RED_FLAG",
+    "query": "xử trí cơn hen cấp nhẹ trung bình SpO2 90-95% SABA corticoid toàn thân",
+    "relevant_chunk_ids": [
+      "GINA_2024_SEVERITY_MOD_14"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_SEVERITY_MOD_14"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_SEVERITY_MOD_14"
+    ]
+  },
+  {
+    "query_id": "Q13_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "phác đồ Track 1 ICS-formoterol cắt cơn ngừa cơn GINA 2024",
+    "relevant_chunk_ids": [
+      "GINA_2024_TRACK1_10"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_TRACK1_10"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_TRACK1_10"
+    ]
+  },
+  {
+    "query_id": "Q14_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "dấu ấn viêm type 2 FeNO bạch cầu ái toan máu đáp ứng ICS",
+    "relevant_chunk_ids": [
+      "GINA_2024_BIOMARKERS_11"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_BIOMARKERS_11"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_BIOMARKERS_11"
+    ]
+  },
+  {
+    "query_id": "Q15_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "co thắt phế quản do gắng sức vận động hít không khí lạnh",
+    "relevant_chunk_ids": [
+      "GINA_2024_EIB_12"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_EIB_12"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_EIB_12"
+    ]
+  },
+  {
+    "query_id": "Q16_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "hội chứng chồng lấp Hen và COPD ACOS phối hợp ICS giãn phế quản",
+    "relevant_chunk_ids": [
+      "GINA_2024_ACOS_13"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_ACOS_13"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_ACOS_13",
+      "GINA_2024_DIFF_02"
+    ]
+  },
+  {
+    "query_id": "Q17_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "yếu tố nguy cơ kịch phát hen lạm dụng quá 2 bình xịt SABA đặt nội khí quản",
+    "relevant_chunk_ids": [
+      "GINA_2024_RISK_EXACERBATION_15"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_RISK_EXACERBATION_15"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_RISK_EXACERBATION_15"
+    ]
+  },
+  {
+    "query_id": "Q18_ASTHMA",
+    "disease": "ASTHMA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "kiểm tra kỹ thuật bình xịt định liều tuân thủ thuốc trào ngược",
+    "relevant_chunk_ids": [
+      "GINA_2024_ADHERENCE_16"
+    ],
+    "annotator_1_chunk_ids": [
+      "GINA_2024_ADHERENCE_16"
+    ],
+    "annotator_2_chunk_ids": [
+      "GINA_2024_ADHERENCE_16",
+      "GINA_2024_TRACK1_10"
+    ]
+  },
+  {
+    "query_id": "Q19_COPD",
+    "disease": "COPD",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "phân độ tắc nghẽn GOLD 1 GOLD 2 GOLD 3 GOLD 4 theo %FEV1 dự đoán",
+    "relevant_chunk_ids": [
+      "GOLD_2024_SPIROMETRY_GRADES_05"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_SPIROMETRY_GRADES_05"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_SPIROMETRY_GRADES_05"
+    ]
+  },
+  {
+    "query_id": "Q20_COPD",
+    "disease": "COPD",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "phân nhóm GOLD ABE mMRC CAT tiền sử nhập viện đợt cấp",
+    "relevant_chunk_ids": [
+      "GOLD_2024_ABE_ASSESSMENT_06"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_ABE_ASSESSMENT_06"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_ABE_ASSESSMENT_06"
+    ]
+  },
+  {
+    "query_id": "Q21_COPD",
+    "disease": "COPD",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "phân biệt COPD lồng ngực hình thùng với suy tim sung huyết orthopnea",
+    "relevant_chunk_ids": [
+      "GOLD_2024_DIFF_CHF_07"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_DIFF_CHF_07"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_DIFF_CHF_07"
+    ]
+  },
+  {
+    "query_id": "Q22_COPD",
+    "disease": "COPD",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "phân biệt đợt cấp COPD đơn thuần và đồng nhiễm viêm phổi chụp X-quang",
+    "relevant_chunk_ids": [
+      "GOLD_2024_DIFF_CAP_08"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_DIFF_CAP_08"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_DIFF_CAP_08"
+    ]
+  },
+  {
+    "query_id": "Q23_COPD",
+    "disease": "COPD",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "tiêu chuẩn Anthonisen đợt cấp AECOPD tăng đờm mủ chỉ định kháng sinh",
+    "relevant_chunk_ids": [
+      "GOLD_2024_AECOPD_ANTHONISEN_09"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_AECOPD_ANTHONISEN_09"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_AECOPD_ANTHONISEN_09"
+    ]
+  },
+  {
+    "query_id": "Q24_COPD",
+    "disease": "COPD",
+    "category": "RED_FLAG",
+    "query": "suy hô hấp tăng CO2 toan hô hấp mục tiêu oxy SpO2 88-92% trong COPD",
+    "relevant_chunk_ids": [
+      "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
+    ]
+  },
+  {
+    "query_id": "Q25_COPD",
+    "disease": "COPD",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "bệnh nhân COPD nặng mở khí quản tracheostomy theo dõi khí máu thở máy",
+    "relevant_chunk_ids": [
+      "GOLD_2024_TRACHEOSTOMY_CHRONIC_11"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_TRACHEOSTOMY_CHRONIC_11"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_TRACHEOSTOMY_CHRONIC_11"
+    ]
+  },
+  {
+    "query_id": "Q26_COPD",
+    "disease": "COPD",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "phối hợp LABA LAMA và bổ sung ICS khi eosinophil >= 300 COPD",
+    "relevant_chunk_ids": [
+      "GOLD_2024_LABA_LAMA_ICS_12"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_LABA_LAMA_ICS_12"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_LABA_LAMA_ICS_12"
+    ]
+  },
+  {
+    "query_id": "Q27_COPD",
+    "disease": "COPD",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "tiền sử hút thuốc bao-năm khói sinh khối bụi nghề nghiệp cai thuốc",
+    "relevant_chunk_ids": [
+      "GOLD_2024_SMOKING_RISK_13",
+      "GOLD_2024_DIAG_01"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_SMOKING_RISK_13",
+      "GOLD_2024_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_SMOKING_RISK_13",
+      "GOLD_2024_DIAG_01"
+    ]
+  },
+  {
+    "query_id": "Q28_COPD",
+    "disease": "COPD",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "bệnh đồng mắc tim mạch trên bệnh nhân COPD lớn tuổi ECG NT-proBNP",
+    "relevant_chunk_ids": [
+      "GOLD_2024_COMORBIDITIES_14"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_COMORBIDITIES_14"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_COMORBIDITIES_14"
+    ]
+  },
+  {
+    "query_id": "Q29_COPD",
+    "disease": "COPD",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "chụp cắt lớp vi tính ngực HRCT đánh giá khí phế thũng giãn phế quản",
+    "relevant_chunk_ids": [
+      "GOLD_2024_IMAGING_HRCT_15"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_IMAGING_HRCT_15"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_IMAGING_HRCT_15",
+      "GOLD_2024_DIFF_CAP_08"
+    ]
+  },
+  {
+    "query_id": "Q30_COPD",
+    "disease": "COPD",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "phục hồi chức năng hô hấp tiêm phòng cúm phế cầu ở bệnh nhân COPD",
+    "relevant_chunk_ids": [
+      "GOLD_2024_REHAB_VACCINE_16"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_REHAB_VACCINE_16"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_REHAB_VACCINE_16"
+    ]
+  },
+  {
+    "query_id": "Q31_COPD",
+    "disease": "COPD",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "so sánh đáp ứng giãn phế quản cố định COPD với biến thiên của hen",
+    "relevant_chunk_ids": [
+      "GOLD_2024_DIFF_02",
+      "GINA_2024_DIFF_02"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_DIFF_02",
+      "GINA_2024_DIFF_02"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_DIFF_02",
+      "GINA_2024_DIFF_02"
+    ]
+  },
+  {
+    "query_id": "Q32_COPD",
+    "disease": "COPD",
+    "category": "RED_FLAG",
+    "query": "dấu hiệu cờ đỏ cấp cứu khó thở tím tái co kéo cơ hô hấp phụ SpO2 < 88%",
+    "relevant_chunk_ids": [
+      "GOLD_2024_REDFLAGS_03",
+      "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
+    ],
+    "annotator_1_chunk_ids": [
+      "GOLD_2024_REDFLAGS_03",
+      "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
+    ],
+    "annotator_2_chunk_ids": [
+      "GOLD_2024_REDFLAGS_03",
+      "GOLD_2024_HYPERCAPNIA_REDFLAG_10"
+    ]
+  },
+  {
+    "query_id": "Q33_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "phân loại HFrEF HFmrEF HFpEF dựa trên chỉ số LVEF siêu âm tim",
+    "relevant_chunk_ids": [
+      "ESC_2023_PHENOTYPES_LVEF_04"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_PHENOTYPES_LVEF_04"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_PHENOTYPES_LVEF_04"
+    ]
+  },
+  {
+    "query_id": "Q34_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "ngưỡng NT-proBNP < 125 loại trừ suy tim mạn và >= 300 pg/mL suy tim cấp",
+    "relevant_chunk_ids": [
+      "ESC_2023_NATRIURETIC_PEPTIDES_05"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_NATRIURETIC_PEPTIDES_05"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_NATRIURETIC_PEPTIDES_05"
+    ]
+  },
+  {
+    "query_id": "Q35_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "dấu hiệu ứ dịch thực thể tĩnh mạch cổ nổi phản hồi gan tĩnh mạch cổ tiếng T3",
+    "relevant_chunk_ids": [
+      "ESC_2023_CONGESTION_SIGNS_06",
+      "ESC_2023_DIAG_01"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_CONGESTION_SIGNS_06",
+      "ESC_2023_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_CONGESTION_SIGNS_06",
+      "ESC_2023_DIAG_01"
+    ]
+  },
+  {
+    "query_id": "Q36_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "chẩn đoán phân biệt Suy tim khó thở với COPD huyết động học ổn định",
+    "relevant_chunk_ids": [
+      "ESC_2023_DIFF_COPD_07"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_DIFF_COPD_07"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_DIFF_COPD_07"
+    ]
+  },
+  {
+    "query_id": "Q37_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "phân biệt phù phổi cấp huyết động Kerley B tim to với viêm phổi thùy",
+    "relevant_chunk_ids": [
+      "ESC_2023_DIFF_CAP_08"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_DIFF_CAP_08"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_DIFF_CAP_08"
+    ]
+  },
+  {
+    "query_id": "Q38_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "RED_FLAG",
+    "query": "cờ đỏ sốc tim huyết áp tâm thu < 90 mmHg đầu chi lạnh lactate > 2",
+    "relevant_chunk_ids": [
+      "ESC_2023_SHOCK_REDFLAG_09"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_SHOCK_REDFLAG_09"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_SHOCK_REDFLAG_09"
+    ]
+  },
+  {
+    "query_id": "Q39_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "tứ trụ điều trị HFrEF ARNI ACEi chẹn beta MRA và SGLT2i",
+    "relevant_chunk_ids": [
+      "ESC_2023_FOUR_PILLARS_HFREF_10"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_FOUR_PILLARS_HFREF_10"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_FOUR_PILLARS_HFREF_10"
+    ]
+  },
+  {
+    "query_id": "Q40_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "cập nhật ESC 2023 chỉ định SGLT2i dapagliflozin empagliflozin cho HFpEF HFmrEF",
+    "relevant_chunk_ids": [
+      "ESC_2023_UPDATE_HFPEF_SGLT2_11"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_UPDATE_HFPEF_SGLT2_11"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_UPDATE_HFPEF_SGLT2_11"
+    ]
+  },
+  {
+    "query_id": "Q41_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "siêu âm tim qua thành ngực Doppler màu điện tâm đồ 12 chuyển đạo eGFR",
+    "relevant_chunk_ids": [
+      "ESC_2023_ECHO_WORKUP_12"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_ECHO_WORKUP_12"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_ECHO_WORKUP_12"
+    ]
+  },
+  {
+    "query_id": "Q42_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "lợi tiểu quai đường tĩnh mạch furosemide natri niệu giảm sung huyết cấp",
+    "relevant_chunk_ids": [
+      "ESC_2023_DIURETICS_ACUTE_13"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_DIURETICS_ACUTE_13"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_DIURETICS_ACUTE_13"
+    ]
+  },
+  {
+    "query_id": "Q43_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "yếu tố thúc đẩy mất bù cấp rung nhĩ nhanh cơn tăng huyết áp cấp cứu",
+    "relevant_chunk_ids": [
+      "ESC_2023_AFIB_DECOMPENSATION_14"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_AFIB_DECOMPENSATION_14"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_AFIB_DECOMPENSATION_14"
+    ]
+  },
+  {
+    "query_id": "Q44_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "thiếu sắt ferritin < 100 TSAT < 20% truyền sắt tĩnh mạch trong suy tim",
+    "relevant_chunk_ids": [
+      "ESC_2023_IRON_DEFICIENCY_15"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_IRON_DEFICIENCY_15"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_IRON_DEFICIENCY_15",
+      "ESC_2023_ECHO_WORKUP_12"
+    ]
+  },
+  {
+    "query_id": "Q45_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "chống chỉ định chẹn beta trong sốc tim theo dõi kali máu khi dùng MRA",
+    "relevant_chunk_ids": [
+      "ESC_2023_SAFETY_BETA_RENAL_16"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_SAFETY_BETA_RENAL_16"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_SAFETY_BETA_RENAL_16"
+    ]
+  },
+  {
+    "query_id": "Q46_HEART_FAILURE",
+    "disease": "HEART_FAILURE",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "khó thở khi nằm orthopnea kịch phát về đêm phù hai chân ran ẩm đáy phổi",
+    "relevant_chunk_ids": [
+      "ESC_2023_DIAG_01",
+      "ESC_2023_CONGESTION_SIGNS_06"
+    ],
+    "annotator_1_chunk_ids": [
+      "ESC_2023_DIAG_01",
+      "ESC_2023_CONGESTION_SIGNS_06"
+    ],
+    "annotator_2_chunk_ids": [
+      "ESC_2023_DIAG_01",
+      "ESC_2023_CONGESTION_SIGNS_06"
+    ]
+  },
+  {
+    "query_id": "Q47_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "khởi phát sốt cao rét run ho đờm màu gỉ sắt đau ngực màng phổi",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_INFECTIOUS_SIGN_04",
+      "BYT_VN_CAP_DIAG_01"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_INFECTIOUS_SIGN_04",
+      "BYT_VN_CAP_DIAG_01"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_INFECTIOUS_SIGN_04",
+      "BYT_VN_CAP_DIAG_01"
+    ]
+  },
+  {
+    "query_id": "Q48_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "hội chứng đông đặc phổi rung thanh tăng gõ đục ran nổ khu trú",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_CONSOLIDATION_EXAM_05"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_CONSOLIDATION_EXAM_05"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_CONSOLIDATION_EXAM_05"
+    ]
+  },
+  {
+    "query_id": "Q49_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "bạch cầu WBC > 10 G/L đa nhân trung tính tăng CRP cao Procalcitonin",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_LAB_INFLAMMATION_06"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_LAB_INFLAMMATION_06"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_LAB_INFLAMMATION_06"
+    ]
+  },
+  {
+    "query_id": "Q50_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "X-quang ngực thẳng đám mờ thâm nhiễm đông đặc thùy phế quản đồ chứa khí",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_CXR_INFILTRATE_07"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_CXR_INFILTRATE_07"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_CXR_INFILTRATE_07"
+    ]
+  },
+  {
+    "query_id": "Q51_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "DIAGNOSTIC_CRITERIA",
+    "query": "đánh giá độ nặng thang điểm CURB-65 nhập viện nội trú hay ICU",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_CURB65_SCORE_08"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_CURB65_SCORE_08"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_CURB65_SCORE_08"
+    ]
+  },
+  {
+    "query_id": "Q52_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "RED_FLAG",
+    "query": "tiêu chuẩn viêm phổi nặng ATS IDSA vào ICU thở máy hoặc vận mạch",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_ICU_SEVERE_09"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_ICU_SEVERE_09"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_ICU_SEVERE_09"
+    ]
+  },
+  {
+    "query_id": "Q53_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "RED_FLAG",
+    "query": "cảnh báo cờ đỏ nhiễm khuẩn huyết sepsis qSOFA >= 2 tụt huyết áp lactate",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_SEPSIS_REDFLAG_10"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_SEPSIS_REDFLAG_10"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_SEPSIS_REDFLAG_10"
+    ]
+  },
+  {
+    "query_id": "Q54_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "phân biệt viêm phổi sốt tăng CRP với phù phổi suy tim NT-proBNP cao",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_DIFF_CHF_11"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_DIFF_CHF_11"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_DIFF_CHF_11"
+    ]
+  },
+  {
+    "query_id": "Q55_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "DIFFERENTIAL_DIAGNOSIS",
+    "query": "phân biệt viêm phổi trên nền COPD với đợt cấp COPD không đông đặc",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_DIFF_COPD_12"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_DIFF_COPD_12"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_DIFF_COPD_12"
+    ]
+  },
+  {
+    "query_id": "Q56_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "nhuộm Gram cấy đờm cấy máu 2 mẫu trước kháng sinh kháng nguyên niệu",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_MICROBIOLOGY_13"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_MICROBIOLOGY_13"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_MICROBIOLOGY_13"
+    ]
+  },
+  {
+    "query_id": "Q57_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "kháng sinh điều trị viêm phổi nhẹ ngoại trú amoxicillin macrolide",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_ABX_OUTPATIENT_14"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_ABX_OUTPATIENT_14"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_ABX_OUTPATIENT_14"
+    ]
+  },
+  {
+    "query_id": "Q58_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "kháng sinh tiêm ceftriaxone kết hợp macrolide hoặc levofloxacin nội trú",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_ABX_INPATIENT_15"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_ABX_INPATIENT_15"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_ABX_INPATIENT_15"
+    ]
+  },
+  {
+    "query_id": "Q59_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "INVESTIGATIONS_AND_MANAGEMENT",
+    "query": "tiêu chuẩn ổn định lâm sàng hết sốt chuyển kháng sinh uống xuất viện",
+    "relevant_chunk_ids": [
+      "BYT_CAP_2020_SWITCH_DISCHARGE_16"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_CAP_2020_SWITCH_DISCHARGE_16"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_CAP_2020_SWITCH_DISCHARGE_16",
+      "BYT_CAP_2020_ABX_INPATIENT_15"
+    ]
+  },
+  {
+    "query_id": "Q60_PNEUMONIA",
+    "disease": "PNEUMONIA",
+    "category": "RED_FLAG",
+    "query": "suy hô hấp cấp SpO2 < 88% huyết áp tâm thu < 90 mmHg rối loạn tri giác",
+    "relevant_chunk_ids": [
+      "BYT_VN_CAP_REDFLAGS_03",
+      "BYT_CAP_2020_SEPSIS_REDFLAG_10"
+    ],
+    "annotator_1_chunk_ids": [
+      "BYT_VN_CAP_REDFLAGS_03",
+      "BYT_CAP_2020_SEPSIS_REDFLAG_10"
+    ],
+    "annotator_2_chunk_ids": [
+      "BYT_VN_CAP_REDFLAGS_03",
+      "BYT_CAP_2020_SEPSIS_REDFLAG_10"
+    ]
+  }
 ]

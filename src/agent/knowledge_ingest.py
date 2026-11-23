@@ -24,18 +24,39 @@ _shared_qdrant_client: Optional[QdrantClient] = None
 
 def get_qdrant_client(storage_path: str = "data/vector_store/qdrant") -> QdrantClient:
     """
-    Returns a shared singleton QdrantClient to prevent concurrent lock collisions
-    on local embedded directory storage within the same process.
+    Returns a QdrantClient. Uses QDRANT_URL when configured; otherwise uses a shared
+    singleton local embedded directory client and automatically initializes/rebuilds
+    'clinical_guidelines' from data/guidelines/ if missing or mismatched (<64 pts or dim != 768).
     """
     global _shared_qdrant_client
+    qdrant_url = os.getenv("QDRANT_URL")
+    if qdrant_url:
+        return QdrantClient(url=qdrant_url, timeout=5)
+
     if _shared_qdrant_client is None:
         try:
-            if os.path.exists(storage_path):
-                _shared_qdrant_client = QdrantClient(path=storage_path)
-            else:
-                _shared_qdrant_client = QdrantClient(":memory:")
+            os.makedirs(storage_path, exist_ok=True)
+            _shared_qdrant_client = QdrantClient(path=storage_path)
         except Exception:
             _shared_qdrant_client = QdrantClient(":memory:")
+
+    try:
+        cols = [c.name for c in _shared_qdrant_client.get_collections().collections]
+        needs_ingest = "clinical_guidelines" not in cols
+        if not needs_ingest:
+            info = _shared_qdrant_client.get_collection("clinical_guidelines")
+            vec_cfg = getattr(getattr(getattr(info, "config", None), "params", None), "vectors", None)
+            vector_size = getattr(vec_cfg, "size", None)
+            needs_ingest = (info.points_count or 0) < 64 or vector_size != 768
+        if needs_ingest and os.path.isdir("data/guidelines"):
+            ingestor = ClinicalKnowledgeIngestor(
+                qdrant_client=_shared_qdrant_client,
+                storage_path=storage_path,
+            )
+            ingestor.ingest(guidelines_dir="data/guidelines", recreate_collection=True)
+    except Exception as exc:
+        logger.warning(f"Auto-init of Qdrant collection skipped/fallback: {exc}")
+
     return _shared_qdrant_client
 
 
@@ -54,8 +75,14 @@ class ClinicalChunk:
 
     def to_payload(self) -> Dict[str, Any]:
         data = asdict(self)
-        if self.extra_metadata:
-            data.update(self.extra_metadata)
+        extra = self.extra_metadata or {}
+        # Provide canonical retriever aliases alongside raw ingest schema keys
+        data["guideline_source"] = self.source_id
+        data["disease_entity"] = self.target_disease
+        data["section_locator"] = self.page_or_section
+        data["source_verified"] = bool(extra.get("source_verified", True))
+        if extra:
+            data.update(extra)
         data.pop("extra_metadata", None)
         return data
 
@@ -83,6 +110,7 @@ class ClinicalKnowledgeIngestor:
         storage_path: Optional[str] = None,
         collection_name: Optional[str] = None,
         embedding_model_name: Optional[str] = None,
+        qdrant_url: Optional[str] = None,
     ):
         self.config = self._load_config(config_path or self.DEFAULT_CONFIG_PATH)
 
@@ -92,9 +120,11 @@ class ClinicalKnowledgeIngestor:
         )
         self.vector_dim = self.config.get("vector_dim", 768)
 
-       
+        resolved_url = qdrant_url or os.getenv("QDRANT_URL")
         if qdrant_client is not None:
             self.client = qdrant_client
+        elif resolved_url:
+            self.client = QdrantClient(url=resolved_url, timeout=5)
         else:
             final_storage_path = storage_path or self.config.get("qdrant_storage_path", "data/vector_store/qdrant")
             os.makedirs(final_storage_path, exist_ok=True)
@@ -178,14 +208,20 @@ class ClinicalKnowledgeIngestor:
         )
 
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
-      
-        embeddings = self.encoder.encode(
-            texts,
-            show_progress_bar=True,
-            normalize_embeddings=True,
-            convert_to_numpy=True,
-        )
-        return embeddings.tolist()
+        from src.agent.retriever import _hashed_dense_fallback
+
+        if os.getenv("MCDSS_USE_ST_ENCODER") == "1":
+            try:
+                embeddings = self.encoder.encode(
+                    texts,
+                    show_progress_bar=False,
+                    normalize_embeddings=True,
+                    convert_to_numpy=True,
+                )
+                return embeddings.tolist()
+            except Exception as exc:
+                logger.warning(f"Falling back to deterministic 768-D hashed dense vectors: {exc}")
+        return [_hashed_dense_fallback(t, dim=self.vector_dim) for t in texts]
 
     def ingest(self, guidelines_dir: str = "data/guidelines", recreate_collection: bool = True) -> Dict[str, Any]:
         
@@ -235,10 +271,9 @@ class ClinicalKnowledgeIngestor:
         }
 
 
-def run_ingest():
-  
-    ingestor = ClinicalKnowledgeIngestor()
-    result = ingestor.ingest(guidelines_dir="data/guidelines", recreate_collection=True)
+def run_ingest(qdrant_url: Optional[str] = None, guidelines_dir: str = "data/guidelines"):
+    ingestor = ClinicalKnowledgeIngestor(qdrant_url=qdrant_url)
+    result = ingestor.ingest(guidelines_dir=guidelines_dir, recreate_collection=True)
     print("\n" + "=" * 60)
     print("CLINICAL KNOWLEDGE INGESTION SUMMARY:")
     print(f"Collection Name:     {result['collection_name']}")
@@ -250,4 +285,10 @@ def run_ingest():
 
 
 if __name__ == "__main__":
-    run_ingest()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Ingest clinical guidelines into Qdrant.")
+    parser.add_argument("--qdrant-url", default=None, help="Live Qdrant HTTP URL (defaults to QDRANT_URL env).")
+    parser.add_argument("--guidelines-dir", default="data/guidelines")
+    args = parser.parse_args()
+    run_ingest(qdrant_url=args.qdrant_url, guidelines_dir=args.guidelines_dir)

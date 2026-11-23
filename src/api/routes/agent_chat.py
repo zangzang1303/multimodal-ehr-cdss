@@ -2,19 +2,21 @@
 Agent Consultation & Clinical Explainability Router
 M-CDSS Phase 2 / Backlog 05 (Task 3.4 & Task 2.3)
 
-Provides Multi-Agent Differential Diagnosis Reasoning and Zero-Hallucination
-Evidence Grounding with Authoritative CPG Retrieval.
+Provides deterministic template differential reasoning and Character-Offset
+Evidence Grounding (string-match verification only) with CPG Retrieval.
 """
 
+import re
 import time
 from typing import Any, Dict, List
 from fastapi import APIRouter, HTTPException
 
 from src.agent.evidence_grounder import EvidenceGrounder
-from src.agent.retriever import HybridGuidelineRetriever, STANDARD_GUIDELINE_CORPUS
+from src.agent.retriever import HybridGuidelineRetriever
 from src.api.schemas import (
     AgentExplainRequest,
     AgentExplainResponse,
+    ClaimAudit,
     EvidenceSpan,
     GuidelineReference,
 )
@@ -26,19 +28,29 @@ grounder = EvidenceGrounder(fuzzy_threshold=0.88)
 retriever = HybridGuidelineRetriever()
 deidentifier = ClinicalDeidentifier(spacy_model=None, use_ner=False)
 
+KNOWN_CLINICAL_DIAGNOSES = {
+    "ASTHMA",
+    "COPD",
+    "HEART_FAILURE",
+    "CONGESTIVE_HEART_FAILURE",
+    "PNEUMONIA",
+    "COMMUNITY_ACQUIRED_PNEUMONIA",
+}
+
 
 @router.options("/explain")
-async def options_explain():
+def options_explain():
     """Direct OPTIONS handler for CORS preflight."""
     return {"status": "ok"}
 
 
 @router.post("/explain", response_model=AgentExplainResponse)
-async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainResponse:
+def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainResponse:
     """
-    Multi-Agent Differential Diagnosis & Evidence Grounding Endpoint.
+    Multi-Agent Differential Diagnosis & Character-Offset Evidence Grounding Endpoint.
     Analyzes raw patient clinical notes against primary and differential hypotheses,
-    extracts verified character spans (Zero-Hallucination), and retrieves CPG references.
+    extracts character-offset spans verified against the note (string-match provenance only),
+    and retrieves CPG references.
     """
     start_time = time.time()
     patient_id = request.patient_id or "PT-001"
@@ -46,7 +58,7 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
 
     if len(raw_notes.strip()) < 5:
         raise HTTPException(
-            status_code=400,
+            status_code=422,
             detail="Bệnh án lâm sàng quá ngắn, vui lòng nhập ít nhất 5 ký tự để phân tích.",
         )
 
@@ -54,25 +66,41 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
     clean_notes = deidentifier.deidentify_text(raw_notes)
     notes_lower = clean_notes.lower()
 
-    # Determine primary vs differential hypothesis
-    if request.target_diagnosis:
+    # Determine primary vs differential hypothesis (calibrated probabilities take priority)
+    warning_msg: str | None = None
+    if request.calibrated_probabilities and len(request.calibrated_probabilities) > 0:
+        sorted_probs = sorted(
+            request.calibrated_probabilities.items(),
+            key=lambda item: float(item[1]),
+            reverse=True,
+        )
+        top1 = sorted_probs[0][0].upper()
+        if len(sorted_probs) > 1:
+            top2 = sorted_probs[1][0].upper()
+        else:
+            top2 = "COPD" if top1 != "COPD" else "ASTHMA"
+        if request.target_diagnosis and request.target_diagnosis.upper() != top1:
+            warning_msg = (
+                f"Client target_diagnosis '{request.target_diagnosis}' was disregarded as ground truth "
+                f"in favor of calibrated model probabilities (top prediction: {top1})."
+            )
+    elif request.target_diagnosis:
         top1 = request.target_diagnosis.upper()
         top2 = request.differential_diagnosis.upper() if request.differential_diagnosis else ("COPD" if top1 != "COPD" else "ASTHMA")
-    elif patient_id == "PT-0044" or ("đặng thu mai" in notes_lower or "18yo" in notes_lower):
-        top1 = "ASTHMA"
-        top2 = "COPD"
-    elif patient_id == "PT-0254" or ("tracheostomy" in notes_lower or "huỳnh phương mai" in notes_lower):
-        top1 = "COPD"
-        top2 = "HEART_FAILURE"
-    elif "sốt" in notes_lower or "đờm" in notes_lower or "pneumonia" in notes_lower or "viêm phổi" in notes_lower:
+    elif "sốt" in notes_lower or "đờm mủ" in notes_lower or "pneumonia" in notes_lower or "viêm phổi" in notes_lower:
         top1 = "PNEUMONIA"
         top2 = "COPD"
     elif "suy tim" in notes_lower or "orthopnea" in notes_lower or "phù" in notes_lower:
         top1 = "HEART_FAILURE"
         top2 = "COPD"
-    elif "khó thở" in notes_lower and ("hút thuốc" in notes_lower or "bao-năm" in notes_lower):
+    elif ("khó thở" in notes_lower or "tracheostomy" in notes_lower or "copd" in notes_lower) and (
+        "hút thuốc" in notes_lower or "bao-năm" in notes_lower or "tracheostomy" in notes_lower or "smoking" in notes_lower
+    ):
         top1 = "COPD"
         top2 = "ASTHMA"
+    elif "inhaler" in notes_lower or "wheez" in notes_lower or "hen" in notes_lower or "asthma" in notes_lower:
+        top1 = "ASTHMA"
+        top2 = "COPD"
     else:
         top1 = "ASTHMA"
         top2 = "COPD"
@@ -100,128 +128,72 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
             disease_entity=c["disease_entity"],
             section_title=c["section_title"],
             clinical_category=c["clinical_category"],
-            evidence_level=c.get("evidence_level", "Level_A"),
+            evidence_level=c.get("evidence_level") or "N/A",
             text_content=c["text_content"],
             relevance_score=c.get("relevance_score", 1.0),
         )
         for c in retrieved_raw
     ]
 
-    # Formulate clinical reasoning and claims depending on case study / input
+    # Formulate uniform clinical reasoning & dynamic evidence extraction (no hardcoded patient IDs)
     claims_to_ground: List[Dict[str, Any]] = []
     red_flags: List[str] = []
-    investigations: List[str] = []
 
-    if patient_id == "PT-0044" or "18yo" in notes_lower:
-        differential_reasoning = (
-            "Phân tích minh họa cho ca PT-0044: "
-            "Bệnh nhân trẻ tuổi khởi phát triệu chứng khó thở, ho và mệt mỏi, đang dùng thuốc hít (inhaler). "
-            "Theo tiêu chuẩn GINA 2024, tuổi khởi phát trẻ cùng bệnh cảnh đáp ứng thuốc hít là đặc trưng mạnh mẽ của Hen phế quản. "
-            "Chẩn đoán COPD bị bác bỏ do bệnh nhân không có tiền sử tiếp xúc khói thuốc lá kéo dài và tuổi < 40 theo tiêu chí loại trừ của GOLD 2024."
+    def _is_admin_boilerplate(line: str) -> bool:
+        stripped = line.strip()
+        if not stripped or len(stripped) < 15:
+            return True
+        if re.fullmatch(r"[-=_\s]+", stripped):
+            return True
+        if "|" in stripped:
+            return True
+        upper = stripped.upper()
+        admin_tokens = (
+            "CLINICAL ENCOUNTER NOTE",
+            "ELECTRONIC HEALTH RECORD",
+            "PATIENT ID:",
+            "HỒ SƠ BỆNH ÁN",
+            "NGÀY TIẾP NHẬN",
+            "BÁC SĨ KHÁM",
+            "CMND/CCCD",
+            "THẺ BHYT",
+            "ĐIỆN THOẠI LIÊN HỆ",
+            "NƠI CƯ TRÚ",
+            "GIỚI TÍNH:",
+            "HỌ VÀ TÊN",
         )
-        claims_to_ground = [
-            {
-                "text": "cough, shortness of breath, and fatigue",
-                "category": "supporting",
-                "label": "Triệu chứng hô hấp thay đổi",
-                "reason": "Phù hợp tiêu chuẩn GINA 2024 về bộ ba triệu chứng ho, khó thở, mệt mỏi.",
-            },
-            {
-                "text": "Patient 18yo",
-                "category": "supporting",
-                "label": "Tuổi khởi phát trẻ (<40)",
-                "reason": "Đặc trưng lâm sàng hướng về Hen hơn là COPD theo tiêu chuẩn GOLD 2024.",
-            },
-            {
-                "text": "Inhalers and cardiovascular medications as prescribed",
-                "category": "supporting",
-                "label": "Tiền sử điều trị thuốc hít",
-                "reason": "Dấu hiệu gián tiếp của bệnh lý đáp ứng giãn phế quản (Bronchodilator response).",
-            },
-            {
-                "text": "BP: 106.2/78.0 mmHg, HR: 70.6 bpm, SpO2: 97.3%",
-                "category": "counter",
-                "label": "Huyết động học ngoài cơn cấp",
-                "reason": "Sinh hiệu ổn định ngoài cơn cấp; cần đo hô hấp ký để xác định dao động FEV1.",
-            },
-        ]
-        investigations = [
-            "Đo chức năng hô hấp (Spirometry) trước và sau nghiệm pháp giãn phế quản (Reversibility Test)",
-            "Đo phân suất oxit nitric thở ra (FeNO) để đánh giá mức độ viêm đường thở type 2",
-            "Test lẩy da (Prick test) hoặc IgE đặc hiệu huyết thanh tìm dị nguyên hô hấp",
-        ]
+        if any(tok in upper for tok in admin_tokens):
+            return True
+        if stripped.endswith(":") or re.fullmatch(r"\d+\.\s*[A-ZÀ-Ỹ0-9\s/()-]+:?", stripped):
+            return True
+        return False
 
-    elif patient_id == "PT-0254" or "tracheostomy" in notes_lower:
-        differential_reasoning = (
-            "Phân tích minh họa cho ca PT-0254: "
-            "Bệnh nhân cao tuổi có can thiệp mở khí quản (tracheostomy) do đợt suy hô hấp cấp 3 tháng trước, "
-            "khám phổi nghe ran rít/ran ngáy (wheezes), đang điều trị corticoid và thuốc giãn phế quản (Pulmicort, prednisone). "
-            "Theo tiêu chuẩn GOLD 2024, tiền sử suy hô hấp cần mở khí quản kết hợp thuốc duy trì phù hợp chẩn đoán COPD giai đoạn nặng. "
-            "Chẩn đoán suy tim bị loại trừ do huyết động ổn định và không có dấu hiệu ứ trệ tuần hoàn ngoại vi."
-        )
-        claims_to_ground = [
-            {
-                "text": "tracheostomy tube placement 3 months ago",
-                "category": "supporting",
-                "label": "Đợt suy hô hấp cấp nặng",
-                "reason": "Chỉ dấu bệnh phổi mạn tính tiến triển nặng theo phân nhóm GOLD E.",
-            },
-            {
-                "text": "crackles/wheezes",
-                "category": "supporting",
-                "label": "Hội chứng tắc nghẽn phế quản",
-                "reason": "Ran rít và ran ngáy phản ánh luồng khí thở ra bị cản trở mạn tính.",
-            },
-            {
-                "text": "Pulmicort",
-                "category": "supporting",
-                "label": "Corticoid hít (ICS) duy trì",
-                "reason": "Thuốc kiểm soát đợt cấp theo phác đồ GOLD 2024.",
-            },
-            {
-                "text": "prednisone",
-                "category": "supporting",
-                "label": "Corticoid toàn thân",
-                "reason": "Chỉ định sau đợt bùng phát hô hấp cấp.",
-            },
-            {
-                "text": "Heart shows regular rhythm",
-                "category": "counter",
-                "label": "Nhịp tim đều (Loại trừ suy tim cấp)",
-                "reason": "Không có dấu hiệu loạn nhịp hay rung nhĩ thường gặp ở suy tim sung huyết.",
-            },
-        ]
-        investigations = [
-            "Đo khí máu động mạch (ABGs) đánh giá tình trạng ứ CO2 mạn tính",
-            "Chụp cắt lớp vi tính ngực độ phân giải cao (HRCT) đánh giá mức độ khí phế thũng",
-            "Đo đa ký hô hấp hoặc theo dõi chức năng canule mở khí quản",
-        ]
-    else:
-        # Generic input case: Extract keywords dynamically from input text
-        differential_reasoning = (
-            f"Phân tích đối kháng lâm sàng: Chẩn đoán ưu tiên {disease_names.get(top1, top1)} "
-            f"so với chẩn đoán phân biệt {disease_names.get(top2, top2)}. "
-            f"Các câu trích dẫn từ bệnh án được định vị nguyên văn, đối chiếu với tiêu chuẩn hướng dẫn điều trị chuẩn quốc tế."
-        )
-
-        # Dynamic sentence extractor to ground sentences actually typed by the user
+    candidate_sentences = [
+        s.strip()
+        for s in re.split(r"(?:\r?\n|(?<!\d)\.(?!\d))", clean_notes)
+        if not _is_admin_boilerplate(s)
+    ]
+    if not candidate_sentences:
         candidate_sentences = [
-            s.strip() for s in raw_notes.replace("\n", ". ").split(".") if len(s.strip()) > 10
+            s.strip()
+            for s in re.split(r"(?:\r?\n|(?<!\d)\.(?!\d))", clean_notes)
+            if len(s.strip()) > 10
         ]
-        for idx, sentence in enumerate(candidate_sentences[:4]):
-            cat = "supporting" if idx % 2 == 0 else "counter"
-            claims_to_ground.append({
-                "text": sentence,
-                "category": cat,
-                "label": f"Chứng cứ {idx + 1}" if cat == "supporting" else f"Yếu tố phân biệt {idx + 1}",
-                "reason": "Trích dẫn nguyên văn từ nội dung diễn biến lâm sàng của bệnh nhân.",
-            })
 
-        investigations = [
-            "Đo chức năng thông khí phổi (Hô hấp ký) trước và sau nghiệm pháp giãn phế quản",
-            "Chụp X-quang tim phổi thẳng hoặc CT lồng ngực liều thấp",
-            "Xét nghiệm tổng phân tích tế bào máu và nồng độ CRP định lượng",
-        ]
+    for idx, sentence in enumerate(candidate_sentences[:4]):
+        cat = "supporting" if idx % 2 == 0 else "counter"
+        claims_to_ground.append({
+            "text": sentence,
+            "category": cat,
+            "label": f"Chứng cứ {idx + 1}" if cat == "supporting" else f"Yếu tố phân biệt {idx + 1}",
+            "reason": "Trích dẫn nguyên văn từ nội dung diễn biến lâm sàng của bệnh nhân.",
+        })
+
+    investigations = [
+        "Đo chức năng thông khí phổi (Hô hấp ký) trước và sau nghiệm pháp giãn phế quản",
+        "Chụp X-quang tim phổi thẳng hoặc CT lồng ngực liều thấp",
+        "Xét nghiệm tổng phân tích tế bào máu và nồng độ CRP định lượng",
+    ]
 
     # Check for clinical red-flags
     if "spO2: 9" not in raw_notes and ("spo2 < 88" in notes_lower or "tím tái" in notes_lower):
@@ -235,10 +207,19 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
         claims=claims_to_ground,
     )
 
+    claim_texts = [
+        c["text"] if isinstance(c, dict) else str(c)
+        for c in claims_to_ground
+    ]
+    raw_audits = grounder.ground_claims_detailed(clean_notes, claim_texts)
+    claim_audits = [ClaimAudit(**item) for item in raw_audits]
+
     grounded_spans = [
         EvidenceSpan(
             start_char=s["start_char"],
             end_char=s["end_char"],
+            start=s["start_char"],
+            end=s["end_char"],
             text=s["text"],
             category=s["category"],
             label=s["label"],
@@ -249,14 +230,16 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
         for s in grounded_raw
     ]
 
-    # The example corpus has no independently verified page-level provenance.
-    # Keep the response grounded in displayed text and avoid turning its
-    # illustrative snippets into clinical advice.
+    has_insufficient_evidence = (
+        top1 not in KNOWN_CLINICAL_DIAGNOSES or len(grounded_spans) == 0
+    )
+    status_value = "insufficient_evidence" if has_insufficient_evidence else "success"
+
+    # Keep reasoning explicitly labeled as deterministic template pipeline
     differential_reasoning = (
-        f"Giả thuyết cần đối chiếu: {top1} và {top2}. "
+        f"Giả thuyết cần đối chiếu (chế độ deterministic_template): {top1} và {top2}. "
         f"Có {len(grounded_spans)} đoạn khớp chính xác với ghi chú đã khử định danh. "
-        "Các trích đoạn phác đồ hiện chưa được xác minh nguồn và phiên bản; "
-        "bác sĩ cần kiểm tra bản gốc trước khi kết luận."
+        "Các trích đoạn phác đồ cần được bác sĩ kiểm tra nguồn và phiên bản trước khi quyết định."
     )
     if not any(reference.source_verified for reference in guideline_refs):
         investigations = []
@@ -264,17 +247,26 @@ async def explain_clinical_case(request: AgentExplainRequest) -> AgentExplainRes
     exec_time = round((time.time() - start_time) * 1000, 2)
 
     return AgentExplainResponse(
+        status=status_value,
+        reasoning_mode="deterministic_template",
         patient_id=patient_id,
         display_note=clean_notes,
         primary_diagnosis=top1,
         primary_diagnosis_name=disease_names.get(top1, top1),
         differential_diagnosis=top2,
         differential_diagnosis_name=disease_names.get(top2, top2),
+        top1_diagnosis=top1,
+        top2_diagnosis=top2,
         differential_reasoning=differential_reasoning,
         grounded_spans=grounded_spans,
+        verified_spans=grounded_spans,
         guideline_references=guideline_refs,
+        guideline_citations=guideline_refs,
+        claim_audits=claim_audits,
         red_flags=red_flags,
         recommended_investigations=investigations,
         hallucination_filtered_count=rejected_count,
+        has_insufficient_evidence=has_insufficient_evidence,
+        warning=warning_msg,
         execution_time_ms=exec_time,
     )

@@ -293,8 +293,8 @@ class DiagnosticStateGraph:
                 {
                     "text": "Bệnh nhân có triệu chứng xuất huyết tiêu hóa ồ ạt kèm hôn mê sâu",
                     "category": "red_flag",
-                    "label": "Thông tin ảo giác",
-                    "reason": "Câu giả định kiểm thử bộ lọc chống ảo giác",
+                    "label": "Đầu dò ngoài văn bản",
+                    "reason": "Câu giả định ngoài bệnh án để kiểm thử bộ lọc khớp tọa độ chuỗi",
                 }
             )
             state.recommended_investigations = [

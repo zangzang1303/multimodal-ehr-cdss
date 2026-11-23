@@ -1,19 +1,14 @@
-# ==============================================================================
-# [MOCK / STAND-IN FILE - DÙNG TẠM THỜI CHO THÀNH VIÊN 3 KIỂM THỬ]
-# File này được tạo tạm thời bởi Thành viên 3 để kiểm thử tests/test_agent_rag.py
-# và tích hợp component EvidenceViewer.tsx (Backlog 05 - Nhiệm vụ 3.2 & 3.3)
-# trong lúc chờ Thành viên 2 bàn giao module evidence_grounder.py chính thức
-# (Backlog 05 - Nhiệm vụ 2.2).
-# ==============================================================================
 """
 Evidence Grounder Engine
 M-CDSS Phase 2 / Backlog 05 (Task 3.2 & 3.3)
 
-Locates LLM-generated evidence claims within raw de-identified clinical notes
-using exact and flexible character offset mapping. Enforces strict zero-hallucination
-filtering: any claim not grounded in patient notes is rejected.
+Locates candidate evidence claims within raw de-identified clinical notes
+using exact and flexible character offset mapping. Enforces deterministic
+character-offset matching: any claim without a verbatim/normalized span match in
+the patient note is rejected (does not validate semantic correctness).
 """
 
+import difflib
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -310,4 +305,102 @@ class EvidenceGrounder:
                 resolved.append(current)
 
         return resolved
+
+    def ground_single_claim(
+        self,
+        raw_clinical_note: str,
+        claim_text: str,
+        category: str = "supporting",
+        label: Optional[str] = None,
+        reason: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Attempts to locate a single claim in raw_clinical_note.
+        Returns a span dict containing both [start_char, end_char] and [start, end]
+        if grounded; returns None if rejected as ungrounded/hallucinated.
+        """
+        if not raw_clinical_note or not isinstance(claim_text, str):
+            return None
+
+        clean_claim = claim_text.strip()
+        if len(clean_claim) < self.min_claim_length:
+            return None
+
+        matched_list = self._find_exact_matches(raw_clinical_note, clean_claim)
+        is_exact = True
+        if not matched_list:
+            is_exact = False
+            matched_list = self._find_case_insensitive_matches(raw_clinical_note, clean_claim)
+        if not matched_list:
+            is_exact = False
+            matched_list = self._find_normalized_matches(raw_clinical_note, clean_claim)
+
+        if not matched_list:
+            return None
+
+        top = matched_list[0]
+        s = int(top["start"])
+        e = int(top["end"])
+        text_in_note = raw_clinical_note[s:e]
+        default_label = (
+            "Bằng chứng ủng hộ"
+            if category == "supporting"
+            else ("Dấu hiệu cờ đỏ" if category == "red_flag" else "Yếu tố phân biệt")
+        )
+        return {
+            "start_char": s,
+            "end_char": e,
+            "start": s,
+            "end": e,
+            "text": text_in_note,
+            "category": category,
+            "label": label or default_label,
+            "reason": reason,
+            "confidence": float(top.get("confidence", 1.0)),
+            "is_exact": is_exact,
+            "match_type": top.get("match_type", "exact"),
+        }
+
+    def ground_evidence_claims(
+        self,
+        raw_clinical_note: str,
+        claims: List[Any],
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """
+        Grounds a list of claim strings or dicts against raw_clinical_note,
+        resolves overlapping spans, and returns (grounded_spans, rejected_count).
+        """
+        if not raw_clinical_note or not claims:
+            return [], len(claims or [])
+
+        grounded_raw: List[Dict[str, Any]] = []
+        rejected_count = 0
+
+        for item in claims:
+            if isinstance(item, dict):
+                claim_text = str(item.get("text", ""))
+                category = str(item.get("category", "supporting"))
+                label = item.get("label")
+                reason = item.get("reason")
+            else:
+                claim_text = str(item)
+                category = "supporting"
+                label = None
+                reason = None
+
+            span = self.ground_single_claim(
+                raw_clinical_note=raw_clinical_note,
+                claim_text=claim_text,
+                category=category,
+                label=label,
+                reason=reason,
+            )
+            if span is None:
+                rejected_count += 1
+            else:
+                grounded_raw.append(span)
+
+        resolved = self.resolve_overlapping_spans(grounded_raw)
+        rejected_count += len(grounded_raw) - len(resolved)
+        return resolved, rejected_count
 
