@@ -11,7 +11,7 @@ guidelines:
     publication_year: 2024
     access_date: "2024-05-15"
     official_url: "https://ginasthma.org/gina-reports/"
-    license_and_usage: "Non-commercial clinical decision support and educational research use permitted under FAIR guidelines"
+    license_and_usage: "Tài liệu có bản quyền GINA; chỉ trích dẫn ngắn và diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn."
     target_disease: "ASTHMA"
     evidence_grading_system: "GINA Evidence Categories (A, B, C, D)"
 
@@ -22,7 +22,7 @@ guidelines:
     publication_year: 2024
     access_date: "2024-04-10"
     official_url: "https://goldcopd.org/2024-gold-report/"
-    license_and_usage: "Academic clinical research and clinical decision support reference use"
+    license_and_usage: "Tài liệu có bản quyền GOLD; chỉ trích dẫn ngắn và diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn."
     target_disease: "COPD"
     evidence_grading_system: "Evidence Levels (Evidence A, Evidence B, Evidence C, Evidence D)"
 
@@ -33,7 +33,7 @@ guidelines:
     publication_year: 2023
     access_date: "2024-03-20"
     official_url: "https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/Acute-and-Chronic-Heart-Failure"
-    license_and_usage: "Clinical practice guidelines standard reference for non-profit research"
+    license_and_usage: "Tài liệu có bản quyền ESC; chỉ trích dẫn ngắn và diễn giải cho mục đích nghiên cứu học thuật, không phân phối lại toàn văn."
     target_disease: "CONGESTIVE_HEART_FAILURE"
     evidence_grading_system: "Classes of Recommendations and Levels of Evidence (Class I/IIa/IIb/III, Level A/B/C)"
 

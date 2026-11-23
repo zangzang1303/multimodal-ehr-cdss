@@ -174,12 +174,12 @@ export default function EvidenceViewer({
         })}
       </div>
 
-      {/* Zero-Hallucination & Anti-Hallucination Status Banner */}
+      {/* Character-Offset Grounding Status Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-xl bg-emerald-500/5 dark:bg-emerald-950/20 border border-emerald-500/20 text-xs">
         <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
           <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
           <span>
-            Các đoạn được tô sáng đã khớp chính xác với ghi chú đã khử định danh.
+            Các đoạn tô sáng khớp vị trí ký tự trong ghi chú đã khử định danh (không đồng nghĩa xác nhận ngữ nghĩa hay chẩn đoán lâm sàng).
           </span>
         </div>
 

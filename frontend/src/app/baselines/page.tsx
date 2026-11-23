@@ -10,7 +10,6 @@ import {
   BookOpen,
   CheckCircle2,
   Cpu,
-  FileText,
   Moon,
   RefreshCw,
   ShieldAlert,
@@ -35,6 +34,7 @@ import {
   FALLBACK_BENCHMARK_RESULTS,
   getBaselineBenchmarks,
 } from "@/lib/api";
+import { ModelCardFooter, ResearchDisclaimerBanner } from "@/components/ResearchBannerAndFooter";
 
 export default function BaselinesBenchmarkPage() {
   const [data, setData] = useState<BenchmarkResultsResponse>(
@@ -193,6 +193,7 @@ export default function BaselinesBenchmarkPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <ResearchDisclaimerBanner />
       {/* Top Navigation */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800/80 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -662,15 +663,7 @@ export default function BaselinesBenchmarkPage() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-6 text-center text-xs text-slate-500 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-sky-500" />
-            <span>Multimodal Clinical Decision Support System - Benchmark Dashboard</span>
-          </div>
-          <div>M-CDSS Research Consortium © 2026. Next.js 14, Recharts &amp; FastAPI.</div>
-        </div>
-      </footer>
+      <ModelCardFooter />
     </div>
   );
 }

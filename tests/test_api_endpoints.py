@@ -91,6 +91,8 @@ def test_inference_status_endpoint(client):
     data = response.json()
     assert data["status"] == "inference_service_ready"
     assert "classical" in data["supported_baselines"]
+    assert "data_manifest_is_mock" in data["model_card"]
+    assert isinstance(data["model_card"]["data_manifest_is_mock"], bool)
 
 
 def test_tabular_features_schema_valid():
@@ -194,10 +196,11 @@ def test_baseline_prediction_result_schema():
         )
 
 
-def test_predict_baseline_endpoint(client):
+def test_predict_baseline_endpoint(client, monkeypatch):
     """
-    Verify POST /api/v1/predict/baseline accepts PatientInferenceRequest
-    and returns predictions for all 3 baselines (Task 3.3).
+    Verify POST /api/v1/predict/baseline defaults to HTTP 503 baseline_models_unavailable
+    when fitted Member 1 artifacts are absent, and supports explicit heuristic fallback
+    only when MCDSS_ALLOW_HEURISTIC_BASELINE=1 is set.
     """
     payload = {
         "patient_id": "PT-001",
@@ -219,6 +222,12 @@ def test_predict_baseline_endpoint(client):
         "clinical_notes": "Bệnh nhân nam 64 tuổi có tiền sử hút thuốc lá, khó thở tăng dần khi gắng sức.",
     }
 
+    monkeypatch.delenv("MCDSS_ALLOW_HEURISTIC_BASELINE", raising=False)
+    strict_response = client.post("/api/v1/predict/baseline", json=payload)
+    assert strict_response.status_code == 503
+    assert strict_response.json()["detail"] == "baseline_models_unavailable"
+
+    monkeypatch.setenv("MCDSS_ALLOW_HEURISTIC_BASELINE", "1")
     response = client.post("/api/v1/predict/baseline", json=payload)
     assert response.status_code == 200
     data = response.json()
@@ -439,7 +448,10 @@ def test_evaluation_benchmark_endpoint(client):
     assert "mcdss_multimodal_core" in benchmarks
     assert benchmarks["mcdss_multimodal_core"]["macro_auroc"] == pytest.approx(0.9594141527959706)
     assert benchmarks["mcdss_multimodal_core"]["ece"] == pytest.approx(0.097339602594344)
-    assert data["evaluation_metadata"]["dca_status"] == "illustrative_points_not_patient_level_validation"
+    assert data["evaluation_metadata"]["dca_status"] in (
+        "illustrative_simulation_pending_patient_level_predictions",
+        "empirical_holdout_predictions",
+    )
 
     # Verify Decision Curve Analysis (DCA) points
     assert "decision_curve_analysis" in data
@@ -478,3 +490,43 @@ def test_agent_explain_in_api_endpoints(client):
     assert data["primary_diagnosis"] == "ASTHMA"
     assert len(data["grounded_spans"]) >= 1
     assert len(data["guideline_references"]) >= 1
+
+
+def test_agent_explain_rejects_empty_and_short_payloads(client):
+    """Verify invalid or too-short notes do not return HTTP 200."""
+    bad_short = client.post("/api/v1/agent/explain", json={"patient_id": "PT-BAD", "clinical_notes": "abc"})
+    assert bad_short.status_code in (400, 422)
+    bad_blank = client.post("/api/v1/agent/explain", json={"patient_id": "PT-BAD", "clinical_notes": "     "})
+    assert bad_blank.status_code in (400, 422)
+
+
+def test_evaluation_benchmark_handles_missing_holdout_artifact(client, monkeypatch):
+    """Verify /evaluation/benchmark handles missing hold-out prediction file gracefully."""
+    from src.api.routes import evaluation_routes
+
+    monkeypatch.setattr(
+        evaluation_routes,
+        "evaluate_holdout_dca",
+        lambda: {
+            "n_samples": 302,
+            "class_prevalence": {"0": 0.235, "1": 0.235, "2": 0.351, "3": 0.179},
+            "prediction_source": "calibrated_simulation_pending_checkpoint",
+            "threshold_points": [
+                {
+                    "threshold": 0.20,
+                    "net_benefit_mcdss": 0.23,
+                    "net_benefit_tabular": 0.17,
+                    "net_benefit_text": 0.22,
+                    "net_benefit_treat_all": 0.06,
+                    "net_benefit_treat_none": 0.0,
+                    "net_tp_gained_per_100": 17.0,
+                    "net_interventions_avoided_per_100": 68.0,
+                }
+            ],
+        },
+    )
+    resp = client.get("/api/v1/evaluation/benchmark")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["evaluation_metadata"]["dca_prediction_source"] == "calibrated_simulation_pending_checkpoint"
+    assert body["evaluation_metadata"]["dca_status"] == "illustrative_simulation_pending_patient_level_predictions"

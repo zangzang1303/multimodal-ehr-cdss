@@ -245,6 +245,10 @@ class PatientInferenceResponse(BaseModel):
     """
 
     patient_id: str = Field(..., description="Patient identifier")
+    prediction_source: str = Field(
+        default="heuristic_baseline_fallback_pending_member1_cbm",
+        description="Prediction provenance until fitted baseline artifacts are loaded",
+    )
     baseline_results: Dict[str, BaselineModelResult] = Field(
         ...,
         description="Results from 3 baseline models: classical_tabular, tabular_deep, text_only",
@@ -314,6 +318,8 @@ class EvidenceSpan(BaseModel):
     """
     start_char: int = Field(..., ge=0, description="Start index in raw patient clinical notes")
     end_char: int = Field(..., ge=0, description="End index in raw patient clinical notes")
+    start: Optional[int] = Field(default=None, ge=0, description="Alias for start_char")
+    end: Optional[int] = Field(default=None, ge=0, description="Alias for end_char")
     text: str = Field(..., description="Exact substring matched within the note")
     category: Literal["supporting", "counter", "red_flag"] = Field(
         default="supporting",
@@ -323,6 +329,25 @@ class EvidenceSpan(BaseModel):
     reason: Optional[str] = Field(default=None, description="Clinical reason or guideline criteria why this text is significant")
     confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Grounding confidence")
     is_exact: bool = Field(default=True, description="Whether matched exactly or via normalized regex")
+
+    @model_validator(mode="after")
+    def _sync_span_offsets(self) -> "EvidenceSpan":
+        if self.start is None:
+            self.start = self.start_char
+        if self.end is None:
+            self.end = self.end_char
+        return self
+
+
+class ClaimAudit(BaseModel):
+    """Detailed verification audit record for an individual evidence claim."""
+    claim: str
+    status: Literal["verified", "candidate", "unverified"]
+    spans: List[Dict[str, Any]] = Field(default_factory=list)
+    confidence: float = 0.0
+    match_type: str = "none"
+    reason: Optional[str] = None
+    clinical_interpretation_note: Optional[str] = None
 
 
 class GuidelineReference(BaseModel):
@@ -353,25 +378,58 @@ class AgentExplainRequest(BaseModel):
     differential_diagnosis: Optional[str] = Field(default=None, description="Optional secondary hypothesis to compare against")
     calibrated_probabilities: Optional[Dict[str, float]] = Field(default=None, description="Optional map of calibrated probabilities")
 
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_clinical_note_alias(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            normalized = dict(data)
+            if "clinical_notes" not in normalized and "clinical_note" in normalized:
+                normalized["clinical_notes"] = normalized["clinical_note"]
+            note = normalized.get("clinical_notes")
+            if isinstance(note, str) and len(note.strip()) < 5:
+                raise ValueError("Clinical note must contain at least 5 non-whitespace characters.")
+            return normalized
+        return data
+
+    @property
+    def clinical_note(self) -> str:
+        return self.clinical_notes
+
 
 class AgentExplainResponse(BaseModel):
     """
     Comprehensive output payload of the Agentic RAG Clinical Consultation.
     """
+    status: str = Field(default="success", description="Verification status ('success' or 'insufficient_evidence')")
+    reasoning_mode: str = Field(default="deterministic_template", description="Reasoning mode used to synthesize explanation")
     patient_id: str = Field(..., description="Patient identifier")
     display_note: str = Field(..., description="De-identified note used for all evidence offsets")
     primary_diagnosis: str = Field(..., description="Primary suspected diagnosis (Hypothesis 1)")
     primary_diagnosis_name: str = Field(..., description="Vietnamese display name of primary diagnosis")
     differential_diagnosis: Optional[str] = Field(default=None, description="Secondary differential diagnosis (Hypothesis 2)")
     differential_diagnosis_name: Optional[str] = Field(default=None, description="Vietnamese display name of differential diagnosis")
+    top1_diagnosis: Optional[str] = Field(default=None, description="Alias for primary_diagnosis")
+    top2_diagnosis: Optional[str] = Field(default=None, description="Alias for differential_diagnosis")
     differential_reasoning: str = Field(..., description="Chain-of-thought clinical differential justification")
     grounded_spans: List[EvidenceSpan] = Field(
         default_factory=list,
         description="List of verified character offsets in patient note for frontend highlighting",
     )
+    verified_spans: List[EvidenceSpan] = Field(
+        default_factory=list,
+        description="Alias for grounded_spans",
+    )
     guideline_references: List[GuidelineReference] = Field(
         default_factory=list,
         description="Relevant clinical practice guideline chunks retrieved via Hybrid RAG",
+    )
+    guideline_citations: List[GuidelineReference] = Field(
+        default_factory=list,
+        description="Alias for guideline_references",
+    )
+    claim_audits: List[ClaimAudit] = Field(
+        default_factory=list,
+        description="Per-claim grounding and independent clinical interpretation audit",
     )
     red_flags: List[str] = Field(default_factory=list, description="Clinical red-flag alerts requiring emergency attention")
     recommended_investigations: List[str] = Field(
@@ -379,4 +437,6 @@ class AgentExplainResponse(BaseModel):
         description="Recommended next diagnostic tests per guideline (e.g. Spirometry, NT-proBNP, CXR)",
     )
     hallucination_filtered_count: int = Field(default=0, description="Number of unsupported claims filtered out to ensure 0% hallucination")
+    has_insufficient_evidence: bool = Field(default=False, description="True if case lacks grounded evidence or is out-of-domain")
+    warning: Optional[str] = Field(default=None, description="Safety or untrusted client label audit warning")
     execution_time_ms: float = Field(default=0.0, description="Execution time in milliseconds")

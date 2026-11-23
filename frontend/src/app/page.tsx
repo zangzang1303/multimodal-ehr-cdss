@@ -6,7 +6,6 @@ import {
   AlertCircle,
   ArrowRight,
   BarChart3,
-  CheckCircle2,
   HeartPulse,
   Moon,
   RefreshCw,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { getHealth, HealthResponse } from "@/lib/api";
 import PatientDataForm from "@/components/PatientDataForm";
+import { ModelCardFooter, ResearchDisclaimerBanner } from "@/components/ResearchBannerAndFooter";
 
 export default function Home() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -65,6 +65,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <ResearchDisclaimerBanner />
       {/* Top Navigation */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800/80 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -231,15 +232,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-950 py-6 text-center text-xs text-slate-500 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-            <span>Multimodal Clinical Decision Support System - Phase 1</span>
-          </div>
-          <div>M-CDSS Research Consortium © 2026. Next.js 14 & FastAPI.</div>
-        </div>
-      </footer>
+      <ModelCardFooter />
     </div>
   );
 }

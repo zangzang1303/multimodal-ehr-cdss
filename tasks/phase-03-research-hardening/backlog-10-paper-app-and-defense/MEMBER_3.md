@@ -1,27 +1,26 @@
 # BACKLOG 10 – THÀNH VIÊN 3 (Full-Stack AI & System Integrator)
 
+> **Cập nhật trạng thái thực hiện (Phase 3 — Bản chuẩn hóa sau rà soát):** Đã siết script `smoke_test`, đổi tên trường kiểm probe sang `out_of_note_probe_rejection_rate`, sửa `eval_rag.py` sang chế độ chỉ đọc trên Qdrant từ xa (xác minh chiều 768, `chunk_id`, `SHA-256` và 8 metadata; *chưa xác nhận ngữ nghĩa vector*), đánh dấu audit 50 ca trên `data/processed/test.parquet` ($N=287$) là **sơ bộ** (`preliminary_non_strict_holdout`, chưa phải `strict 302`), và đồng bộ lại LaTeX (`04`, `05`, `06`), slide/video, Q&A, UI để không khẳng định quá mức. Backlog **chưa hoàn thành 100%** do chưa có `HTTP 200` trên `/predict/multimodal` trong Docker nhẹ, chưa có encoder `all-mpnet-base-v2`, chưa chấm tay 20 mẫu grounding, chưa kiểm thử trên máy thứ hai và còn chờ số liệu RQ1–RQ4 của TV1 & TV2.
+
 ## Nhiệm vụ 3.1 – Docker clean-run & smoke test
-- Trên **máy thứ hai** (hoặc VM sạch): làm theo README từ đầu → `docker compose up --build -d` → 3 dịch vụ healthy.
-- `scripts/smoke_test.ps1` / `.sh`: `/health`, `/api/v1/predict/status`, 1 ca `/predict/multimodal`, 1 ca `/agent/explain`, trang `/` và `/evaluation` trả 200.
-- README: mục "Quick start 5 phút", cách lấy checkpoint + data + Qdrant snapshot (kèm SHA-256), yêu cầu phần cứng, xử lý sự cố thường gặp.
+- [x] Cập nhật `scripts/smoke_test.ps1` và `scripts/smoke_test.sh`: chế độ mặc định (strict) yêu cầu `/predict/multimodal` trả `HTTP 200` và báo `[FAIL]` nếu gặp `503` (nêu rõ thiếu `torch` hay cache HF); chế độ `-AllowLightweightNoTorch` / `--allow-lightweight-no-torch` tách riêng kết quả `503` thành `[FAIL-SAFE ONLY]` thay vì `[PASS]`.
+- [x] Đã chạy `docker compose up --build -d --wait` trên máy phát triển với `qdrant/qdrant:v1.20.0`, `api` và `frontend` đều đạt `healthy` (frontend tạm chạy trên cổng `3001` do cổng `3000` đang bị container `clinic_frontend` của dự án khác chiếm dụng), và xác nhận `7 PASS + 1 FAIL-SAFE ONLY` ở chế độ lightweight.
+- [ ] **Chạy kiểm chứng strict `smoke_test` (bao gồm `/predict/multimodal` trả `HTTP 200`) và chạy trên máy thứ hai (hoặc VM sạch):** **Chưa hoàn thành** — *Lý do:* Image `requirements-deploy.txt` không cài `torch` và chưa có cache `Bio_ClinicalBERT`, nên strict `smoke_test.ps1` báo `[FAIL]` (exit code 1) ở bước 3; đồng thời chưa có máy vật lý thứ hai hay VM sạch để thử cài mới hoàn toàn.
+- [ ] **Cập nhật root `README.md` mục "Quick start 5 phút" & liên kết tải checkpoint + data + Qdrant snapshot kèm SHA-256:** **Chưa hoàn thành** — *Lý do:* Chờ TV1 & TV2 chốt bản đóng băng cuối của `multimodal_best.pt`, `DATA_MANIFEST.json` và `results/registry.json`.
 
 ## Nhiệm vụ 3.2 – Section System & hình vẽ
-- `04_software_architecture.tex`, `05_multi_agent_rag.tex`, `06_frontend_dca_ux.tex`: xoá `[TODO]`; mô tả đúng chế độ suy luận (deterministic / LLM nếu đã làm); thêm bảng latency p50/p95 và bảng RAG (Recall@k, MRR, grounding).
-- Xuất sơ đồ kiến trúc vector (SVG/PDF) đồng bộ giữa paper và slide; ảnh chụp UI thật (không mock).
+- [x] Cập nhật `docs/paper_latex/sections/04_software_architecture.tex`, `05_multi_agent_rag.tex`, `06_frontend_dca_ux.tex` với số liệu trung thực và không khẳng định quá mức: `64` chunk xác minh đọc-chỉ chiều 768/ID/SHA-256/8 metadata trong Qdrant Docker (`v1.20.0`, *vector băm 768-D — chưa xác nhận chất lượng ngữ nghĩa vector*), bảng RAG qua `--require-qdrant` ($\kappa = 0,9449$), bảng HTTP Docker end-to-end latency thật (`p50=62,92 ms`, `p95=84,23 ms`), đánh dấu audit 50 ca trên `data/processed/test.parquet` ($N=287$) là **sơ bộ** (chưa phải `strict 302`) dùng `out_of_note_probe_rejection_rate`, giữ `[TODO-HUMAN-REVIEW]` cho 20 mẫu ngữ nghĩa và `[TODO-TV1/TV2]` cho số liệu RQ1–RQ4.
+- [ ] **Xuất lại sơ đồ SVG/PDF đồng bộ & ảnh chụp màn hình UI thật (không dính badge mock):** **Chưa hoàn thành** — *Lý do:* Đang chờ TV1/TV2 bàn giao số liệu đa seed thật cho `results/registry.json` và manifest thật để UI không còn nhãn `[MOCK]`.
 
 ## Nhiệm vụ 3.3 – Video demo 3–5 phút
-Kịch bản (cập nhật `docs/thuyết trình/KICH_BAN_VIDEO_DEMO_LAM_SANG_GIAI_DOAN_2.md`, xoá 10 placeholder):
-1. (0:00–0:30) Bài toán & cảnh báo phạm vi nghiên cứu.
-2. (0:30–2:00) Nhập ca tổng hợp → xác suất hiệu chuẩn → highlight chứng cứ → mở drawer phác đồ.
-3. (2:00–3:00) Bỏ phương thức văn bản → xác suất thay đổi (minh hoạ RQ4); ca mô hình không chắc chắn.
-4. (3:00–4:00) Trang đánh giá: bảng có CI, phân rã văn bản (RQ2), DCA.
-5. (4:00–4:30) Giới hạn & hướng phát triển.
+- [x] Cập nhật kịch bản chi tiết 5 phân cảnh (`0:00–4:30`) tại `docs/thuyết trình/KICH_BAN_VIDEO_DEMO_LAM_SANG_GIAI_DOAN_2.md` theo đúng phạm vi kiểm tra sơ bộ khớp ký tự trên `data/processed/test.parquet` ($N=287$, chưa phải `strict 302`), giới hạn Qdrant đọc-chỉ + vector băm ngoại tuyến, `pending_human_review` 20 mẫu, và giữ khung `[TODO-TV1/TV2]`.
+- [ ] **Quay và xuất bản video MP4 Full HD hoàn chỉnh:** **Chưa hoàn thành** — *Lý do:* Cần TV1 & TV2 hoàn tất checkpoint + cache + số liệu RQ1–RQ4 và khắc phục suy luận multimodal `HTTP 200` mới quay demo sống hoàn chỉnh.
 
 ## Nhiệm vụ 3.4 – Slide thuyết trình (15–20 trang) & demo trực tiếp
-Cập nhật `docs/thuyết trình/KICH_BAN_SLIDE_BAO_CAO_NGHIEM_THU_GIAI_DOAN_2.md` (xoá 21 placeholder). Mạch đề xuất:
-1. Vấn đề & khoảng trống (1–2) → 2. Câu hỏi nghiên cứu (1) → 3. Dữ liệu & chống rò rỉ (2) → 4. Phương pháp (2) → 5. Kết quả RQ1–RQ2 – **phát hiện chính** (3) → 6. Hiệu chuẩn, DCA, độ bền (2) → 7. Hệ thống & demo (3) → 8. Giới hạn trung thực (1) → 9. Hướng phát triển: MIMIC-IV, khảo sát bác sĩ, LLM có ràng buộc (1) → 10. Kết luận (1).
-- Chuẩn bị **phương án dự phòng**: video demo cục bộ + ảnh chụp, nếu demo trực tiếp lỗi mạng/GPU.
-- Bấm giờ: tổng ≤ thời lượng quy định, mỗi người nói phần mình phụ trách.
+- [x] Cập nhật kịch bản nội dung 20 slide tại `docs/thuyết trình/KICH_BAN_SLIDE_BAO_CAO_NGHIEM_THU_GIAI_DOAN_2.md` theo mạch RQ1–RQ5, bỏ các cụm từ khẳng định tuyệt đối (`tuyệt đối không ảo giác`, `loại bỏ hoàn toàn`), phản ánh trung thực kết quả Qdrant đọc-chỉ `64` điểm (giới hạn ở ID/SHA-256/8 metadata & vector băm 768-D ngoại tuyến), đánh dấu audit 50 ca là **sơ bộ** + `out_of_note_probe_rejection_rate` + `[TODO-HUMAN-REVIEW]` 20 mẫu, HTTP Docker latency và giữ `[TODO-TV1/TV2]`.
+- [ ] **Xuất tệp trình chiếu (PowerPoint/PDF), ghép ảnh UI/video dự phòng và diễn tập bấm giờ 3 thành viên:** **Chưa hoàn thành** — *Lý do:* Chờ TV1 & TV2 hoàn thành kết quả RQ1–RQ4 điền hết `[TODO-TV1/TV2]` và hoàn tất chấm thủ công 20 mẫu grounding.
 
 ## Nhiệm vụ 3.5 – Q&A phần hệ thống
-Câu trả lời ngắn cho: Vì sao Qdrant? grounding chống ảo giác đến mức nào? latency bao nhiêu, chạy CPU được không? triển khai thực tế cần gì (HL7 FHIR, phân quyền, audit log, giám sát drift)?
+- [x] Cập nhật tài liệu hỏi–đáp kỹ thuật hệ thống với dẫn chứng số liệu và giới hạn trung thực tại `docs/thuyết trình/QA_HE_THONG_VA_KIEN_TRUC_MEMBER_3.md`.
+
+**Trạng thái nghiệm thu Backlog 10 (TV3):** `[ ] Chưa hoàn thành toàn phần` — Tài liệu, script kiểm thử chặt chẽ và số đo HTTP Docker/Qdrant của TV3 đã chuẩn hóa; còn chờ strict multimodal `HTTP 200`, chấm tay 20 mẫu grounding, máy thứ hai chạy Docker sạch và số liệu thật từ TV1/TV2 để chốt slide/video/ảnh UI.

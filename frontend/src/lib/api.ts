@@ -67,10 +67,27 @@ export async function getHealth(): Promise<HealthResponse> {
   return response.json();
 }
 
+export interface ModelCardMetadata {
+  checkpoint_name: string;
+  checkpoint_sha256_short: string;
+  trained_at: string;
+  temperature: number;
+  data_manifest_sha: string;
+  data_manifest_is_mock?: boolean;
+  data_manifest_version?: string;
+}
+
+export interface InferenceStatusResponse {
+  status: string;
+  supported_baselines: string[];
+  reasoning_mode?: string;
+  model_card?: ModelCardMetadata;
+}
+
 /**
- * Fetch baseline inference engine status
+ * Fetch inference engine status and model card provenance
  */
-export async function getInferenceStatus(): Promise<{ status: string; supported_baselines: string[] }> {
+export async function getInferenceStatus(): Promise<InferenceStatusResponse> {
   const response = await fetch(`${API_BASE_URL}/api/v1/predict/status`, {
     method: "GET",
     headers: {
@@ -276,11 +293,14 @@ export interface MultimodalMockResponse {
 }
 
 /**
- * Call backend to predict using the Multimodal Core mock endpoint
+ * Call backend mock endpoint ONLY when NEXT_PUBLIC_DEMO_MOCK=1 is explicitly enabled.
  */
 export async function predictMultimodalMock(
   payload: PatientInferenceRequest
 ): Promise<MultimodalMockResponse> {
+  if (process.env.NEXT_PUBLIC_DEMO_MOCK !== "1") {
+    throw new Error("Mock endpoint is disabled unless NEXT_PUBLIC_DEMO_MOCK=1.");
+  }
   const response = await fetch(`${API_BASE_URL}/api/v1/predict/mock`, {
     method: "POST",
     headers: {
@@ -474,6 +494,8 @@ export interface AgentExplainRequest {
 }
 
 export interface AgentExplainResponse {
+  status?: string;
+  reasoning_mode?: string;
   patient_id: string;
   display_note: string;
   primary_diagnosis: string;
@@ -486,6 +508,8 @@ export interface AgentExplainResponse {
   red_flags: string[];
   recommended_investigations: string[];
   hallucination_filtered_count: number;
+  has_insufficient_evidence?: boolean;
+  warning?: string | null;
   execution_time_ms: number;
 }
 
@@ -574,5 +598,135 @@ export async function getClinicalEvaluationBenchmark(): Promise<EvaluationBenchm
     throw new Error(`Failed to fetch evaluation benchmark: ${response.status}`);
   }
 
+  return response.json();
+}
+
+export interface ResultsRegistryResponse {
+  _mock_notice?: string;
+  metadata?: {
+    registry_version?: string;
+    git_commit?: string;
+    data_manifest_sha?: string;
+    seeds?: number[];
+    is_mock_for_member1_member2?: boolean;
+  };
+  rq1_multiseed_comparison?: {
+    is_mock?: boolean;
+    note?: string;
+    models?: Array<{
+      model: string;
+      auroc_mean: number;
+      auroc_sd: number;
+      auroc_ci95: [number, number];
+      f1_mean: number;
+      ece_mean: number;
+      delta_auroc_vs_best_unimodal: number;
+      holm_adjusted_p: number;
+    }>;
+  };
+  rq2_text_signal_decomposition?: {
+    is_mock?: boolean;
+    note?: string;
+    variants?: Array<{
+      variant: string;
+      label: string;
+      tfidf_lr: number;
+      clinical_bert: number;
+      cross_attention: number;
+    }>;
+  };
+  rq4_missing_modality?: {
+    is_mock?: boolean;
+    note?: string;
+    scenarios?: Array<{
+      scenario: string;
+      label: string;
+      cross_attention_auroc: number;
+      tabular_only_auroc: number;
+      text_only_auroc: number;
+    }>;
+  };
+  rag?: {
+    is_mock?: boolean;
+    qdrant_target?: string;
+    qdrant_points_count?: number;
+    qdrant_vector_dim_verified?: number;
+    qdrant_corpus_sync_verified?: boolean;
+    qdrant_chunk_id_match_count?: number;
+    qdrant_content_sha256_match_count?: number;
+    qdrant_metadata_match_count?: number;
+    qdrant_checked_metadata_fields?: string[];
+    qdrant_vector_semantics_verified?: boolean;
+    qdrant_sync_scope_note?: string;
+    corpus_size_chunks?: number;
+    dense_encoder?: string;
+    dense_encoder_is_semantic_model?: boolean;
+    retrieval_scope_note?: string;
+    query_count?: number;
+    cohens_kappa?: number;
+    modes?: Record<
+      string,
+      {
+        recall_at_1: number;
+        recall_at_3: number;
+        recall_at_5: number;
+        mrr: number;
+        ndcg_at_5: number;
+      }
+    >;
+    grounding_audit_50_cases?: {
+      audit_status?: string;
+      audit_method?: string;
+      audit_scope_limitation?: string;
+      notes_source_path?: string;
+      notes_source_is_canonical_strict_302?: boolean;
+      dataset_total_rows?: number;
+      notes_from_dataset_count?: number;
+      notes_from_fallback_template_count?: number;
+      cases_tested?: number;
+      total_claims?: number;
+      total_genuine_claims?: number;
+      grounded_claims?: number;
+      injected_out_of_note_probes?: number;
+      rejected_out_of_note_probes?: number;
+      out_of_note_probe_rejection_rate?: number;
+      span_substring_match_rate?: number;
+      manual_semantic_precision_20_spans?: number | null;
+      manual_semantic_audit_status?: string;
+      manual_audit_sample_file?: string;
+      exported_samples_for_review?: number;
+    };
+  };
+  latency?: {
+    is_mock?: boolean;
+    measurement_mode?: string;
+    target_url?: string;
+    device_info?: string;
+    num_warm_requests?: number;
+    endpoints?: Record<
+      string,
+      {
+        status_codes_observed?: number[];
+        cold_status_code?: number;
+        cold_ms: number;
+        mean_ms: number;
+        p50_ms: number;
+        p95_ms: number;
+        p99_ms: number;
+        note?: string;
+      }
+    >;
+  };
+}
+
+export async function getResultsRegistry(): Promise<ResultsRegistryResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/evaluation/registry`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch evaluation registry: ${response.status}`);
+  }
   return response.json();
 }

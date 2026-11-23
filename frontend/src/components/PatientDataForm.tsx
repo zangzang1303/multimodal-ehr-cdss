@@ -186,6 +186,9 @@ export default function PatientDataForm() {
     useState<BaselineInferenceResponse | null>(null);
   const [multimodalResponse, setMultimodalResponse] =
     useState<MultimodalMockResponse | null>(null);
+  const [modalityMode, setModalityMode] = useState<
+    "full" | "drop_text" | "drop_tabular"
+  >("full");
 
   const handleNumericalChange = (key: keyof TabularFeatures, value: string) => {
     const num = parseFloat(value);
@@ -294,10 +297,33 @@ export default function PatientDataForm() {
     }
 
     try {
+      const effectiveTabular: TabularFeatures =
+        modalityMode === "drop_tabular"
+          ? {
+              age: 55,
+              systolic_bp: 120,
+              diastolic_bp: 80,
+              heart_rate: 76,
+              respiratory_rate: 16,
+              spo2: 96,
+              temperature: 37.0,
+              wbc_count: 7.5,
+              crp: 5.0,
+              gender: "M",
+              smoking_status: "NEVER",
+              history_hypertension: 0,
+              history_diabetes: 0,
+            }
+          : tabular;
+      const effectiveNotes =
+        modalityMode === "drop_text"
+          ? "Khuyết văn bản bệnh án lâm sàng (RQ4 Missing-Modality Demo)."
+          : clinicalNotes;
+
       const payload: PatientInferenceRequest = {
         patient_id: patientId,
-        tabular_features: tabular,
-        clinical_notes: clinicalNotes,
+        tabular_features: effectiveTabular,
+        clinical_notes: effectiveNotes,
       };
 
       const [baselineRes, multiRes] = await Promise.allSettled([
@@ -621,8 +647,47 @@ export default function PatientDataForm() {
               </div>
             </div>
 
-            {/* Action Button */}
-            <div className="pt-2">
+            {/* Missing-Modality RQ4 Toggle + Action Button */}
+            <div className="pt-2 space-y-3">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                    Kiểm Thử Khuyết Phương Thức (RQ4 Missing-Modality Toggle):
+                  </span>
+                  <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400">
+                    {modalityMode === "full"
+                      ? "Đầy đủ Bảng + Văn bản"
+                      : modalityMode === "drop_text"
+                        ? "Ẩn Văn bản"
+                        : "Thay Bảng số bằng Trung vị"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-[11px]">
+                  {[
+                    { id: "full", label: "Đầy đủ 2 nguồn" },
+                    { id: "drop_text", label: "Bỏ Văn bản" },
+                    { id: "drop_tabular", label: "Bỏ Bảng số" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() =>
+                        setModalityMode(
+                          opt.id as "full" | "drop_text" | "drop_tabular"
+                        )
+                      }
+                      className={`py-1.5 px-2 rounded-lg font-medium border transition-colors ${
+                        modalityMode === opt.id
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <button
                 type="submit"
                 id="btn-run-inference"
@@ -657,7 +722,7 @@ export default function PatientDataForm() {
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white text-base">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              <span>Kết Quả Đối Chứng 3 Baselines (Mock Inference Output)</span>
+              <span>Kết Quả Đối Chứng 3 Baselines (Fallback Heuristic — Chờ Baselines .cbm/.pt TV1)</span>
             </div>
             <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-mono">
               Bệnh nhân: {predictionResponse.patient_id}

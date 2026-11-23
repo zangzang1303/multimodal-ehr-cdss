@@ -1,112 +1,109 @@
-# Kịch Bản Video Demo Lâm Sàng: Hệ Thống Hỗ Trợ Chẩn Đoán Đa Phương Thức M-CDSS (Giai Đoạn 2)
+# Kịch Bản Video Demo Lâm Sàng: Hệ Thống Hỗ Trợ Chẩn Đoán Đa Phương Thức M-CDSS (Cập nhật Giai Đoạn 3)
 
-> **Thời lượng tiêu chuẩn:** 4 phút 30 giây (nằm trong khung chuẩn 3 – 5 phút của nghiệm thu dự án).  
-> **Độ phân giải khuyến nghị:** Full HD (1920 × 1080, 60fps).  
-> **Phong cách trình bày:** Chuyên nghiệp, khách quan, chuẩn mực y khoa; kết hợp giữa slide đồ họa ngắn gọn ở phần mở đầu và thao tác trực tiếp trên giao diện Web M-CDSS thực tế.  
-> **Lưu ý về số liệu thực nghiệm Giai đoạn 2:** Các vị trí đánh dấu `[TODO-TV1/TV2: ...]` trong kịch bản là khung trống chờ điền số liệu thực nghiệm chính thức sau khi Thành viên 1 và Thành viên 2 hoàn tất huấn luyện `multimodal_best.pt` và chạy đánh giá trên tập kiểm thử $N=302$.
-
----
-
-## 1. Bảng Phân Bổ Thời Lượng 5 Phân Cảnh
-
-| Phân cảnh | Nội dung trọng tâm | Thời lượng | Mốc thời gian |
-| :---: | :--- | :---: | :---: |
-| **Cảnh 1** | Mở đầu: Bài toán lâm sàng & Khoảng trống y văn từ JMIR (2024) | 45 giây | `0:00 – 0:45` |
-| **Cảnh 2** | Thao tác bàn khám: Nhập ca bệnh khó (`PT-0044` & `PT-0254`) | 55 giây | `0:45 – 1:40` |
-| **Cảnh 3** | Kết quả dung hợp đa phương thức & Hiệu chuẩn xác suất ($\text{ECE} < 0,05$) | 55 giây | `1:40 – 2:35` |
-| **Cảnh 4** | Giải trình không ảo giác: Tô sáng bằng chứng & Tra cứu phác đồ GINA/GOLD | 65 giây | `2:35 – 3:40` |
-| **Cảnh 5** | Thẩm định lâm sàng: Đồ thị Lợi ích ròng DCA, PROBAST & Kết luận y đức | 50 giây | `3:40 – 4:30` |
+> **Thời lượng tiêu chuẩn:** 4 phút 30 giây (trong khung 3–5 phút theo Backlog 10 Nhiệm vụ 3.3).
+>
+> **Độ phân giải khuyến nghị:** Full HD (1920 × 1080, 60fps).
+>
+> **Phong cách trình bày:** Khách quan, trung thực khoa học; thao tác trực tiếp trên giao diện Web M-CDSS thực tế kết nối backend cục bộ.
+>
+> **Lưu ý về trạng thái số liệu `[TODO-TV1/TV2]`:** Các khung `[TODO-TV1/TV2: ...]` giữ nguyên làm vị trí chờ điền kết quả thực nghiệm đa seed chính thức (RQ1–RQ4) từ Thành viên 1 và Thành viên 2. Toàn bộ thông số hệ thống, truy xuất RAG (64 đoạn JSON phác đồ xác minh đọc-chỉ chiều 768/`chunk_id`/SHA-256 nội dung/8 metadata trong Qdrant sống nhưng dùng vector băm 768-D ngoại tuyến do thiếu `all-mpnet-base-v2`, 60 truy vấn, kiểm định sơ bộ khớp chuỗi 50 ca trên `data/processed/test.parquet` $N=287$ chưa phải `strict 302`) và độ trễ HTTP Docker end-to-end đã điền từ đo đạc thực tế tại `results/rag_evaluation_report.json` và `results/latency_report.json`.
+>
+> **Phương án dự phòng:** Xuất bản ghi hình MP4 cục bộ độ phân giải Full HD kèm ảnh chụp màn hình từng bước phòng trường hợp mạng/GPU trục trặc khi demo trực tiếp.
 
 ---
 
-## 2. Kịch Bản Chi Tiết Từng Phân Cảnh (Hình Ảnh – Thao Tác – Thuyết Minh – Phụ Đề)
+## 1. Bảng Phân Bổ Thời Lượng 5 Phân Cảnh (Khung Chuẩn Phase 3)
+
+| Phân cảnh  | Nội dung trọng tâm                                                                             | Thời lượng | Mốc thời gian |
+| :--------: | :--------------------------------------------------------------------------------------------- | :--------: | :-----------: |
+| **Cảnh 1** | Bài toán lâm sàng, Khoảng trống JMIR (2024) & Cảnh báo phạm vi nghiên cứu                      |  30 giây   | `0:00 – 0:30` |
+| **Cảnh 2** | Nhập ca tổng hợp → Xác suất hiệu chuẩn → Tô sáng bằng chứng → Ngăn kéo phác đồ                 |  90 giây   | `0:30 – 2:00` |
+| **Cảnh 3** | Minh họa RQ4 (Tắt phương thức văn bản / bảng) & Ca mô hình bất định (`< 55%`)                  |  60 giây   | `2:00 – 3:00` |
+| **Cảnh 4** | Trang đánh giá (`/evaluation`): CI đa seed, phân rã văn bản RQ2, DCA & Tab Phase 3 RAG/Latency |  60 giây   | `3:00 – 4:00` |
+| **Cảnh 5** | Giới hạn trung thực, PROBAST & Hướng phát triển                                                |  30 giây   | `4:00 – 4:30` |
 
 ---
 
-### 🎬 PHÂN CẢNH 1: MỞ ĐẦU — KHOẢNG TRỐNG Y VĂN & MỤC TIÊU HỆ THỐNG (`0:00 – 0:45`)
-
-* **Hình ảnh hiển thị trên màn hình (Visuals):**
-  * `0:00 – 0:15`: Hiển thị trang tiêu đề dự án **M-CDSS** kèm sơ đồ tổng quan bài toán phân biệt 4 hội chứng hô hấp – tim mạch cấp tính (*Hen phế quản, COPD, Suy tim, Viêm phổi*).
-  * `0:15 – 0:32`: Hiển thị infographic tóm tắt nghiên cứu tổng quan hệ thống trên tạp chí **JMIR (2024)** của Hunik và cộng sự: `10.657` công trình sàng lọc $\rightarrow$ `15` nghiên cứu đạt chuẩn $\rightarrow$ **100% chỉ dùng dữ liệu bảng** và **0% đạt chuẩn nguy cơ sai lệch thấp theo PROBAST**.
-  * `0:32 – 0:45`: Chuyển cảnh mượt sang giao diện chính của hệ thống Web M-CDSS đang hoạt động thực tế.
-
-* **Lời thuyết minh (Voiceover):**
-  > *"Xin kính chào thầy cô và hội đồng đánh giá. Trong thực hành cấp cứu và chăm sóc ban đầu, việc phân biệt sớm bốn bệnh lý có triệu chứng khó thở chồng lấp gồm Hen phế quản, COPD, Suy tim và Viêm phổi là một thách thức lớn. Thế nhưng, theo tổng quan hệ thống công bố trên tạp chí JMIR năm 2024, sau khi sàng lọc hơn 10.600 công trình, 100% các nghiên cứu đạt chuẩn hiện nay chỉ sử dụng dữ liệu bảng số mà bỏ qua hoàn toàn văn bản ghi chú của bác sĩ; đồng thời chưa có nghiên cứu nào đạt mức nguy cơ sai lệch thấp theo tiêu chuẩn PROBAST. Từ khoảng trống đó, nhóm chúng em phát triển nguyên mẫu Hệ thống Hỗ trợ Quyết định Lâm sàng Đa phương thức M-CDSS, kết hợp đồng thời sinh hiệu xét nghiệm và văn bản bệnh án tự do kèm cơ chế giải thích dựa trên y học chứng cứ."*
-
-* **Phụ đề nhấn mạnh (On-screen Captions):**
-  * `[JMIR 2024 Systematic Review]`: 15/15 nghiên cứu chỉ dùng dữ liệu bảng | 0/15 đạt Low Risk of Bias (PROBAST).
-  * `[Giải pháp M-CDSS]`: Dung hợp Chú ý chéo (Cross-Attention) + Hiệu chuẩn xác suất + Giải thích kèm y văn.
+## 2. Kịch Bản Chi Tiết Từng Phân Cảnh
 
 ---
 
-### 🎬 PHÂN CẢNH 2: THAO TÁC NHẬP CA BỆNH LÂM SÀNG KHÓ (`0:45 – 1:40`)
+### PHÂN CẢNH 1: BÀI TOÁN & CẢNH BÁO PHẠM VI NGHIÊN CỨU (`0:00 – 0:30`)
 
-* **Hình ảnh & Thao tác trên giao diện (UI Actions):**
-  * `0:45 – 1:05`: Tại màn hình chính (**Bàn làm việc Hội chẩn Lâm sàng**), con trỏ chuột di chuyển qua khu vực nhập 12 chỉ số sinh hiệu và xét nghiệm (Tuổi, Giới tính, Huyết áp, Nhịp tim, Nhịp thở, Thân nhiệt, $\text{SpO}_2$, WBC, CRP, Tiền sử bệnh nền). Nhấn thử vào một ô sinh hiệu để thấy hệ thống kiểm tra giới hạn sinh lý hợp lệ.
-  * `1:05 – 1:25`: Nhấp chọn nút nạp nhanh ca bệnh thực tế từ tập kiểm thử độc lập: **Ca bệnh 1 – Mã bệnh nhân `PT-0044`** (Nữ, 18 tuổi, nhãn thực tế: Hen phế quản – *ASTHMA*).
-  * `1:25 – 1:40`: Phóng cận cảnh hai nguồn dữ liệu vừa được nạp lên màn hình:
-    * Bên trái (Bảng số): $\text{SpO}_2 = 97,3\%$ (đo ngoài cơn cấp), nhưng chỉ số viêm $\text{CRP} = 24,28\text{ mg/L}$ tăng cao kèm tiền sử tăng huyết áp.
-    * Bên phải (Ghi chú lâm sàng): Mô tả bệnh nhân 18 tuổi khởi phát cơn khò khè cấp tính và có tiền sử đáp ứng với thuốc xịt giãn phế quản (*Inhalers*). Nhấn nút **"Thực thi Hội chẩn Đa phương thức"**.
+- **Hình ảnh hiển thị (Visuals):**
+    - `0:00 – 0:15`: Màn hình tiêu đề **M-CDSS**, tóm tắt bài toán phân biệt 4 hội chứng hô hấp–tim mạch (_ASTHMA, COPD, CHF, CAP_) và phát hiện từ JMIR (2024): 15/15 nghiên cứu chỉ dùng dữ liệu bảng, 0/15 đạt chuẩn Low Risk of Bias theo PROBAST.
+    - `0:15 – 0:30`: Phóng cận cảnh thanh **`ResearchDisclaimerBanner`** ở đầu giao diện Web (`/`) và **`ModelCardFooter`** ở chân trang (hiển thị SHA-256 của checkpoint, nhãn **`MOCK — chờ TV2`** cho `data_manifest_sha256` placeholder hiện tại, và `reasoning_mode = deterministic_template`).
 
-* **Lời thuyết minh (Voiceover):**
-  > *"Tại bàn làm việc hội chẩn của bác sĩ, hệ thống tiếp nhận đồng thời 12 thông số sinh hiệu, xét nghiệm máu và phần ghi chú khám lâm sàng tự do, với cơ chế kiểm soát chặt chẽ miền giá trị sinh lý. Để minh họa cách hệ thống xử lý các ca bệnh phức tạp, chúng em nạp ca bệnh thực tế mã số PT-0044 từ tập kiểm thử độc lập. Đây là bệnh nhân nữ 18 tuổi mắc Hen phế quản. Điểm đánh lừa ở ca này là bệnh nhân được đo sinh hiệu ngoài cơn khó thở cấp nên SpO2 vẫn đạt 97,3%, trong khi chỉ số viêm CRP lại tăng cao tới 24,28 mg/L. Nếu chỉ nhìn vào bảng số, mô hình đơn phương thức CatBoost đã chẩn đoán nhầm sang COPD (78,82%). Hãy cùng xem hệ thống đa phương thức M-CDSS xử lý ca bệnh này như thế nào."*
+- **Lời thuyết minh (Voiceover):**
 
-* **Phụ đề nhấn mạnh (On-screen Captions):**
-  * `[Ca bệnh PT-0044]`: Nữ, 18 tuổi — Nhãn thực tế: Hen phế quản (`ASTHMA`).
-  * `[Điểm mù Bảng số]`: Đo ngoài cơn cấp ($\text{SpO}_2 = 97,3\%$), CRP tăng cao ($24,28\text{ mg/L}$) khiến CatBoost đoán nhầm thành COPD ($78,82\%$).
+    > _"Xin kính chào thầy cô và hội đồng. Trong chăm sóc ban đầu và cấp cứu, bốn hội chứng Hen phế quản, COPD, Suy tim và Viêm phổi có triệu chứng chồng lấp rất dễ nhầm lẫn. Theo tổng quan trên tạp chí JMIR năm 2024, cả 15 nghiên cứu đạt chuẩn đều chỉ dùng dữ liệu bảng mà bỏ qua ghi chú bác sĩ, và chưa có nghiên cứu nào đạt nguy cơ sai lệch thấp theo PROBAST. Nhóm xây dựng nguyên mẫu nghiên cứu M-CDSS để khảo sát câu hỏi đó. Xin lưu ý ngay từ đầu: dữ liệu huấn luyện–kiểm thử hiện tại là bộ dữ liệu tổng hợp từ Synthea và MTSamples, và M-CDSS là nguyên mẫu phục vụ nghiên cứu học thuật, tuyệt đối không dùng để ra quyết định điều trị tự động trên bệnh nhân thật."_
+
+- **Phụ đề nhấn mạnh:**
+    - `[Cảnh báo Phạm vi]`: Research Prototype | Synthesized Cohort (Synthea + MTSamples) | Không thay thế bác sĩ.
 
 ---
 
-### 🎬 PHÂN CẢNH 3: KẾT QUẢ CHẨN ĐOÁN ĐA PHƯƠNG THỨC & HIỆU CHUẨN XÁC SUẤT (`1:40 – 2:35`)
+### PHÂN CẢNH 2: NHẬP CA TỔNG HỢP, XÁC SUẤT HIỆU CHUẨN, BẰNG CHỨNG & PHÁC ĐỒ (`0:30 – 2:00`)
 
-* **Hình ảnh & Thao tác trên giao diện (UI Actions):**
-  * `1:40 – 2:05`: Màn hình hiển thị kết quả suy luận trên thẻ **Kết quả Hỗ trợ Chẩn đoán**:
-    * Hệ thống đa phương thức M-CDSS dự đoán chính xác **Hen phế quản (`ASTHMA`)** ở vị trí Top-1 với xác suất đã hiệu chuẩn `[TODO-TV1/TV2: Điền % xác suất dự đoán của M-CDSS trên ca PT-0044]`.
-    * Chỉ vào huy hiệu **"Đã hiệu chuẩn nhiệt độ (Temperature Scaled – ECE = `[TODO-TV2: Điền ECE thực nghiệm]` < 0,05)"** và thanh đo xác suất phân bổ trên 4 nhóm bệnh (tổng xác suất bằng đúng 100%).
-  * `2:05 – 2:35`: Chuyển nhanh sang nạp **Ca bệnh 2 – Mã bệnh nhân `PT-0254`** (Nữ, 65 tuổi, nhãn thực tế: `COPD`).
-    * Chỉ rõ sự đối lập: Mô hình văn bản đơn thuần bị đánh lừa bởi các từ khóa mở khí quản và tiếng ran phổi nên đoán nhầm sang Suy tim (`HEART_FAILURE`, 58,99%).
-    * Trong khi đó, M-CDSS sử dụng bảng số làm *"mỏ neo huyết động học"* (huyết áp 115,9/80,1 mmHg, nhịp tim 64,3 bpm ổn định) để bác bỏ suy tim cấp và dự đoán chính xác **`COPD`** (`[TODO-TV1/TV2: Điền % xác suất dự đoán của M-CDSS trên ca PT-0254]`).
+- **Thao tác giao diện (UI Actions):**
+    - `0:30 – 0:55`: Trên trang chính (`/`), trỏ vào `PatientDataForm.tsx` nhập hoặc nạp một ca bệnh tổng hợp điển hình (ví dụ `PT-0044`, nữ 18 tuổi, đo ngoài cơn cấp với $\text{SpO}_2 = 97,3\%$, $\text{CRP} = 24,28\text{ mg/L}$, kèm ghi chú bệnh sử dùng ống hít giãn phế quản và cơn khò khè). Kiểm tra validation biên sinh lý và nhấn nút hội chẩn.
+    - `0:55 – 1:25`: Quan sát `DiagnosticCard.tsx` hiển thị phân phối xác suất đã hiệu chuẩn nhiệt độ (`[TODO-TV1/TV2: Điền % dự đoán đa phương thức chính thức trên ca mẫu tổng hợp]`, $\text{ECE} = \text{[TODO-TV2: Điền ECE chính thức]}$) cùng huy hiệu **`reasoning_mode = deterministic_template`**, đặt cạnh dự đoán đối chứng của các baseline đơn phương thức (nhấn mạnh tắt mặc định mock fallback khi `NEXT_PUBLIC_DEMO_MOCK` không bật).
+    - `1:25 – 2:00`: Cuộn xuống **`EvidenceViewer.tsx`** cho thấy các cụm từ bằng chứng được tô sáng khớp chính xác vị trí ký tự (`[start_char, end_char]`) ngay trên bệnh án gốc. Mở **`GuidelineDrawer.tsx`** bên phải màn hình, đối chiếu trích đoạn phác đồ **GINA 2024 / GOLD 2024 / ESC 2023 / Bộ Y tế 2020** truy xuất từ kho **64 đoạn JSON chuẩn hóa** đồng bộ trực tiếp trong Qdrant `v1.20.0`.
 
-* **Lời thuyết minh (Voiceover):**
-  > *"Kết quả hiển thị tức thì: nhờ cơ chế chú ý chéo Cross-Attention kết hợp tín hiệu sinh hiệu và văn bản, M-CDSS nhận diện chính xác Hen phế quản trên ca PT-0044 với xác suất hiệu chuẩn `[TODO-TV1/TV2: Điền %]`, khắc phục hoàn toàn sai lầm của nhánh bảng số đơn lẻ. Đặc biệt, xác suất đầu ra đã được hiệu chuẩn bằng thuật toán Temperature Scaling, kéo sai số hiệu chuẩn kỳ vọng ECE xuống `[TODO-TV2: Điền ECE]`, đạt ngưỡng an toàn lâm sàng dưới 0,05. Ngược lại, ở ca bệnh thứ hai PT-0254 của một bệnh nhân nữ 65 tuổi mắc COPD, văn bản chứa nhiều từ ngữ gây nhiễu khiến mô hình ngôn ngữ đơn thuần đoán nhầm sang Suy tim (58,99%). Khi đó, M-CDSS lại dùng chính huyết áp và nhịp tim hoàn toàn bình ổn trên bảng số làm mỏ neo huyết động học để loại trừ suy tim cấp, đưa chẩn đoán trở về đúng COPD (`[TODO-TV1/TV2: Điền %]`)."*
+- **Lời thuyết minh (Voiceover):**
 
-* **Phụ đề nhấn mạnh (On-screen Captions):**
-  * `[Cross-Attention Late Fusion]`: Kết hợp "mỏ neo huyết động học" (Bảng số) và ngữ cảnh bệnh sử (Văn bản).
-  * `[Temperature Scaling]`: Đạt $\text{ECE} = \text{[TODO-TV2]} < 0,05$ — Xác suất dự đoán phản ánh trung thực nguy cơ lâm sàng.
+    > _"Trên bàn làm việc hội chẩn, bác sĩ nhập đồng thời 13 biến bảng số có kiểm soát giới hạn sinh lý và ghi chú lâm sàng tự do. Với ca tổng hợp mẫu PT-0044, mô hình bảng số đơn thuần dễ bị nhiễu bởi chỉ số CRP cao và SpO2 bình thường ngoài cơn cấp. Khi đi qua kiến trúc dung hợp đa phương thức kết hợp tầng hiệu chuẩn Temperature Scaling, hệ thống đưa ra phân phối xác suất hiệu chuẩn (`[TODO-TV1/TV2: %]`) và ghi rõ chế độ giải trình deterministic_template. Tiếp theo, hệ thống Agentic RAG vừa neo chính xác từng cụm từ bằng chứng theo chỉ số ký tự trên ghi chú gốc để chống bịa đặt triệu chứng, vừa mở ngăn kéo phác đồ từ kho 64 đoạn tri thức chuẩn hóa GINA, GOLD, ESC và Bộ Y tế Việt Nam."_
+
+- **Phụ đề nhấn mạnh:**
+    - `[Evidence Grounding — Sơ bộ]`: Khớp vị trí ký tự (`200/200` claim pipeline trên tập `test.parquet` $N=287$, chưa phải `strict 302`) | Từ chối `50/50` đầu dò ngoài ghi chú _(chưa thay thế kiểm tra ngữ nghĩa)_.
+    - `[Guideline KB]`: 64 đoạn JSON (xác minh đọc-chỉ chiều 768/`chunk_id`/SHA-256/8 metadata trong Qdrant `v1.20.0`; vector băm 768-D ngoại tuyến, chưa xác nhận ngữ nghĩa vector).
 
 ---
 
-### 🎬 PHÂN CẢNH 4: GIẢI TRÌNH KHÔNG ẢO GIÁC & TRA CỨU PHÁC ĐỒ Y KHOA (`2:35 – 3:40`)
+### PHÂN CẢNH 3: MÔ PHỎNG THIẾU PHƯƠNG THỨC (RQ4) & CA BẤT ĐỊNH (`2:00 – 3:00`)
 
-* **Hình ảnh & Thao tác trên giao diện (UI Actions):**
-  * `2:35 – 3:05`: Cuộn xuống khu vực **Bằng chứng Lâm sàng trong Hồ sơ Bệnh án (Evidence Viewer)**.
-    * Di chuột vào các đoạn văn bản được tô sáng màu vàng/xanh trực tiếp trên ghi chú bệnh án gốc (ví dụ: cụm từ mô tả khởi phát trẻ tuổi, cơn khò khè cấp tính và tiền sử dùng ống hít giãn phế quản).
-    * Hiển thị hộp thông tin xác nhận: **"Đã kiểm chứng khớp nguyên văn 100% vị trí ký tự (Hallucination-Free Verified)"**.
-  * `3:05 – 3:40`: Nhấp vào nút **"Tra cứu Phác đồ Điều trị Chính thống"** bên cạnh chẩn đoán.
-    * Ngăn kéo phác đồ (**Guideline Drawer**) trượt mở từ bên phải màn hình.
-    * Hiển thị trích dẫn trực tiếp từ **Hướng dẫn GINA 2024**, **GOLD 2024** và **Phác đồ Bộ Y tế**, kèm mức độ chứng cứ (Evidence Level A) và các tiêu chuẩn chẩn đoán phân biệt Hen – COPD.
+- **Thao tác giao diện (UI Actions):**
+    - `2:00 – 2:30`: Quay lại `PatientDataForm.tsx`, bật công tắc **RQ4 Missing-Modality Toggle** ("Tắt phương thức văn bản / chỉ giữ sinh hiệu" hoặc ngược lại), nhấn chạy lại hội chẩn để thấy trực tiếp xác suất dự đoán thay đổi rõ rệt và trạng thái thiếu phương thức được ghi nhận trong luồng đối chứng (`[TODO-TV1/TV2: Nêu độ lệch dự đoán / Macro-F1 thực nghiệm RQ4 khi khuyết văn bản]`).
+    - `2:30 – 3:00`: Nạp một ca bệnh có triệu chứng chồng lấp hoặc dữ liệu nghèo nàn làm xác suất Top-1 hạ xuống dưới **$55\%$** (`confidence < 0.55`), quay cận cảnh hộp **Cảnh báo Bất định Lâm sàng** màu hổ phách trên `DiagnosticCard.tsx` khuyến cáo bác sĩ hội chẩn chuyên khoa bổ sung thay vì tin cậy tự động.
 
-* **Lời thuyết minh (Voiceover):**
-  > *"Trong y khoa, một con số xác suất không kèm lời giải thích sẽ không thể thuyết phục được bác sĩ. Tuy nhiên, nếu để mô hình ngôn ngữ tự do sinh lời giải thích thì lại tiềm ẩn nguy cơ ảo giác, tức tự bịa ra triệu chứng không có trong hồ sơ. Để giải quyết triệt để bài toán này, hệ thống đa tác tử của chúng em tích hợp bộ kiểm chứng vị trí ký tự tất định. Mọi câu chứng cứ được tô sáng trên màn hình đều bắt buộc phải đối sánh khớp 100% từng ký tự với văn bản gốc của bác sĩ; bất kỳ suy diễn nào nằm ngoài văn bản đều bị chặn hoàn toàn. Đồng thời, khi bác sĩ nhấp vào thẻ tra cứu y văn, ngăn kéo phác đồ sẽ hiển thị ngay điều khoản tương ứng trong hướng dẫn quốc tế GINA 2024, GOLD 2024 và Bộ Y tế, giúp bác sĩ đối chiếu hai chiều giữa triệu chứng thực tế của bệnh nhân và tiêu chuẩn y học chứng cứ."*
+- **Lời thuyết minh (Voiceover):**
 
-* **Phụ đề nhấn mạnh (On-screen Captions):**
-  * `[Anti-Hallucination Evidence Grounding]`: Đối sánh vị trí ký tự $[start, end]$ — Cam kết 0% triệu chứng bịa đặt.
-  * `[Hybrid Guideline RAG]`: Đối chiếu trực tiếp phác đồ GINA 2024, GOLD 2024, ESC & Bộ Y tế.
+    > _"Để minh họa trực tiếp câu hỏi nghiên cứu RQ4 về độ bền khi thiếu phương thức lâm sàng, giao diện tích hợp công tắc giả lập thiếu văn bản hoặc thiếu sinh hiệu. Khi tắt phần ghi chú bệnh án, bác sĩ quan sát ngay mức dịch chuyển phân phối xác suất của mô hình (`[TODO-TV1/TV2: Nêu mức suy giảm định lượng]`). Đặc biệt, với những ca khó mà xác suất Top-1 xuống dưới ngưỡng an toàn 55%, thẻ chẩn đoán tự động kích hoạt cảnh báo bất định lâm sàng, nhắc bác sĩ không dựa vào gợi ý AI một cách máy móc."_
+
+- **Phụ đề nhấn mạnh:**
+    - `[RQ4 Live Toggle]`: Bỏ phương thức văn bản $\rightarrow$ Quan sát biến thiên xác suất trực tiếp.
+    - `[Uncertainty Guardrail]`: Top-1 $< 55\%$ $\rightarrow$ Hiển thị cảnh báo bất định bắt buộc.
 
 ---
 
-### 🎬 PHÂN CẢNH 5: ĐỒ THỊ LỢI ÍCH RÒNG DCA, KIỂM ĐỊNH PROBAST & KẾT LUẬN (`3:40 – 4:30`)
+### PHÂN CẢNH 4: TRANG ĐÁNH GIÁ (`/evaluation`) — CI ĐA SEED, RQ2, DCA & RAG/LATENCY (`3:00 – 4:00`)
 
-* **Hình ảnh & Thao tác trên giao diện (UI Actions):**
-  * `3:40 – 4:05`: Chuyển sang trang **Thẩm định Lâm sàng & Đối chứng (`/evaluation`)**.
-    * Lướt qua bảng đối chứng tổng hợp trên tập kiểm thử độc lập ($N = 302$): M-CDSS đạt $\text{AUROC} = \text{[TODO-TV1]}$, $\text{Macro-F1} = \text{[TODO-TV1]}$, $\text{ECE} = \text{[TODO-TV2]}$.
-    * Nhấp sang tab **"Lợi ích ròng Lâm sàng & PROBAST"**. Kéo thanh trượt ngưỡng quyết định can thiệp $p_t$ từ $10\%$ đến $45\%$ trên đồ thị **Decision Curve Analysis (DCA)**.
-    * Chỉ vào đường cong của M-CDSS so với đường *Treat All* (Can thiệp tất cả) và *Treat None* (Không can thiệp), cùng chỉ số **`[TODO-TV1/TV2: Điền số ca can thiệp đúng tăng thêm / 100 BN]`** tại ngưỡng $p_t = 20\%$.
-  * `4:05 – 4:30`: Cuộn xuống bảng **Thẩm định 4 miền PROBAST** (Participants, Predictors, Outcome, Analysis đều đạt mức *Nguy cơ sai lệch thấp – Low Risk of Bias*) và khung **Tuyên bố Y đức** ở cuối trang.
+- **Thao tác giao diện (UI Actions):**
+    - `3:00 – 3:20`: Chuyển sang `/evaluation`. Ở Tab 1, lướt qua bảng đối chứng đa seed kèm khoảng tin cậy 95% (95% CI) của **RQ1** (`[TODO-TV1/TV2: Điền AUROC & Macro-F1 đa seed ± std / 95% CI]`) và phân rã đóng góp văn bản **RQ2** (`[TODO-TV1/TV2: Điền kết quả nguyên văn bản vs che nhãn/từ khóa]`).
+    - `3:20 – 3:40`: Chuyển sang Tab 2 (**DCA & PROBAST**), kéo thanh trượt ngưỡng quyết định can thiệp trong dải lâm sàng $p_t \in [0,10; 0,45]$ trên `DCACurveChart.tsx` (`[TODO-TV1/TV2: Điền Net Benefit & ca phát hiện đúng thêm / 100 BN tại p_t = 0,20]`).
+    - `3:40 – 4:00`: Chuyển sang **Tab 3 (Phase 3 Research Hardening — Registry)** tải trực tiếp từ `/api/v1/evaluation/registry`, trình chiếu số liệu **đo thực tế** của Thành viên 3:
+        - **RQ5 RAG qua Qdrant Docker sống (60 truy vấn, $\kappa = 0,9449$ — vector băm 768-D ngoại tuyến, chưa dùng `all-mpnet-base-v2`):** `dense_only` (`R@1 = 0,7833`, `R@3 = 0,9167`, `MRR = 0,8688`), `bm25_only` & `hybrid_rrf` (`R@1 = 0,9000`, `R@3 = 0,9500`, `R@5 = 1,0000`, `MRR = 0,9319`); Kiểm tra sơ bộ trên 50 ca từ `data/processed/test.parquet` ($N=287$, trạng thái `preliminary_non_strict_holdout` — chưa phải `strict 302`, 0 template fallback): `200/200` claim pipeline thỏa mãn bất biến cắt chuỗi (`1,00`), `50/50` đầu dò chuỗi ngoài ghi chú bị loại (`out_of_note_probe_rejection_rate = 1,00` — *chỉ chứng minh khớp chuỗi, chưa chứng minh độ đúng ngữ nghĩa*); 20 mẫu span xuất ra `grounding_manual_audit_20_samples.json` đang hiển thị **`Chờ chấm tay (20 mẫu)`**.
+        - **Độ trễ HTTP Docker đầu-cuối (200 lượt gọi ấm):** `/api/v1/agent/explain` (**HTTP 200**) đạt $p_{50} = 62,92\text{ ms}$, $p_{95} = 84,23\text{ ms}$; `/api/v1/predict/baseline` và `/predict/multimodal` trả HTTP 503 an toàn ($p_{95} = 51,24\text{ ms}$ và $50,55\text{ ms}$) khi thiếu model/PyTorch.
 
-* **Lời thuyết minh (Voiceover):**
-  > *"Cuối cùng, tại trang Thẩm định Lâm sàng trên tập kiểm thử độc lập 302 hồ sơ với kiểm toán 0% rò rỉ dữ liệu, M-CDSS đạt AUROC macro `[TODO-TV1]` và Macro-F1 đạt `[TODO-TV1]`. Không dừng lại ở các chỉ số học máy, đồ thị Phân tích Đường cong Quyết định DCA tương tác cho phép bác sĩ điều chỉnh ngưỡng xác suất can thiệp thực tế. Trên dải ngưỡng lâm sàng, đường cong lợi ích ròng của M-CDSS vượt trội hơn cả hai chiến lược can thiệp tất cả hoặc không can thiệp; giúp phát hiện đúng thêm `[TODO-TV1/TV2]` ca bệnh trên mỗi 100 bệnh nhân ở ngưỡng 20% mà không làm tăng điều trị thừa. Toàn bộ hệ thống đạt chuẩn nguy cơ sai lệch thấp trên cả 4 miền PROBAST và được đóng gói trọn gói bằng Docker, sẵn sàng hỗ trợ đắc lực cho bác sĩ trong vai trò công cụ tham khảo lâm sàng minh bạch. Em xin trân trọng cảm ơn thầy cô đã theo dõi."*
+- **Lời thuyết minh (Voiceover):**
 
-* **Phụ đề nhấn mạnh (On-screen Captions):**
-  * `[Decision Curve Analysis]`: Lợi ích ròng trên dải $p_t \in [0,10; 0,45]$ (`[TODO-TV1/TV2]` ca đúng / 100 bệnh nhân tại $p_t=0,20$).
-  * `[PROBAST & Y đức]`: Đạt Low Risk of Bias cả 4 miền | Công cụ hỗ trợ tham khảo, tôn trọng quyền quyết định của bác sĩ.
+    > _"Trên trang Đánh giá hợp nhất lấy dữ liệu từ Registry chuẩn hóa, hội đồng có thể kiểm tra kết quả đa seed kèm khoảng tin cậy cho RQ1, phân tích đóng góp văn bản ở RQ2 (`[TODO-TV1/TV2]`), và đường cong lợi ích ròng DCA Macro One-vs-Rest 4 lớp giới hạn trong dải ngưỡng 10 đến 45 phần trăm. Đặc biệt ở thẻ Phase 3, phép kiểm tra chỉ đọc qua Qdrant Docker 64 điểm đã xác minh khớp chiều 768, 64 chunk_id, SHA-256 nội dung và 8 trường metadata — dù chưa xác nhận chất lượng ngữ nghĩa của vector do vẫn đang dùng vector băm 768 chiều ngoại tuyến (Recall@3 bằng 0,95 và Recall@5 bằng 1,0 trên 60 truy vấn, còn `all-mpnet-base-v2` vẫn ở trạng thái chờ). Về phần grounding 50 ca trên tập `data/processed/test.parquet` N=287, chúng em ghi rõ đây mới là kết quả kiểm tra sơ bộ (chưa phải hold-out strict N=302): pipeline khớp tọa độ cắt chuỗi 200 trên 200 đoạn và từ chối 50 trên 50 đầu dò ngoài bệnh án, 20 mẫu ngữ nghĩa đang chờ chấm tay, và độ trễ HTTP đầu-cuối qua Docker của /agent/explain đạt trung vị 62,92 mili-giây và p95 đạt 84,23 mili-giây."_
+
+- **Phụ đề nhấn mạnh:**
+    - `[RQ5 RAG Sơ bộ]`: 60 queries ($\kappa=0,9449$, hash 768-D — chờ `mpnet`) | `hybrid_rrf` R@3=0,95, R@5=1,00 | Sơ bộ chuỗi `200/200` + ngoài note `50/50` (`test.parquet` N=287, chưa phải `strict 302`) | 20 mẫu `[TODO-HUMAN-REVIEW]`.
+    - `[Docker HTTP Latency]`: `/agent/explain` $p_{50} = 62,92\text{ ms}$, $p_{95} = 84,23\text{ ms}$.
+
+---
+
+### PHÂN CẢNH 5: GIỚI HẠN TRUNG THỰC & HƯỚNG PHÁT TRIỂN (`4:00 – 4:30`)
+
+- **Hình ảnh hiển thị (Visuals):**
+    - `4:00 – 4:15`: Hiển thị bảng tổng hợp kiểm toán 4 miền **PROBAST** (_Low Risk_) đặt cạnh thẻ **Giới hạn Trung thực**.
+    - `4:15 – 4:30`: Màn hình kết thúc nêu 3 hướng phát triển: ngoại kiểm trên **MIMIC-IV**, khảo sát đánh giá hữu dụng của bác sĩ lâm sàng, và tích hợp mô hình ngôn ngữ cục bộ có ràng buộc đối chiếu tọa độ qua `EvidenceGrounder` kết hợp kiểm duyệt của bác sĩ.
+
+- **Lời thuyết minh (Voiceover):**
+
+    > _"Cuối cùng, nhóm nhìn nhận thẳng thắn các giới hạn hiện tại: bộ dữ liệu còn mang tính tổng hợp chưa qua ngoại kiểm bệnh viện thật, mô hình mới dừng ở phân loại đơn nhãn 4 bệnh, cơ chế grounding ký tự giúp giảm trích dẫn vô căn cứ nhưng không loại bỏ hết sai lệch ngữ nghĩa, và ở chế độ ngoại tuyến không có trọng số all-mpnet-base-v2 hay Bio_ClinicalBERT cục bộ, hệ thống chủ động lùi về dense băm 768 chiều hoặc trả HTTP 503 thay vì giả lập kết quả. Hướng đi tiếp theo của nhóm là thẩm định ngoại kiểm trên MIMIC-IV, lấy ý kiến bác sĩ nội trú và tích hợp LLM cục bộ có kiểm tra trích dẫn. Em xin trân trọng cảm ơn."_
+
+- **Phụ đề nhấn mạnh:**
+    - `[Trung thực Khoa học]`: Chưa ngoại kiểm MIMIC-IV/BV | Safeguard 503 khi thiếu weight thật | Định hướng: MIMIC-IV + Clinician Survey + Constrained LLM.
