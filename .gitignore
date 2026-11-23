@@ -39,3 +39,4 @@ frontend/build/
 .vscode/
 .idea/
 reports/*
+catboost_info/

@@ -1,30 +1,45 @@
 {
-  "_mock_notice": "[MOCK FILE - TẠO TẠM BỞI THÀNH VIÊN 3 ĐỂ KIỂM THỬ PHASE 3 - CHỜ THÀNH VIÊN 2 CHỐT MANIFEST CHÍNH THỨC (BACKLOG 08 TASK 2.1)]",
-  "manifest_version": "1.0.0-mock",
-  "generated_by": "member3_mock_placeholder",
-  "manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  "canonical_split_dir": "data/processed_rebuilt_strict",
+  "manifest_version": "1.0.0",
+  "canonical_data_dir": "data/processed_rebuilt_strict",
+  "recreation_command": "python scripts/rebuild_canonical_dataset.py",
+  "commit": "HEAD",
+  "description": "Canonical preprocessed multimodal EHR dataset with strict patient-level splitting and full de-identification.",
   "splits": {
     "train": {
-      "rows": 1425,
-      "relative_path": "data/processed_rebuilt_strict/train.parquet",
-      "sha256": "mock-train-sha256-pending-member2"
+      "path": "data/processed_rebuilt_strict/train.parquet",
+      "sha256": "7d522112590e60cf53cd677674acd52f409a34d3f3c0775fb08211ac14fddb0a",
+      "row_count": 1425,
+      "class_distribution": {
+        "0": 358,
+        "1": 358,
+        "2": 340,
+        "3": 369
+      },
+      "features_count": 38
     },
     "val": {
-      "rows": 273,
-      "relative_path": "data/processed_rebuilt_strict/val.parquet",
-      "sha256": "mock-val-sha256-pending-member2"
+      "path": "data/processed_rebuilt_strict/val.parquet",
+      "sha256": "5e925be4a32ee986f9e2907ca8de00dc17d6e6f3a9c48bf94d50f511a45353e8",
+      "row_count": 273,
+      "class_distribution": {
+        "0": 71,
+        "1": 71,
+        "2": 54,
+        "3": 77
+      },
+      "features_count": 38
     },
     "test": {
-      "rows": 302,
-      "relative_path": "data/processed_rebuilt_strict/test.parquet",
-      "sha256": "mock-test-sha256-pending-member2",
-      "class_counts": {
-        "ASTHMA": 71,
-        "COPD": 71,
-        "HEART_FAILURE": 106,
-        "PNEUMONIA": 54
-      }
+      "path": "data/processed_rebuilt_strict/test.parquet",
+      "sha256": "31b161484c3cdf77c20682d8ca13ff21fa55d1f378a93a5865fe4cec7d7f66e4",
+      "row_count": 302,
+      "class_distribution": {
+        "0": 71,
+        "1": 71,
+        "2": 106,
+        "3": 54
+      },
+      "features_count": 38
     }
   }
 }

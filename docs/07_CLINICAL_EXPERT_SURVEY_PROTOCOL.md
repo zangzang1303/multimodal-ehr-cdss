@@ -126,13 +126,53 @@ Khảo sát được thiết kế nhằm đánh giá 3 trụ cột lâm sàng c�
    │ 1. Bộ câu hỏi khảo sát Likert Scale 1-5       │ [✓] ĐÃ HOÀN THÀNH & BAN HÀNH     │
    │ 2. Giao thức làm mù đôi & chọn mẫu phân tầng  │ [✓] ĐÃ THIẾT KẾ & ĐÓNG GÓI       │
    │ 3. Khung bảo vệ quyền riêng tư HIPAA          │ [✓] ĐÃ PHÊ DUYỆT (Tập Test ẩn)   │
-   │ 4. Tuyển dụng bác sĩ & Thu thập đánh giá thực │ [⏳] CHƯA THỰC HIỆN (PENDING)     │
-   │    (Lý do: Đang chuẩn bị hồ sơ IRB và thỏa    │      Không thay thế bằng số liệu │
-   │     thuận bảo mật với cơ sở khám bệnh)        │      đánh giá giả lập).          │
+   │ 4. Tuyển dụng bác sĩ & Thu thập đánh giá thực │ [⚠️] CHƯA THỰC HIỆN              │
+   │    (Số lượng bác sĩ đồng ý chính thức < 2;     │      Ghi nhận minh bạch theo     │
+   │     không thay thế bằng điểm số giả định)      │      quy chuẩn TRIPOD+AI)        │
+   │ 5. Lộ trình ngoại kiểm PhysioNet / MIMIC-IV   │ [✓] ĐÃ HOÀN TẤT THIẾT KẾ LỘ TRÌNH│
    └───────────────────────────────────────────────┴──────────────────────────────────┘
 ```
 
-### Kế Hoạch Triển Khai Trong Giai Đoạn Tiếp Theo (Next Steps for Phase 3):
-1. **Phối hợp Thành viên 1:** Tích hợp bộ quy tắc loại trừ dựa trên ý kiến sơ bộ của chuyên gia (ví dụ: tuổi $\le 20$ kèm không hút thuốc thì phạt nặng xác suất COPD).
-2. **Phối hợp Thành viên 3:** Xây dựng cửa sổ Modal khảo sát (In-App Doctor Survey Widget) ngay trên giao diện Web bác sĩ (`frontend`) để khi thử nghiệm lâm sàng, bác sĩ có thể bấm 1-click chấm điểm trực tiếp cho ca bệnh mà không cần dùng phiếu giấy.
+> [!IMPORTANT]
+> **MINH BẠCH VỀ TÌNH TRẠNG KHẢO SÁT CHUYÊN GIA LÂM SÀNG:**  
+> Theo quy chuẩn nghiệm thu Task 2.5 (Backlog 09) và nguyên tắc liêm chính khoa học: *"Chỉ báo cáo kết quả khảo sát khi có $\ge 2$ bác sĩ hành nghề chính thức tham gia đánh giá độc lập; nếu chưa đủ, bắt buộc ghi rõ 'CHƯA THỰC HIỆN', tuyệt đối không được tự bịa số liệu Likert hay nhận xét giả định"*.  
+> Hiện tại, do nhóm nghiên cứu chưa hoàn tất ký kết DUA lâm sàng và chưa tuyển đủ tối thiểu 02 bác sĩ chuyên khoa có chứng chỉ hành nghề (CCHN) hoàn thành trọn vẹn 20 ca đánh giá mù đôi, khảo sát được bảo lưu ở trạng thái **CHƯA THỰC HIỆN**.  
+> Khi đạt đủ điều kiện tuyển mộ ($\ge 2$ bác sĩ), nhóm sẽ tiến hành thu thập và tính toán độ đồng thuận liên quan sát viên (Inter-rater Agreement) bằng hệ số **Krippendorff's Alpha ($\alpha$)** và **Fleiss' Kappa ($\kappa$)** cho thang đo thứ bậc nhiều người đánh giá.
+
+---
+
+## 6. LỘ TRÌNH DỮ LIỆU THỰC & NGOẠI KIỂM BỆNH VIỆN QUA PHYSIONET MIMIC-IV (REAL-WORLD EXTERNAL VALIDATION ROADMAP)
+
+Để giải quyết triệt để ranh giới giữa dữ liệu tổng hợp (Synthea/MTSamples) và thực hành lâm sàng thực địa, nhóm nghiên cứu đã thiết lập lộ trình ngoại kiểm độc lập (External Hospital Validation) sử dụng cơ sở dữ liệu hồi cứu quy mô lớn **MIMIC-IV** và **MIMIC-IV-Note** (Beth Israel Deaconess Medical Center, Boston, MA):
+
+```
+                     LỘ TRÌNH 4 BƯỚC NGOẠI KIỂM PHYSIONET MIMIC-IV
+  ┌────────────────────────────────────────────────────────────────────────────────────────┐
+  │ BƯỚC 1: ĐÀO TẠO ĐẠO ĐỨC & CHỨNG CHỈ CITI (CITI TRAINING PROGRAM)                       │
+  │ • Hoàn thành khóa học: "Data or Specimens Only Research" trên CITI Program.            │
+  │ • Nộp chứng chỉ cho PhysioNet để đạt tư cách "Credentialed User".                      │
+  ├────────────────────────────────────────────────────────────────────────────────────────┤
+  │ BƯỚC 2: KÝ THỎA THUẬN SỬ DỤNG DỮ LIỆU (DUA - DATA USE AGREEMENT)                       │
+  │ • Ký cam kết bảo mật: không tái nhận danh bệnh nhân, không chia sẻ dữ liệu ra ngoài.   │
+  │ • Được cấp quyền truy cập BigQuery / Cloud Storage cho MIMIC-IV v2.2 & MIMIC-IV-Note.  │
+  ├────────────────────────────────────────────────────────────────────────────────────────┤
+  │ BƯỚC 3: TRÍCH XUẤT TẬP CON NGOẠI KIỂM THEO 4 MÃ ICD-10 ĐÍCH                           │
+  │ Trích xuất bệnh nhân nhập viện ban đầu có chẩn đoán xuất viện (diagnoses_icd) tương ứng:│
+  │ • Hen phế quản (Asthma):           ICD-10 J45 (J45.0 - J45.9)                          │
+  │ • Bệnh phổi tắc nghẽn mạn (COPD):   ICD-10 J44 (J44.0, J44.1, J44.9)                   │
+  │ • Suy tim sung huyết (HF):         ICD-10 I50 (I50.1, I50.2x, I50.3x, I50.9)           │
+  │ • Viêm phổi mắc phải (Pneumonia):  ICD-10 J18 (J18.0, J18.1, J18.9)                    │
+  │ Khai thác: Sinh hiệu cấp cứu đầu tiên (ED vitals) + Ghi chú tiếp nhận (Discharge/ED).   │
+  ├────────────────────────────────────────────────────────────────────────────────────────┤
+  │ BƯỚC 4: THỰC THI KIỂM ĐỊNH NGOẠI KIỂM KHÔNG HUẤN LUYỆN LẠI (ZERO-SHOT TRANSPORTABILITY)│
+  │ • Nạp checkpoint mô hình M-CDSS huấn luyện trên Synthetic EHR.                         │
+  │ • Suy luận trực tiếp trên tập trích xuất MIMIC-IV (N = 1000 ca, 250 ca/bệnh lý).        │
+  │ • Đo lường độ suy giảm hiệu năng ngoại kiểm: ΔAUROC, ΔAUPRC, Calibration Drift (ECE).  │
+  └────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Kế hoạch công bố khoa học (Scientific Paper Transition):
+Trong bản thảo bài báo khoa học (Mục *Limitations & Future Directions*), nhóm sẽ tuyên bố rõ ràng:
+1. Nghiên cứu hiện tại đã hoàn thiện toàn diện về mặt kiến trúc đa phương thức, kiểm định nội bộ đa chiều (DCA, Missing Modality, Subgroup Fairness, Temporal Generalization).
+2. Quy trình trích xuất và giao thức ngoại kiểm MIMIC-IV 4 nhóm ICD-10 đã được đóng gói hoàn chỉnh thành mã nguồn và sẽ được kích hoạt ngay khi hoàn tất phê duyệt tài khoản PhysioNet Credentialed.
 

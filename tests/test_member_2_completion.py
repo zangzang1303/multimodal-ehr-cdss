@@ -109,6 +109,8 @@ class TestMember2Task2ClinicalUtilityScriptAndOutputs:
         assert len(data["dca_analysis"]["dca_table"]) > 0
 
     def test_cli_execution(self):
+        import os
+
         cmd = [
             sys.executable,
             str(ROOT_DIR / "scripts" / "evaluate_clinical_utility.py"),
@@ -116,9 +118,14 @@ class TestMember2Task2ClinicalUtilityScriptAndOutputs:
             "--test_data", "data/processed_rebuilt_strict/test.parquet",
             "--output_plots", "data/evaluation_plots",
         ]
-        result = subprocess.run(cmd, cwd=ROOT_DIR, capture_output=True, text=True)
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "utf-8"
+        result = subprocess.run(cmd, cwd=ROOT_DIR, capture_output=True, text=True, encoding="utf-8", env=env)
         assert result.returncode == 0, f"CLI execution failed:\nSTDOUT: {result.stdout}\nSTDERR: {result.stderr}"
-        assert "[✓] Clinical validation automated execution completed successfully." in result.stdout
+        assert (
+            "[✓] Clinical validation automated execution completed successfully." in result.stdout
+            or "Clinical validation automated execution completed successfully." in result.stdout
+        )
 
 
 class TestMember2Task3PhysicianSurveyProtocol:
