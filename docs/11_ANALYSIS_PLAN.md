@@ -115,3 +115,54 @@ Cập nhật lại 2 ca bệnh điển hình PT-0044 và PT-0254 dựa trên k�
 
 ---
 *Kế hoạch phân tích này được đóng băng và lưu vào tài liệu kỹ thuật của dự án trước khi thực thi tính toán.*
+
+---
+
+## 7. PHỤ LỤC A – ĐĂNG KÝ BỔ SUNG CỦA THÀNH VIÊN 1 & SỬA ĐỔI (2026-11-23, TRƯỚC KHI CHẠY)
+
+> Phụ lục này được viết **trước** lần chạy thí nghiệm đầu tiên trên bộ dữ liệu canonical đã dựng lại ngày 2026-11-23. SHA-256 của tệp này tại thời điểm chạy được ghi vào `results/registry.json → metadata.analysis_plan_sha256`.
+
+### A.0. Dữ liệu
+- Bộ canonical = `data/processed_rebuilt_strict/` dựng lại bằng `scripts/rebuild_canonical_dataset.py` (pipeline Phase 1 trên `data/raw_rebuilt/` + bộ khử định danh Phase 3). Cùng bệnh nhân/split với benchmark 2026-10-28 (1425/273/302), chỉ khác văn bản đã khử định danh.
+- Bộ dữ liệu ngày 2026-11-18 (tái tạo từ `data/raw/`) **bị loại**: 86–90% ghi chú còn tên chẩn đoán, 42% ghi chú test dùng lại thân ghi chú MTSamples gắn với một nhãn ở train. Mọi kết quả tính trên bộ đó không được báo cáo.
+
+### A.1. RQ1 – Danh mục mô hình (cố định)
+| Khoá | Mô hình |
+| :--- | :--- |
+| `lr_tabular` | Logistic Regression (9 biến số chuẩn hoá + one-hot 4 biến danh mục) |
+| `catboost` | CatBoost (siêu tham số `configs/model_config.yaml`) |
+| `ft_transformer` | FT-Transformer chỉ dữ liệu bảng (`AblationModel("tabular")`) |
+| `tfidf_lr` | TF-IDF (1–2 gram, min_df=2, sublinear) + Logistic Regression |
+| `bert_frozen` | Bio_ClinicalBERT đóng băng + mean-pool + head tuyến tính |
+| `bert_ft` | Bio_ClinicalBERT fine-tune **khối encoder cuối** + head |
+| `concat_frozen` | Concat late fusion, BERT đóng băng |
+| `xattn_frozen` | **Cross-attention, BERT đóng băng – mô hình triển khai (deployment)** |
+| `xattn_ft` | Cross-attention, fine-tune khối encoder cuối |
+| `ensemble_cb_bertft` | Trung bình xác suất đã hiệu chuẩn của `catboost` và `bert_ft` |
+
+- Seed: 13, 42, 101, 2024, 7 (mô hình tất định như `lr_tabular`, `tfidf_lr` chạy một lần). `max_length = 512`.
+- Mọi mô hình được hiệu chuẩn bằng temperature scaling khớp trên **validation**; chỉ số chính báo cáo trên xác suất đã hiệu chuẩn.
+- Chọn seed đại diện cho mỗi mô hình = seed có **validation NLL thấp nhất**. Checkpoint triển khai = `xattn_frozen` ở seed đó.
+- Báo cáo: mean ± SD qua seed; CI 95% paired bootstrap (B = 2000, theo bệnh nhân) trên seed đại diện; so sánh chính = `xattn_frozen` vs từng mô hình khác, ΔAUROC macro, p hai phía, hiệu chỉnh Holm trên 9 so sánh.
+
+### A.2. RQ2 – Phân rã tín hiệu văn bản
+Biến thể ghi chú (hàm thuần `src/data_pipeline/note_variants.py`): `full`, `num_masked` (mọi số → `<NUM>`), `no_vitals` (bỏ khối VITALS và mọi dòng/câu chứa sinh hiệu–xét nghiệm có số), `narrative_only` (chỉ CHIEF COMPLAINT + HPI + MEDICATIONS). Mô hình: `tfidf_lr`, `bert_frozen`, `bert_ft`, `xattn_frozen`; 3 seed (13, 42, 101). Giả thuyết: AUROC của mô hình chỉ dùng văn bản giảm về gần 0,5 khi bỏ thông tin số; fusion ≈ tabular.
+
+### A.3. RQ3 – Mô phỏng bổ trợ có kiểm soát (mô phỏng, không phải hiệu năng lâm sàng)
+Nền `num_masked`. Chèn một câu triệu chứng đặc hiệu theo lớp (từ điển rút từ GINA/GOLD/ESC/BYT) vào đầu HPI cho tỷ lệ ρ ∈ {0; 0,25; 0,5; 0,75; 1} bệnh nhân ở mọi split; 10% câu chèn lấy từ lớp sai (ε = 0,1). Nhiễu Gauss σ ∈ {0; 0,5; 1,0} × SD(train) cộng vào 9 biến số ở mọi split. Mô hình: `tabular`, `text`, `concat`, `cross_attention` (BERT đóng băng), 2 seed (13, 42). Kết quả: Δ = AUROC(fusion) − max(AUROC đơn phương thức) theo (ρ, σ).
+
+### A.4. RQ4a – Hiệu chuẩn
+Trên mô hình triển khai: không hiệu chuẩn / temperature / vector scaling / isotonic one-vs-rest (fit trên val). ECE chính = 10 bins độ rộng bằng nhau (`src/evaluation/metrics.py`); phụ = 15 bins equal-mass, classwise ECE; CI bootstrap.
+
+### A.5. Sửa đổi so với mục 3–5 (có lý do)
+1. **Công thức số can thiệp tránh được (mục 3.5) sai.** Công thức đúng (Vickers et al., 2016): *Net reduction in interventions per 100* = (NB_model − NB_treat-all) × (1 − p_t) / p_t × 100. Công thức cũ (chia cho p_t) phóng đại kết quả.
+2. **Robustness và DCA (mục 3–4)** chạy trên **mô hình triển khai của dự án** (`xattn_frozen`) và các mô hình RQ1, không dùng mô hình fusion riêng huấn luyện trong `scripts/evaluate_research_hardening_member2.py` (không có validation, temperature cố định 1,15, `max_length = 128`).
+3. **Temporal split (mục 5)** phải tôn trọng nhóm nguồn (patient + note group) và có validation: nhóm được sắp theo thời điểm khám sớm nhất, cắt 70/15/15 theo thời gian. Mô hình: `catboost`, `tfidf_lr`, `bert_frozen`, `xattn_frozen` (seed 42). Đây là kiểm tra độ bền nội bộ trên dấu thời gian tổng hợp.
+
+### A.6. Phân tích độ nhạy POST-HOC (thêm 2026-11-23, sau khi thấy phân bố test, trước khi chạy CV)
+- Lý do: trong tập test strict, 106/106 ca suy tim là nam và từng hút thuốc, không có người đang hút thuốc; phân bố này khác train (do chia theo nhóm nguồn). Kết luận dựa trên một tập test 302 ca có thể không bền.
+- Thiết kế: gộp 2.000 ca, nhóm hợp nhất (patient + note group), `StratifiedGroupKFold(5, shuffle=True, random_state=42)`; trong mỗi fold, 15% nhóm của phần còn lại làm validation (chọn epoch/temperature). Mô hình: `lr_tabular`, `catboost`, `tfidf_lr`, `bert_frozen`, `bert_ft`, `xattn_frozen`, `ensemble_cb_bertft`; seed 42.
+- Báo cáo: macro AUROC từng fold, trung bình ± SD qua fold. **Gắn nhãn post-hoc**; không thay thế kết quả chính A.1.
+
+### A.7. Ghi chú làm rõ (2026-11-23, sau khi chạy RQ1 – không thay đổi phân tích)
+- "Bootstrap theo bệnh nhân" trong kế hoạch được thực hiện ở mức **bản ghi** (`patient_id`). Kiểm toán sau đó cho thấy 2.000 bản ghi được sinh từ 478 bệnh nhân Synthea gốc; trong tập test, toàn bộ 106 bản ghi suy tim và 54 bản ghi viêm phổi đến từ **một** bệnh nhân gốc mỗi lớp. Bootstrap theo cụm bệnh nhân gốc không khả thi (một cụm/lớp), nên CI được báo cáo kèm cảnh báo là đánh giá thấp độ bất định; số bệnh nhân gốc theo split/lớp được ghi trong `results/registry.json → data_provenance`.

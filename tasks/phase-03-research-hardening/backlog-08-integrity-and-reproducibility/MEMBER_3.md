@@ -1,5 +1,8 @@
 # BACKLOG 08 – THÀNH VIÊN 3 (Full-Stack AI & System Integrator)
 
+> **RÀ SOÁT CỦA THÀNH VIÊN 1 (2026-11-23):** ✅ Chấp nhận. `/agent/explain` hoạt động, mock gán cứng đã gỡ, CI + pin Qdrant có. Bổ sung của TV1: `/predict/baseline` nay phục vụ mô hình baseline thật (`src/api/baseline_service.py`); `/evaluation/benchmark` không còn số liệu gán cứng trong mã nguồn; model card đọc metadata từ checkpoint.
+
+
 > **Cập nhật trạng thái thực hiện (Phase 3 — Bản sửa sau rà soát):** Đã khắc phục các sai lệch thuộc phạm vi Thành viên 3 (xóa hardcode `PT-0044`/`PT-0254` trong `agent_chat.py`, đổi mặc định `/predict/baseline` sang `HTTP 503`, gắn nhãn `MOCK — chờ TV2` cho `DATA_MANIFEST.json`, nâng `docker-compose.yml` về `qdrant/qdrant:v1.20.0`, lazy-import `torch` trong `inference.py`). Tổng thể backlog **chưa nghiệm thu 100%** vì còn phụ thuộc model thật & manifest thật từ TV1/TV2 và chạy CI trên GitHub PR runner.
 
 ## Nhiệm vụ 3.1 – Sửa `/agent/explain` và đưa test về xanh (ngày 1–2)

@@ -1,75 +1,94 @@
 % ==============================================================================
-% Phân mục 07: Kết quả Thực nghiệm & Phân tích Lợi ích Ròng Lâm sàng (Results)
-% [PHỐI HỢP THÀNH VIÊN 1 & 2 --- BACKLOG 07 NHIỆM VỤ 1.2 & BACKLOG 06 NHIỆM VỤ 1.1-1.3, 2.1-2.3]
+% Phân mục 07: Kết quả thực nghiệm (Results) – THÀNH VIÊN 1 (+ Thành viên 2 phần DCA/fairness)
+% Mọi con số được \input từ generated/*.tex (sinh bởi scripts/export_latex_tables.py từ
+% results/registry.json). KHÔNG gõ tay số liệu vào file này.
 % ==============================================================================
-\section{Kết Quả Thực Nghiệm, Nghiên Cứu Cắt Bỏ và Lợi Ích Ròng Lâm Sàng (Empirical Results)}
+\section{Kết Quả (Results)}
 \label{sec:empirical_results}
 
-\subsection{Đối chứng Toàn diện với Ba Mô hình Đơn phương thức và Nghiên cứu Cắt bỏ}
-Toàn bộ các mô hình được đánh giá khách quan trên cùng tập kiểm thử độc lập $N = 302$ hồ sơ bệnh án (\textit{Strict Hold-out Test Set}, phân bố gồm 71 ca \texttt{ASTHMA}, 71 ca \texttt{COPD}, 106 ca \texttt{HEART\_FAILURE} và 54 ca \texttt{PNEUMONIA}). Nhóm 1 trong Bảng~\ref{tab:benchmark_comparison} trình bày kết quả thực nghiệm chính thức của 3 mô hình đơn phương thức Giai đoạn 1 từ tệp \texttt{data/rebuilt\_strict\_results\_2026-10-28.json}; Nhóm 2 là khung kết quả chờ điền sau khi Thành viên 1 và Thành viên 2 hoàn tất huấn luyện và đánh giá mô hình đa phương thức Giai đoạn 2.
-
-\begin{table}[htbp]
-\centering
-\caption{Kết quả thực nghiệm của 3 mô hình Baseline Giai đoạn 1 (nguồn: \texttt{data/rebuilt\_strict\_results\_2026-10-28.json}) và khung bảng chờ bổ sung kết quả Ablation / M-CDSS Giai đoạn 2 của Thành viên 1 \& 2 trên tập kiểm thử độc lập ($N = 302$).}
-\label{tab:benchmark_comparison}
-\footnotesize
-\begin{tabular}{@{}lcccccc@{}}
-\toprule
-\textbf{Kiến trúc Mô hình} & \textbf{AUROC} $\uparrow$ & \textbf{AUPRC} $\uparrow$ & \textbf{Macro-F1} $\uparrow$ & \textbf{Accuracy} $\uparrow$ & \textbf{Brier} $\downarrow$ & \textbf{ECE} $\downarrow$ \\
-\midrule
-\multicolumn{7}{@{}l}{\textit{Nhóm 1: Các mô hình Baseline đơn phương thức --- Đã nghiệm thu Giai đoạn 1 (\texttt{rebuilt\_strict\_results\_2026-10-28.json})}} \\
-CatBoost (\textit{Nhánh Bảng số GBDT}) \cite{prokhorenkova2018catboost} & 0.9223 & 0.7872 & 0.6083 & 0.6854 & 0.3844 & 0.0663 \\
-FT-Transformer (\textit{Nhánh Bảng số Học sâu}) \cite{gorishniy2021revisiting} & 0.8976 & 0.7023 & 0.5789 & 0.6589 & 0.4725 & 0.1152 \\
-Bio\_ClinicalBERT (\textit{Nhánh Văn bản Lâm sàng}) \cite{alsentzer2019publicly} & 0.9735 & 0.9314 & 0.8421 & 0.8543 & 0.2329 & 0.0373 \\
-\midrule
-\multicolumn{7}{@{}l}{\textit{Nhóm 2: Nghiên cứu Cắt bỏ \& Mô hình Dung hợp Giai đoạn 2 --- Chờ bổ sung từ Thành viên 1 \& 2}} \\
-Concat Late Fusion (\textit{Ghép nối phẳng $\bm{h}_{\text{tab}} \Vert \bm{h}_{\text{text}}$}) & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV2]} \\
-M-CDSS Uncalibrated (\textit{Cross-Attention trước hiệu chuẩn}) & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV1]} & \texttt{[TODO-TV2]} \\
-\rowcolor{mcdssBgLight}
-\textbf{M-CDSS Calibrated (\textit{Cross-Attention + Temp Scaling})} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV1]}} & \textbf{\texttt{[TODO-TV2]}} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Nhận xét kết quả thực nghiệm (Khung chờ điền số liệu từ Thành viên 1 \& 2):
+\subsection{RQ1 -- So sánh công bằng giữa các mô hình}
+Bảng~\ref{tab:rq1} trình bày kết quả của mười mô hình trên tập kiểm thử strict ($N=\testN$). Ba quan sát chính:
 \begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Đóng góp của Dung hợp Chú ý chéo:} \texttt{[TODO-TV1 (Backlog 04 Task 1.4 \& Backlog 06 Task 1.1): Điền mức cải thiện $\Delta\text{AUROC}$ và $\Delta\text{Macro-F1}$ của M-CDSS so với FT-Transformer, Bio\_ClinicalBERT và Concat Late Fusion sau khi có kết quả chạy thật]}.
-    \item \textbf{Hiệu quả của Temperature Scaling:} \texttt{[TODO-TV2 (Backlog 04 Task 2.3): Điền mức giảm ECE và Brier Score trước và sau khi hiệu chuẩn nhiệt độ, kèm tham chiếu đồ thị Reliability Diagram data/calibration\_curve.png]}.
+  \item \textbf{Mô hình đơn phương thức mạnh nhất là Bio\_ClinicalBERT fine-tune} (macro AUROC \aucBertFT{} $\pm$ \aucsdBertFT{}), cao hơn mọi mô hình chỉ dùng dữ liệu bảng. Ensemble trung bình xác suất CatBoost + BERT-FT đạt \aucEnsemble{} $\pm$ \aucsdEnsemble{}.
+  \item \textbf{Cross-attention đóng băng (mô hình triển khai)} đạt \aucXattn{} $\pm$ \aucsdXattn{}: cao hơn có ý nghĩa thống kê so với CatBoost ($\Delta=\deltaCatBoost$, $p_{\text{Holm}}=\pCatBoost$), TF-IDF + LR, BERT đóng băng và concat fusion, nhưng \emph{không khác biệt} so với Logistic Regression ($\Delta=\deltaLRTab{}$, $p_{\text{Holm}}=\pLRTab$) và FT-Transformer chỉ dùng dữ liệu bảng ($\Delta=\deltaFTT{}$, $p_{\text{Holm}}=\pFTT$), và \emph{thấp hơn có ý nghĩa} so với BERT-FT ($\Delta=\deltaBertFT{}$ \deltaciBertFT, $p_{\text{Holm}}=\pBertFT$) và ensemble ($\Delta=\deltaEnsemble{}$, $p_{\text{Holm}}=\pEnsemble$).
+  \item \textbf{Fine-tune khối BERT cuối trong mô hình dung hợp không cải thiện}: cross-attention fine-tune đạt \aucXattnFT{} $\pm$ \aucsdXattnFT{}, không khác mô hình triển khai ($p_{\text{Holm}}=\pXattnFT$). Mô hình dung hợp có độ biến thiên giữa các seed lớn hơn mô hình đơn phương thức (concat: SD \aucsdConcat{}); vì seed đại diện được chọn theo NLL validation, khoảng cách ở cột $\Delta$ của concat lớn hơn chênh lệch trung bình qua seed.
 \end{enumerate}
+Như vậy, trên tập test strict, giả thuyết ``dung hợp chú ý chéo vượt mô hình đơn phương thức tốt nhất'' \textbf{không được ủng hộ}. Tuy nhiên, phân tích độ nhạy post-hoc bằng 5-fold grouped CV (Bảng~\ref{tab:generalization}) cho bức tranh khác: cross-attention đạt \cvXattn{} $\pm$ \cvsdXattn{} và là mô hình \emph{ổn định nhất} qua các fold, trong khi BERT-FT đạt \cvBertFT{} $\pm$ \cvsdBertFT{} (fold kém nhất \cvminBertFT) và ensemble \cvEnsemble{} $\pm$ \cvsdEnsemble. Ưu thế của BERT-FT trên tập test strict vì vậy không bền khi tập test gồm các bệnh nhân gốc khác; kết luận RQ1 phụ thuộc vào cách chia dữ liệu và cần được kiểm chứng trên dữ liệu thật.
 
-\subsection{Giải quyết Điểm mù Đơn phương thức và Phân tích Lỗi (Error Analysis)}
-Thực nghiệm Giai đoạn 1 (\texttt{data/rebuilt\_strict\_results\_2026-10-28.json}) đã xác định các ca bệnh điển hình thể hiện sự đối lập giữa hai phương thức đơn lẻ trên tập kiểm thử:
-\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Ca bệnh \texttt{PT-0044} (Nhãn thực tế: \texttt{ASTHMA} --- Điểm mù Bảng số):} Nhánh bảng số dự đoán nhầm thành \texttt{COPD} với độ tự tin $78.82\%$, trong khi nhánh văn bản \textit{Bio\_ClinicalBERT} dự đoán đúng \texttt{ASTHMA} ($85.80\%$). Kết quả trên mô hình dung hợp M-CDSS: \texttt{[TODO-TV1/TV2: Điền xác suất dự đoán thực tế sau hiệu chuẩn và trọng số Cross-Attention của M-CDSS trên ca PT-0044]}.
-    \item \textbf{Ca bệnh \texttt{PT-0254} (Nhãn thực tế: \texttt{COPD} --- Điểm mù Văn bản):} Nhánh văn bản \textit{Bio\_ClinicalBERT} bị nhiễu ngữ cảnh và dự đoán nhầm sang \texttt{HEART\_FAILURE} ($59.00\%$), trong khi nhánh bảng số dự đoán đúng \texttt{COPD} ($75.22\%$). Kết quả trên mô hình dung hợp M-CDSS: \texttt{[TODO-TV1/TV2: Điền xác suất dự đoán thực tế sau hiệu chuẩn và trọng số Cross-Attention của M-CDSS trên ca PT-0254]}.
-    \item \textbf{Ma trận Nhầm lẫn Đa lớp (\textit{Confusion Matrix}):} \texttt{[TODO-TV2 (Backlog 06 Task 2.1): Chèn biểu đồ data/confusion\_matrix.png và phân tích các ca bệnh chồng lấp giữa 4 nhóm bệnh trên tập Test]}.
-\end{itemize}
+\input{generated/tab_rq1}
 
-\subsection{Phân tích Đường cong Quyết định (DCA Net Benefit --- Template Chờ Bổ Sung)}
-% [TEMPLATE TRỐNG CHỜ KẾT QUẢ TỪ THÀNH VIÊN 1 & 2: BACKLOG 06 TASK 1.2 & 2.2]
-Bảng~\ref{tab:dca_empirical_template} được tạo sẵn để điền số liệu Lợi ích ròng lâm sàng (\textit{Net Benefit}) tính trực tiếp từ ma trận xác suất dự đoán từng mẫu (\texttt{data/holdout\_predictions.npz}) trên tập kiểm thử $N=302$ sau khi Thành viên 1 và Thành viên 2 hoàn thành Nhiệm vụ 1.2 \& 2.2 (Backlog 06).
+\subsection{RQ2 -- Tín hiệu văn bản đến từ đâu}
+Bảng~\ref{tab:rq2} và Hình~\ref{fig:rq2} cho thấy hiệu năng của các mô hình chỉ dùng văn bản phụ thuộc gần như hoàn toàn vào các giá trị số nằm trong ghi chú. Khi mọi con số bị thay bằng \texttt{<NUM>}, AUROC của BERT-FT giảm từ \rqtwoBertFTFull{} xuống \rqtwoBertFTNumMasked{} và của TF-IDF + LR từ \rqtwoTfidfFull{} xuống \rqtwoTfidfNumMasked{}; khi chỉ giữ phần tự sự (lý do khám, bệnh sử, thuốc), BERT-FT còn \rqtwoBertFTNarrative{}. Đáng chú ý, khi bỏ sinh hiệu/xét nghiệm nhưng vẫn giữ tuổi trong tiêu đề và bệnh sử (``Age: 97'', ``97yo''), BERT-FT vẫn đạt \rqtwoBertFTNoVitals{} -- phù hợp với việc tuổi gần như tự phân tách các lớp trong đoàn hệ này (Mục~\ref{sec:clinical_cohort}); chỉ khi \emph{mọi} con số (kể cả tuổi) bị che thì tín hiệu văn bản mới biến mất. Ngược lại, cross-attention giữ AUROC \rqtwoXattnNumMasked{} (che số) và \rqtwoXattnNarrative{} (chỉ tự sự), tương đương các mô hình chỉ dùng dữ liệu bảng -- tức mô hình dung hợp dựa vào nhánh bảng khi văn bản không còn thông tin số. Nói cách khác, trong dữ liệu bán tổng hợp này, ghi chú lâm sàng chủ yếu \emph{mã hoá lại} sinh hiệu và xét nghiệm, và lợi thế của BERT-FT so với mô hình bảng đến từ việc đọc các con số đó cùng ngữ cảnh định dạng của ghi chú, không phải từ mô tả triệu chứng.
 
-\begin{table}[htbp]
-\centering
-\caption{[Template chờ điền dữ liệu] Lợi ích ròng lâm sàng (One-vs-Rest Macro Net Benefit) tại các ngưỡng xác suất quyết định $p_t$ tiêu biểu trên tập kiểm thử độc lập ($N = 302$ --- Nhiệm vụ 1.2 \& 2.2 Backlog 06 của Thành viên 1 \& 2).}
-\label{tab:dca_empirical_template}
-\footnotesize
-\begin{tabular}{@{}lcccccc@{}}
-\toprule
-\textbf{Ngưỡng $p_t$} & $\text{NB}_{\text{Treat All}}$ & $\text{NB}_{\text{Tabular}}$ & $\text{NB}_{\text{Text}}$ & $\text{NB}_{\text{M-CDSS}}$ & $\Delta\text{TP}_{\text{net}/100}$ & $\Delta\text{FP}_{\text{avoided}/100}$ \\
-\midrule
-$p_t = 0.10$ & 0.167 & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
-$p_t = 0.20$ & 0.062 & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
-$p_t = 0.25$ & 0.000 & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
-$p_t = 0.35$ & $-0.154$ & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
-$p_t = 0.45$ & $-0.364$ & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} & \texttt{[TODO-TV1/2]} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{generated/tab_rq2}
 
-\subsection{Kiểm định Ngoại kiểm và Khảo sát Đánh giá của Bác sĩ (Template Chờ Bổ Sung)}
-% [TEMPLATE TRỐNG CHỜ KẾT QUẢ TỪ THÀNH VIÊN 1 (TASK 1.3) & THÀNH VIÊN 2 (TASK 2.3) - BACKLOG 06]
-\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Kiểm định Ngoại kiểm (\textit{External Validation}):} \texttt{[TODO-TV1 (Backlog 06 Task 1.3): Điền kết quả đánh giá độ suy giảm hiệu năng $\Delta\text{AUROC}$ trên tập dữ liệu ngoại kiểm độc lập]}.
-    \item \textbf{Khảo sát Đánh giá Định tính với Bác sĩ (\textit{Clinician Blind-Review Survey}):} \texttt{[TODO-TV2 (Backlog 06 Task 2.3): Điền điểm trung bình thang đo Likert (1--5) của 2--3 bác sĩ trên 20 ca bệnh ngẫu nhiên về: (1) Độ chính xác dự đoán sơ bộ, (2) Tính thuyết phục của câu chứng cứ highlight, và (3) Tính hữu ích của trích dẫn phác đồ GINA/GOLD/ESC]}.
-\end{itemize}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/generated/fig_rq2_text_decomposition.pdf}
+  \caption{RQ2 -- Macro AUROC theo biến thể ghi chú. Đường đứt nét: Logistic Regression chỉ dùng dữ liệu bảng; đường chấm: đoán ngẫu nhiên.}
+  \label{fig:rq2}
+\end{figure}
+
+\subsection{RQ3 -- Khi nào dung hợp có ích (mô phỏng)}
+\IfFileExists{generated/tab_rq3.tex}{%
+Bảng~\ref{tab:rq3} và Hình~\ref{fig:rq3} trình bày kết quả mô phỏng. Đây là \textbf{thí nghiệm mô phỏng cơ chế}: câu triệu chứng đặc hiệu do nhóm nghiên cứu chèn vào ghi chú đã che số, nên kết quả chỉ cho biết điều kiện để kiến trúc khai thác được thông tin bổ trợ, không phản ánh hiệu năng lâm sàng. \input{generated/rq3_text}
+\input{generated/tab_rq3}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\linewidth]{figures/generated/fig_rq3_heatmap.pdf}
+  \caption{RQ3 -- $\Delta$ AUROC giữa cross-attention và mô hình đơn phương thức tốt hơn theo tỷ lệ ca có tín hiệu văn bản ($\rho$) và mức nhiễu dữ liệu bảng ($\sigma$).}
+  \label{fig:rq3}
+\end{figure}}{Kết quả RQ3 chưa được sinh.}
+
+\subsection{RQ4 -- Hiệu chuẩn, lợi ích ròng và độ bền}
+\textbf{Hiệu chuẩn.} Temperature scaling giảm ECE của mô hình triển khai từ \eceUncal{} xuống \eceTemp{} (Bảng~\ref{tab:calibration}, Hình~\ref{fig:calibration}); vector scaling và isotonic khớp trên tập validation 273 ca không cải thiện thêm. \textbf{Không phương pháp nào đạt mục tiêu ECE $<0.05$} đã đặt ra.
+
+\input{generated/tab_calibration}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{figures/generated/fig_calibration.pdf}
+  \caption{Biểu đồ độ tin cậy của mô hình triển khai trên tập test theo bốn phương pháp hiệu chuẩn.}
+  \label{fig:calibration}
+\end{figure}
+
+\textbf{Lợi ích ròng (DCA).} Với bài toán suy tim one-vs-rest, mọi mô hình đều có net benefit cao hơn chiến lược ``can thiệp tất cả'' và ``không can thiệp'' trên toàn dải $p_t\in[0.05;0.30]$ (Bảng~\ref{tab:dca}, Hình~\ref{fig:dca}); khoảng tin cậy bootstrap giữa các mô hình chồng lấn. Tỷ lệ suy tim trong tập test là 35.1\%, cao hơn nhiều so với chăm sóc ban đầu, và cả 106 bản ghi suy tim trong test đến từ \emph{một} bệnh nhân Synthea gốc; vì vậy DCA ở đây chỉ minh hoạ phương pháp, giá trị net benefit không ngoại suy được và không đủ để kết luận về lợi ích lâm sàng.
+
+\input{generated/tab_dca}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.75\linewidth]{figures/generated/fig_dca.pdf}
+  \caption{Đường cong quyết định cho suy tim (one-vs-rest), dải mờ là CI 95\% bootstrap.}
+  \label{fig:dca}
+\end{figure}
+
+\textbf{Thiếu dữ liệu lúc suy luận.} Khi thiếu ngẫu nhiên 10--50\% biến số, cross-attention suy giảm chậm hơn CatBoost (Bảng~\ref{tab:robustness}, Hình~\ref{fig:missing}) vì vẫn đọc được giá trị tương ứng trong ghi chú. Tuy nhiên khi mất toàn bộ dữ liệu bảng, AUROC của mô hình dung hợp giảm mạnh, trong khi BERT-FT không bị ảnh hưởng; khi mất văn bản, mô hình dung hợp thấp hơn CatBoost. Các mô hình được huấn luyện trên dữ liệu đầy đủ, không có kỹ thuật bỏ ngẫu nhiên phương thức (modality dropout); đây là hướng cải thiện trực tiếp.
+
+\input{generated/tab_robustness}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/generated/fig_missing_modality.pdf}
+  \caption{Macro AUROC khi thiếu dữ liệu lúc suy luận (trung bình qua seed).}
+  \label{fig:missing}
+\end{figure}
+
+\textbf{Độ bền nội bộ.} Bảng~\ref{tab:generalization} báo cáo 5-fold grouped CV (post-hoc) và temporal split. Trong grouped CV, cross-attention có AUROC trung bình cao nhất và độ lệch chuẩn nhỏ nhất; ngược lại, trên temporal split cross-attention giảm còn \tmpXattn{} trong khi CatBoost giữ \tmpCatBoost. Hai kết quả trái chiều này cho thấy xếp hạng giữa các mô hình không ổn định trên đoàn hệ có ít bệnh nhân gốc. Đây là kiểm tra trên cùng đoàn hệ bán tổng hợp, \emph{không} phải ngoại kiểm.
+
+\input{generated/tab_generalization}
+
+\subsection{Phân nhóm và phân tích lỗi}
+Bảng~\ref{tab:fairness} trình bày hiệu năng theo phân nhóm. Nhiều phân nhóm thiếu hẳn một số lớp (ví dụ không có ca suy tim nữ, không có người đang hút thuốc trong tập test) do cách sinh dữ liệu tổng hợp, nên AUROC chỉ tính trên các lớp có mặt và không thể diễn giải như đánh giá công bằng. Ma trận nhầm lẫn (Hình~\ref{fig:confusion}) cho thấy nhầm lẫn tập trung ở cặp hen -- viêm phổi và hen -- COPD; chi tiết 30 ca nhầm lẫn có độ tin cậy cao nhất nằm trong \texttt{results/registry.json} (\texttt{error\_analysis}) và \texttt{docs/06\_ERROR\_ANALYSIS\_AND\_CLINICAL\_DISCREPANCIES.md}. Hai ca minh hoạ từ Giai đoạn 1 đều được mô hình triển khai dự đoán đúng: \texttt{PT-0044} (hen) và \texttt{PT-0254} (COPD).
+
+\input{generated/tab_fairness}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.45\linewidth]{figures/generated/fig_confusion_matrix.pdf}
+  \caption{Ma trận nhầm lẫn của mô hình triển khai trên tập test strict.}
+  \label{fig:confusion}
+\end{figure}
+
+\subsection{RQ5 -- Truy xuất và neo bằng chứng}
+Kết quả đánh giá truy xuất phác đồ và neo bằng chứng được trình bày tại Mục~\ref{sec:multi_agent_rag} (Bảng~\ref{tab:rag_eval}).

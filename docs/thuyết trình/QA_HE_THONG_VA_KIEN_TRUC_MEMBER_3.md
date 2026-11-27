@@ -23,7 +23,7 @@
 2. **Kết quả kiểm tra sơ bộ trên 50 bệnh án (`50/50` lấy từ `data/processed/test.parquet`, tổng $N=287$, trạng thái `preliminary_non_strict_holdout` — chưa phải tập hold-out chuẩn `strict N=302`, không dùng bản ghi mẫu tổng hợp):**
     - **Bất biến cắt chuỗi từ `explain_clinical_case()`:** **200 / 200 (`1,00`)** đoạn ứng viên thỏa mãn `display_note[start_char:end_char] == span.text`.
     - **Từ chối chuỗi ngoài văn bản (`out_of_note_probe_rejection_rate`):** **50 / 50 (`1,00`)** đầu dò chuỗi không nằm trong ghi chú bị bộ lọc từ chối (tên trường báo cáo phản ánh đúng phép kiểm chuỗi ngoài ghi chú, không gọi là đo lường hallucination ngữ nghĩa).
-    - **Đánh giá ngữ nghĩa thủ công 20 mẫu span:** Đã xuất 20 câu lâm sàng thực tế sang `results/grounding_manual_audit_20_samples.json` với `"human_verified": null` (`manual_semantic_precision_20_spans = null` — **`[TODO-HUMAN-REVIEW]`**).
+    - **Đánh giá ngữ nghĩa thủ công 20 mẫu span:** Đã xuất 20 câu lâm sàng thực tế sang `results/grounding_manual_audit_20_samples.json` với `"human_verified": null` (`manual_semantic_precision_20_spans = null` — **`chấm ngữ nghĩa thủ công: chưa thực hiện`**).
 3. **Giới hạn trung thực bắt buộc phải nêu rõ:** Các chỉ số tự động trên chỉ là **kiểm tra sơ bộ** về **khớp chuỗi và lọc chuỗi nằm ngoài bệnh án** trên split `N=287`; chúng **không** đại diện cho hold-out `strict N=302`, **không** chứng minh được độ đúng ngữ nghĩa, không phát hiện lỗi đảo ngược phủ định (_"không khó thở"_ bị trích thành _"khó thở"_) và **không phải xác nhận lâm sàng**. Hệ thống mặc định vận hành ở `reasoning_mode = "deterministic_template"` (đã xóa các nhánh hardcode `PT-0044`/`PT-0254`) và luôn yêu cầu bác sĩ kiểm chứng lại nội dung.
 
 ---
@@ -36,7 +36,7 @@
     - `POST /api/v1/agent/explain` (**HTTP 200**): Cold = `169,03 ms` | Warm Mean = `63,49 ms` | **$p_{50} = 62,92\text{ ms}$** | **$p_{95} = 84,23\text{ ms}$** | $p_{99} = 92,25\text{ ms}$.
     - `POST /api/v1/predict/baseline` (**HTTP 503** safeguard mặc định `baseline_models_unavailable`): Cold = `32,76 ms` | Warm Mean = `47,57 ms` | $p_{50} = 47,77\text{ ms}$ | $p_{95} = 51,24\text{ ms}$ | $p_{99} = 52,40\text{ ms}$.
     - `POST /api/v1/predict/multimodal` (**HTTP 503** safeguard trong image Docker triển khai nhẹ do không đóng gói `torch` và thiếu cache `Bio_ClinicalBERT`): Cold = `54,87 ms` | Warm Mean = `48,30 ms` | $p_{50} = 48,16\text{ ms}$ | $p_{95} = 50,55\text{ ms}$ | $p_{99} = 52,45\text{ ms}$. _(Phép đo này mới xác nhận cơ chế fail-safe 503, chưa đo suy luận PyTorch thực)._
-2. **Thời gian thực thi đầy đủ `Bio_ClinicalBERT` + `FT-Transformer` khi nạp đủ trọng số:** `[TODO-TV1/TV2: Bổ sung số đo latency HTTP 200 của /api/v1/predict/multimodal và /baseline trên môi trường có torch + cache Bio_ClinicalBERT và GPU/CPU mục tiêu]`.
+2. **Thời gian thực thi đầy đủ `Bio_ClinicalBERT` + `FT-Transformer` khi nạp đủ trọng số:** `đo nội tiến trình trên CPU (mô hình thật, HTTP 200): /predict/multimodal p50 782 ms, p95 943 ms; /predict/baseline p50 203 ms; Docker image đầy đủ và GPU chưa đo`.
 
 ---
 

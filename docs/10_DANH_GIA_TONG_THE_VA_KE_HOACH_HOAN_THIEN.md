@@ -32,7 +32,7 @@
 
 **Nguyên nhân (đã xác minh):**
 1. `data/checkpoints/multimodal_best.pt` có `training_metadata = {best_epoch: 0, epochs_total: 0, best_val_loss: 0.0}` → bị ghi đè ở commit `01ffef7` bởi một lần chạy `train_multimodal.py` không huấn luyện.
-2. Trên máy này trọng số `emilyalsentzer/Bio_ClinicalBERT` chỉ là file `.incomplete` trong HF cache. Cả ba nơi đều **âm thầm fallback sang BERT khởi tạo ngẫu nhiên** (`AutoModel.from_config`):
+2. Cả ba nơi đều **âm thầm fallback sang BERT khởi tạo ngẫu nhiên** (`AutoModel.from_config`) khi thiếu trọng số. *(Đính chính 2026-11-23: trên máy rà soát, snapshot `d5892b39…` thực ra có `pytorch_model.bin` đầy đủ, chỉ các blob tải dở là `.incomplete`; lần đánh giá AUROC 0,58 nhiều khả năng chạy trên máy khác thiếu trọng số. Lỗi fallback vẫn có thật và đã được sửa.)* Các vị trí:
    `src/models/text_encoder.py` (khối `except OSError`), `scripts/train_multimodal.py` (~dòng 160–165), `scripts/evaluate_clinical_utility.py` (dòng 276–283).
    → Embedding văn bản là nhiễu ⇒ AUROC ≈ 0,55–0,59.
 3. Các file `.parquet` **không được git theo dõi** → mỗi thành viên có tập dữ liệu khác nhau. Phân bố lớp của tập test N=287 (69/72/74/72) **khác** strict test chính thức (71/71/106/54).

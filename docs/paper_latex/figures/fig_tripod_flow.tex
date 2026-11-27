@@ -14,13 +14,13 @@
     % --- KHỐI NGUỒN DỮ LIỆU ---
     \node[mcdssBox, text width=5.2cm, fill=blue!5] (src_synthea) {
         \textbf{Synthea EHR Simulation}\\
-        $N_1 = 2.450$ hồ sơ bệnh nhân tổng hợp\\
+        $N_1 = 1.171$ bệnh nhân tổng hợp\\
         \scriptsize (Dữ liệu bảng: nhân khẩu, sinh hiệu, lab)
     };
     
     \node[mcdssBox, text width=5.2cm, fill=teal!5, right=1.2cm of src_synthea] (src_mtsamples) {
         \textbf{MTSamples Repository}\\
-        $N_2 = 4.999$ ghi chú lâm sàng thực tế\\
+        $N_2 = 4.999$ ghi chú phiên mã (MTSamples)\\
         \scriptsize (Văn bản tự do: bệnh sử, khám thực thể)
     };
 
@@ -28,9 +28,9 @@
     \node[mcdssBox, text width=4.6cm, draw=mcdssDanger, fill=red!4, below right=0.9cm and -1.8cm of src_synthea] (filter_box) {
         \textbf{Tiêu chí Loại trừ \& Lọc chất lượng}\\
         \scriptsize
-        $\bullet$ Bệnh ngoài 4 nhóm mục tiêu ($n = 450$)\\
-        $\bullet$ Ghi chú chuyên khoa không khớp ($n = 3.999$)\\
-        $\bullet$ Ngoại lai sinh lý vượt ngưỡng can thiệp\\
+        $\bullet$ Chọn lần khám có mã điều kiện thuộc 4 nhóm; tái sử dụng bệnh nhân khi thiếu lần khám $\Rightarrow$ 2.000 bản ghi từ \textbf{478 bệnh nhân gốc} (viêm phổi: 8)\\
+        $\bullet$ Ghi chú MTSamples khớp từ khoá theo lớp, khử trùng lặp: dùng 305; 1.695 bản ghi dùng ghi chú template\\
+        $\bullet$ Tuổi chặn trong $[18; 100]$; sinh hiệu cắt theo ngưỡng sinh lý\\
         $\bullet$ Cấm xét nghiệm tiêu chuẩn vàng: $FEV_1/FVC$, siêu âm tim $LVEF$, cấy đờm vi sinh\\
         $\bullet$ Che từ khóa nhãn (\texttt{[REDACTED\_DIAGNOSIS]})\\
         $\bullet$ Thêm PHI giả lập để kiểm thử de-ID
@@ -68,7 +68,7 @@
         \scriptsize
         Hen: $71$ | COPD: $71$\\
         Suy tim: $106$ | Viêm phổi: $54$\\
-        \textit{Đánh giá độc lập: AUROC, DCA}
+        \textit{Bệnh nhân gốc: Hen 8, COPD 56, Suy tim 1, Viêm phổi 1}
     };
 
     % --- ĐƯỜNG KẾT NỐI ---

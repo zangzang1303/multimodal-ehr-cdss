@@ -22,6 +22,7 @@ class ClinicalTextEncoder(nn.Module):
         backbone: nn.Module | None = None,
         freeze_backbone: bool = False,
         local_files_only: bool = False,
+        allow_random_backbone: bool = False,
         dropout: float = 0.1,
     ) -> None:
         super().__init__()
@@ -31,18 +32,14 @@ class ClinicalTextEncoder(nn.Module):
         self.freeze_backbone = freeze_backbone
         self._tokenizer = None
 
+        self.backbone_revision = None
         if backbone is None:
-            from transformers import AutoConfig, AutoModel
+            from src.models.backbone_loader import load_pretrained_text_backbone
 
-            try:
-                backbone = AutoModel.from_pretrained(
-                    model_name, local_files_only=local_files_only
-                )
-            except OSError:
-                config = AutoConfig.from_pretrained(
-                    model_name, local_files_only=local_files_only
-                )
-                backbone = AutoModel.from_config(config)
+            backbone, self.backbone_revision = load_pretrained_text_backbone(
+                model_name, local_files_only=local_files_only,
+                allow_random_backbone=allow_random_backbone,
+            )
         self.backbone = backbone
 
         if freeze_backbone:

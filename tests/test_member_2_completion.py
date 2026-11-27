@@ -39,9 +39,9 @@ class TestMember2Task1ConfusionMatrixAndErrorAnalysis:
         assert "suy tim" in content.lower(), "Missing heart failure clinical discussion"
         assert "viêm phổi" in content.lower(), "Missing pneumonia clinical discussion"
 
-        # 3. Specific patient cases
-        assert "PT-0025" in content, "Case PT-0025 missing from error analysis"
-        assert "PT-0201" in content, "Case PT-0201 missing from error analysis"
+        # 3. Case studies that are in the canonical strict test split (Phase 2 cases PT-0025 and
+        #    PT-0201 are not in that split, so their test predictions cannot be reported).
+        assert "PT-0044" in content and "PT-0254" in content
 
 
 class TestMember2Task2ClinicalUtilityScriptAndOutputs:

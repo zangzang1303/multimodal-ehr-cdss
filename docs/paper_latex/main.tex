@@ -8,18 +8,22 @@
 % Nạp gói Template Học thuật tùy chỉnh của dự án M-CDSS
 \usepackage{templates/mcdss_article}
 
+% Số liệu sinh tự động từ results/registry.json (scripts/export_latex_tables.py)
+\input{generated/macros}
+\IfFileExists{generated/rq3_macros.tex}{\input{generated/rq3_macros}}{}
+
 \begin{document}
 
 % ------------------------------------------------------------------------------
 % KHỐI TIÊU ĐỀ & THÔNG TIN TÁC GIẢ
 % ------------------------------------------------------------------------------
 \mcdsstitle
-    {M-CDSS: Hệ Thống Hỗ Trợ Quyết Định Lâm Sàng Đa Phương Thức Kết Hợp Chú Ý Chéo, Hiệu Chuẩn Nhiệt Độ và Đa Tác Tử Truy Xuất Y Văn Chống Ảo Giác}
+    {Dung Hợp Đa Phương Thức Dữ Liệu Bảng và Ghi Chú Lâm Sàng cho Chẩn Đoán Phân Biệt Hô Hấp -- Tim Mạch: Đánh Giá Có Kiểm Soát Rò Rỉ, Dư Thừa Phương Thức và Nguyên Mẫu M-CDSS Có Hiệu Chuẩn và Giải Trình Kiểm Chứng Được}
     {Nguyễn Nho Dương\textsuperscript{1}, Lê Tuấn Cảnh\textsuperscript{2}, Nguyễn Văn Cường\textsuperscript{3}}
     {\textsuperscript{1}Trưởng nhóm Học máy \& Mô hình hóa Đa phương thức (Lead ML / Multimodal Modeling) \\
      \textsuperscript{2}Kỹ sư Dữ liệu Y sinh \& Bảo mật Quyền riêng tư (Biomedical Data Engineering \& Privacy) \\
      \textsuperscript{3}Kỹ sư Toàn phần AI, Hệ thống Đa tác tử \& Kiến trúc Phần mềm (Full-Stack AI \& Agent Architecture)}
-    {Electronic Health Records (EHR), Multimodal Deep Learning, Cross-Attention Late Fusion, Temperature Scaling Calibration, Agentic RAG, Evidence Grounding, Decision Curve Analysis (DCA), TRIPOD-AI, PROBAST.}
+    {Electronic Health Records (EHR), Multimodal Fusion, Cross-Attention, Shortcut Learning, Data Leakage, Calibration, Retrieval-Augmented Explanation, Decision Curve Analysis, TRIPOD+AI, PROBAST+AI.}
 
 % ------------------------------------------------------------------------------
 % PHÂN MỤC 00: TÓM TẮT CÓ CẤU TRÚC (STRUCTURED ABSTRACT)

@@ -33,6 +33,7 @@ from src.evaluation.metrics import (
     plot_reliability_diagram,
 )
 from src.models.baselines import CATEGORICAL_FEATURES, NUMERICAL_FEATURES
+from src.models.checkpoint_io import save_checkpoint_safely
 from src.models.calibration import TemperatureScalingCalibrator
 from src.models.multimodal_fusion import AblationModel
 from src.models.text_encoder import DEFAULT_TEXT_MODEL
@@ -146,23 +147,11 @@ def cache_text_embeddings(
         DEFAULT_TEXT_MODEL, local_files_only=args.local_files_only
     )
 
-    try:
-        from huggingface_hub import try_to_load_from_cache
+    from src.models.backbone_loader import load_pretrained_text_backbone
 
-        has_weights = try_to_load_from_cache(DEFAULT_TEXT_MODEL, "model.safetensors") or try_to_load_from_cache(
-            DEFAULT_TEXT_MODEL, "pytorch_model.bin"
-        )
-    except Exception:
-        has_weights = None
-
-    if has_weights:
-        backbone = AutoModel.from_pretrained(
-            DEFAULT_TEXT_MODEL, local_files_only=args.local_files_only
-        ).to(device).eval()
-    else:
-        print("  [*] Instantiating ClinicalBERT architecture from cached config...")
-        cfg = AutoConfig.from_pretrained(DEFAULT_TEXT_MODEL, local_files_only=args.local_files_only)
-        backbone = AutoModel.from_config(cfg).to(device).eval()
+    backbone, args.backbone_revision = load_pretrained_text_backbone(
+        DEFAULT_TEXT_MODEL, local_files_only=args.local_files_only)
+    backbone = backbone.to(device).eval()
 
     for p in backbone.parameters():
         p.requires_grad_(False)
@@ -495,7 +484,6 @@ def main() -> None:
         )
         print(f"[✓] Subgroup fairness audit saved to: {args.fairness_report}")
 
-    args.checkpoint.parent.mkdir(parents=True, exist_ok=True)
     checkpoint_payload = {
         "model_state": {k: v.detach().cpu() for k, v in model.state_dict().items()},
         "model_mode": "cross_attention",
@@ -514,6 +502,7 @@ def main() -> None:
         "preprocessing": preprocessing,
         "source_split": str(args.data_dir),
         "seed": args.seed,
+        "provenance": {"backbone_revision": getattr(args, "backbone_revision", None)},
         "training_metadata": {
             "trained_at": datetime.now(timezone.utc).isoformat(),
             "best_epoch": train_meta["best_epoch"],
@@ -523,8 +512,13 @@ def main() -> None:
             "calibrated_test_metrics": cal_metrics,
         },
     }
-    torch.save(checkpoint_payload, args.checkpoint)
-    print(f"[✓] Checkpoint saved successfully to: {args.checkpoint}")
+    if args.eval_only:
+        print("[i] --eval-only: checkpoint left untouched (Backlog 08 guard).")
+    else:
+        saved = save_checkpoint_safely(checkpoint_payload, args.checkpoint,
+                                       epochs_trained=int(train_meta["final_epochs_trained"]),
+                                       smoke_test=args.smoke_test)
+        print(f"[✓] Checkpoint saved successfully to: {saved}")
 
     summary_results = {
         "metadata": {

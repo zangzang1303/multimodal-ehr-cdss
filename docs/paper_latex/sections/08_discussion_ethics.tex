@@ -5,14 +5,28 @@
 \section{Thảo Luận, Thẩm Định PROBAST+AI và Tuyên Bố Y Đức (Discussion, PROBAST+AI \& Ethics)}
 \label{sec:discussion_ethics}
 
+\subsection{Diễn giải kết quả chính}
+\textbf{Dung hợp không vượt phương án đơn giản.} Dưới so sánh công bằng, cross-attention đóng băng (\aucXattn) không vượt mô hình chỉ dữ liệu bảng tốt nhất và thấp hơn có ý nghĩa so với Bio\_ClinicalBERT fine-tune (\aucBertFT) cũng như ensemble trung bình xác suất (\aucEnsemble). Fine-tune khối BERT cuối trong mô hình dung hợp không thay đổi kết luận. Đây là kết quả âm tính được báo cáo đầy đủ theo kế hoạch đăng ký trước, phù hợp với nhận định rằng lợi ích của dung hợp cần được chứng minh so với cả các phương án dung hợp đơn giản \cite{kline2022multimodal}. Phân tích grouped CV post-hoc lại cho thấy cross-attention ổn định hơn rõ rệt (\cvXattn{} $\pm$ \cvsdXattn{} so với \cvBertFT{} $\pm$ \cvsdBertFT{} của BERT-FT), còn temporal split cho kết quả ngược lại. Trên một đoàn hệ chỉ có 478 bệnh nhân gốc, thứ hạng giữa các mô hình phụ thuộc mạnh vào việc bệnh nhân nào rơi vào tập test; kết luận an toàn nhất là \emph{chưa có bằng chứng} dung hợp vượt trội, đồng thời dung hợp có thể giảm phương sai so với mô hình chỉ văn bản.
+
+\textbf{Lợi thế của mô hình văn bản là lối tắt qua các con số.} RQ2 cho thấy khi che các giá trị số, mô hình văn bản giảm về gần mức ngẫu nhiên, còn mô hình dung hợp lùi về hiệu năng của nhánh bảng. Ghi chú trong đoàn hệ này mã hoá lại sinh hiệu nên hai ``phương thức'' không độc lập thông tin -- một dạng shortcut learning \cite{geirhos2020shortcut} khiến mọi so sánh ``đa phương thức vs đơn phương thức'' trên dữ liệu kiểu này dễ bị diễn giải sai. RQ3 (mô phỏng) bổ sung điều kiện ngược lại: \IfFileExists{generated/rq3_text.tex}{\input{generated/rq3_text}}{(chưa có kết quả)}
+
+\textbf{Đặc điểm dữ liệu chi phối kết quả.} 2.000 bản ghi chỉ đến từ 478 bệnh nhân Synthea gốc; trong tập test, suy tim và viêm phổi mỗi lớp chỉ một bệnh nhân gốc, và tuổi gần như tự phân tách các lớp (Mục~\ref{sec:clinical_cohort}). Phân tích lỗi cho thấy 42/62 lỗi của mô hình triển khai thuộc về đúng bệnh nhân viêm phổi duy nhất trong test, người có tuổi khác hẳn nhóm viêm phổi ở tập huấn luyện. Vì vậy các con số hiệu năng tuyệt đối trong bài không nên được hiểu là độ khó hay mức khả thi của bài toán lâm sàng; giá trị của chúng nằm ở \emph{so sánh tương đối} giữa các mô hình trong cùng điều kiện và ở các phân tích cơ chế (RQ2--RQ3).
+
+\textbf{Bài học về quy trình.} Trong Giai đoạn 3, một bản dữ liệu trung gian được tái tạo từ nguồn cũ đã đưa tên chẩn đoán và ghi chú MTSamples dùng lại vào cả train và test; các kết quả tính trên bản đó (macro AUROC $\approx$0.97) trông hợp lý nhưng là do rò rỉ \cite{kapoor2023leakage}. Kiểm tra rò rỉ ở mức nội dung ghi chú (tên chẩn đoán chưa che, ghi chú nguồn dùng lại mang thông tin nhãn) và manifest SHA-256 nội dung đã phát hiện và chặn lỗi này; chúng tôi khuyến nghị đưa các kiểm tra này vào mọi pipeline EHR đa phương thức.
+
+\textbf{Ý nghĩa cho ứng dụng.} Nguyên mẫu M-CDSS vẫn có giá trị như một \emph{hạ tầng nghiên cứu}: xác suất được hiệu chuẩn và công bố kèm cảnh báo bất định, mọi trích dẫn được neo vào vị trí ký tự kiểm chứng được, mô hình baseline và mô hình dung hợp được phục vụ song song để người dùng so sánh, và mọi số liệu hiển thị đọc từ một registry duy nhất. Trước khi dùng trên bệnh nhân thật cần: (i) dữ liệu thật có ghi chú độc lập thông tin với sinh hiệu (ví dụ MIMIC-IV \cite{johnson2023mimiciv}); (ii) huấn luyện có bỏ ngẫu nhiên phương thức để chịu được thiếu dữ liệu; (iii) ngoại kiểm và đánh giá của bác sĩ theo giao thức đã soạn.
+
+\subsection{Giới hạn}
+(1) Dữ liệu bán tổng hợp với số bệnh nhân gốc rất nhỏ ở một số lớp; nhãn không do bác sĩ xác định. (2) Một tập test strict duy nhất; CI bootstrap theo bản ghi đánh giá thấp độ bất định; grouped CV là phân tích post-hoc. (3) Ghi chú phần lớn sinh theo template tiếng Anh; chưa đánh giá trên ghi chú tiếng Việt. (4) ECE chưa đạt mục tiêu $<0.05$. (5) Lớp giải trình dùng suy luận theo template tất định, chưa có LLM; độ đúng ngữ nghĩa của 20 đoạn trích dẫn chưa được chấm thủ công. (6) Chưa thực hiện khảo sát bác sĩ và ngoại kiểm.
+
 \subsection{Đối Chiếu Tiêu Chuẩn Nguy Cơ Sai Lệch Quốc Tế PROBAST+AI}
-Khác với 15 nghiên cứu tiền nhiệm trong tổng quan hệ thống của Hunik và cộng sự \cite{hunik2024diagnostic} đều rơi vào mức nguy cơ sai lệch cao hoặc không rõ ràng nhưng không được thảo luận minh bạch, quy trình phát triển và kiểm định M-CDSS áp dụng công cụ \textbf{PROBAST+AI} \cite{probastai2024bmj,moons2025probast} với tinh thần liêm chính học thuật cao nhất. 
+Khác với 15 nghiên cứu tiền nhiệm trong tổng quan hệ thống của Hunik và cộng sự \cite{hunik2024diagnostic} đều rơi vào mức nguy cơ sai lệch cao hoặc không rõ ràng nhưng không được thảo luận minh bạch, quy trình phát triển và kiểm định M-CDSS áp dụng công cụ \textbf{PROBAST+AI} \cite{probastai2024bmj} với tinh thần liêm chính học thuật cao nhất. 
 
 Thay vì tự xếp loại ``Nguy cơ thấp'' hình thức, nhóm nghiên cứu phân định rạch ròi giữa \textit{tính nghiêm ngặt trong phân tích nội bộ (Internal Analytical Rigor)} và \textit{giới hạn cố hữu của dữ liệu bán tổng hợp (Synthetic Data Boundary)}. Bảng~\ref{tab:probast_summary} tổng hợp kết quả tự kiểm toán độc lập về cả hai khía cạnh: Nguy cơ Sai lệch (\textit{Risk of Bias}) và Mối lo ngại về Tính áp dụng thực tế (\textit{Applicability Concerns}).
 
 \begin{table}[htbp]
 \centering
-\caption{Tóm tắt kết quả tự kiểm toán nguy cơ sai lệch và tính áp dụng thực tiễn theo 4 miền tiêu chuẩn PROBAST+AI \cite{probastai2024bmj,moons2025probast}.}
+\caption{Tóm tắt kết quả tự kiểm toán nguy cơ sai lệch và tính áp dụng thực tiễn theo 4 miền tiêu chuẩn PROBAST+AI \cite{probastai2024bmj}.}
 \label{tab:probast_summary}
 \footnotesize
 \begin{tabularx}{\textwidth}{@{}lccX@{}}
@@ -22,9 +36,9 @@ Thay vì tự xếp loại ``Nguy cơ thấp'' hình thức, nhóm nghiên cứu
 1. Đối tượng (\textit{Participants}) & \textbf{Cao (\textit{High})} & \textbf{Cao (\textit{High})} & Đoàn hệ 2.000 hồ sơ kết hợp bán tổng hợp từ Synthea EHR \cite{walonoski2018synthea} và MTSamples \cite{mtsamples2012}. Dù phân chia kiểm soát 0\% rò rỉ bệnh nhân, dữ liệu chưa đại diện cho biến thiên dịch tễ và bệnh nhân thực tế tại các bệnh viện Việt Nam. \\[0.4em]
 2. Biến dự báo (\textit{Predictors}) & \textbf{Thấp / Chưa rõ} & \textbf{Chưa rõ (\textit{Unclear})} & Khóa chuỗi thời gian $t < t_{\text{diag}}$ qua \texttt{TemporalAligner} và cấm tuyệt đối các xét nghiệm tiêu chuẩn vàng ($FEV_1/FVC$, Siêu âm $EF$, Cấy đờm vi sinh). \textit{Cảnh báo:} Khối sinh hiệu chèn vào ghi chú theo template tạo ra dư thừa phương thức và nguy cơ shortcut learning (RQ2). \\[0.4em]
 3. Kết cục (\textit{Outcome}) & \textbf{Cao (\textit{High})} & \textbf{Cao (\textit{High})} & Nhãn chẩn đoán quy đổi từ mã mô phỏng Synthea; các đoạn trích tự sự MTSamples được ghép mà không có mối liên kết bệnh học trực tiếp từ cùng một bệnh nhân thực tế. \\[0.4em]
-4. Phân tích (\textit{Analysis}) & \textbf{Thấp (\textit{Low})} & \textbf{Thấp (\textit{Low})} & Khắc phục hoàn toàn các khiếm khuyết phân tích: kiểm toán $0\%$ rò rỉ bệnh nhân ($N_{\text{test}} = 302$); gán MICE kèm chỉ báo khuyết thiếu chỉ fit trên Train; báo cáo khoảng tin cậy 95\% Bootstrap (2.000 lần lặp) kèm hiệu chỉnh Holm; kiểm định độ bền khi khuyết phương thức; kiểm tra tổng quát hóa thời gian nội bộ ($N_{\text{test}}=600$, AUROC $0.9884$); phân tích lợi ích ròng lâm sàng DCA và công bằng phân nhóm (Fairness). \\
+4. Phân tích (\textit{Analysis}) & \textbf{Chưa rõ (\textit{Unclear})} & -- & Điểm mạnh: split theo nhóm nguồn với audit nội dung ghi chú (Mục~\ref{sec:clinical_cohort}); kế hoạch phân tích đăng ký trước có hash; 5 seed; temperature scaling khớp trên validation; CI bootstrap theo bệnh nhân ($B=2000$) và hiệu chỉnh Holm; báo cáo cả kết quả bất lợi (Bảng~\ref{tab:rq1}). Điểm yếu: một tập test duy nhất $N=302$ có phân bố nhân khẩu học khác tập huấn luyện; ECE chưa đạt $<0.05$; temporal split dựa trên dấu thời gian tổng hợp; một bản dữ liệu trung gian (2026-11-18) đã tái đưa rò rỉ nhãn vào và phải thu hồi. \\
 \midrule
-\multicolumn{4}{@{}l}{\textbf{Đánh giá tổng thể:} \textbf{High Risk of Bias / High Applicability Concern} (Đúng bản chất của nghiên cứu phương pháp luận bán tổng hợp).} \\
+\multicolumn{4}{@{}l}{\textbf{Đánh giá tổng thể:} \textbf{High Risk of Bias / High Applicability Concern} (miền 1 và 3 cao do bản chất dữ liệu bán tổng hợp; miền 4 chưa rõ).} \\
 \bottomrule
 \end{tabularx}
 \end{table}

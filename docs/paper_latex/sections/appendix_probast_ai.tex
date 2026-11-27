@@ -6,7 +6,7 @@
 \section{Phụ Lục: Báo Cáo Thẩm Định Chi Tiết 20 Câu Hỏi Tín Hiệu PROBAST+AI}
 \label{sec:appendix_probast_ai}
 
-Công cụ **PROBAST+AI** (\textit{Prediction model Risk Of Bias ASsessment Tool for Artificial Intelligence}) \cite{probastai2024bmj,moons2025probast} được thiết kế chuyên biệt để đánh giá nguy cơ sai lệch (\textit{Risk of Bias}) và mối lo ngại về tính áp dụng (\textit{Applicability Concerns}) của các mô hình học máy trong y tế. 
+Công cụ **PROBAST+AI** (\textit{Prediction model Risk Of Bias ASsessment Tool for Artificial Intelligence}) \cite{probastai2024bmj} được thiết kế chuyên biệt để đánh giá nguy cơ sai lệch (\textit{Risk of Bias}) và mối lo ngại về tính áp dụng (\textit{Applicability Concerns}) của các mô hình học máy trong y tế. 
 
 Bảng~\ref{tab:probast_20_questions} trình bày chi tiết kết quả tự kiểm toán độc lập trên toàn bộ 20 câu hỏi tín hiệu thuộc 4 miền phương pháp luận, tích hợp đầy đủ các kết quả phân tích thống kê chuyên sâu từ Giai đoạn 3 (Backlog 08 và Backlog 09).
 
@@ -38,16 +38,16 @@ Bảng~\ref{tab:probast_20_questions} trình bày chi tiết kết quả tự ki
 3.5 & Khoảng thời gian giữa biến dự báo và kết cục có hợp lý và nhất quán không? & Có & Biến dự báo thu thập lúc tiếp nhận ($t_0$), chẩn đoán xác lập trong cùng đợt khám ($t_{\text{diag}}$). \\
 \midrule
 \multicolumn{4}{@{}l}{\textbf{MIỀN 4: PHÂN TÍCH SỐ LIỆU (ANALYSIS) --- Nguy cơ: THẤP (LOW) | Tính áp dụng: THẤP (LOW CONCERN)}} \\
-4.1 & Cỡ mẫu và số lượng ca biến cố (Events Per Variable - EPV) có đủ lớn không? & Có & $N = 2.000$ với 500 biến cố/nhóm, tỷ lệ $\text{EPV} \ge 38$, vượt xa ngưỡng khuyến nghị tối thiểu $\ge 10-20$. \\
+4.1 & Cỡ mẫu và số lượng ca biến cố (Events Per Variable - EPV) có đủ lớn không? & Chưa rõ & Tập huấn luyện 1.425 ca (340--369 ca/lớp) với 13 biến bảng; EPV đủ cho mô hình hồi quy nhưng không áp dụng trực tiếp được cho mô hình học sâu nhiều tham số; tập test chỉ 302 ca nên CI rộng (Bảng~\ref{tab:rq1}). \\
 4.2 & Các biến số liên tục có được xử lý thích hợp mà không bị phân nhóm tùy tiện không? & Có & Giữ nguyên giá trị số thực liên tục của sinh hiệu và xét nghiệm, chuẩn hóa qua Layer Normalization. \\
 4.3 & Tất cả đối tượng tham gia ban đầu có được giữ lại trong phân tích không? & Có & Không xóa dòng chứa dữ liệu thiếu (\textit{No Complete Case drop}); 100\% đối tượng được giữ lại. \\
 4.4 & Dữ liệu khuyết thiếu (Missing Data) có được xử lý minh bạch và đúng phương pháp không? & Có & Áp dụng thuật toán MICE chỉ fit trên Train và transform sang Val/Test, kèm 2 biến chỉ báo thiếu (\texttt{wbc\_missing}, \texttt{crp\_missing}). \\
 4.5 & Có tránh việc chọn lọc biến dựa trên phân tích đơn biến (Univariable Screening) không? & Có & Chọn lọc đặc trưng dựa trên tri thức lâm sàng tiên nghiệm kết hợp Dropout và Weight Decay. \\
 4.6 & Cấu trúc phân cụm bệnh nhân có được kiểm soát khi chia tập dữ liệu không? & Có & Stratified Group Splitting theo \texttt{patient\_id} và \texttt{source\_note\_group}; kiểm toán $0\%$ rò rỉ giữa Train, Val và Test. \\
 4.7 & Các chỉ số đo lường hiệu năng có phản ánh đầy đủ năng lực phân biệt và độ tin cậy không? & Có & Báo cáo đa chiều: AUROC, AUPRC, Macro-F1, ECE, Brier Score kèm khoảng tin cậy 95\% Bootstrap (2.000 lần lặp) và hiệu chỉnh Holm. \\
-4.8 & Nguy cơ quá khớp (Overfitting) và độ tin cậy xác suất có được hiệu chuẩn không? & Có & Dừng sớm trên Val; hiệu chuẩn Temperature Scaling ($T \approx 1.35$), kiểm định độ bền khi khuyết phương thức và kiểm tra tổng quát hóa chuỗi thời gian ($N=600$, AUROC $0.9884$). \\
+4.8 & Nguy cơ quá khớp (Overfitting) và độ tin cậy xác suất có được hiệu chuẩn không? & Một phần & Dừng sớm và chọn seed trên validation; temperature scaling khớp trên validation nhưng ECE của mô hình triển khai vẫn khoảng 0.08, chưa đạt mục tiêu $<0.05$ (Bảng~\ref{tab:calibration}); độ biến thiên giữa các seed được báo cáo; kiểm tra độ bền nội bộ ở Bảng~\ref{tab:generalization}. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\paragraph{Kết luận tổng thể:} Theo nguyên tắc khắt khe nhất của PROBAST+AI, nếu bất kỳ một miền nào có nguy cơ sai lệch cao thì đánh giá tổng thể của nghiên cứu phải được xếp vào mức \textbf{High Risk of Bias / High Applicability Concern}. Việc thừa nhận trung thực điều này giúp nghiên cứu bảo vệ vững chắc đóng góp khoa học cốt lõi: đây là một công trình mẫu mực về \textit{tính nghiêm ngặt trong phương pháp luận học máy y tế}, tạo tiền đề kỹ thuật vững chắc trước khi tiến hành thu thập dữ liệu bệnh viện thực tế.
+\paragraph{Kết luận tổng thể:} Theo nguyên tắc khắt khe nhất của PROBAST+AI, nếu bất kỳ một miền nào có nguy cơ sai lệch cao thì đánh giá tổng thể của nghiên cứu phải được xếp vào mức \textbf{High Risk of Bias / High Applicability Concern}. Việc thừa nhận trung thực điều này giúp nghiên cứu bảo vệ vững chắc đóng góp khoa học cốt lõi: kết luận của bài chỉ áp dụng cho đoàn hệ bán tổng hợp đã nghiên cứu; miền Phân tích được chấm \emph{Chưa rõ} (một tập test, ECE chưa đạt mục tiêu). Ngoại kiểm trên dữ liệu bệnh viện thực là điều kiện bắt buộc trước mọi tuyên bố lâm sàng.

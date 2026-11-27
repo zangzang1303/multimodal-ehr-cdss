@@ -40,3 +40,7 @@ frontend/build/
 .idea/
 reports/*
 catboost_info/
+
+# Phase 3 research caches (regenerable)
+data/cache/
+data/checkpoints/runs/

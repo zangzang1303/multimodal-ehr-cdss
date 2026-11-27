@@ -35,49 +35,9 @@ async def get_clinical_evaluation_benchmark() -> Dict[str, Any]:
             "prevalence_per_class": 0.25,
             "validation_standard": "TRIPOD-AI reporting framework; PROBAST not independently assessed",
         },
-        "model_benchmarks": {
-            "classical_tabular": {
-                "name": "Baseline 1: CatBoost/XGBoost (Tabular)",
-                "modality": "Structured Tabular Only",
-                "macro_auroc": 0.8895,
-                "macro_auprc": 0.6841,
-                "macro_f1": 0.5612,
-                "accuracy": 0.6424,
-                "brier_score": 0.4891,
-                "ece": 0.1245,
-            },
-            "tabular_deep": {
-                "name": "Baseline 2: FT-Transformer (Tabular)",
-                "modality": "Structured Tabular Only",
-                "macro_auroc": 0.8976,
-                "macro_auprc": 0.7023,
-                "macro_f1": 0.5789,
-                "accuracy": 0.6589,
-                "brier_score": 0.4725,
-                "ece": 0.1152,
-            },
-            "text_only": {
-                "name": "Baseline 3: Bio_ClinicalBERT (Text)",
-                "modality": "Unstructured Clinical Notes Only",
-                "macro_auroc": 0.9735,
-                "macro_auprc": 0.9314,
-                "macro_f1": 0.8421,
-                "accuracy": 0.8543,
-                "brier_score": 0.2329,
-                "ece": 0.0373,
-            },
-            "mcdss_multimodal_core": {
-                "name": "M-CDSS: Cross-Attention Late Fusion (Ours)",
-                "modality": "Multimodal (Tabular + Clinical Notes)",
-                "macro_auroc": 0.9845,
-                "macro_auprc": 0.9480,
-                "macro_f1": 0.8872,
-                "accuracy": 0.8940,
-                "brier_score": 0.1745,
-                "ece": 0.0312,
-                "net_gain_auroc_over_tabular": 0.0869,
-            },
-        },
+        # Filled exclusively from results/registry.json and data/ablation_results.json below;
+        # no metric is hard-coded in source (Phase 3 rule: one source of truth).
+        "model_benchmarks": {},
         "decision_curve_analysis": {
             "threshold_points": [],
             "analysis_threshold_range": [0.10, 0.45],
@@ -114,7 +74,17 @@ async def get_clinical_evaluation_benchmark() -> Dict[str, Any]:
     result["model_benchmarks"]["mcdss_multimodal_core"]["net_gain_auroc_over_tabular"] = (
         models["cross_attention_fusion"]["macro_auroc"] - models["tabular_only"]["macro_auroc"]
     )
-    result["model_benchmarks"].pop("classical_tabular")
+    registry_path = Path(__file__).resolve().parents[3] / "results" / "registry.json"
+    if registry_path.exists():
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        for row in registry.get("rq1_multiseed_comparison", {}).get("models", []):
+            if row["model"] == "catboost":
+                result["model_benchmarks"]["classical_tabular"] = {
+                    "name": "CatBoost (Tabular)", "modality": "Structured Tabular Only",
+                    "macro_auroc": row["auroc_mean"], "macro_auprc": row["auprc_mean"], "macro_f1": row["f1_mean"],
+                    "accuracy": row["accuracy_mean"], "brier_score": row["brier_score_mean"], "ece": row["ece_mean"],
+                    "aggregation": f"mean of {row['n_seeds']} seeds",
+                }
     result["decision_curve_analysis"]["dca_conclusion"] = (
         "Computed from patient-level hold-out predictions; this is a research analysis, not evidence of clinical utility."
         if is_empirical else

@@ -1,34 +1,51 @@
 % ==============================================================================
-% Phân mục 03: Kiến trúc Dung hợp Đa phương thức & Hiệu chuẩn (Methodology)
+% Phân mục 03: Phương pháp – mô hình, thiết kế thực nghiệm và phân tích thống kê
+% [THÀNH VIÊN 1 – BACKLOG 10 NHIỆM VỤ 1.1]. Kế hoạch phân tích đăng ký trước:
+% docs/11_ANALYSIS_PLAN.md (phụ lục A, hash đóng băng tại results/preregistration/).
 % ==============================================================================
-\section{Kiến Trúc Học Sâu Đa Phương Thức và Hiệu Chuẩn Xác Suất (Multimodal Methodology)}
+\section{Phương Pháp (Methods)}
 \label{sec:methodology}
 
-\subsection{Mã hóa Đặc trưng Chuyên biệt cho Từng Phương thức}
-Thay vì ghép nối phẳng (\textit{Early Concatenation}) làm lu mờ cấu trúc tương tác riêng của từng nguồn dữ liệu, M-CDSS sử dụng hai bộ mã hóa chuyên biệt đưa dữ liệu về cùng không gian nhúng ẩn $d_{\text{model}} = 128$:
-\begin{itemize}[leftmargin=1.8em, itemsep=0.2em]
-    \item \textbf{Nhánh Bảng số (\textit{FT-Transformer Encoder} \cite{gorishniy2021revisiting}):} Mỗi đặc trưng số học $x_j^{\text{(num)}}$ và đặc trưng phân loại $x_k^{\text{(cat)}}$ được ánh xạ thành một vector token $\bm{t}_i \in \mathbb{R}^{d}$ thông qua bộ \texttt{TabularFeatureTokenizer}:
-    \begin{equation}
-        \bm{t}_j^{\text{(num)}} = x_j^{\text{(num)}} \cdot \bm{W}_j^{\text{(num)}} + \bm{b}_j^{\text{(num)}}, \quad
-        \bm{T}_{\text{tab}} = \text{TransformerEncoder}\left(\big[\bm{t}_{\text{[CLS]}}, \bm{t}_1, \dots, \bm{t}_M\big]\right) \in \mathbb{R}^{(M+1) \times d}
-    \end{equation}
-    \item \textbf{Nhánh Ngôn ngữ Y sinh (\textit{Bio\_ClinicalBERT Encoder} \cite{alsentzer2019publicly}):} Văn bản bệnh án $T$ được phân tách thành chuỗi $L$ subword tokens và đi qua mạng \texttt{emilyalsentzer/Bio\_ClinicalBERT}, sau đó chiếu tuyến tính qua tầng \texttt{LinearProjection} để thu được ma trận trạng thái ẩn văn bản $\bm{H}_{\text{text}} \in \mathbb{R}^{L \times d}$.
-\end{itemize}
+\subsection{Câu hỏi nghiên cứu}
+Nghiên cứu trả lời năm câu hỏi đã đăng ký trước khi chạy thực nghiệm:
+\textbf{RQ1} -- dưới so sánh công bằng (cùng split, cùng chế độ huấn luyện backbone, nhiều seed, khoảng tin cậy), dung hợp chú ý chéo có vượt mô hình đơn phương thức tốt nhất và các cách dung hợp đơn giản không;
+\textbf{RQ2} -- tín hiệu dự báo của nhánh văn bản đến từ đâu;
+\textbf{RQ3} -- trong điều kiện nào thì dung hợp thực sự có ích (mô phỏng có kiểm soát);
+\textbf{RQ4} -- mô hình có hiệu chuẩn, có lợi ích ròng (DCA) và bền vững khi thiếu một phương thức không;
+\textbf{RQ5} -- lời giải trình có neo vào bằng chứng và truy xuất đúng phác đồ không (Mục~\ref{sec:multi_agent_rag}).
 
-\subsection{Dung hợp Chú ý Chéo (Cross-Attention Late Fusion) và Hiệu chuẩn Nhiệt độ}
-Như đã chứng minh qua phân tích các ca bệnh sai biệt thực tế (điển hình là ca \texttt{PT-0044} và \texttt{PT-0254}), dữ liệu bảng đóng vai trò ``mỏ neo huyết động học'' giúp kiểm chứng các triệu chứng mô tả trong văn bản. Do đó, tầng dung hợp sử dụng vector biểu diễn bảng làm Truy vấn ($\bm{Q}$), chiếu vào Khóa ($\bm{K}$) và Giá trị ($\bm{V}$) của văn bản lâm sàng:
+\subsection{Bộ mã hóa từng phương thức}
+\textbf{Nhánh bảng (FT-Transformer \cite{gorishniy2021revisiting}).} Chín biến số liên tục (chuẩn hóa theo trung bình/độ lệch chuẩn của tập huấn luyện) và bốn biến danh mục được ánh xạ thành token $\bm{t}_j\in\mathbb{R}^{d}$, $d=128$:
 \begin{equation}
-    \bm{Q} = \bm{T}_{\text{tab}} \bm{W}_Q, \quad
-    \bm{K} = \bm{H}_{\text{text}} \bm{W}_K, \quad
-    \bm{V} = \bm{H}_{\text{text}} \bm{W}_V
+  \bm{t}_j^{(\text{num})}=x_j\,\bm{W}_j+\bm{b}_j,\qquad
+  \bm{T}_{\text{tab}}=\mathrm{TransformerEncoder}_{4\times}\big([\bm{t}_{\text{[CLS]}},\bm{t}_1,\dots,\bm{t}_{13}]\big)\in\mathbb{R}^{14\times d}.
 \end{equation}
-\begin{equation}
-    \text{CrossAttn}(\bm{Q}, \bm{K}, \bm{V}) = \text{softmax}\!\left(\frac{\bm{Q}\bm{K}^\top}{\sqrt{d_k}} + \bm{M}_{\text{pad}}\right)\bm{V}
-\end{equation}
-trong đó $\bm{M}_{\text{pad}}$ là mặt nạ che các token đệm ($-\infty$ tại vị trí padding). Vector dung hợp sau kết nối tắt (\textit{Residual Connection}) và chuẩn hóa tầng (\textit{LayerNorm}) được đưa qua đầu phân loại MLP để sinh vector logits $\bm{z} \in \mathbb{R}^4$.
+\textbf{Nhánh văn bản (Bio\_ClinicalBERT \cite{alsentzer2019publicly}).} Ghi chú đã khử định danh được tách thành tối đa $L=512$ subword token. Mười một khối encoder đầu luôn đóng băng; trạng thái đầu ra khối 11 được tính một lần và lưu lại. Khối encoder cuối được chạy lại trong mỗi bước huấn luyện ở một trong hai chế độ: \emph{đóng băng} (cho đầu ra trùng khớp tuyệt đối với \texttt{last\_hidden\_state} của mô hình gốc, sai khác tối đa $0{,}0$) hoặc \emph{fine-tune} (khối cuối được cập nhật với tốc độ học $2\times10^{-5}$). Đầu ra được chiếu tuyến tính về $\bm{H}_{\text{text}}\in\mathbb{R}^{L\times d}$. Thiết kế này cho phép so sánh mô hình chỉ văn bản và mô hình dung hợp \emph{dưới cùng một chế độ backbone}, điều mà thực nghiệm Giai đoạn 2 chưa đảm bảo.
 
-Cuối cùng, để khắc phục hiện tượng quá tự tin (\textit{overconfidence}) thường gặp ở mạng nơ-ron sâu, tầng \textbf{Temperature Scaling} \cite{guo2017calibration} tối ưu hóa tham số nhiệt độ vô hướng $T > 0$ bằng thuật toán L-BFGS đối với hàm mất mát Negative Log-Likelihood trên tập Validation:
+\subsection{Đầu dung hợp}
+\textbf{Cross-attention có cổng.} Token \texttt{[CLS]} của nhánh bảng làm truy vấn trên các token văn bản không phải padding:
 \begin{equation}
-    \hat{p}_c = \frac{\exp(z_c / T)}{\sum_{j=1}^{4} \exp(z_j / T)}, \quad c \in \{1, 2, 3, 4\}
+  \bm{c}=\mathrm{softmax}\!\Big(\tfrac{(\bm{t}_{\text{[CLS]}}\bm{W}_Q)(\bm{H}_{\text{text}}\bm{W}_K)^\top}{\sqrt{d_k}}+\bm{M}_{\text{pad}}\Big)\bm{H}_{\text{text}}\bm{W}_V,\qquad
+  \bm{g}=\sigma\big(\bm{W}_g[\bm{t}_{\text{[CLS]}};\bm{c}]\big),\quad
+  \bm{h}=\bm{g}\odot\bm{t}_{\text{[CLS]}}+(1-\bm{g})\odot\bm{c},
 \end{equation}
-Quá trình này giữ nguyên thứ tự xếp hạng giữa các lớp (không làm thay đổi AUROC/Accuracy) nhưng kéo sai số hiệu chuẩn kỳ vọng (ECE) xuống dưới ngưỡng an toàn lâm sàng $0.05$.
+với 4 đầu chú ý; $\bm{z}=\bm{W}_o\,\mathrm{LN}(\bm{h})\in\mathbb{R}^4$.
+\textbf{Concat fusion} (đối chứng): $\bm{z}=\bm{W}\,\mathrm{LN}([\bm{t}_{\text{[CLS]}};\overline{\bm{H}}_{\text{text}}])$ với $\overline{\bm{H}}_{\text{text}}$ là trung bình các token hợp lệ.
+\textbf{Ensemble xác suất} (đối chứng): trung bình xác suất đã hiệu chuẩn của CatBoost và Bio\_ClinicalBERT fine-tune cùng seed.
+
+\subsection{Huấn luyện và hiệu chuẩn}
+Mọi mạng nơ-ron dùng AdamW (tốc độ học đầu phân loại $2\times10^{-4}$, weight decay $10^{-5}$), batch 32, tối đa 12 epoch, dừng sớm khi NLL validation không giảm sau 4 epoch, cắt gradient chuẩn 1,0 và mixed precision. Logistic Regression và TF-IDF + LR chọn hệ số điều chuẩn $C\in\{0{,}25;1;4;16\}$ theo NLL validation; CatBoost dùng siêu tham số cố định trong \texttt{configs/model\_config.yaml}. Với \emph{mọi} mô hình, xác suất được hiệu chuẩn bằng temperature scaling \cite{guo2017calibration}, $\hat p_c=\exp(z_c/T)/\sum_j\exp(z_j/T)$, với $T$ tối ưu theo NLL trên tập validation ($N=273$); với mô hình sklearn, $z=\log\hat p$. Tập kiểm thử chỉ được dùng để báo cáo.
+
+\subsection{Thiết kế thực nghiệm}
+\textbf{RQ1.} Mười mô hình (Bảng~\ref{tab:rq1}) huấn luyện với 5 seed (13, 42, 101, 2024, 7); mô hình tất định chạy một lần. Seed đại diện của mỗi mô hình là seed có NLL validation thấp nhất; checkpoint triển khai là cross-attention đóng băng ở seed đại diện. Mô hình triển khai được chọn \emph{trước} khi xem kết quả test vì tương thích với dịch vụ suy luận (BERT đầy đủ, đóng băng).
+
+\textbf{RQ2 -- phân rã tín hiệu văn bản.} Bốn biến thể ghi chú được tạo bằng hàm tất định: \emph{gốc}; \emph{che số} (mọi chữ số $\to$ \texttt{<NUM>}); \emph{bỏ sinh hiệu} (bỏ khối VITALS và mọi câu chứa sinh hiệu/xét nghiệm có giá trị số); \emph{chỉ tự sự} (chỉ lý do khám, bệnh sử, thuốc). TF-IDF + LR, BERT (đóng băng, fine-tune) và cross-attention được huấn luyện lại trên từng biến thể với 3 seed.
+
+\textbf{RQ3 -- mô phỏng bổ trợ có kiểm soát.} Trên biến thể che số, một câu triệu chứng đặc hiệu theo lớp (diễn giải từ tiêu chuẩn chẩn đoán GINA, GOLD, ESC, Bộ Y tế) được chèn vào đầu bệnh sử cho tỷ lệ $\rho\in\{0;0{,}25;0{,}5;0{,}75;1\}$ bệnh nhân; 10\% câu chèn lấy từ lớp sai. Nhiễu Gauss $\sigma\in\{0;0{,}5;1\}\times$SD được cộng vào chín biến số. Đại lượng báo cáo: $\Delta=\text{AUROC}_{\text{fusion}}-\max(\text{AUROC}_{\text{bảng}},\text{AUROC}_{\text{văn bản}})$. Đây là \emph{mô phỏng cơ chế}, tín hiệu do nhóm nghiên cứu thiết kế, không phản ánh hiệu năng lâm sàng.
+
+\textbf{RQ4.} (a) Hiệu chuẩn: không hiệu chuẩn, temperature, vector scaling và isotonic one-vs-rest, đều khớp trên validation. (b) DCA \cite{vickers2006decision,vickers2016netbenefit}: suy tim one-vs-rest, hành động giả định là chỉ định NT-proBNP và siêu âm tim, dải ngưỡng $p_t\in[0{,}05;0{,}30]$; số can thiệp giảm ròng trên 100 bệnh nhân $=(\text{NB}-\text{NB}_{\text{all}})(1-p_t)/p_t\times100$. (c) Thiếu phương thức lúc suy luận: ghi chú rỗng; toàn bộ biến bảng thay bằng trung vị/mode của train; thiếu ngẫu nhiên 10/30/50\% biến số (thay bằng trung vị). (d) Temporal split có tôn trọng nhóm nguồn (70/15/15 theo thời điểm khám sớm nhất của nhóm) -- kiểm tra độ bền nội bộ trên dấu thời gian tổng hợp, không phải ngoại kiểm.
+
+\textbf{Phân tích độ nhạy post-hoc.} Do tập test strict có phân bố nhân khẩu học khác tập huấn luyện (Mục~\ref{sec:clinical_cohort}), chúng tôi bổ sung 5-fold grouped cross-validation trên toàn bộ 2.000 ca (seed 42). Phân tích này được đăng ký bổ sung sau khi thấy phân bố test nhưng trước khi chạy, và được gắn nhãn post-hoc.
+
+\subsection{Phân tích thống kê}
+Chỉ số chính là macro AUROC one-vs-rest; chỉ số phụ gồm macro AUPRC, macro-F1 (argmax), Brier đa lớp và ECE (10 bin độ rộng bằng nhau; phụ: 15 bin equal-mass và classwise ECE). Kết quả đa seed được báo cáo dạng trung bình $\pm$ độ lệch chuẩn. Khoảng tin cậy 95\% dùng bootstrap theo bản ghi (mỗi \texttt{patient\_id}; $B=2000$, phân vị) trên seed đại diện. Vì các bản ghi được sinh từ một số ít bệnh nhân Synthea gốc (chỉ 	estSourcePatients{} bệnh nhân gốc trong tập test, trong đó suy tim và viêm phổi mỗi lớp chỉ một bệnh nhân), CI này \emph{đánh giá thấp} độ bất định thực; bootstrap theo cụm bệnh nhân gốc không khả thi vì hai lớp chỉ có một cụm. so sánh cặp dùng \emph{cùng} các mẫu bootstrap cho hai mô hình, $p$ hai phía từ phân phối bootstrap của hiệu số, hiệu chỉnh Holm trên 9 so sánh với mô hình triển khai. Toàn bộ số liệu trong bài được sinh tự động từ \texttt{results/registry.json} bằng \texttt{scripts/export\_latex\_tables.py}.

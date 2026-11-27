@@ -1,5 +1,17 @@
 # BACKLOG 09 – THÀNH VIÊN 1 (Lead ML / Modeling & Evaluation)
 
+> **Trạng thái 2026-11-27: HOÀN THÀNH** – mọi số liệu trong `results/registry.json` (sinh bởi `scripts/build_results_registry.py`).
+>
+> | Nhiệm vụ | Kết quả |
+> | :--- | :--- |
+> | 1.1 [CORE] Ma trận so sánh công bằng | ✅ 10 mô hình × 5 seed (`scripts/run_research_experiments.py rq1`); fine-tune khối BERT cuối dùng chung cho text-only và fusion (`src/models/text_tail.py`). Kết quả: BERT-FT và ensemble > cross-attention trên test strict; cross-attention ≈ mô hình bảng. |
+> | 1.2 [CORE] Thống kê | ✅ `src/evaluation/stats.py` (paired bootstrap, Holm, DCA Vickers, ECE equal-mass, vector scaling, isotonic) + unit test. Bootstrap theo bản ghi – có cảnh báo vì chỉ 478 bệnh nhân gốc. |
+> | 1.3 [CORE] Phân rã tín hiệu văn bản | ✅ 4 biến thể (`src/data_pipeline/note_variants.py`) × 4 mô hình × 3 seed. Che mọi con số → văn bản sụp về ~0.54–0.68; bỏ sinh hiệu nhưng giữ tuổi → văn bản vẫn ~0.9. Attribution (IG) **không làm** – thay bằng phân tích lỗi theo bệnh nhân gốc. |
+> | 1.4 [OPTIONAL] Mô phỏng bổ trợ | ✅ lưới ρ×σ = 5×3, 2 seed (`results/rq3_simulation.json`); fusion có lợi khi văn bản mang tín hiệu riêng hoặc bảng nhiễu. |
+> | 1.5 [CORE] Hiệu chuẩn | ✅ 4 phương pháp; temperature tốt nhất (ECE ≈ 0.077), **chưa đạt < 0.05**. |
+> | Bổ sung | DCA, missing-modality, temporal (theo nhóm), fairness, error analysis trên mô hình triển khai (thay kết quả thu hồi của TV2); 5-fold grouped CV post-hoc (`A.6`). |
+
+
 ## Nhiệm vụ 1.1 [CORE] – Ma trận so sánh công bằng (RQ1)
 Hiện tại so sánh lệch: text-only baseline **fine-tune** khối cuối, nhánh text trong fusion **đóng băng**. Chạy cùng split, cùng seed (≥ 3, lý tưởng 5):
 

@@ -1,5 +1,12 @@
 # BACKLOG 09 – THÀNH VIÊN 3 (Full-Stack AI & System Integrator)
 
+> **RÀ SOÁT CỦA THÀNH VIÊN 1 (2026-11-23):** ✅ Chấp nhận phần RAG/latency, cách ghi giới hạn trung thực. Cập nhật:
+> - Audit grounding 50 ca đã chạy lại trên **strict N=302** (`canonical_strict_holdout`): 199/200 claim được neo, khớp chuỗi 1.00, 50/50 probe bị từ chối (chế độ Qdrant in-memory).
+> - Latency HTTP 200 đo nội tiến trình trên CPU với mô hình thật: `/predict/multimodal` p50 ≈ 782 ms, `/predict/baseline` p50 ≈ 203 ms, `/agent/explain` p50 ≈ 19 ms (`results/latency_report.json`; bản Docker nhẹ lưu ở `results/latency_report_docker_lightweight_2026-11-19.json`).
+> - Trang `/evaluation`: nhãn MOCK nay phụ thuộc `is_mock`; thêm bảng RQ1 đọc từ registry.
+> - Còn lại (cần con người): chấm thủ công 20 span; encoder `all-mpnet-base-v2` chưa có trong cache.
+
+
 > **Cập nhật trạng thái thực hiện (Phase 3 — Bản chuẩn hóa sau rà soát):** Đã tách `eval_rag.py` sang chế độ **chỉ đọc** trên Qdrant từ xa (xác minh khớp chiều `768`, `64/64` `chunk_id`, `SHA-256` của `text_content` và 8 trường metadata, *chưa xác nhận chất lượng ngữ nghĩa của vector băm*), đánh dấu rõ audit 50 ca là **sơ bộ** (`preliminary_non_strict_holdout` từ `data/processed/test.parquet` $N=287$, chưa phải `strict N=302`, 0 template fallback), đổi tên trường đo probe sang `out_of_note_probe_rejection_rate`, và giữ giới hạn diễn giải trung thực cạnh các chỉ số Recall.
 
 ## Nhiệm vụ 3.1 [CORE] – Đánh giá truy xuất & neo bằng chứng (RQ5)

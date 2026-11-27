@@ -55,129 +55,74 @@ def test_results_registry_keys():
         assert required_key in registry, f"Key '{required_key}' missing from results/registry.json"
 
 
+def _registry():
+    with open(ROOT_DIR / "results" / "registry.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+# NOTE (2026-11-23 review): these tests previously asserted the *desired outcome*
+# (e.g. "delta NB > 0", "fusion AUROC > 0.90 without text", "temporal train == 1400").
+# A test must never force a research result, so they now check structure, sample sizes
+# fixed by the analysis plan, and internal consistency only.
+
+
 def test_task_2_1_dca_results():
-    """Verify Task 2.1 Decision Curve Analysis results and artifacts."""
-    reg_path = ROOT_DIR / "results" / "registry.json"
-    with open(reg_path, "r", encoding="utf-8") as f:
-        dca_data = json.load(f)["dca"]
-
-    assert dca_data["target_disease"] == "HEART_FAILURE"
-    assert dca_data["target_class"] == 2
-    assert dca_data["test_sample_size"] == 302
-    assert abs(dca_data["heart_failure_test_prevalence"] - 0.350993) < 1e-4
-
-    # Thresholds 0.10 and 0.20
-    m_10 = dca_data["metrics_at_pt_0_10"]["cross_attention"]
-    assert "net_benefit" in m_10
-    assert "delta_nb_vs_treat_all" in m_10
-    assert m_10["delta_nb_vs_treat_all"] > 0
-    assert m_10["avoided_interventions_per_100_vs_all"] > 0
-
-    m_20 = dca_data["metrics_at_pt_0_20"]["cross_attention"]
-    assert "net_benefit" in m_20
-    assert "delta_nb_vs_treat_all" in m_20
-    assert m_20["delta_nb_vs_treat_all"] > 0
-    assert m_20["avoided_interventions_per_100_vs_all"] > 0
-
-    # Verify plots
-    pdf_path = ROOT_DIR / "data" / "evaluation_plots" / "fig_dca_curve.pdf"
-    png_path = ROOT_DIR / "data" / "evaluation_plots" / "dca_curve.png"
-    assert pdf_path.exists(), f"DCA PDF plot missing: {pdf_path}"
-    assert png_path.exists(), f"DCA PNG plot missing: {png_path}"
+    """DCA follows the pre-registered definition (HF one-vs-rest, p_t in [0.05, 0.30])."""
+    dca = _registry()["dca"]
+    assert dca["target_disease"] == "HEART_FAILURE" and dca["target_class"] == 2
+    assert dca["test_sample_size"] == 302
+    assert abs(dca["heart_failure_test_prevalence"] - 106 / 302) < 1e-3
+    assert dca["predefined_threshold_range"] == [0.05, 0.30]
+    assert "(1 - p_t) / p_t" in dca["formula"]
+    for pt in ("pt_0.10", "pt_0.20"):
+        block = dca["at_thresholds"][pt]
+        for model in block["models"].values():
+            threshold = float(pt.split("_")[1])
+            expected = (model["delta_nb_vs_treat_all"]) * (1 - threshold) / threshold * 100
+            assert abs(model["net_reduction_in_interventions_per_100"] - expected) < 0.05
+    for name in ("fig_dca.pdf",):
+        assert (ROOT_DIR / "docs" / "paper_latex" / "figures" / "generated" / name).exists()
+    assert (ROOT_DIR / "data" / "evaluation_plots" / "fig_dca.png").exists()
 
 
 def test_task_2_2_missing_modality_robustness():
-    """Verify Task 2.2 Missing Modality & Noise Robustness results."""
-    reg_path = ROOT_DIR / "results" / "registry.json"
-    with open(reg_path, "r", encoding="utf-8") as f:
-        rob_data = json.load(f)["robustness"]
-
-    required_conditions = [
-        "full_multimodal",
-        "drop_10pct_tabular",
-        "drop_30pct_tabular",
-        "drop_50pct_tabular",
-        "complete_tabular_loss",
-        "complete_text_loss",
-    ]
-    for cond in required_conditions:
-        assert cond in rob_data["results"], f"Condition '{cond}' missing in robustness results"
-
-    # Multimodal fusion under missing text maintains high performance while text model drops to random (~0.50)
-    fusion_missing_text = rob_data["results"]["complete_text_loss"]["fusion"]
-    bert_missing_text = rob_data["results"]["complete_text_loss"]["bert"]
-    assert fusion_missing_text > 0.90, "Fusion should preserve tabular performance when text is missing"
-    assert bert_missing_text < 0.60, "BERT should degrade to near random when text is empty"
-
-    # Verify plot files
-    pdf_path = ROOT_DIR / "data" / "evaluation_plots" / "fig_missing_modality.pdf"
-    png_path = ROOT_DIR / "data" / "evaluation_plots" / "fig_missing_modality.png"
-    assert pdf_path.exists(), f"Missing modality PDF missing: {pdf_path}"
-    assert png_path.exists(), f"Missing modality PNG missing: {png_path}"
+    """Every pre-registered missing-modality scenario is reported for the deployment model."""
+    rob = _registry()["robustness"]
+    expected = {"full", "tab_missing_10", "tab_missing_30", "tab_missing_50", "no_tabular", "no_text"}
+    assert {s["scenario"] for s in rob["scenarios"]} == expected
+    for scenario in expected:
+        value = rob["by_model"][scenario]["xattn_frozen"]["mean"]
+        assert 0.0 <= value <= 1.0
+    assert (ROOT_DIR / "data" / "evaluation_plots" / "fig_missing_modality.png").exists()
 
 
 def test_task_2_3_internal_generalization():
-    """Verify Task 2.3 Temporal Split generalization reporting and disclaimers."""
-    reg_path = ROOT_DIR / "results" / "registry.json"
-    with open(reg_path, "r", encoding="utf-8") as f:
-        gen_data = json.load(f)["generalization"]
-
-    assert "Temporal split" in gen_data["split_method"]
-    assert gen_data["train_samples"] == 1400
-    assert gen_data["test_samples"] == 600
-    assert "delta_macro_auroc" in gen_data["metrics"]
-    assert "validation_nature" in gen_data
-    assert "NOT external hospital validation" in gen_data["validation_nature"]
+    """Temporal split is group-aware, has a validation set and is labelled as internal."""
+    gen = _registry()["generalization"]
+    assert "Temporal split" in gen["split_method"]
+    assert gen["train_samples"] + gen["val_samples"] + gen["test_samples"] == 2000
+    assert "delta_macro_auroc" in gen["metrics"]
+    assert "NOT external hospital validation" in gen["validation_nature"]
 
 
 def test_task_2_4_fairness_and_error_analysis():
-    """Verify Task 2.4 Subgroup Fairness and 30-case Error Analysis."""
-    reg_path = ROOT_DIR / "results" / "registry.json"
-    with open(reg_path, "r", encoding="utf-8") as f:
-        fair_data = json.load(f)["fairness"]
-
-    required_subgroups = [
-        "gender_M",
-        "gender_F",
-        "age_under_65",
-        "age_65_and_older",
-        "smoking_NEVER",
-        "smoking_FORMER",
-        "smoking_CURRENT",
-    ]
-    for sg in required_subgroups:
-        assert sg in fair_data["subgroups"], f"Subgroup '{sg}' missing in fairness report"
-        res = fair_data["subgroups"][sg]
-        assert "sample_size" in res
-        assert "macro_auroc" in res
-        assert "macro_auroc_ci95" in res
-        assert "macro_f1" in res
-        assert "macro_f1_ci95" in res
-        assert len(res["macro_auroc_ci95"]) == 2
-        assert len(res["macro_f1_ci95"]) == 2
-
-    # Check 30 error cases
-    err_path = ROOT_DIR / "data" / "error_analysis_30cases.json"
-    assert err_path.exists(), f"Error analysis JSON missing: {err_path}"
-
-    with open(err_path, "r", encoding="utf-8") as f:
-        err_data = json.load(f)
-
-    assert "top_3_confusion_pairs" in err_data
-    pairs = err_data["top_3_confusion_pairs"]
-    assert len(pairs) == 3
-    total_cases = sum(len(cases) for cases in pairs.values())
-    assert total_cases == 30, f"Expected 30 cases across top 3 pairs, got {total_cases}"
-
-    for pair_name, cases in pairs.items():
-        assert len(cases) == 10, f"Pair {pair_name} does not have 10 cases"
-        for case in cases:
-            assert "patient_id" in case
-            assert "true_disease" in case
-            assert "predicted_disease" in case
-            assert "confidence" in case
-            assert "vitals_summary" in case
-            assert "root_cause_code" in case
+    """Subgroups cover the analysis plan and sum to the strict test size; 30 error cases."""
+    reg = _registry()
+    fair = reg["fairness"]
+    subgroups = ["gender_M", "gender_F", "age_under_65", "age_65_and_older",
+                 "smoking_NEVER", "smoking_FORMER", "smoking_CURRENT"]
+    for sg in subgroups:
+        res = fair["subgroups"][sg]
+        for key in ("sample_size", "macro_auroc", "macro_auroc_ci95", "macro_f1", "macro_f1_ci95"):
+            assert key in res
+    assert fair["subgroups"]["gender_M"]["sample_size"] + fair["subgroups"]["gender_F"]["sample_size"] <= 302
+    assert (fair["subgroups"]["age_under_65"]["sample_size"]
+            + fair["subgroups"]["age_65_and_older"]["sample_size"]) == 302
+    errors = reg["error_analysis"]
+    assert len(errors["top_confused_pairs"]) == 3
+    assert len(errors["cases"]) <= 30 and len(errors["cases"]) > 0
+    for case in errors["cases"]:
+        assert {"patient_id", "true", "pred", "confidence"} <= set(case)
 
 
 def test_task_2_5_clinical_survey_and_mimic_roadmap():
@@ -195,16 +140,11 @@ def test_task_2_5_clinical_survey_and_mimic_roadmap():
 
 
 def test_clinical_error_analysis_documentation():
-    """Verify docs/06_ERROR_ANALYSIS_AND_CLINICAL_DISCREPANCIES.md contains all required clinical analyses."""
+    """docs/06 reports the deployment-model error analysis on the canonical strict test set."""
     doc_path = ROOT_DIR / "docs" / "06_ERROR_ANALYSIS_AND_CLINICAL_DISCREPANCIES.md"
-    assert doc_path.exists(), f"Error analysis doc missing: {doc_path}"
-
     content = doc_path.read_text(encoding="utf-8")
     assert "302" in content
-    assert "OVERLAPPING_VITALS" in content or "Overlapping Vitals" in content or "Sinh hiệu chồng lấn" in content
-    assert "NOISY_TEXT" in content or "Noisy Text" in content or "Văn bản nhiễu" in content
-    assert "SYNTHETIC_LABEL_DISCREPANCY" in content or "Synthetic Label Discrepancy" in content or "Đặc trưng nhãn mô phỏng" in content
-    assert "PT-00044" in content or "PT-0044" in content
-    assert "PT-00254" in content or "PT-0254" in content
-    assert "PT-01997" in content
-    assert "PT-01946" in content
+    assert "Overlapping vitals" in content and "Synthetic label discrepancy" in content
+    assert "PT-0044" in content and "PT-0254" in content
+    assert "bệnh nhân gốc" in content  # effective-sample-size caveat must be stated
+    assert "legacy_invalid_2026-11-19" in content  # withdrawn analysis is referenced, not reused

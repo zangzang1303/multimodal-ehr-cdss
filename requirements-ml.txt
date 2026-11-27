@@ -1,0 +1,5 @@
+# Optional ML runtime for the API image (docker build --build-arg INSTALL_ML=1).
+# torch is installed separately from the CPU wheel index in the Dockerfile.
+transformers==5.20.1
+catboost==1.2.10
+joblib>=1.4.0

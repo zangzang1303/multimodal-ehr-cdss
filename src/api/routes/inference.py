@@ -49,7 +49,6 @@ def _load_model_card_metadata() -> dict:
     repo_root = Path(__file__).resolve().parents[3]
     ckpt_path = repo_root / "data" / "checkpoints" / "multimodal_best.pt"
     manifest_path = repo_root / "data" / "DATA_MANIFEST.json"
-    summary_path = repo_root / "data" / "benchmark_summary.json"
 
     ckpt_sha = "unavailable"
     if ckpt_path.is_file():
@@ -73,22 +72,25 @@ def _load_model_card_metadata() -> dict:
             manifest_is_mock = True
             manifest_version = "unavailable"
 
-    trained_at = "2026-11-05"
-    temperature = 1.3541
-    if summary_path.is_file():
+    trained_at, temperature, seed = "unavailable", None, None
+    if ckpt_path.is_file():
         try:
-            summary = json.loads(summary_path.read_text(encoding="utf-8"))
-            temperature = float(summary.get("temperature", 1.3541))
-            if summary.get("evaluated_at"):
-                trained_at = str(summary["evaluated_at"])[:10]
+            import torch
+
+            ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=True)
+            temperature = float(ckpt.get("temperature"))
+            seed = ckpt.get("seed")
+            trained_at = str(ckpt.get("training_metadata", {}).get("trained_at", "unavailable"))[:10]
         except Exception:
             pass
-
+    if manifest_path.is_file() and manifest_sha == "unavailable":
+        manifest_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()[:12]
     return {
         "checkpoint_name": ckpt_path.name,
         "checkpoint_sha256_short": ckpt_sha,
         "trained_at": trained_at,
-        "temperature": round(temperature, 4),
+        "temperature": round(temperature, 4) if temperature is not None else None,
+        "seed": seed,
         "data_manifest_sha": manifest_sha,
         "data_manifest_is_mock": manifest_is_mock,
         "data_manifest_version": manifest_version,
@@ -134,6 +136,21 @@ async def predict_baseline(request: PatientInferenceRequest) -> PatientInference
     masquerade as fitted model predictions. Set MCDSS_ALLOW_HEURISTIC_BASELINE=1
     explicitly if local UI fallback testing is needed.
     """
+    from src.api import baseline_service
+
+    if baseline_service.artifacts_available():
+        clean_note = deidentifier.deidentify_text(request.clinical_notes or "")
+        try:
+            results = baseline_service.predict_baselines(request.tabular_features.model_dump(), clean_note)
+        except (ImportError, FileNotFoundError, OSError) as exc:
+            raise HTTPException(status_code=503, detail=f"baseline_models_unavailable: {exc}") from exc
+        return PatientInferenceResponse(
+            patient_id=request.patient_id or "PT-001",
+            prediction_source="fitted_baseline_artifacts_seed42",
+            baseline_results={name: BaselineModelResult(predicted_class=r["predicted_class"],
+                                                        confidence=round(r["confidence"], 4))
+                              for name, r in results.items()},
+        )
     if os.getenv("MCDSS_ALLOW_HEURISTIC_BASELINE") != "1" or os.getenv("MCDSS_STRICT_NO_MOCK_BASELINE") == "1":
         raise HTTPException(status_code=503, detail="baseline_models_unavailable")
 

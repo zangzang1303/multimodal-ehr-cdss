@@ -10,7 +10,9 @@
 
 > [!IMPORTANT]
 > **ĐIỀU CHỈNH ĐÁNH GIÁ TRUNG THỰC KHOA HỌC:**
-> Sau đợt rà soát ngày 18/11/2026, nhóm nghiên cứu đã chấm lại toàn bộ 4 miền theo đúng nguyên tắc khách quan của công cụ PROBAST+AI (*Moons et al., The BMJ / Annals of Internal Medicine 2025*), từ chối việc tự đánh giá "Low Risk" hình thức khi chưa có ngoại kiểm lâm sàng độc lập.
+> Sau đợt rà soát ngày 18/11/2026, nhóm nghiên cứu đã chấm lại toàn bộ 4 miền theo đúng nguyên tắc khách quan của công cụ PROBAST+AI (*Moons et al., The BMJ 2025;388:e082505*), từ chối việc tự đánh giá "Low Risk" hình thức khi chưa có ngoại kiểm lâm sàng độc lập.
+
+> **Cập nhật 2026-11-23 (sau Backlog 09, TV1):** Miền 4 giữ mức **Chưa rõ (Unclear)**. Đã có: 5 seed, CI bootstrap, Holm, kế hoạch đăng ký trước có hash, grouped CV post-hoc. Chưa đủ để chấm Thấp vì: một tập test có phân bố khác train; 2.000 bản ghi chỉ từ 478 bệnh nhân Synthea gốc (suy tim và viêm phổi trong test mỗi lớp 1 bệnh nhân gốc) nên CI theo bản ghi đánh giá thấp độ bất định; ECE ≈ 0,08 chưa đạt mục tiêu. Miền 1 bổ sung lý do: tuổi gần như tự phân tách các lớp (COPD trung vị ~35 tuổi, viêm phổi ~100). Chi tiết: `results/registry.json → data_provenance`, bài báo Mục 2 và Mục 8.
 
 | Miền Đánh Giá (Domain) | Nguy Cơ Sai Lệch (Risk of Bias) | Mối Lo Ngại Về Tính Áp Dụng (Applicability Concerns) | Lý Do & Bằng Chứng Khoa Học Thực Tế |
 | :--- | :---: | :---: | :--- |

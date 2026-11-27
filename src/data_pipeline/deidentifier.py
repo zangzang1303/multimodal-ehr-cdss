@@ -146,6 +146,11 @@ class ClinicalDeidentifier:
             r"\bBỆNH VIỆN(?:\s+[A-ZĐÀ-Ỹ0-9]+)+\b"
         )
 
+        # Phase 1 rule (restored 2026-11-23): facility keyword + run of Capitalised words, e.g.
+        # "Bệnh viện Bạch Mai ngày ..." - the Phase 3 rule below only matched names followed by punctuation.
+        self.hospital_capitalised_pattern = re.compile(
+            r"\b(?i:bệnh viện|bv|phòng khám|trạm y tế|trung tâm y tế)\s+([A-ZÀ-ỸĐ][a-zà-ỹđ0-9]*(?:\s+[A-ZÀ-ỸĐ0-9][a-zà-ỹđ0-9]*)*)\b"
+        )
         self.hospital_context_pattern = re.compile(
             r"\b(?i:bệnh viện|bv|phòng khám|trạm y tế|trung tâm y tế)\s+([A-ZÀ-ỸĐ][A-Za-z0-9à-ỹđ\s]+?)(?=\s*[\r\n|,;.]|\s*$)"
         )
@@ -195,6 +200,7 @@ class ClinicalDeidentifier:
         )
 
         result = self.hospital_context_pattern.sub(self.HOSPITAL_TOKEN, result)
+        result = self.hospital_capitalised_pattern.sub(self.HOSPITAL_TOKEN, result)
         result = self.hospital_en_pattern.sub(self.HOSPITAL_TOKEN, result)
 
         result = self.email_pattern.sub(self.EMAIL_TOKEN, result)

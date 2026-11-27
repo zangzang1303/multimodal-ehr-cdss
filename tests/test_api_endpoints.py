@@ -2,6 +2,9 @@
 Unit Tests for FastAPI REST Endpoints & Pydantic Schemas
 """
 
+import tempfile
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -222,15 +225,31 @@ def test_predict_baseline_endpoint(client, monkeypatch):
         "clinical_notes": "Bệnh nhân nam 64 tuổi có tiền sử hút thuốc lá, khó thở tăng dần khi gắng sức.",
     }
 
+    from src.api import baseline_service
+
+    real_dir = baseline_service.BASELINE_DIR
+    # 1) No fitted artifacts -> 503 (never heuristic numbers by default)
+    monkeypatch.setattr(baseline_service, "BASELINE_DIR", Path(tempfile.mkdtemp()))
     monkeypatch.delenv("MCDSS_ALLOW_HEURISTIC_BASELINE", raising=False)
     strict_response = client.post("/api/v1/predict/baseline", json=payload)
     assert strict_response.status_code == 503
     assert strict_response.json()["detail"] == "baseline_models_unavailable"
 
+    # 2) Heuristic fallback only when explicitly enabled (UI testing)
     monkeypatch.setenv("MCDSS_ALLOW_HEURISTIC_BASELINE", "1")
     response = client.post("/api/v1/predict/baseline", json=payload)
     assert response.status_code == 200
+    assert response.json()["prediction_source"].startswith("heuristic")
+
+    # 3) Fitted artifacts (scripts/export_baseline_artifacts.py) -> real model predictions
+    monkeypatch.delenv("MCDSS_ALLOW_HEURISTIC_BASELINE", raising=False)
+    monkeypatch.setattr(baseline_service, "BASELINE_DIR", real_dir)
+    if not (real_dir / "manifest.json").is_file():
+        pytest.skip("fitted baseline artifacts not exported on this machine")
+    response = client.post("/api/v1/predict/baseline", json=payload)
+    assert response.status_code == 200
     data = response.json()
+    assert data["prediction_source"] == "fitted_baseline_artifacts_seed42"
 
     assert data["patient_id"] == "PT-001"
     assert "baseline_results" in data
@@ -446,8 +465,11 @@ def test_evaluation_benchmark_endpoint(client):
     assert "model_benchmarks" in data
     benchmarks = data["model_benchmarks"]
     assert "mcdss_multimodal_core" in benchmarks
-    assert benchmarks["mcdss_multimodal_core"]["macro_auroc"] == pytest.approx(0.9594141527959706)
-    assert benchmarks["mcdss_multimodal_core"]["ece"] == pytest.approx(0.097339602594344)
+    import json
+    ablation = json.loads((Path(__file__).resolve().parents[1] / "data" / "ablation_results.json").read_text())
+    expected = ablation["variants"]["cross_attention"]["test"]
+    assert benchmarks["mcdss_multimodal_core"]["macro_auroc"] == pytest.approx(expected["macro_auroc"])
+    assert benchmarks["mcdss_multimodal_core"]["ece"] == pytest.approx(expected["ece"])
     assert data["evaluation_metadata"]["dca_status"] in (
         "illustrative_simulation_pending_patient_level_predictions",
         "empirical_holdout_predictions",

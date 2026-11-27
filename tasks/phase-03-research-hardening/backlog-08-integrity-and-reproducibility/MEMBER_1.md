@@ -1,5 +1,16 @@
 # BACKLOG 08 – THÀNH VIÊN 1 (Lead ML / Modeling & Evaluation)
 
+> **Trạng thái 2026-11-23: HOÀN THÀNH** (kèm rà soát và sửa dữ liệu canonical của TV2 – xem CHANGELOG 2026-11-23)
+>
+> | Nhiệm vụ | Kết quả | Bằng chứng |
+> | :--- | :--- | :--- |
+> | 1.1 Chặn fallback | ✅ `src/models/backbone_loader.py`; áp dụng ở `text_encoder.py`, `train_multimodal.py`, `evaluate_clinical_utility.py`; chỉ còn `from_config` sau cờ `allow_random_backbone` | `tests/test_phase3_member1.py::test_missing_pretrained_weights_raise_instead_of_random_init` |
+> | 1.2 Bảo vệ checkpoint + 5 seed | ✅ `src/models/checkpoint_io.py` (từ chối eval-only/0 epoch, smoke → `*.smoke.pt`, provenance); RQ1 chạy 5 seed (13, 42, 101, 2024, 7); checkpoint triển khai = cross-attention đóng băng seed 101 (NLL validation thấp nhất) | `data/checkpoints/multimodal_best.pt` (`training_metadata.epochs_total > 0`, `provenance`), `results/raw/rq1_training_summary.json` |
+> | 1.3 Dự đoán từng bản ghi + baseline thật | ✅ `data/predictions/rq1/*.npz` (val + test + 5 kịch bản thiếu dữ liệu); baseline seed 42 xuất ra `data/checkpoints/baselines/` → `/predict/baseline` trả 200 từ mô hình thật | `scripts/export_baseline_artifacts.py`, `src/api/baseline_service.py` |
+> | 1.4 Results registry | ✅ `scripts/build_results_registry.py` → `results/registry.json`; `scripts/export_latex_tables.py` → `docs/paper_latex/generated/`; API đọc registry/ablation sinh lại | Kiểm chứng chéo: `evaluate_clinical_utility.py` (đường code khác) cho AUROC 0.9583, ECE 0.0773 = registry |
+>
+> Ghi chú: AUROC cross-attention cũ (0.959, 1 seed) tái lập được trong khoảng 0.945–0.966 qua 5 seed (TB 0.956). Không có `make reproduce`; quy trình tái lập đầy đủ nằm ở README mục 6.2.
+
 ## Nhiệm vụ 1.1 – Chặn fallback "BERT ngẫu nhiên" (ngày 1)
 **Vấn đề:** khi thiếu trọng số Bio_ClinicalBERT, code dùng `AutoModel.from_config(...)` → embedding nhiễu mà không báo lỗi.
 **Vị trí:**

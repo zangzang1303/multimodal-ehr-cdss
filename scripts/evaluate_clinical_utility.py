@@ -271,22 +271,10 @@ def extract_multimodal_tensors(
         from transformers import AutoConfig, AutoModel, AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(DEFAULT_TEXT_MODEL, local_files_only=True)
-        try:
-            from huggingface_hub import try_to_load_from_cache
-            has_weights = try_to_load_from_cache(DEFAULT_TEXT_MODEL, "model.safetensors") or try_to_load_from_cache(
-                DEFAULT_TEXT_MODEL, "pytorch_model.bin"
-            )
-        except Exception:
-            has_weights = None
+        from src.models.backbone_loader import load_pretrained_text_backbone
 
-        if has_weights:
-            backbone = AutoModel.from_pretrained(DEFAULT_TEXT_MODEL, local_files_only=True).to(device).eval()
-        else:
-            # Load from config deterministically matching training backbone
-            torch.manual_seed(seed)
-            np.random.seed(seed)
-            cfg = AutoConfig.from_pretrained(DEFAULT_TEXT_MODEL, local_files_only=True)
-            backbone = AutoModel.from_config(cfg).to(device).eval()
+        backbone, _ = load_pretrained_text_backbone(DEFAULT_TEXT_MODEL, local_files_only=True)
+        backbone = backbone.to(device).eval()
 
         notes = df["clinical_note"].fillna("").astype(str).tolist()
         hidden_chunks, mask_chunks = [], []

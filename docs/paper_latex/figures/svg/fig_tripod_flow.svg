@@ -23,7 +23,7 @@
   <g transform="translate(60, 75)" filter="url(#shadow)">
     <rect width="320" height="75" rx="6" fill="#F0F7FF" stroke="#0F4C81" stroke-width="1.5" />
     <text x="160" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#0F4C81">Synthea EHR Simulation</text>
-    <text x="160" y="44" text-anchor="middle" font-size="11" fill="#1E293B">N₁ = 2.450 hồ sơ bệnh nhân tổng hợp</text>
+    <text x="160" y="44" text-anchor="middle" font-size="11" fill="#1E293B">N₁ = 1.171 bệnh nhân tổng hợp (Synthea)</text>
     <text x="160" y="62" text-anchor="middle" font-size="10" fill="#64748B">(Dữ liệu bảng: nhân khẩu, sinh hiệu, lab)</text>
   </g>
 
@@ -31,7 +31,7 @@
   <g transform="translate(520, 75)" filter="url(#shadow)">
     <rect width="320" height="75" rx="6" fill="#F0FDFA" stroke="#0D9488" stroke-width="1.5" />
     <text x="160" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#0D9488">MTSamples Repository</text>
-    <text x="160" y="44" text-anchor="middle" font-size="11" fill="#1E293B">N₂ = 4.999 ghi chú lâm sàng thực tế</text>
+    <text x="160" y="44" text-anchor="middle" font-size="11" fill="#1E293B">N₂ = 4.999 ghi chú phiên mã (MTSamples)</text>
     <text x="160" y="62" text-anchor="middle" font-size="10" fill="#64748B">(Văn bản tự do: bệnh sử, khám thực thể)</text>
   </g>
 
@@ -44,8 +44,8 @@
   <g transform="translate(200, 205)" filter="url(#shadow)">
     <rect width="500" height="110" rx="6" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.5" />
     <text x="250" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#DC2626">Tiêu chí Loại trừ, Làm sạch Chống Rò rỉ &amp; Ghép Cặp</text>
-    <text x="20" y="42" font-size="10.5" fill="#1E293B">• Loại trừ bệnh lý ngoài 4 nhóm mục tiêu hô hấp - tim mạch (n = 450)</text>
-    <text x="20" y="58" font-size="10.5" fill="#1E293B">• Loại trừ ghi chú chuyên khoa không tương thích (n = 3.999)</text>
+    <text x="20" y="42" font-size="10.5" fill="#1E293B">• 2.000 bản ghi (500/lớp) từ 478 bệnh nhân gốc; viêm phổi chỉ 8 bệnh nhân gốc</text>
+    <text x="20" y="58" font-size="10.5" fill="#1E293B">• 305 ghi chú MTSamples khớp từ khoá; 1.695 ghi chú template</text>
     <text x="20" y="74" font-size="10.5" fill="#1E293B">• Cấm xét nghiệm tiêu chuẩn vàng: FEV₁/FVC (GOLD), Siêu âm EF (ESC), Cấy đờm vi sinh</text>
     <text x="20" y="90" font-size="10.5" fill="#1E293B">• Che từ khóa nhãn ([REDACTED_DIAGNOSIS]) &amp; giả lập PHI để kiểm thử pipeline de-ID</text>
     <text x="20" y="104" font-size="10" fill="#64748B">• Chèn khối sinh hiệu vào ghi chú theo template tiếp nhận (cội nguồn phát hiện RQ2)</text>

@@ -1,5 +1,12 @@
 # BACKLOG 10 – THÀNH VIÊN 3 (Full-Stack AI & System Integrator)
 
+> **RÀ SOÁT CỦA THÀNH VIÊN 1 (2026-11-23):**
+> - ✅ TV1 bổ sung build tuỳ chọn `MCDSS_INSTALL_ML=1` (torch CPU + transformers + catboost) và mount HF cache chỉ-đọc trong `docker-compose.yml` → cho phép strict smoke test `/predict/multimodal` = 200 (chưa build thử vì máy TV1 thiếu dung lượng ổ C:).
+> - ✅ README mục 4.2/6.2/6.3 viết lại (gỡ bảng "kết quả kỳ vọng" bịa; quy trình tái lập; lệnh Docker đầy đủ). Checkpoint/data/registry đã chốt.
+> - ✅ Các `[TODO-TV1/TV2]` trong `04`, `05`, `06` đã thay bằng macro sinh từ registry.
+> - Còn lại (cần con người): chạy Docker sạch trên máy thứ hai; quay video; xuất slide; tổng duyệt.
+
+
 > **Cập nhật trạng thái thực hiện (Phase 3 — Bản chuẩn hóa sau rà soát):** Đã siết script `smoke_test`, đổi tên trường kiểm probe sang `out_of_note_probe_rejection_rate`, sửa `eval_rag.py` sang chế độ chỉ đọc trên Qdrant từ xa (xác minh chiều 768, `chunk_id`, `SHA-256` và 8 metadata; *chưa xác nhận ngữ nghĩa vector*), đánh dấu audit 50 ca trên `data/processed/test.parquet` ($N=287$) là **sơ bộ** (`preliminary_non_strict_holdout`, chưa phải `strict 302`), và đồng bộ lại LaTeX (`04`, `05`, `06`), slide/video, Q&A, UI để không khẳng định quá mức. Backlog **chưa hoàn thành 100%** do chưa có `HTTP 200` trên `/predict/multimodal` trong Docker nhẹ, chưa có encoder `all-mpnet-base-v2`, chưa chấm tay 20 mẫu grounding, chưa kiểm thử trên máy thứ hai và còn chờ số liệu RQ1–RQ4 của TV1 & TV2.
 
 ## Nhiệm vụ 3.1 – Docker clean-run & smoke test

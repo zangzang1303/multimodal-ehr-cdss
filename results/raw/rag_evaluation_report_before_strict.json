@@ -1,0 +1,76 @@
+{
+  "is_mock": false,
+  "evaluated_at": "2026-11-19T04:03:28.541413+00:00",
+  "qdrant_target": "http://127.0.0.1:6333",
+  "qdrant_points_count": 64,
+  "qdrant_vector_dim_verified": 768,
+  "qdrant_corpus_sync_verified": true,
+  "qdrant_chunk_id_match_count": 64,
+  "qdrant_content_sha256_match_count": 64,
+  "qdrant_metadata_match_count": 64,
+  "qdrant_checked_metadata_fields": [
+    "source_id",
+    "version",
+    "target_disease",
+    "section_title",
+    "page_or_section",
+    "clinical_category",
+    "evidence_level",
+    "source_verified"
+  ],
+  "qdrant_vector_semantics_verified": false,
+  "qdrant_sync_scope_note": "Read-only check verified 768-D vector dimension, chunk_id set, text_content SHA-256, and 8 provenance metadata fields against data/guidelines/*.json; it does NOT verify semantic embedding quality because offline deterministic 768-D hashed fallback vectors are active instead of all-mpnet-base-v2.",
+  "corpus_size_chunks": 64,
+  "ingested_guideline_json_chunks": 64,
+  "dense_encoder": "768d_hashed_deterministic_cpu_fallback (all-mpnet-base-v2 offline unavailable)",
+  "dense_encoder_is_semantic_model": false,
+  "retrieval_scope_note": "Recall/MRR/nDCG metrics reflect live Qdrant RRF using deterministic 768-D hashed fallback vectors (all-mpnet-base-v2 offline unavailable), NOT a real semantic encoder.",
+  "query_count": 60,
+  "cohens_kappa": 0.9449,
+  "modes": {
+    "dense_only": {
+      "recall_at_1": 0.7833,
+      "recall_at_3": 0.9167,
+      "recall_at_5": 0.9833,
+      "mrr": 0.8688,
+      "ndcg_at_5": 0.8729
+    },
+    "bm25_only": {
+      "recall_at_1": 0.9,
+      "recall_at_3": 0.95,
+      "recall_at_5": 1.0,
+      "mrr": 0.9319,
+      "ndcg_at_5": 0.9354
+    },
+    "hybrid_rrf": {
+      "recall_at_1": 0.9,
+      "recall_at_3": 0.95,
+      "recall_at_5": 1.0,
+      "mrr": 0.9319,
+      "ndcg_at_5": 0.9354
+    }
+  },
+  "grounding_audit_50_cases": {
+    "audit_status": "preliminary_non_strict_holdout",
+    "audit_method": "pipeline_offset_invariant_and_out_of_note_string_rejection_only",
+    "audit_scope_limitation": "Automatic metrics verify character-offset substring matching on display_note and rejection of out-of-note probe strings only; they do NOT establish semantic correctness, negation fidelity, or clinical validity. PRELIMINARY non-strict hold-out audit only: sourced from data/processed/test.parquet (N=287), NOT an official evaluation on the pending canonical strict N=302 split.",
+    "notes_source_path": "data/processed/test.parquet",
+    "notes_source_is_canonical_strict_302": false,
+    "dataset_total_rows": 287,
+    "cases_tested": 50,
+    "notes_from_dataset_count": 50,
+    "notes_from_fallback_template_count": 0,
+    "total_genuine_claims": 200,
+    "grounded_claims": 200,
+    "genuine_claim_grounding_rate": 1.0,
+    "injected_out_of_note_probes": 50,
+    "rejected_out_of_note_probes": 50,
+    "out_of_note_probe_rejection_rate": 1.0,
+    "span_substring_match_rate": 1.0,
+    "manual_semantic_precision_20_spans": null,
+    "manual_semantic_audit_status": "pending_human_review",
+    "manual_audit_sample_file": "results/grounding_manual_audit_20_samples.json",
+    "sampled_20_spans_checked": 0,
+    "exported_samples_for_review": 20
+  }
+}

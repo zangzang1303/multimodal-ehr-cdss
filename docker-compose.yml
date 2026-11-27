@@ -34,6 +34,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # MCDSS_INSTALL_ML=1 docker compose up --build  -> full model inference (CPU)
+        INSTALL_ML: ${MCDSS_INSTALL_ML:-0}
     container_name: mcdss-api
     restart: unless-stopped
     ports:
@@ -48,6 +51,8 @@ services:
       - ./data:/app/data:ro
       - ./configs:/app/configs:ro
       - ./results:/app/results:ro
+      # Hugging Face cache containing emilyalsentzer/Bio_ClinicalBERT (read-only, offline)
+      - ${HF_CACHE_DIR:-~/.cache/huggingface}:/root/.cache/huggingface:ro
     depends_on:
       qdrant:
         condition: service_healthy

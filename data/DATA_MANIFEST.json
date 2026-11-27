@@ -1,5 +1,5 @@
 {
-  "manifest_version": "1.0.0",
+  "manifest_version": "1.1.0",
   "canonical_data_dir": "data/processed_rebuilt_strict",
   "recreation_command": "python scripts/rebuild_canonical_dataset.py",
   "commit": "HEAD",
@@ -7,7 +7,8 @@
   "splits": {
     "train": {
       "path": "data/processed_rebuilt_strict/train.parquet",
-      "sha256": "7d522112590e60cf53cd677674acd52f409a34d3f3c0775fb08211ac14fddb0a",
+      "sha256": "ce83cac64b8dbecba90d9d025ce3453642d0a29f770d1822b2276bdda36f4511",
+      "content_sha256": "3a5e16ae4c1f390f2307d56bb68150afbba111631cf68e8e61b5bc6907666ed4",
       "row_count": 1425,
       "class_distribution": {
         "0": 358,
@@ -19,7 +20,8 @@
     },
     "val": {
       "path": "data/processed_rebuilt_strict/val.parquet",
-      "sha256": "5e925be4a32ee986f9e2907ca8de00dc17d6e6f3a9c48bf94d50f511a45353e8",
+      "sha256": "7ccbc0d59e8ff15ce21a59179f1fe326ad1866340713cafa2c9c424dcd076589",
+      "content_sha256": "ed40a3f8648ce257b4a7ab4e413f307657924d1d1f274865030e6995fa2d6cfb",
       "row_count": 273,
       "class_distribution": {
         "0": 71,
@@ -31,7 +33,8 @@
     },
     "test": {
       "path": "data/processed_rebuilt_strict/test.parquet",
-      "sha256": "31b161484c3cdf77c20682d8ca13ff21fa55d1f378a93a5865fe4cec7d7f66e4",
+      "sha256": "fe288662936a72e054c6218fbf3727ead658118a947694482e34d835f34a30f0",
+      "content_sha256": "98f76dc93fe0fd47188d6510d996733dd0ab5a7a8b9d6d122c4467e01ddbddf1",
       "row_count": 302,
       "class_distribution": {
         "0": 71,

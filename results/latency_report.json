@@ -1,46 +1,46 @@
 {
   "is_mock": false,
-  "measured_at": "2026-11-19T03:33:53.482548+00:00",
-  "measurement_mode": "http_docker_end_to_end",
-  "target_url": "http://127.0.0.1:8000",
-  "device_info": "Windows 11 | AMD64 | CPU (16 logical cores)",
+  "measured_at": "2026-11-23T10:51:41.663379+00:00",
+  "measurement_mode": "in_process_asgi_testclient",
+  "target_url": "in-process://fastapi.TestClient",
+  "device_info": "Windows 11 | AMD64 | CPU (20 logical cores)",
   "note_length_chars": 340,
-  "num_warm_requests": 200,
+  "num_warm_requests": 100,
   "endpoints": {
     "/api/v1/agent/explain": {
       "status_codes_observed": [
         200
       ],
-      "cold_ms": 169.03,
-      "mean_ms": 63.49,
-      "p50_ms": 62.92,
-      "p95_ms": 84.23,
-      "p99_ms": 92.25,
+      "cold_ms": 147.48,
+      "mean_ms": 20.14,
+      "p50_ms": 19.15,
+      "p95_ms": 27.92,
+      "p99_ms": 32.05,
       "cold_status_code": 200
     },
     "/api/v1/predict/baseline": {
       "status_codes_observed": [
-        503
+        200
       ],
-      "cold_ms": 32.76,
-      "mean_ms": 47.57,
-      "p50_ms": 47.77,
-      "p95_ms": 51.24,
-      "p99_ms": 52.4,
-      "cold_status_code": 503,
-      "note": "HTTP 503 baseline_models_unavailable safeguard (default when Member 1 fitted baseline models are absent)."
+      "cold_ms": 64713.53,
+      "mean_ms": 226.25,
+      "p50_ms": 203.07,
+      "p95_ms": 332.14,
+      "p99_ms": 387.04,
+      "cold_status_code": 200,
+      "note": "Heuristic baseline fallback executed (MCDSS_ALLOW_HEURISTIC_BASELINE=1)."
     },
     "/api/v1/predict/multimodal": {
       "status_codes_observed": [
-        503
+        200
       ],
-      "cold_ms": 54.87,
-      "mean_ms": 48.3,
-      "p50_ms": 48.16,
-      "p95_ms": 50.55,
-      "p99_ms": 52.45,
-      "cold_status_code": 503,
-      "note": "HTTP 503 safeguard measured (multimodal inference NOT exercised: missing torch in deploy image or missing Bio_ClinicalBERT cache)."
+      "cold_ms": 2022.38,
+      "mean_ms": 756.53,
+      "p50_ms": 781.97,
+      "p95_ms": 943.31,
+      "p99_ms": 993.1,
+      "cold_status_code": 200,
+      "note": "Checkpoint + Bio_ClinicalBERT multimodal inference measured (HTTP 200)."
     }
   }
 }

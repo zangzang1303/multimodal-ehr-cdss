@@ -1,5 +1,11 @@
 # BACKLOG 09 – THÀNH VIÊN 2 (Biomedical Data Engineer & Privacy)
 
+> **RÀ SOÁT CỦA THÀNH VIÊN 1 (2026-11-23) – các kết quả dưới đây ĐÃ BỊ THU HỒI**
+> Script `evaluate_research_hardening_member2.py` chạy trên bộ dữ liệu rò rỉ nhãn (xem Backlog 08), tự huấn luyện một mô hình fusion riêng (không validation, temperature cố định 1.15, `max_length` 128) và dùng sai công thức số can thiệp tránh được (chia cho p_t thay vì p_t/(1−p_t)). Toàn bộ artefact đã chuyển vào `data/legacy_invalid_2026-11-19/`.
+> Kết quả thay thế (DCA, missing-modality, temporal split theo nhóm, fairness kèm số lớp có mặt, phân tích lỗi) được tính trên **mô hình triển khai chính thức** và nằm trong `results/registry.json` (`rq4_dca`, `rq4_missing_modality`, `generalization`, `fairness`, `error_analysis`); `docs/06` đã viết lại. Các test của TV2 từng khẳng định *kết quả mong muốn* (ví dụ ΔNB > 0, AUROC fusion > 0.90 khi mất văn bản) đã chuyển sang kiểm tra cấu trúc.
+> Giữ nguyên: định nghĩa DCA đăng ký trước (HF, p_t 0.05–0.30), lộ trình MIMIC-IV, trạng thái khảo sát bác sĩ "CHƯA THỰC HIỆN".
+
+
 **Tình trạng:** [✓] ĐÃ HOÀN THÀNH 100% CÁC NHIỆM VỤ (Passed all verification tests in `tests/test_phase3_backlog09_member2.py`)
 
 ---

@@ -615,13 +615,14 @@ export interface ResultsRegistryResponse {
     note?: string;
     models?: Array<{
       model: string;
+      label?: string;
       auroc_mean: number;
       auroc_sd: number;
       auroc_ci95: [number, number];
       f1_mean: number;
       ece_mean: number;
       delta_auroc_vs_best_unimodal: number;
-      holm_adjusted_p: number;
+      holm_adjusted_p: number | null;
     }>;
   };
   rq2_text_signal_decomposition?: {

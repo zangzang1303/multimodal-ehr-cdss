@@ -8,7 +8,7 @@
 \subsection{Thiết Kế Đoàn Hệ và Bản Chất Tạo Dữ Liệu Bán Tổng Hợp (Cohort Genesis \& Simulation Transparency)}
 Nhằm khắc phục triệt để các khiếm khuyết phương pháp luận được chỉ ra trong tổng quan hệ thống của Hunik và cộng sự \cite{hunik2024diagnostic} (trong đó đa số nghiên cứu tiền nhiệm gặp nguy cơ sai lệch cao do rò rỉ thông tin hoặc mất đồng bộ thời gian), nghiên cứu này thiết lập đoàn hệ hồi cứu chuẩn hóa gồm $N_{\text{total}} = 2.000$ hồ sơ bệnh án điện tử đa phương thức. 
 
-Để đảm bảo tính trung thực khoa học theo khuyến nghị của TRIPOD+AI \cite{collins2024tripod,moons2024tripod} và PROBAST+AI \cite{probastai2024bmj,moons2025probast}, quy trình kiến tạo đoàn hệ được mô tả minh bạch qua bốn thành phần cốt lõi:
+Để đảm bảo tính trung thực khoa học theo khuyến nghị của TRIPOD+AI \cite{collins2024tripod} và PROBAST+AI \cite{probastai2024bmj}, quy trình kiến tạo đoàn hệ được mô tả minh bạch qua bốn thành phần cốt lõi:
 \begin{enumerate}[leftmargin=1.8em, itemsep=0.2em]
     \item \textbf{Dữ liệu dạng bảng từ Synthea EHR:} Vector đặc trưng sinh lý học số hóa ($\bm{x}_{\text{tab}} \in \mathbb{R}^{13}$) được trích xuất từ bộ sinh bệnh nhân tổng hợp \textbf{Synthea} \cite{walonoski2018synthea}, bao gồm $2$ biến nhân khẩu học (Tuổi, Giới tính), $6$ chỉ số sinh hiệu đo đạc lúc tiếp nhận (Huyết áp tâm thu SBP, Huyết áp tâm trương DBP, Nhịp tim HR, Nhịp thở RR, Thân nhiệt Temp, Độ bão hòa oxy máu $\text{SpO}_2$), $2$ chỉ số xét nghiệm phản ứng viêm pha cấp (Bạch cầu WBC, Nồng độ CRP) và $3$ tiền sử bệnh nền/yếu tố nguy cơ (Hút thuốc lá, Tăng huyết áp, Đái tháo đường).
     \item \textbf{Văn bản ghi chú lâm sàng từ MTSamples:} Các phân đoạn văn bản bệnh sử tự do (lý do vào viện, bệnh sử diễn tiến, khám thực thể nghe phổi) được chọn lọc từ kho ghi chú y khoa mở \textbf{MTSamples} \cite{mtsamples2012}, phản ánh ngữ cảnh mô tả lâm sàng phong phú của bác sĩ.
@@ -23,43 +23,9 @@ Nhằm khắc phục triệt để các khiếm khuyết phương pháp luận �
 \subsection{Đặc Điểm Lâm Sàng Ban Đầu của Đoàn Hệ (Baseline Characteristics)}
 Bảng~\ref{tab:cohort_characteristics} mô tả chi tiết các thông số nhân khẩu học, sinh hiệu và xét nghiệm lâm sàng trên toàn bộ đoàn hệ ($N = 2.000$), phân tách theo các tập phân chia (Train/Val/Test) và phân tách đặc trưng bệnh học theo từng nhóm chẩn đoán mục tiêu. Theo khuyến cáo của chuẩn TRIPOD+AI \cite{collins2024tripod}, các biến số liên tục có phân bố lệch được báo cáo dưới dạng Trung vị kèm Khoảng tứ phân hồi cứu (Median [IQR]), cùng tỷ lệ khuyết thiếu thực tế.
 
-\begin{table}[htbp]
-\centering
-\caption{Đặc điểm lâm sàng ban đầu (Baseline Clinical Characteristics) của đoàn hệ M-CDSS ($N = 2.000$) theo phân chia và theo nhóm bệnh.}
-\label{tab:cohort_characteristics}
-\scriptsize
-\begin{tabularx}{\textwidth}{@{}lcccc|cccc@{}}
-\toprule
-\textbf{Biến số lâm sàng} & \textbf{Toàn bộ} & \textbf{Train} & \textbf{Val} & \textbf{Test} & \textbf{Hen phế quản} & \textbf{COPD} & \textbf{Suy tim} & \textbf{Viêm phổi} \\
- & ($N=2000$) & ($N=1425$) & ($N=273$) & ($N=302$) & ($n=500$) & ($n=500$) & ($n=500$) & ($n=500$) \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Nhân khẩu học \& Yếu tố nguy cơ, n (\%) hoặc Trung vị [IQR]}} \\
-Tuổi (năm) & 62 [48--71] & 62 [48--71] & 61 [44--71] & 65 [49--73] & 39 [30--48] & 67 [62--72] & 71 [65--77] & 58 [48--69] \\
-Giới tính Nam & 1016 (50.8\%) & 722 (50.7\%) & 125 (45.8\%) & 169 (56.0\%) & 263 (52.6\%) & 250 (50.0\%) & 249 (49.8\%) & 254 (50.8\%) \\
-Tiền sử hút thuốc & 1180 (59.0\%) & 854 (59.9\%) & 157 (57.5\%) & 169 (56.0\%) & 157 (31.4\%) & 474 (94.8\%) & 285 (57.0\%) & 264 (52.8\%) \\
-Tăng huyết áp & 1004 (50.2\%) & 699 (49.1\%) & 135 (49.5\%) & 170 (56.3\%) & 80 (16.0\%) & 268 (53.6\%) & 453 (90.6\%) & 203 (40.6\%) \\
-Đái tháo đường & 533 (26.7\%) & 384 (26.9\%) & 66 (24.2\%) & 83 (27.5\%) & 48 (9.6\%) & 135 (27.0\%) & 215 (43.0\%) & 135 (27.0\%) \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Sinh hiệu ban đầu lúc tiếp nhận, Trung vị [IQR]}} \\
-Huyết áp tâm thu (mmHg) & 128.4 [117--144] & 127.7 [117--142] & 128.2 [117--145] & 131.9 [118--148] & 117.6 [111--125] & 132.0 [122--142] & 151.7 [139--167] & 123.2 [114--133] \\
-Huyết áp tâm trương (mmHg) & 80.5 [74--89] & 80.4 [74--89] & 79.5 [73--88] & 81.6 [74--90] & 75.8 [71--81] & 82.9 [76--89] & 91.7 [84--99] & 75.2 [69--82] \\
-Nhịp tim (nhịp/phút) & 92.3 [82--103] & 92.0 [82--103] & 93.0 [83--103] & 92.3 [83--104] & 86.5 [78--94] & 87.9 [80--95] & 95.4 [84--108] & 102.8 [92--114] \\
-Nhịp thở (lần/phút) & 24.1 [21--27] & 24.1 [21--27] & 23.9 [22--27] & 24.4 [22--27] & 22.1 [20--24] & 23.9 [21--27] & 25.1 [22--28] & 26.0 [23--28] \\
-Thân nhiệt ($^\circ\text{C}$) & 37.0 [36.7--37.6] & 37.0 [36.7--37.7] & 37.0 [36.7--37.8] & 36.9 [36.6--37.3] & 36.8 [36.6--37.0] & 37.0 [36.7--37.3] & 36.7 [36.5--36.9] & 38.8 [38.2--39.2] \\
-$\text{SpO}_2$ ngoại vi (\%) & 91.9 [89.5--94.2] & 92.0 [89.5--94.2] & 91.6 [89.2--93.8] & 92.0 [89.5--94.3] & 94.3 [92.8--95.6] & 90.2 [87.8--92.6] & 91.7 [89.7--93.5] & 91.0 [88.5--93.2] \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Xét nghiệm pha cấp \& Tỷ lệ khuyết thiếu (Missingness)}} \\
-WBC ($\times 10^9/\text{L}$), khuyết 14.4\% & 8.9 [7.2--12.1] & 8.9 [7.2--12.2] & 9.1 [7.2--13.0] & 8.6 [7.3--10.6] & 7.5 [6.3--8.6] & 9.1 [7.5--10.5] & 7.9 [6.5--9.1] & 16.1 [13.4--19.1] \\
-CRP (mg/L), khuyết 19.1\% & 7.8 [3.0--31.5] & 7.7 [2.9--32.4] & 9.6 [3.3--40.3] & 7.1 [2.9--20.4] & 2.0 [0.7--4.6] & 8.6 [4.5--15.3] & 5.5 [2.8--10.2] & 62.2 [43.9--85.6] \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Số lượng bệnh nhân mục tiêu ($y$), n (\%)}} \\
-Hen phế quản (\texttt{ASTHMA}) & 500 (25.0\%) & 358 (25.1\%) & 71 (26.0\%) & 71 (23.5\%) & 500 (100\%) & 0 (0\%) & 0 (0\%) & 0 (0\%) \\
-COPD (\texttt{COPD}) & 500 (25.0\%) & 358 (25.1\%) & 71 (26.0\%) & 71 (23.5\%) & 0 (0\%) & 500 (100\%) & 0 (0\%) & 0 (0\%) \\
-Suy tim (\texttt{HEART\_FAILURE}) & 500 (25.0\%) & 340 (23.9\%) & 54 (19.8\%) & 106 (35.1\%) & 0 (0\%) & 0 (0\%) & 500 (100\%) & 0 (0\%) \\
-Viêm phổi (\texttt{PNEUMONIA}) & 500 (25.0\%) & 369 (25.9\%) & 77 (28.2\%) & 54 (17.9\%) & 0 (0\%) & 0 (0\%) & 0 (0\%) & 500 (100\%) \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\input{generated/tab_cohort}
+
+\paragraph{Bất thường của dữ liệu tổng hợp (quan trọng cho diễn giải kết quả).} Bảng~\ref{tab:cohort_characteristics} cho thấy đoàn hệ có những đặc điểm không hợp lý về mặt lâm sàng: tuổi trung vị của nhóm COPD chỉ khoảng 35 trong khi nhóm viêm phổi tập trung quanh 100 tuổi, và SpO$_2$ trung vị của nhóm suy tim thấp bất thường (khoảng 77\%). Vì vậy tuổi và SpO$_2$ gần như tự phân tách các lớp (Logistic Regression chỉ với tuổi đạt macro AUROC khoảng 0.81 trên tập test). Quan trọng hơn, 2.000 bản ghi được sinh từ chỉ \textbf{478 bệnh nhân Synthea gốc} (lớp viêm phổi: 8 bệnh nhân gốc; hen và suy tim: 57; COPD: 402), mỗi bệnh nhân gốc đóng góp nhiều lần khám. Việc chia theo nhóm nguồn ngăn rò rỉ giữa các split nhưng làm tập test strict chỉ còn 	estSourcePatients{} bệnh nhân gốc: \textbf{toàn bộ 106 bản ghi suy tim và 54 bản ghi viêm phổi trong test mỗi lớp đến từ một bệnh nhân gốc} (vì vậy mọi ca suy tim trong test là nam và không có người đang hút thuốc). Hệ quả: hiệu năng theo lớp và DCA cho suy tim thực chất mô tả hành vi trên một bệnh nhân tổng hợp, và khoảng tin cậy bootstrap theo bản ghi đánh giá thấp độ bất định (Mục~\ref{sec:methodology}). Mọi kết quả hiệu năng trong bài cần được hiểu trong bối cảnh này: chúng mô tả hành vi của các mô hình trên một benchmark tổng hợp có tín hiệu nhân khẩu học mạnh, không phải độ khó của bài toán lâm sàng thực.
 
 \subsection{Quy Trình Khử Định Danh Bảo Vệ Quyền Riêng Tư (HIPAA Safe-Harbor De-Identification)}
 Để đảm bảo an toàn tuyệt đối cho người bệnh và tuân thủ các quy định quốc tế (HIPAA Safe Harbor \cite{hhs2012hipaa}, GDPR Điều 9) cũng như Nghị định 13/2023/NĐ-CP của Chính phủ Việt Nam về bảo vệ dữ liệu cá nhân, module \texttt{ClinicalDeidentifier} thực thi pipeline làm sạch 18 nhóm thông tin định danh cá nhân (PHI) qua kiến trúc lai ghép:

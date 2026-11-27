@@ -19,15 +19,15 @@ Hệ thống **Multimodal Clinical Decision Support System (M-CDSS)** là giải
 ```
                       KHOẢNG TRỐNG TRONG Y VĂN (JMIR REVIEW 2024)
    ┌──────────────────────────────────────────────┬──────────────────────────────────────────────┐
-   │ 100% mô hình chẩn đoán từ EHR tại tuyến cơ sở│ 0% công trình khai thác ghi chú lâm sàng     │
-   │ chỉ sử dụng dữ liệu bảng cấu trúc thuần túy  │ tự do của bác sĩ bằng AI tạo sinh / LLMs     │
+   │ 15 nghiên cứu đạt chuẩn / 10.657 bản ghi     │ 0/15 nghiên cứu có nguy cơ sai lệch thấp     │
+   │ (AI + EHR, chăm sóc ban đầu)                 │ (PROBAST; chủ yếu do mô tả phương pháp kém)  │
    ├──────────────────────────────────────────────┼──────────────────────────────────────────────┤
-   │ >60% nghiên cứu có Nguy cơ Sai lệch Cao      │ 87% mô hình chưa từng được kiểm định         │
-   │ (PROBAST High Risk of Bias) do rò rỉ dữ liệu │ ngoại kiểm độc lập (External Validation)     │
+   │ 11/15 (73%) chỉ nhắm một bệnh mạn tính       │ 13/15 chỉ phát triển, 2/15 ngoại kiểm        │
+   │                                              │ (Hunik et al., JMIR Med Inform 2025)         │
    └──────────────────────────────────────────────┴──────────────────────────────────────────────┘
                                           │
                                           ▼
-                       GIẢI PHÁP ĐỘT PHÁ: M-CDSS PLATFORM
+                       NGUYÊN MẪU NGHIÊN CỨU: M-CDSS
    ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
    │  FT-Transformer (Dữ liệu bảng) ──┐                                                         │
    │                                  ├──> [Cross-Attention Fusion] ──> [Calibrated Predictions]│
@@ -38,21 +38,18 @@ Hệ thống **Multimodal Clinical Decision Support System (M-CDSS)** là giải
 ```
 
 ### 1.1. Khoảng Trống Nghiên Cứu Từ Y Văn Thực Chứng (The Research Gap)
-Theo nghiên cứu tổng quan hệ thống toàn diện công bố trên **JMIR Medical Informatics** (*Hunik et al., 2024, preprint 62862*), sau khi sàng lọc **10.657 công trình nghiên cứu** trên toàn cầu về các mô hình dự đoán chẩn đoán từ hồ sơ sức khỏe điện tử (EHR) tại tuyến chăm sóc ban đầu:
-1. **Thiên lệch dữ liệu đơn phương thức (100% Unimodal Structured Data):** Toàn bộ 15 nghiên cứu đạt chuẩn đều chỉ dựa vào dữ liệu có cấu trúc (chỉ số sinh hiệu, xét nghiệm máu, mã chẩn đoán ICD/ICPC, bảng câu hỏi). Hoàn toàn chưa có nghiên cứu nào tích hợp và khai thác dữ liệu phi cấu trúc — các ghi chú lâm sàng tự do (unstructured clinical progress notes) vốn chứa đựng tới **80% bức tranh bệnh cảnh thực tế** của bệnh nhân.
-2. **Khủng hoảng phương pháp luận & Nguy cơ sai lệch nghiêm trọng (High Risk of Bias):** Đánh giá theo công cụ chuẩn quốc tế **PROBAST** (*Prediction model Risk Of Bias ASsessment Tool*) chỉ ra **0% nghiên cứu đạt Low Risk of Bias**, trong đó **60% (9/15) có nguy cơ sai lệch cao** và **40% (6/15) có nguy cơ sai lệch không rõ ràng**. Nguyên nhân cốt lõi bao gồm:
-   - *Target Leakage (Rò rỉ nhãn chẩn đoán):* Đưa chính tiêu chuẩn vàng chẩn đoán làm biến đầu vào dự đoán (ví dụ: dùng đường huyết đói để chẩn đoán đái tháo đường, dùng kết quả đo chức năng hô hấp FEV1/FVC để dự đoán Hen/COPD).
-   - *Mất đồng bộ chuỗi thời gian (Temporal Misalignment):* 60% bài báo không xác định rõ mốc thời gian phát sinh của biến dự đoán so với thời điểm chẩn đoán.
-   - *Thiếu minh bạch về dữ liệu khuyết:* 67% công trình không báo cáo cách thức xử lý dữ liệu khuyết tật (Missing Data), tự ý loại bỏ ca bệnh gây sai lệch chọn mẫu.
-   - *Thiếu hiệu chuẩn xác suất (Calibration):* Chỉ 27% (4/15) bài báo thực hiện hiệu chuẩn độ tin cậy xác suất đầu ra.
-3. **Thiếu kiểm định ngoại kiểm (Lack of Generalizability):** 87% (13/15) mô hình chưa từng được kiểm định trên tập dữ liệu độc lập ngoài cơ sở huấn luyện; 73% chỉ tập trung chẩn đoán một bệnh đơn lẻ, không đáp ứng được bài toán chẩn đoán phân biệt đa bệnh thực tế tại phòng khám bác sĩ gia đình.
+Tổng quan hệ thống của **Hunik và cộng sự** (*JMIR Medical Informatics* 2025;13:e62862, doi:10.2196/62862) về các mô hình chẩn đoán dựa trên AI và EHR trong chăm sóc ban đầu:
+1. Sàng lọc **10.657 bản ghi**, chọn **15 nghiên cứu**; 13 nghiên cứu chỉ phát triển mô hình, 2 nghiên cứu ngoại kiểm.
+2. **11/15 (73%)** chỉ nhắm một bệnh mạn tính.
+3. Theo PROBAST, **không nghiên cứu nào có nguy cơ sai lệch thấp**; nguy cơ cao chủ yếu do mô tả phương pháp không đầy đủ.
+4. Tác giả kết luận các mô hình hiện có **chưa sẵn sàng** để triển khai trong chăm sóc ban đầu.
 
-### 1.2. Luận Điểm Đột Phá Của M-CDSS
-Hệ thống **M-CDSS** khắc phục triệt để các hạn chế trên thông qua 2 trụ cột kỹ thuật:
-- **Multimodal Late Fusion qua Cross-Attention:** Kết hợp sức mạnh biểu diễn dữ liệu bảng số học độ chính xác cao của mạng học sâu dạng bảng (**FT-Transformer**) với chiều không gian ngữ nghĩa sâu rộng từ văn bản bệnh án tự do (**Clinical LLM / BioLinkBERT**). Cơ chế Cross-Attention đóng vai trò "cầu nối liên phương thức" (cross-modal bridge), cho phép các bất thường định lượng (ví dụ: $SpO_2 \downarrow$, $WBC \uparrow$) được đối chiếu và giải thích trực tiếp bởi các mô tả định tính (tiền sử hút thuốc lá 20 bao-năm, khó thở kịch phát về đêm, rale rít đáy phổi).
-- **Agentic RAG & Evidence Grounding triệt tiêu ảo giác (Zero-Hallucination):** Khắc phục nhược điểm "bịa đặt thông tin" của các mô hình ngôn ngữ lớn trong y khoa bằng quy trình Multi-Agent khép kín. Mọi kết luận chẩn đoán phân biệt bắt buộc phải:
-  1. Được neo (grounded) chính xác vào phác đồ điều trị quốc tế chuẩn (*GINA, GOLD, ESC, Bộ Y tế*) thông qua Hybrid Vector Search.
-  2. Được định vị chính xác vị trí ký tự (character offset spans) trong chính ghi chú khám bệnh ban đầu của bệnh nhân.
+> Các con số chi tiết khác từng ghi ở đây (tỷ lệ chỉ dùng dữ liệu bảng, tỷ lệ hiệu chuẩn…) đã được gỡ bỏ ngày 2026-11-23 vì chưa đối chiếu được với bản công bố chính thức.
+
+### 1.2. Mục Tiêu và Phát Hiện Chính của M-CDSS
+- **Nguyên mẫu đa phương thức:** FT-Transformer (dữ liệu bảng) + Bio_ClinicalBERT (ghi chú) dung hợp bằng cross-attention, hiệu chuẩn temperature scaling, giải trình bằng truy xuất phác đồ và neo bằng chứng vào vị trí ký tự trong ghi chú.
+- **Phát hiện chính (Phase 3, số liệu trong `results/registry.json`):** trên đoàn hệ bán tổng hợp này, dung hợp **không vượt** mô hình văn bản fine-tune và ensemble đơn giản; tín hiệu văn bản chủ yếu đến từ các con số sinh hiệu nằm trong ghi chú; dữ liệu có rất ít bệnh nhân gốc ở một số lớp.
+- **Giới hạn:** lớp giải trình dùng suy luận theo template tất định (chưa có LLM); khớp vị trí ký tự **không** đồng nghĩa với đúng về ngữ nghĩa lâm sàng; chưa ngoại kiểm, chưa khảo sát bác sĩ.
 
 ---
 
@@ -64,7 +61,7 @@ Hệ thống **M-CDSS** khắc phục triệt để các hạn chế trên thôn
   - **Cross-Attention Mechanism:** Sử dụng truy vấn từ bảng số ($Q_{tab}$) chiếu lên không gian từ ngữ ($K_{text}, V_{text}$) và ngược lại, tạo ra biểu diễn dung hợp toàn diện $h_{fused}$.
 * 🎯 **Hiệu Chuẩn Xác Suất Lâm Sàng (Clinical Probability Calibration):**
   - Tích hợp lớp **Temperature Scaling** và **Platt Scaling** được tối ưu hóa trên Validation Set độc lập.
-  - Giảm thiểu hiện tượng "tự tin thái quá" (overconfidence) thường gặp ở Deep Learning, hạ chỉ số sai số hiệu chuẩn kỳ vọng **$ECE < 0.05$** và tối ưu **Brier Score**. Đảm bảo khi hệ thống báo rủi ro 80%, xác suất mắc bệnh thực tế tiệm cận chính xác 80%.
+  - Giảm thiểu hiện tượng "tự tin thái quá" (overconfidence) thường gặp ở Deep Learning, mục tiêu ECE < 0.05 (**chưa đạt**: ECE sau hiệu chuẩn ≈ 0.08, xem MODEL_CARD.md) và tối ưu **Brier Score**. Đảm bảo khi hệ thống báo rủi ro 80%, xác suất mắc bệnh thực tế tiệm cận chính xác 80%.
 * 🩺 **Quy Trình Agentic RAG Phân Biệt & Phản Biện (Clinician-in-the-Loop RAG):**
   - **Hypothesis Generator:** Tiếp nhận phân phối xác suất đã hiệu chuẩn từ mạng Multimodal.
   - **Guideline Retrieval Agent:** Tự động truy xuất các tiêu chí chẩn đoán phân biệt từ cơ sở dữ liệu tri thức y khoa chuẩn hóa (GINA cho Hen, GOLD cho COPD, ESC cho Suy tim, Hướng dẫn Bộ Y tế).
@@ -73,7 +70,7 @@ Hệ thống **M-CDSS** khắc phục triệt để các hạn chế trên thôn
   - Thuật toán so khớp chuỗi ký tự (exact & semantic span alignment) ánh xạ từng lý lẽ của LLM về chỉ số offset ký tự `[start_char, end_char]` trong ghi chú gốc.
   - Bác sĩ có thể bấm vào từng khuyến nghị để làm sáng (highlight) trực tiếp câu chữ gốc trong bệnh án.
 * 🛡️ **Kiểm Soát Nguy Cơ Sai Lệch Triệt Để Theo Chuẩn PROBAST & TRIPOD-AI:**
-  - **Temporal Alignment Engine:** Khóa chuỗi thời gian nghiêm ngặt $t_{event} < t_{confirmed\_diag}$, loại bỏ 100% rủi ro rò rỉ thông tin tương lai.
+  - **Temporal Alignment Engine:** Khóa chuỗi thời gian nghiêm ngặt $t_{event} < t_{confirmed\_diag}$, loại các sự kiện sau thời điểm chẩn đoán.
   - **MICE Imputation Pipeline:** Gán dữ liệu khuyết đa biến minh bạch (*Multiple Imputation by Chained Equations*), báo cáo đầy đủ chỉ số missingness trước và sau gán.
   - **Patient-Level Stratified Group Splitting:** Phân chia tập dữ liệu 70/15/15 theo `patient_id`, đảm bảo không có bất kỳ rò rỉ dữ liệu giữa các lần tái khám của cùng một bệnh nhân.
 * 💻 **Nền Tảng Full-Stack Clinician Dashboard:**
@@ -155,21 +152,20 @@ Theo kế hoạch chiến lược phát triển, hệ thống thiết lập khun
 | **Baseline 1: Classical Tabular** | Random Forest, XGBoost, CatBoost | Chỉ dữ liệu bảng (Sinh hiệu, xét nghiệm, nhân khẩu) | Tái hiện hiện trạng các công bố trong y văn tổng quan JMIR. |
 | **Baseline 2: Tabular DL** | FT-Transformer, TabNet | Dữ liệu bảng thông qua kiến trúc Deep Learning | Đo lường năng lực tối đa của dữ liệu bảng khi dùng cơ chế Attention. |
 | **Baseline 3: Text-only LLM** | ClinicalBERT, Med-LLM Embeddings | Chỉ ghi chú bệnh án lâm sàng tự do | Đo lường sức mạnh biểu đạt ngữ nghĩa của văn bản y khoa thuần túy. |
-| **Hệ Thống Đề Xuất (Ours)** | **Multimodal Cross-Attention Fusion + Agentic RAG** | **Dữ liệu bảng + Ghi chú lâm sàng + Phác đồ y khoa chuẩn** | **Giải pháp đột phá khắc phục điểm nghẽn đơn phương thức và triệt tiêu ảo giác.** |
+| **Hệ Thống Đề Xuất (Ours)** | **Multimodal Cross-Attention Fusion + Agentic RAG** | **Dữ liệu bảng + Ghi chú lâm sàng + Phác đồ y khoa chuẩn** | Kiểm tra liệu dung hợp có vượt các phương án đơn phương thức và dung hợp đơn giản (kết quả: không – xem 4.2). |
 
-### 4.2. Bảng Chỉ Số Thực Nghiệm Kỳ Vọng (Expected Benchmark Results)
-*Đánh giá trên tập dữ liệu kiểm định ngoại kiểm độc lập đối với bài toán chẩn đoán phân biệt 4 nhóm bệnh lý hô hấp - tuần hoàn phức tạp: Hen phế quản (Asthma), COPD, Suy tim sung huyết (CHF) và Viêm phổi mắc phải cộng đồng (CAP).*
+### 4.2. Kết Quả Thực Nghiệm (Phase 3 – số liệu thật)
+> Bảng "kết quả kỳ vọng" của các phiên bản trước **không phải số liệu thực nghiệm** và đã bị gỡ bỏ (2026-11-23).
 
-| Chỉ Số Đánh Giá (Metric) | Baseline 1 (XGBoost) | Baseline 2 (TabNet/FT-T) | Baseline 3 (ClinicalBERT) | Mô Hình Đề Xuất (M-CDSS Ours) | Mục Tiêu & Chuẩn Lâm Sàng |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **AUROC (Macro OVR)** | 0.824 | 0.841 | 0.812 | **0.895** | $\ge 0.88$ (Phân loại vượt trội) |
-| **AUPRC (Macro)** | 0.741 | 0.763 | 0.730 | **0.842** | $\ge 0.82$ (Độ nhạy cao khi mất cân bằng) |
-| **Macro-F1 Score** | 0.762 | 0.779 | 0.751 | **0.851** | $\ge 0.84$ (Cân bằng Precision/Recall) |
-| **Brier Score** ($\downarrow$) | 0.142 | 0.131 | 0.150 | **0.088** | $\le 0.10$ (Sai số dự đoán thấp) |
-| **Expected Calibration Error (ECE)** ($\downarrow$) | 0.118 | 0.095 | 0.126 | **0.038** | $< 0.05$ (Xác suất tin cậy tuyệt đối) |
-| **DCA Net Benefit ($p_t = 0.20$)** | 0.68 | 0.71 | 0.66 | **0.81** | Tối đa hóa số ca can thiệp đúng |
-| **Evidence Attribution Faithfulness** | N/A | N/A | 62.4% | **98.6%** | $100\%$ trích dẫn đúng văn bản gốc |
-| **Hallucination Rate** ($\downarrow$) | N/A | N/A | 18.5% | **0.0%** | Không bịa đặt triệu chứng/phác đồ |
+- **Nguồn sự thật duy nhất:** [`results/registry.json`](results/registry.json) (sinh bởi `scripts/build_results_registry.py` từ dự đoán từng bản ghi trong `data/predictions/`).
+- **Tóm tắt cho người dùng:** [`MODEL_CARD.md`](MODEL_CARD.md) (sinh tự động từ registry).
+- **Bảng trong bài báo:** `docs/paper_latex/generated/*.tex` (sinh bởi `scripts/export_latex_tables.py`).
+
+Kết luận chính (chi tiết và khoảng tin cậy trong registry):
+1. Dưới so sánh công bằng 5 seed, cross-attention **không vượt** Bio_ClinicalBERT fine-tune và ensemble CatBoost + BERT; không khác biệt so với mô hình chỉ dữ liệu bảng tốt nhất.
+2. Tín hiệu của nhánh văn bản đến chủ yếu từ các **con số sinh hiệu/xét nghiệm** nằm trong ghi chú (RQ2).
+3. Dữ liệu bán tổng hợp có số bệnh nhân gốc rất nhỏ ở một số lớp (suy tim, viêm phổi trong tập test: 1 bệnh nhân gốc mỗi lớp) – xem `data_provenance` trong registry.
+4. ECE sau temperature scaling chưa đạt mục tiêu < 0,05.
 
 ---
 
@@ -245,7 +241,7 @@ multimodal-ehr-cdss/
 ├── tests/                              # Bộ Unit Tests & Integration Tests toàn diện
 │   ├── test_data_pipeline.py           # Kiểm tra De-ID, Temporal Lock và MICE
 │   ├── test_multimodal_model.py        # Kiểm tra Forward pass, Tensor Shapes, Calibration
-│   ├── test_agent_rag.py               # Kiểm tra Retrieval, Zero-hallucination, Offset spans
+│   ├── test_agent_rag.py               # Kiểm tra Retrieval, từ chối claim ngoài ghi chú, Offset spans
 │   └── test_api_endpoints.py           # Kiểm tra REST API HTTP Status, Payloads & Latency
 ├── tasks/                              # HỆ THỐNG 5 BACKLOG TUẦN TỰ CHO NHÓM 3 NGƯỜI
 │   ├── README.md                       # Quy trình Scrum, Definition of Done & Thứ tự làm Backlog
@@ -287,40 +283,42 @@ pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-### 6.2. Huấn Luyện & Đánh Giá Thực Nghiệm (Scientific CLI)
+### 6.2. Tái Lập Toàn Bộ Kết Quả Nghiên Cứu (Phase 3)
+
+Yêu cầu: trọng số `emilyalsentzer/Bio_ClinicalBERT` trong Hugging Face cache (`huggingface-cli download emilyalsentzer/Bio_ClinicalBERT`), GPU ≥ 4 GB khuyến nghị.
 
 ```bash
-# 0. Tạo split theo provenance và bắt buộc audit trước khi huấn luyện
-python -c "from src.data_pipeline.dataset_loader import process_and_save_patient_splits; process_and_save_patient_splits(processed_data_dir='data/processed_strict')"
-python scripts/audit_data_leakage.py --data-dir data/processed_strict --output data/strict_split_audit.json
+# 0. Dựng lại dữ liệu canonical từ data/raw_rebuilt/ + audit rò rỉ (nội dung ghi chú) + manifest SHA-256
+python scripts/rebuild_canonical_dataset.py
+python -m src.data_pipeline.manifest data/processed_rebuilt_strict      # phải PASS
 
-# 1. Huấn luyện 3 Baselines chỉ trên split đã vượt audit
-python scripts/run_baselines.py --data_dir data/processed_strict --output_file data/baseline_results.json
+# 1. Thí nghiệm đăng ký trước (docs/11_ANALYSIS_PLAN.md) – lưu dự đoán từng bản ghi vào data/predictions/
+python scripts/run_research_experiments.py rq1        # 10 mô hình x 5 seed + checkpoint triển khai
+python scripts/run_research_experiments.py temporal   # temporal split theo nhóm nguồn
+python scripts/run_research_experiments.py rq2        # phân rã tín hiệu văn bản
+python scripts/run_research_experiments.py rq3        # mô phỏng bổ trợ có kiểm soát
+python scripts/run_research_experiments.py cv         # 5-fold grouped CV (post-hoc)
 
-# 2. Huấn luyện Mạng Đa Phương Thức Đề Xuất (Multimodal Cross-Attention Fusion)
-python scripts/train_multimodal.py \
-    --config configs/model_config.yaml \
-    --epochs 50 \
-    --batch_size 32 \
-    --calibrate \
-    --save_path data/checkpoints/multimodal_best.pt
+# 2. Thống kê, hình, registry, bảng LaTeX, model card, Bảng 1
+python scripts/build_results_registry.py
+python scripts/export_latex_tables.py
+python scripts/export_cohort_table.py
+python scripts/export_model_card.py
+python scripts/export_baseline_artifacts.py           # mô hình baseline cho /predict/baseline
 
-# 3. Chạy Đo Đạc Lợi Ích Lâm Sàng (DCA Curve) & Hiệu Chuẩn Xác Suất (ECE)
-python scripts/evaluate_clinical_utility.py \
-    --model_path data/checkpoints/multimodal_best.pt \
-    --test_data data/processed/test.parquet \
-    --output_plots data/evaluation_plots/
-
-# 4. Chạy toàn bộ Unit Tests kiểm tra độ tin cậy và không rò rỉ dữ liệu
-pytest tests/ -v
+# 3. Kiểm thử
+pytest tests/ -q
 ```
 
 ### 6.3. Khởi Chạy Nền Tảng Trọn Gói Bằng Docker Compose
 Chỉ với một lệnh duy nhất, toàn bộ hệ sinh thái bao gồm **FastAPI Backend**, **Next.js Clinician UI** và **Vector DB (Qdrant)** sẽ được khởi tạo trong môi trường cô lập:
 
 ```bash
-# Xây dựng và khởi chạy containers
+# Xây dựng và khởi chạy containers (image nhẹ: /predict/multimodal và /predict/baseline trả 503)
 docker compose up --build -d
+
+# Bản đầy đủ: cài torch CPU + transformers + catboost và mount Hugging Face cache (chỉ đọc)
+MCDSS_INSTALL_ML=1 HF_CACHE_DIR=~/.cache/huggingface docker compose up --build -d
 
 # Kiểm tra trạng thái các dịch vụ
 docker compose ps

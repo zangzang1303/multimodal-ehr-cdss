@@ -41,6 +41,21 @@
       "3": 54
     }
   },
+  "content": {
+    "unredacted_target_term_rate": {
+      "train": 0.0,
+      "val": 0.0,
+      "test": 0.0
+    },
+    "note_body_duplicated_from_train_rate": {
+      "val": 0.8315,
+      "test": 0.8311
+    },
+    "label_informative_duplicate_rate": {
+      "val": 0.0,
+      "test": 0.0
+    }
+  },
   "passed": true,
   "failures": []
 }

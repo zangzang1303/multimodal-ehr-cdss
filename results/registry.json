@@ -1,271 +1,3641 @@
 {
-  "dca": {
+  "metadata": {
+    "registry_version": "2.0.0",
+    "generated_at": "2026-11-27T00:09:09.101338+00:00",
+    "generator": "scripts/build_results_registry.py",
+    "git_commit": "2150b09765520c4150277a80f2202d52692765bf",
+    "data_manifest_sha256": "7aafd62acd0209922909fed22acd2e187f4bfa6654d7f6839aa9c7ee3cda2305",
+    "analysis_plan_freeze": {
+      "file": "docs/11_ANALYSIS_PLAN.md",
+      "sha256": "9b20ca25d523c6b33e1259260553a9d84c2e5d225b6f47e7c09af542418898e6",
+      "frozen_at": "2026-11-23T09:22:29Z",
+      "note": "Frozen before the first experiment run on the 2026-11-23 canonical dataset"
+    },
+    "seeds": [
+      7,
+      13,
+      42,
+      101,
+      2024
+    ],
+    "n_bootstrap": 2000,
+    "bootstrap_seed": 2026,
+    "deployment_model": "xattn_frozen",
+    "deployment_seed": 101,
+    "is_mock_for_member1_member2": false
+  },
+  "data_provenance": {
+    "train": {
+      "records": 1425,
+      "distinct_source_patients": 345,
+      "records_per_class": {
+        "ASTHMA": 358,
+        "COPD": 358,
+        "HEART_FAILURE": 340,
+        "PNEUMONIA": 369
+      },
+      "distinct_source_patients_per_class": {
+        "ASTHMA": 41,
+        "COPD": 287,
+        "HEART_FAILURE": 44,
+        "PNEUMONIA": 6
+      }
+    },
+    "val": {
+      "records": 273,
+      "distinct_source_patients": 71,
+      "records_per_class": {
+        "ASTHMA": 71,
+        "COPD": 71,
+        "HEART_FAILURE": 54,
+        "PNEUMONIA": 77
+      },
+      "distinct_source_patients_per_class": {
+        "ASTHMA": 8,
+        "COPD": 59,
+        "HEART_FAILURE": 12,
+        "PNEUMONIA": 1
+      }
+    },
+    "test": {
+      "records": 302,
+      "distinct_source_patients": 62,
+      "records_per_class": {
+        "ASTHMA": 71,
+        "COPD": 71,
+        "HEART_FAILURE": 106,
+        "PNEUMONIA": 54
+      },
+      "distinct_source_patients_per_class": {
+        "ASTHMA": 8,
+        "COPD": 56,
+        "HEART_FAILURE": 1,
+        "PNEUMONIA": 1
+      }
+    },
+    "warning": "Records are generated from a small number of Synthea source patients (e.g. all HEART_FAILURE and all PNEUMONIA test records each come from ONE source patient). Bootstrap CIs resample records and therefore understate uncertainty; per-class results for those classes describe single synthetic patients. See also sensitivity_grouped_cv_posthoc."
+  },
+  "rq1_multiseed_comparison": {
+    "is_mock": false,
+    "primary_metric": "macro AUROC (one-vs-rest), temperature-calibrated on validation",
+    "test_n": 302,
+    "best_unimodal_by_mean_auroc": "bert_ft",
+    "note": "Mean ± SD over seeds; CI95 = record-level bootstrap (B=2000; records share Synthea source patients, so CIs understate uncertainty - see data_provenance) on the seed with lowest validation NLL. Comparisons: deployment model (xattn_frozen) minus comparator, Holm-adjusted over all comparators.",
+    "models": [
+      {
+        "model": "lr_tabular",
+        "label": "Logistic Regression (bảng)",
+        "modality": "tabular",
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "representative_seed": 0,
+        "auroc_mean": 0.9449,
+        "auprc_mean": 0.8192,
+        "f1_mean": 0.6686,
+        "accuracy_mean": 0.7285,
+        "brier_score_mean": 0.3866,
+        "ece_mean": 0.0779,
+        "auroc_sd": 0.0,
+        "auprc_sd": 0.0,
+        "f1_sd": 0.0,
+        "accuracy_sd": 0.0,
+        "brier_score_sd": 0.0,
+        "ece_sd": 0.0,
+        "auroc_rep_seed": 0.9449,
+        "auroc_ci95": [
+          0.9271,
+          0.9615
+        ],
+        "per_seed_auroc": {
+          "0": 0.9449
+        },
+        "delta_auroc_vs_best_unimodal": -0.03,
+        "holm_adjusted_p": 0.4557
+      },
+      {
+        "model": "catboost",
+        "label": "CatBoost (bảng)",
+        "modality": "tabular",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 13,
+        "auroc_mean": 0.9254,
+        "auprc_mean": 0.7903,
+        "f1_mean": 0.6475,
+        "accuracy_mean": 0.7046,
+        "brier_score_mean": 0.3679,
+        "ece_mean": 0.061,
+        "auroc_sd": 0.0025,
+        "auprc_sd": 0.0034,
+        "f1_sd": 0.0303,
+        "accuracy_sd": 0.0179,
+        "brier_score_sd": 0.0115,
+        "ece_sd": 0.0171,
+        "auroc_rep_seed": 0.9257,
+        "auroc_ci95": [
+          0.9045,
+          0.9445
+        ],
+        "per_seed_auroc": {
+          "101": 0.9274,
+          "13": 0.9257,
+          "2024": 0.9263,
+          "42": 0.9211,
+          "7": 0.9263
+        },
+        "delta_auroc_vs_best_unimodal": -0.0495,
+        "holm_adjusted_p": 0.01
+      },
+      {
+        "model": "ft_transformer",
+        "label": "FT-Transformer (bảng)",
+        "modality": "tabular",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 13,
+        "auroc_mean": 0.9292,
+        "auprc_mean": 0.7706,
+        "f1_mean": 0.7323,
+        "accuracy_mean": 0.7675,
+        "brier_score_mean": 0.3476,
+        "ece_mean": 0.0919,
+        "auroc_sd": 0.0188,
+        "auprc_sd": 0.0345,
+        "f1_sd": 0.0898,
+        "accuracy_sd": 0.0597,
+        "brier_score_sd": 0.0725,
+        "ece_sd": 0.0351,
+        "auroc_rep_seed": 0.9487,
+        "auroc_ci95": [
+          0.9314,
+          0.9637
+        ],
+        "per_seed_auroc": {
+          "101": 0.8981,
+          "13": 0.9487,
+          "2024": 0.9364,
+          "42": 0.9287,
+          "7": 0.9339
+        },
+        "delta_auroc_vs_best_unimodal": -0.0457,
+        "holm_adjusted_p": 0.5158
+      },
+      {
+        "model": "tfidf_lr",
+        "label": "TF-IDF + LR (văn bản)",
+        "modality": "text",
+        "n_seeds": 1,
+        "seeds": [
+          0
+        ],
+        "representative_seed": 0,
+        "auroc_mean": 0.917,
+        "auprc_mean": 0.8071,
+        "f1_mean": 0.6742,
+        "accuracy_mean": 0.7417,
+        "brier_score_mean": 0.4006,
+        "ece_mean": 0.0938,
+        "auroc_sd": 0.0,
+        "auprc_sd": 0.0,
+        "f1_sd": 0.0,
+        "accuracy_sd": 0.0,
+        "brier_score_sd": 0.0,
+        "ece_sd": 0.0,
+        "auroc_rep_seed": 0.917,
+        "auroc_ci95": [
+          0.8926,
+          0.9412
+        ],
+        "per_seed_auroc": {
+          "0": 0.917
+        },
+        "delta_auroc_vs_best_unimodal": -0.0579,
+        "holm_adjusted_p": 0.009
+      },
+      {
+        "model": "bert_frozen",
+        "label": "Bio_ClinicalBERT đóng băng (văn bản)",
+        "modality": "text",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 13,
+        "auroc_mean": 0.8986,
+        "auprc_mean": 0.7473,
+        "f1_mean": 0.5917,
+        "accuracy_mean": 0.6722,
+        "brier_score_mean": 0.4599,
+        "ece_mean": 0.1156,
+        "auroc_sd": 0.027,
+        "auprc_sd": 0.0697,
+        "f1_sd": 0.1152,
+        "accuracy_sd": 0.0725,
+        "brier_score_sd": 0.0988,
+        "ece_sd": 0.0528,
+        "auroc_rep_seed": 0.9044,
+        "auroc_ci95": [
+          0.8794,
+          0.9266
+        ],
+        "per_seed_auroc": {
+          "101": 0.8618,
+          "13": 0.9044,
+          "2024": 0.881,
+          "42": 0.9182,
+          "7": 0.9276
+        },
+        "delta_auroc_vs_best_unimodal": -0.0763,
+        "holm_adjusted_p": 0.009
+      },
+      {
+        "model": "bert_ft",
+        "label": "Bio_ClinicalBERT fine-tune (văn bản)",
+        "modality": "text",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 7,
+        "auroc_mean": 0.9749,
+        "auprc_mean": 0.9186,
+        "f1_mean": 0.8426,
+        "accuracy_mean": 0.8656,
+        "brier_score_mean": 0.2181,
+        "ece_mean": 0.0723,
+        "auroc_sd": 0.0035,
+        "auprc_sd": 0.0139,
+        "f1_sd": 0.0287,
+        "accuracy_sd": 0.0194,
+        "brier_score_sd": 0.025,
+        "ece_sd": 0.055,
+        "auroc_rep_seed": 0.9784,
+        "auroc_ci95": [
+          0.9688,
+          0.987
+        ],
+        "per_seed_auroc": {
+          "101": 0.9699,
+          "13": 0.9776,
+          "2024": 0.9731,
+          "42": 0.9756,
+          "7": 0.9784
+        },
+        "delta_auroc_vs_best_unimodal": 0.0,
+        "holm_adjusted_p": 0.012
+      },
+      {
+        "model": "concat_frozen",
+        "label": "Concat fusion (đóng băng)",
+        "modality": "fusion",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 101,
+        "auroc_mean": 0.929,
+        "auprc_mean": 0.7728,
+        "f1_mean": 0.7415,
+        "accuracy_mean": 0.7795,
+        "brier_score_mean": 0.3411,
+        "ece_mean": 0.1161,
+        "auroc_sd": 0.0215,
+        "auprc_sd": 0.0405,
+        "f1_sd": 0.109,
+        "accuracy_sd": 0.0647,
+        "brier_score_sd": 0.0889,
+        "ece_sd": 0.0313,
+        "auroc_rep_seed": 0.8924,
+        "auroc_ci95": [
+          0.8702,
+          0.9134
+        ],
+        "per_seed_auroc": {
+          "101": 0.8924,
+          "13": 0.9487,
+          "2024": 0.9389,
+          "42": 0.931,
+          "7": 0.9337
+        },
+        "delta_auroc_vs_best_unimodal": -0.0459,
+        "holm_adjusted_p": 0.009
+      },
+      {
+        "model": "xattn_frozen",
+        "label": "Cross-attention (đóng băng) – triển khai",
+        "modality": "fusion",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 101,
+        "auroc_mean": 0.9556,
+        "auprc_mean": 0.8543,
+        "f1_mean": 0.6905,
+        "accuracy_mean": 0.7768,
+        "brier_score_mean": 0.3419,
+        "ece_mean": 0.0808,
+        "auroc_sd": 0.0082,
+        "auprc_sd": 0.0398,
+        "f1_sd": 0.0208,
+        "accuracy_sd": 0.0125,
+        "brier_score_sd": 0.0251,
+        "ece_sd": 0.0307,
+        "auroc_rep_seed": 0.9583,
+        "auroc_ci95": [
+          0.9432,
+          0.972
+        ],
+        "per_seed_auroc": {
+          "101": 0.9583,
+          "13": 0.9452,
+          "2024": 0.9492,
+          "42": 0.9599,
+          "7": 0.9654
+        },
+        "delta_auroc_vs_best_unimodal": -0.0193,
+        "holm_adjusted_p": null
+      },
+      {
+        "model": "xattn_ft",
+        "label": "Cross-attention (fine-tune)",
+        "modality": "fusion",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 101,
+        "auroc_mean": 0.961,
+        "auprc_mean": 0.875,
+        "f1_mean": 0.7259,
+        "accuracy_mean": 0.804,
+        "brier_score_mean": 0.3096,
+        "ece_mean": 0.1056,
+        "auroc_sd": 0.0146,
+        "auprc_sd": 0.0566,
+        "f1_sd": 0.1161,
+        "accuracy_sd": 0.0612,
+        "brier_score_sd": 0.092,
+        "ece_sd": 0.018,
+        "auroc_rep_seed": 0.9579,
+        "auroc_ci95": [
+          0.9452,
+          0.97
+        ],
+        "per_seed_auroc": {
+          "101": 0.9579,
+          "13": 0.9394,
+          "2024": 0.9604,
+          "42": 0.9785,
+          "7": 0.969
+        },
+        "delta_auroc_vs_best_unimodal": -0.0139,
+        "holm_adjusted_p": 0.9305
+      },
+      {
+        "model": "ensemble_cb_bertft",
+        "label": "Ensemble CatBoost + BERT-FT",
+        "modality": "fusion",
+        "n_seeds": 5,
+        "seeds": [
+          7,
+          13,
+          42,
+          101,
+          2024
+        ],
+        "representative_seed": 7,
+        "auroc_mean": 0.978,
+        "auprc_mean": 0.9397,
+        "f1_mean": 0.8009,
+        "accuracy_mean": 0.8331,
+        "brier_score_mean": 0.2447,
+        "ece_mean": 0.1159,
+        "auroc_sd": 0.0028,
+        "auprc_sd": 0.0113,
+        "f1_sd": 0.0523,
+        "accuracy_sd": 0.0375,
+        "brier_score_sd": 0.0167,
+        "ece_sd": 0.0289,
+        "auroc_rep_seed": 0.9818,
+        "auroc_ci95": [
+          0.9728,
+          0.9899
+        ],
+        "per_seed_auroc": {
+          "101": 0.9766,
+          "13": 0.9803,
+          "2024": 0.9758,
+          "42": 0.9755,
+          "7": 0.9818
+        },
+        "delta_auroc_vs_best_unimodal": 0.0031,
+        "holm_adjusted_p": 0.009
+      }
+    ],
+    "comparisons_vs_deployment_model": [
+      {
+        "comparator": "lr_tabular",
+        "delta": 0.0134,
+        "ci95": [
+          -0.0051,
+          0.0332
+        ],
+        "p_value": 0.1519,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.4557
+      },
+      {
+        "comparator": "catboost",
+        "delta": 0.0326,
+        "ci95": [
+          0.0137,
+          0.0534
+        ],
+        "p_value": 0.002,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.01
+      },
+      {
+        "comparator": "ft_transformer",
+        "delta": 0.0096,
+        "ci95": [
+          -0.0077,
+          0.0273
+        ],
+        "p_value": 0.2579,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.5158
+      },
+      {
+        "comparator": "tfidf_lr",
+        "delta": 0.0412,
+        "ci95": [
+          0.0193,
+          0.0645
+        ],
+        "p_value": 0.001,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.009
+      },
+      {
+        "comparator": "bert_frozen",
+        "delta": 0.0539,
+        "ci95": [
+          0.0288,
+          0.0802
+        ],
+        "p_value": 0.001,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.009
+      },
+      {
+        "comparator": "bert_ft",
+        "delta": -0.0202,
+        "ci95": [
+          -0.0331,
+          -0.0076
+        ],
+        "p_value": 0.003,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.012
+      },
+      {
+        "comparator": "concat_frozen",
+        "delta": 0.0659,
+        "ci95": [
+          0.0481,
+          0.0862
+        ],
+        "p_value": 0.001,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.009
+      },
+      {
+        "comparator": "xattn_ft",
+        "delta": 0.0004,
+        "ci95": [
+          -0.0104,
+          0.0104
+        ],
+        "p_value": 0.9305,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.9305
+      },
+      {
+        "comparator": "ensemble_cb_bertft",
+        "delta": -0.0235,
+        "ci95": [
+          -0.0347,
+          -0.0129
+        ],
+        "p_value": 0.001,
+        "n_boot": 2000.0,
+        "holm_adjusted_p": 0.009
+      }
+    ]
+  },
+  "rq2_text_signal_decomposition": {
+    "is_mock": false,
+    "tabular_only_reference_auroc": {
+      "lr_tabular": 0.9449,
+      "catboost": 0.9254,
+      "ft_transformer": 0.9292
+    },
+    "note": "Mean macro AUROC over seeds 13/42/101 (TF-IDF deterministic). Variants defined in src/data_pipeline/note_variants.py. Tabular-only models do not use notes; their AUROC is the reference a fusion model can fall back to.",
+    "variants": [
+      {
+        "variant": "full",
+        "label": "Ghi chú gốc",
+        "bert_frozen": 0.8948,
+        "bert_frozen_sd": 0.0294,
+        "bert_frozen_ci95": [
+          0.8794,
+          0.9266
+        ],
+        "bert_ft": 0.9744,
+        "bert_ft_sd": 0.004,
+        "bert_ft_ci95": [
+          0.9556,
+          0.9829
+        ],
+        "tfidf_lr": 0.917,
+        "tfidf_lr_sd": 0.0,
+        "tfidf_lr_ci95": [
+          0.8926,
+          0.9412
+        ],
+        "xattn_frozen": 0.9544,
+        "xattn_frozen_sd": 0.0082,
+        "xattn_frozen_ci95": [
+          0.9431,
+          0.9719
+        ],
+        "clinical_bert": 0.9744,
+        "cross_attention": 0.9544
+      },
+      {
+        "variant": "num_masked",
+        "label": "Che mọi con số",
+        "bert_frozen": 0.6555,
+        "bert_frozen_sd": 0.0487,
+        "bert_frozen_ci95": [
+          0.65,
+          0.7086
+        ],
+        "bert_ft": 0.6794,
+        "bert_ft_sd": 0.0023,
+        "bert_ft_ci95": [
+          0.6481,
+          0.7084
+        ],
+        "tfidf_lr": 0.5413,
+        "tfidf_lr_sd": 0.0,
+        "tfidf_lr_ci95": [
+          0.5106,
+          0.5698
+        ],
+        "xattn_frozen": 0.9202,
+        "xattn_frozen_sd": 0.0249,
+        "xattn_frozen_ci95": [
+          0.8739,
+          0.9136
+        ],
+        "clinical_bert": 0.6794,
+        "cross_attention": 0.9202
+      },
+      {
+        "variant": "no_vitals",
+        "label": "Bỏ sinh hiệu/xét nghiệm",
+        "bert_frozen": 0.9234,
+        "bert_frozen_sd": 0.0106,
+        "bert_frozen_ci95": [
+          0.9098,
+          0.9559
+        ],
+        "bert_ft": 0.9048,
+        "bert_ft_sd": 0.0459,
+        "bert_ft_ci95": [
+          0.9108,
+          0.9564
+        ],
+        "tfidf_lr": 0.8852,
+        "tfidf_lr_sd": 0.0,
+        "tfidf_lr_ci95": [
+          0.8544,
+          0.9161
+        ],
+        "xattn_frozen": 0.9645,
+        "xattn_frozen_sd": 0.0124,
+        "xattn_frozen_ci95": [
+          0.9349,
+          0.9649
+        ],
+        "clinical_bert": 0.9048,
+        "cross_attention": 0.9645
+      },
+      {
+        "variant": "narrative_only",
+        "label": "Chỉ phần tự sự",
+        "bert_frozen": 0.7768,
+        "bert_frozen_sd": 0.0105,
+        "bert_frozen_ci95": [
+          0.7408,
+          0.7981
+        ],
+        "bert_ft": 0.776,
+        "bert_ft_sd": 0.0596,
+        "bert_ft_ci95": [
+          0.6814,
+          0.7494
+        ],
+        "tfidf_lr": 0.8264,
+        "tfidf_lr_sd": 0.0,
+        "tfidf_lr_ci95": [
+          0.7961,
+          0.8577
+        ],
+        "xattn_frozen": 0.9167,
+        "xattn_frozen_sd": 0.0225,
+        "xattn_frozen_ci95": [
+          0.877,
+          0.9177
+        ],
+        "clinical_bert": 0.776,
+        "cross_attention": 0.9167
+      }
+    ]
+  },
+  "rq3_complementarity_simulation": {
+    "is_mock": false,
+    "simulation": true,
+    "note": "SIMULATION (docs/11_ANALYSIS_PLAN.md A.3): class cues injected into number-masked notes for a fraction rho of patients (10% wrong-class cues); Gaussian noise sigma*SD on tabular features. Mean of seeds 13/42. Measures mechanism, not clinical performance.",
+    "n_runs": 76,
+    "grid": [
+      {
+        "rho": 0.0,
+        "sigma": 0.0,
+        "tabular": 0.9387,
+        "text": 0.6401,
+        "concat": 0.9393,
+        "cross_attention": 0.9333,
+        "delta_xattn_vs_best_unimodal": -0.0054,
+        "delta_concat_vs_best_unimodal": 0.0006
+      },
+      {
+        "rho": 0.0,
+        "sigma": 0.5,
+        "tabular": 0.9022,
+        "text": 0.6401,
+        "concat": 0.8984,
+        "cross_attention": 0.8881,
+        "delta_xattn_vs_best_unimodal": -0.0141,
+        "delta_concat_vs_best_unimodal": -0.0038
+      },
+      {
+        "rho": 0.0,
+        "sigma": 1.0,
+        "tabular": 0.7973,
+        "text": 0.6401,
+        "concat": 0.8553,
+        "cross_attention": 0.8466,
+        "delta_xattn_vs_best_unimodal": 0.0493,
+        "delta_concat_vs_best_unimodal": 0.058
+      },
+      {
+        "rho": 0.25,
+        "sigma": 0.0,
+        "tabular": 0.9387,
+        "text": 0.6331,
+        "concat": 0.9395,
+        "cross_attention": 0.9333,
+        "delta_xattn_vs_best_unimodal": -0.0054,
+        "delta_concat_vs_best_unimodal": 0.0008
+      },
+      {
+        "rho": 0.25,
+        "sigma": 0.5,
+        "tabular": 0.9022,
+        "text": 0.6331,
+        "concat": 0.8987,
+        "cross_attention": 0.8882,
+        "delta_xattn_vs_best_unimodal": -0.014,
+        "delta_concat_vs_best_unimodal": -0.0036
+      },
+      {
+        "rho": 0.25,
+        "sigma": 1.0,
+        "tabular": 0.7973,
+        "text": 0.6331,
+        "concat": 0.8559,
+        "cross_attention": 0.8579,
+        "delta_xattn_vs_best_unimodal": 0.0605,
+        "delta_concat_vs_best_unimodal": 0.0585
+      },
+      {
+        "rho": 0.5,
+        "sigma": 0.0,
+        "tabular": 0.9387,
+        "text": 0.7794,
+        "concat": 0.9399,
+        "cross_attention": 0.9334,
+        "delta_xattn_vs_best_unimodal": -0.0053,
+        "delta_concat_vs_best_unimodal": 0.0012
+      },
+      {
+        "rho": 0.5,
+        "sigma": 0.5,
+        "tabular": 0.9022,
+        "text": 0.7794,
+        "concat": 0.8993,
+        "cross_attention": 0.9051,
+        "delta_xattn_vs_best_unimodal": 0.0029,
+        "delta_concat_vs_best_unimodal": -0.003
+      },
+      {
+        "rho": 0.5,
+        "sigma": 1.0,
+        "tabular": 0.7973,
+        "text": 0.7794,
+        "concat": 0.8571,
+        "cross_attention": 0.857,
+        "delta_xattn_vs_best_unimodal": 0.0597,
+        "delta_concat_vs_best_unimodal": 0.0598
+      },
+      {
+        "rho": 0.75,
+        "sigma": 0.0,
+        "tabular": 0.9387,
+        "text": 0.8591,
+        "concat": 0.941,
+        "cross_attention": 0.9576,
+        "delta_xattn_vs_best_unimodal": 0.0189,
+        "delta_concat_vs_best_unimodal": 0.0023
+      },
+      {
+        "rho": 0.75,
+        "sigma": 0.5,
+        "tabular": 0.9022,
+        "text": 0.8591,
+        "concat": 0.9007,
+        "cross_attention": 0.9313,
+        "delta_xattn_vs_best_unimodal": 0.0291,
+        "delta_concat_vs_best_unimodal": -0.0016
+      },
+      {
+        "rho": 0.75,
+        "sigma": 1.0,
+        "tabular": 0.7973,
+        "text": 0.8591,
+        "concat": 0.8593,
+        "cross_attention": 0.9181,
+        "delta_xattn_vs_best_unimodal": 0.059,
+        "delta_concat_vs_best_unimodal": 0.0002
+      },
+      {
+        "rho": 1.0,
+        "sigma": 0.0,
+        "tabular": 0.9387,
+        "text": 0.9083,
+        "concat": 0.9424,
+        "cross_attention": 0.9756,
+        "delta_xattn_vs_best_unimodal": 0.0369,
+        "delta_concat_vs_best_unimodal": 0.0037
+      },
+      {
+        "rho": 1.0,
+        "sigma": 0.5,
+        "tabular": 0.9022,
+        "text": 0.9083,
+        "concat": 0.9022,
+        "cross_attention": 0.9621,
+        "delta_xattn_vs_best_unimodal": 0.0538,
+        "delta_concat_vs_best_unimodal": -0.0062
+      },
+      {
+        "rho": 1.0,
+        "sigma": 1.0,
+        "tabular": 0.7973,
+        "text": 0.9083,
+        "concat": 0.8625,
+        "cross_attention": 0.9473,
+        "delta_xattn_vs_best_unimodal": 0.039,
+        "delta_concat_vs_best_unimodal": -0.0458
+      }
+    ]
+  },
+  "rq4_calibration": {
+    "is_mock": false,
+    "model": "xattn_frozen",
+    "seed": 101,
+    "temperature": 1.2117,
+    "target_ece": 0.05,
+    "target_met_by": [],
+    "note": "All calibrators fitted on validation (N=273) only; metrics on strict test (N=302).",
+    "methods": {
+      "uncalibrated": {
+        "ece_10_equal_width": 0.0788,
+        "ece_ci95": [
+          0.0498,
+          0.1272
+        ],
+        "ece_15_equal_mass": 0.1105,
+        "classwise_ece": 0.0845,
+        "brier": 0.3255,
+        "nll": 0.6996,
+        "macro_auroc": 0.9565,
+        "accuracy": 0.7947
+      },
+      "temperature": {
+        "ece_10_equal_width": 0.0773,
+        "ece_ci95": [
+          0.0504,
+          0.1243
+        ],
+        "ece_15_equal_mass": 0.1208,
+        "classwise_ece": 0.0994,
+        "brier": 0.3206,
+        "nll": 0.653,
+        "macro_auroc": 0.9583,
+        "accuracy": 0.7947
+      },
+      "vector_scaling": {
+        "ece_10_equal_width": 0.0976,
+        "ece_ci95": [
+          0.0583,
+          0.1483
+        ],
+        "ece_15_equal_mass": 0.1363,
+        "classwise_ece": 0.0892,
+        "brier": 0.36,
+        "nll": 0.9352,
+        "macro_auroc": 0.9522,
+        "accuracy": 0.7815
+      },
+      "isotonic_ovr": {
+        "ece_10_equal_width": 0.0943,
+        "ece_ci95": [
+          0.0628,
+          0.1483
+        ],
+        "ece_15_equal_mass": 0.1709,
+        "classwise_ece": 0.0958,
+        "brier": 0.3934,
+        "nll": 2.3154,
+        "macro_auroc": 0.8282,
+        "accuracy": 0.7748
+      }
+    }
+  },
+  "rq4_missing_modality": {
+    "is_mock": false,
+    "note": "Mean macro AUROC over seeds. Missing text = empty note string encoded by the same BERT; missing tabular = train median / mode; random missingness imputed with train median (analysis plan section 4). Models were trained on complete data (no modality dropout).",
+    "scenarios": [
+      {
+        "scenario": "full",
+        "label": "Đầy đủ",
+        "cross_attention_auroc": 0.9556,
+        "tabular_only_auroc": 0.9254,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "tab_missing_10",
+        "label": "Thiếu 10% biến số",
+        "cross_attention_auroc": 0.9364,
+        "tabular_only_auroc": 0.8966,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "tab_missing_30",
+        "label": "Thiếu 30% biến số",
+        "cross_attention_auroc": 0.9081,
+        "tabular_only_auroc": 0.8559,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "tab_missing_50",
+        "label": "Thiếu 50% biến số",
+        "cross_attention_auroc": 0.8883,
+        "tabular_only_auroc": 0.8227,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "no_tabular",
+        "label": "Mất toàn bộ bảng",
+        "cross_attention_auroc": 0.6778,
+        "tabular_only_auroc": 0.5,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "no_text",
+        "label": "Mất văn bản",
+        "cross_attention_auroc": 0.9018,
+        "tabular_only_auroc": 0.9254,
+        "text_only_auroc": 0.5007
+      }
+    ],
+    "by_model": {
+      "full": {
+        "xattn_frozen": {
+          "mean": 0.9556,
+          "sd": 0.0082
+        },
+        "xattn_ft": {
+          "mean": 0.961,
+          "sd": 0.0146
+        },
+        "concat_frozen": {
+          "mean": 0.929,
+          "sd": 0.0215
+        },
+        "catboost": {
+          "mean": 0.9254,
+          "sd": 0.0025
+        },
+        "lr_tabular": {
+          "mean": 0.9449,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.9292,
+          "sd": 0.0188
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "tfidf_lr": {
+          "mean": 0.917,
+          "sd": 0.0
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.978,
+          "sd": 0.0028
+        }
+      },
+      "tab_missing_10": {
+        "xattn_frozen": {
+          "mean": 0.9364,
+          "sd": 0.011
+        },
+        "xattn_ft": {
+          "mean": 0.9427,
+          "sd": 0.0148
+        },
+        "concat_frozen": {
+          "mean": 0.8954,
+          "sd": 0.02
+        },
+        "catboost": {
+          "mean": 0.8966,
+          "sd": 0.003
+        },
+        "lr_tabular": {
+          "mean": 0.9138,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.8964,
+          "sd": 0.0095
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9757,
+          "sd": 0.0029
+        }
+      },
+      "tab_missing_30": {
+        "xattn_frozen": {
+          "mean": 0.9081,
+          "sd": 0.0164
+        },
+        "xattn_ft": {
+          "mean": 0.9099,
+          "sd": 0.0076
+        },
+        "concat_frozen": {
+          "mean": 0.8503,
+          "sd": 0.0135
+        },
+        "catboost": {
+          "mean": 0.8559,
+          "sd": 0.0049
+        },
+        "lr_tabular": {
+          "mean": 0.8694,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.8475,
+          "sd": 0.0147
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9755,
+          "sd": 0.0029
+        }
+      },
+      "tab_missing_50": {
+        "xattn_frozen": {
+          "mean": 0.8883,
+          "sd": 0.0124
+        },
+        "xattn_ft": {
+          "mean": 0.889,
+          "sd": 0.014
+        },
+        "concat_frozen": {
+          "mean": 0.8134,
+          "sd": 0.0199
+        },
+        "catboost": {
+          "mean": 0.8227,
+          "sd": 0.0056
+        },
+        "lr_tabular": {
+          "mean": 0.8223,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.8124,
+          "sd": 0.0226
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.977,
+          "sd": 0.0018
+        }
+      },
+      "no_tabular": {
+        "xattn_frozen": {
+          "mean": 0.6778,
+          "sd": 0.0422
+        },
+        "xattn_ft": {
+          "mean": 0.6581,
+          "sd": 0.0555
+        },
+        "concat_frozen": {
+          "mean": 0.7437,
+          "sd": 0.025
+        },
+        "catboost": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "lr_tabular": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        }
+      },
+      "no_text": {
+        "xattn_frozen": {
+          "mean": 0.9018,
+          "sd": 0.0079
+        },
+        "xattn_ft": {
+          "mean": 0.9103,
+          "sd": 0.0144
+        },
+        "concat_frozen": {
+          "mean": 0.9306,
+          "sd": 0.0212
+        },
+        "catboost": {
+          "mean": 0.9254,
+          "sd": 0.0025
+        },
+        "lr_tabular": {
+          "mean": 0.9449,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.9292,
+          "sd": 0.0188
+        },
+        "bert_ft": {
+          "mean": 0.5007,
+          "sd": 0.0061
+        },
+        "bert_frozen": {
+          "mean": 0.4997,
+          "sd": 0.0018
+        },
+        "tfidf_lr": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9254,
+          "sd": 0.0025
+        }
+      }
+    }
+  },
+  "rq4_dca": {
+    "is_mock": false,
     "target_disease": "HEART_FAILURE",
     "target_class": 2,
-    "hypothetical_intervention": "Chỉ định NT-proBNP và Siêu âm tim Doppler màu sớm",
+    "hypothetical_intervention": "NT-proBNP + siêu âm tim sớm (analysis plan 3.2)",
     "test_sample_size": 302,
-    "heart_failure_test_prevalence": 0.3509933774834437,
-    "prevalence_note": "Tỷ lệ HF trong test = 35.1% (106/302), cao hơn thực tế chăm sóc ban đầu => net benefit không ngoại suy được.",
+    "heart_failure_test_prevalence": 0.351,
     "predefined_threshold_range": [
       0.05,
       0.3
     ],
-    "metrics_at_pt_0_10": {
-      "cross_attention": {
-        "threshold": 0.1,
-        "net_benefit": 0.3197203826342899,
-        "net_benefit_all": 0.2788815305371597,
-        "delta_nb_vs_treat_all": 0.04083885209713023,
-        "avoided_interventions_per_100_vs_all": 40.83885209713023
+    "formula": "Net reduction per 100 = (NB_model - NB_treat_all) * (1 - p_t) / p_t * 100 (Vickers 2016)",
+    "prevalence_note": "HF prevalence 35.1% in the synthetic test set; net benefit is a within-cohort comparison and does not transfer to primary care.",
+    "at_thresholds": {
+      "pt_0.10": {
+        "treat_all": 0.2789,
+        "models": {
+          "xattn_frozen": {
+            "net_benefit": 0.3451,
+            "delta_nb_vs_treat_all": 0.0662,
+            "net_reduction_in_interventions_per_100": 59.6026
+          },
+          "catboost": {
+            "net_benefit": 0.3389,
+            "delta_nb_vs_treat_all": 0.06,
+            "net_reduction_in_interventions_per_100": 53.9735
+          },
+          "bert_ft": {
+            "net_benefit": 0.3355,
+            "delta_nb_vs_treat_all": 0.0567,
+            "net_reduction_in_interventions_per_100": 50.9934
+          },
+          "ensemble_cb_bertft": {
+            "net_benefit": 0.3374,
+            "delta_nb_vs_treat_all": 0.0585,
+            "net_reduction_in_interventions_per_100": 52.649
+          },
+          "lr_tabular": {
+            "net_benefit": 0.3293,
+            "delta_nb_vs_treat_all": 0.0504,
+            "net_reduction_in_interventions_per_100": 45.3642
+          }
+        }
       },
-      "catboost": {
-        "threshold": 0.1,
-        "net_benefit": 0.3322295805739514,
-        "net_benefit_all": 0.2788815305371597,
-        "delta_nb_vs_treat_all": 0.05334805003679172,
-        "avoided_interventions_per_100_vs_all": 53.34805003679172
-      },
-      "bio_clinicalbert": {
-        "threshold": 0.1,
-        "net_benefit": 0.2788815305371597,
-        "net_benefit_all": 0.2788815305371597,
-        "delta_nb_vs_treat_all": 0.0,
-        "avoided_interventions_per_100_vs_all": 0.0
-      },
-      "ensemble": {
-        "threshold": 0.1,
-        "net_benefit": 0.2788815305371597,
-        "net_benefit_all": 0.2788815305371597,
-        "delta_nb_vs_treat_all": 0.0,
-        "avoided_interventions_per_100_vs_all": 0.0
-      },
-      "avoided_interventions_per_100_patients": 40.83885209713023
-    },
-    "metrics_at_pt_0_20": {
-      "cross_attention": {
-        "threshold": 0.19999999999999998,
-        "net_benefit": 0.3054635761589404,
-        "net_benefit_all": 0.18874172185430468,
-        "delta_nb_vs_treat_all": 0.11672185430463569,
-        "avoided_interventions_per_100_vs_all": 58.36092715231784
-      },
-      "catboost": {
-        "threshold": 0.19999999999999998,
-        "net_benefit": 0.3120860927152318,
-        "net_benefit_all": 0.18874172185430468,
-        "delta_nb_vs_treat_all": 0.12334437086092712,
-        "avoided_interventions_per_100_vs_all": 61.67218543046356
-      },
-      "bio_clinicalbert": {
-        "threshold": 0.19999999999999998,
-        "net_benefit": 0.18874172185430468,
-        "net_benefit_all": 0.18874172185430468,
-        "delta_nb_vs_treat_all": 0.0,
-        "avoided_interventions_per_100_vs_all": 0.0
-      },
-      "ensemble": {
-        "threshold": 0.19999999999999998,
-        "net_benefit": 0.3120860927152318,
-        "net_benefit_all": 0.18874172185430468,
-        "delta_nb_vs_treat_all": 0.12334437086092712,
-        "avoided_interventions_per_100_vs_all": 61.67218543046356
-      },
-      "avoided_interventions_per_100_patients": 58.36092715231784
-    },
-    "artifacts": {
-      "plot_pdf": "data\\evaluation_plots\\fig_dca_curve.pdf",
-      "plot_png": "data\\evaluation_plots\\dca_curve.png"
-    }
-  },
-  "robustness": {
-    "conditions": [
-      "Đầy đủ 100%\n(Full Multimodal)",
-      "Thiếu 10% Bảng\n(10% Tabular Drop)",
-      "Thiếu 30% Bảng\n(30% Tabular Drop)",
-      "Thiếu 50% Bảng\n(50% Tabular Drop)",
-      "Mất Toàn bộ Bảng\n(100% Tabular Loss)",
-      "Mất Toàn bộ Text\n(100% Text Loss)"
-    ],
-    "results": {
-      "full_multimodal": {
-        "fusion": 0.9695129500692947,
-        "catboost": 0.97454749992192,
-        "bert": 0.7198737339920428
-      },
-      "drop_10pct_tabular": {
-        "fusion": 0.9678819519594235,
-        "catboost": 0.9721905067465191,
-        "bert": 0.7198737339920428
-      },
-      "drop_30pct_tabular": {
-        "fusion": 0.9550470153372219,
-        "catboost": 0.9617798329465969,
-        "bert": 0.7198737339920428
-      },
-      "drop_50pct_tabular": {
-        "fusion": 0.9391796494675102,
-        "catboost": 0.9363694757665015,
-        "bert": 0.7198737339920428
-      },
-      "complete_tabular_loss": {
-        "fusion": 0.47080754297727584,
-        "catboost": 0.687820112575469,
-        "bert": 0.7198737339920428
-      },
-      "complete_text_loss": {
-        "fusion": 0.9701719223915931,
-        "catboost": 0.97454749992192,
-        "bert": 0.5019734308817867
+      "pt_0.20": {
+        "treat_all": 0.1887,
+        "models": {
+          "xattn_frozen": {
+            "net_benefit": 0.3435,
+            "delta_nb_vs_treat_all": 0.1548,
+            "net_reduction_in_interventions_per_100": 61.9205
+          },
+          "catboost": {
+            "net_benefit": 0.3411,
+            "delta_nb_vs_treat_all": 0.1523,
+            "net_reduction_in_interventions_per_100": 60.9272
+          },
+          "bert_ft": {
+            "net_benefit": 0.327,
+            "delta_nb_vs_treat_all": 0.1382,
+            "net_reduction_in_interventions_per_100": 55.298
+          },
+          "ensemble_cb_bertft": {
+            "net_benefit": 0.3328,
+            "delta_nb_vs_treat_all": 0.144,
+            "net_reduction_in_interventions_per_100": 57.6159
+          },
+          "lr_tabular": {
+            "net_benefit": 0.3154,
+            "delta_nb_vs_treat_all": 0.1267,
+            "net_reduction_in_interventions_per_100": 50.6623
+          }
+        }
       }
     },
-    "clinical_takeaway": "Dung hợp đa phương thức Cross-Attention duy trì AUROC > 0.90 ngay cả khi mất toàn bộ dữ liệu bảng (nhờ bù trừ từ văn bản) hoặc mất toàn bộ văn bản (nhờ dữ liệu bảng). Ngược lại, mô hình đơn phương thức suy sụp về mức ngẫu nhiên (AUROC ~ 0.50) khi mất phương thức sở trường. Đây là bằng chứng thực nghiệm vững chắc nhất cho giá trị triển khai của hệ thống trong môi trường lâm sàng thực tế.",
-    "artifacts": {
-      "plot_pdf": "data\\evaluation_plots\\fig_missing_modality.pdf",
-      "plot_png": "data\\evaluation_plots\\fig_missing_modality.png"
+    "curves": {
+      "threshold": [
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.1,
+        0.11,
+        0.12,
+        0.13,
+        0.14,
+        0.15,
+        0.16,
+        0.17,
+        0.18,
+        0.19,
+        0.2,
+        0.21,
+        0.22,
+        0.23,
+        0.24,
+        0.25,
+        0.26,
+        0.27,
+        0.28,
+        0.29,
+        0.3
+      ],
+      "treat_all": [
+        0.31683513419309867,
+        0.3095674228547274,
+        0.30214341664886424,
+        0.2945580190037432,
+        0.28680590932246564,
+        0.2788815305371597,
+        0.27077907582409405,
+        0.2624924744130042,
+        0.2540153764177514,
+        0.24534113660865547,
+        0.23646279703934556,
+        0.2273730684326711,
+        0.21806431022101652,
+        0.2085285091261509,
+        0.19875725615239967,
+        0.18874172185430468,
+        0.17847262972587813,
+        0.16794022754287657,
+        0.15713425647200482,
+        0.14604391774137335,
+        0.13465783664459163,
+        0.12296402362627529,
+        0.11094983216910098,
+        0.09860191317144956,
+        0.08590616546963903,
+        0.07284768211920528
+      ],
+      "treat_none": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "xattn_frozen": {
+        "net_benefit": [
+          0.34750784245381666,
+          0.3467662392560237,
+          0.3460086876023642,
+          0.34552260293694215,
+          0.3450986099992723,
+          0.3451066961000736,
+          0.34485452786665677,
+          0.3451234196267309,
+          0.3450559488467687,
+          0.3445248729400893,
+          0.3439813011297234,
+          0.3440555029959004,
+          0.3435330726881034,
+          0.3437247617509288,
+          0.34322622843594147,
+          0.3435430463576159,
+          0.34395171430966553,
+          0.34445576498556635,
+          0.3440698374473209,
+          0.3436737539212269,
+          0.34326710816777045,
+          0.3428494719885449,
+          0.3424203937222172,
+          0.3419793966151582,
+          0.34152597705437926,
+          0.34105960264900664
+        ],
+        "ci95_low": [
+          0.2925975949808296,
+          0.29214985205016203,
+          0.2912759025849178,
+          0.29037935502447454,
+          0.28978968051815734,
+          0.29027777777777775,
+          0.29020016370265644,
+          0.2910671282360024,
+          0.29057052599528055,
+          0.28991221315262594,
+          0.2892384105960265,
+          0.2890137180700095,
+          0.2885811457751536,
+          0.28816023259570345,
+          0.28771155261221487,
+          0.2880794701986755,
+          0.2876603235811887,
+          0.2896077432501274,
+          0.2891115507009547,
+          0.2886023004531196,
+          0.2880794701986755,
+          0.28754250939681403,
+          0.28699083734010705,
+          0.28642384105960267,
+          0.28584087305288686,
+          0.28524124881740776
+        ],
+        "ci95_high": [
+          0.40031805507145346,
+          0.3995402987177681,
+          0.3987458164209926,
+          0.39822199827238697,
+          0.39775853285787055,
+          0.3984547461368653,
+          0.3982532182454051,
+          0.39812236604455137,
+          0.39756984090736075,
+          0.39699484059756646,
+          0.39640144137125033,
+          0.39657442447177543,
+          0.3959297454719539,
+          0.39638992085285085,
+          0.39600707219360637,
+          0.39571605960264894,
+          0.39627797803671716,
+          0.39703472575989124,
+          0.39642964651242785,
+          0.3958086441268734,
+          0.39517108167770404,
+          0.3950398245928046,
+          0.39490497142338743,
+          0.3944168506254599,
+          0.39391847775394073,
+          0.3935903500473035
+        ]
+      },
+      "catboost": {
+        "net_benefit": [
+          0.34105960264900664,
+          0.3393687473580386,
+          0.3392793562629068,
+          0.33976389288799314,
+          0.3395313295975548,
+          0.33885209713024284,
+          0.3383064216087507,
+          0.3397049969897652,
+          0.3396133059298166,
+          0.33967349453257356,
+          0.3387222438644332,
+          0.33900977609586885,
+          0.3408202345807069,
+          0.3400904538846713,
+          0.3401193688169406,
+          0.34105960264900664,
+          0.3413110906194987,
+          0.3425878757004585,
+          0.3420916831512858,
+          0.3415824329034507,
+          0.34216335540838855,
+          0.34168605691784504,
+          0.3411956817563277,
+          0.340691685062546,
+          0.34017349127879865,
+          0.33964049195837276
+        ],
+        "ci95_low": [
+          0.2857790170791216,
+          0.28342081161053967,
+          0.28348020366018656,
+          0.28433270947307804,
+          0.28421512262571863,
+          0.2832873436350257,
+          0.282859587766947,
+          0.28340984346779047,
+          0.2835074598462358,
+          0.28391152009856774,
+          0.28299084534476043,
+          0.28271050141911075,
+          0.28520306391127426,
+          0.2845158294298175,
+          0.28480398168588017,
+          0.2864238410596026,
+          0.28610948109648754,
+          0.28680378672100526,
+          0.28644534273673344,
+          0.2861493551760195,
+          0.2858719646799117,
+          0.28556917844997315,
+          0.2852580967068856,
+          0.2845796541574687,
+          0.2838821005503218,
+          0.2833491012298959
+        ],
+        "ci95_high": [
+          0.3949111188567445,
+          0.3932048752994222,
+          0.3934424624368012,
+          0.3936114310394471,
+          0.39350120078596895,
+          0.39293598233995586,
+          0.3925236252697373,
+          0.39403973509933776,
+          0.39407779553931643,
+          0.39382026798090247,
+          0.3926957537982079,
+          0.3927901292967518,
+          0.3951567860847363,
+          0.3945243094815054,
+          0.3938762161720219,
+          0.39486754966887416,
+          0.3945060357112918,
+          0.3960901681100356,
+          0.39571794099939794,
+          0.39543394911118857,
+          0.39514348785871967,
+          0.39484517630212995,
+          0.3945386918261816,
+          0.39422369389256806,
+          0.39376340826415446,
+          0.39310548722800376
+        ]
+      },
+      "bert_ft": {
+        "net_benefit": [
+          0.34105960264900664,
+          0.34063688882626464,
+          0.3392793562629068,
+          0.33774834437086093,
+          0.337238920020377,
+          0.3355408388520971,
+          0.33380459855644024,
+          0.3329319686935581,
+          0.33219152013397274,
+          0.33050977976282153,
+          0.32995714842228285,
+          0.3295490381583097,
+          0.3292906726242719,
+          0.3284606687126474,
+          0.32769193034093697,
+          0.32698675496688745,
+          0.3254673484784978,
+          0.3248429274919341,
+          0.32428829448697,
+          0.32380620425235274,
+          0.32339955849889623,
+          0.3219080007159478,
+          0.32160029030209564,
+          0.3213760117733628,
+          0.3212386904206697,
+          0.3211920529801325
+        ],
+        "ci95_low": [
+          0.2854522481700941,
+          0.28574573763562067,
+          0.28429911699779253,
+          0.28246472790095023,
+          0.28196637799286806,
+          0.2799852832965416,
+          0.2783224198229035,
+          0.276791089704997,
+          0.276725089442034,
+          0.27482096103496073,
+          0.2740455784962992,
+          0.2738883632923368,
+          0.27350494694007815,
+          0.2718462283960588,
+          0.2706187147412313,
+          0.26986754966887416,
+          0.2682957498532987,
+          0.2685409237561555,
+          0.2673518534445687,
+          0.2666390728476821,
+          0.26708057395143486,
+          0.2648984249149812,
+          0.26444139526444704,
+          0.2639762693156733,
+          0.26357965674843764,
+          0.26348155156102177
+        ],
+        "ci95_high": [
+          0.3952596723597072,
+          0.39488516274482177,
+          0.3937611265399131,
+          0.39245608983587676,
+          0.39186467506003925,
+          0.39036975717439293,
+          0.3888319443410968,
+          0.3881735400361228,
+          0.38749333942300374,
+          0.38572308640073927,
+          0.3850847292559408,
+          0.3848982970671712,
+          0.3843054336551504,
+          0.38363148118236146,
+          0.38300731747199734,
+          0.3824503311258278,
+          0.3808837706429709,
+          0.3797036848361351,
+          0.37959920873828157,
+          0.3790562913907285,
+          0.37858719646799116,
+          0.37721496330767856,
+          0.3770389186246938,
+          0.37656824871228844,
+          0.37585929484189906,
+          0.37607615894039725
+        ]
+      },
+      "ensemble_cb_bertft": {
+        "net_benefit": [
+          0.338271174625305,
+          0.3368324644215866,
+          0.33753471480452896,
+          0.33659660236107114,
+          0.336911432937923,
+          0.33738042678440033,
+          0.33707865168539325,
+          0.33699578567128236,
+          0.33614980589175614,
+          0.33482211612505774,
+          0.3346318659914297,
+          0.33333333333333337,
+          0.33335992978536666,
+          0.3342755612986594,
+          0.33390564957893876,
+          0.3327814569536424,
+          0.332509011652276,
+          0.33231448463236546,
+          0.33417906596714547,
+          0.335308469850122,
+          0.3355408388520971,
+          0.3381958117057455,
+          0.33997096979043817,
+          0.3394039735099338,
+          0.338821005503218,
+          0.3382213812677389
+        ],
+        "ci95_low": [
+          0.28300365981178116,
+          0.280962026208257,
+          0.2827262693156733,
+          0.28102505038871295,
+          0.28126773888363293,
+          0.2821651949963208,
+          0.2820057295929757,
+          0.2817466887417219,
+          0.2811619852325493,
+          0.2796569382411828,
+          0.27872516556291393,
+          0.27719567959634184,
+          0.27706454958908483,
+          0.27733807139395894,
+          0.2772463412640013,
+          0.2756622516556292,
+          0.27578694777433144,
+          0.2750891492613347,
+          0.27822310140190937,
+          0.2791869989543395,
+          0.2792494481236203,
+          0.2828888491140147,
+          0.28454141340832806,
+          0.28384841795437826,
+          0.28313590150172563,
+          0.28240302743614004
+        ],
+        "ci95_high": [
+          0.3928197978389683,
+          0.391297379174299,
+          0.3922657195755892,
+          0.391595882522315,
+          0.3915453751546466,
+          0.3925772626931567,
+          0.3920687923208572,
+          0.3919325707405178,
+          0.39096064550506204,
+          0.3898833359002002,
+          0.3897594468250876,
+          0.38837511825922416,
+          0.3883746908162451,
+          0.3891132288806332,
+          0.3882399231461041,
+          0.38741721854304634,
+          0.3870452259200268,
+          0.3866552046187807,
+          0.38880192655027085,
+          0.38953032415475763,
+          0.3896247240618102,
+          0.3911804188294254,
+          0.39382200852762406,
+          0.3931337380426784,
+          0.3924225818487081,
+          0.3916863765373699
+        ]
+      },
+      "lr_tabular": {
+        "net_benefit": [
+          0.338271174625305,
+          0.3366211075102156,
+          0.33454390087588126,
+          0.3331413763317017,
+          0.3310166654537516,
+          0.3292862398822664,
+          0.32725649229853415,
+          0.326158940397351,
+          0.32476973433812895,
+          0.32242414908362854,
+          0.3211920529801325,
+          0.3200883002207506,
+          0.3197957392483843,
+          0.3182846066871265,
+          0.31681792167443384,
+          0.3153973509933775,
+          0.3157850616145528,
+          0.3145695364238411,
+          0.3124193687107595,
+          0.3112582781456954,
+          0.31346578366445915,
+          0.3149275102917487,
+          0.3142520185067586,
+          0.3136497424576895,
+          0.3131237757671859,
+          0.31267738883632923
+        ],
+        "ci95_low": [
+          0.2831692227256884,
+          0.280962026208257,
+          0.27832372000284844,
+          0.27669881946443997,
+          0.27410577832763267,
+          0.27224981604120674,
+          0.2701828633082819,
+          0.2692655027092113,
+          0.2678313161300145,
+          0.2652067611273679,
+          0.26392676275808336,
+          0.2623699148533586,
+          0.2622277188223091,
+          0.2602144241641092,
+          0.2586000735835173,
+          0.2574503311258278,
+          0.2573130606086009,
+          0.25589234165393104,
+          0.25350369828846653,
+          0.2525270128964796,
+          0.254939293598234,
+          0.25630481474852335,
+          0.2559976866551755,
+          0.2555141648270788,
+          0.2544492118272549,
+          0.25496688741721857
+        ],
+        "ci95_high": [
+          0.3924712443360056,
+          0.3910824996477385,
+          0.3890256711528875,
+          0.38756838468183125,
+          0.38531493341095985,
+          0.3837472406181015,
+          0.3822466329339981,
+          0.3812462372065021,
+          0.3795596407094465,
+          0.3779608809487139,
+          0.3763245033112583,
+          0.3752838221381267,
+          0.3756592595547753,
+          0.3741883379098691,
+          0.37389931322050524,
+          0.37253725165562906,
+          0.372967138905189,
+          0.3721344880285277,
+          0.3706459103810097,
+          0.36964970372952244,
+          0.3719646799116998,
+          0.3735457311616252,
+          0.3724938764401705,
+          0.37215323767476083,
+          0.37137743680626806,
+          0.37088457899716165
+        ]
+      }
     }
-  },
-  "generalization": {
-    "split_method": "Temporal split (encounter_timestamp: older 70% -> newer 30%)",
-    "validation_nature": "Internal Generalization / Robustness Check (NOT external hospital validation)",
-    "train_samples": 1400,
-    "test_samples": 600,
-    "train_time_range": [
-      "2026-06-01 17:55:00",
-      "2026-08-03 17:52:00"
-    ],
-    "test_time_range": [
-      "2026-08-03 18:08:00",
-      "2026-08-31 05:58:00"
-    ],
-    "metrics": {
-      "macro_auroc_temporal": 0.9884155047009912,
-      "macro_auroc_strict": 0.9695129500692947,
-      "delta_macro_auroc": 0.018902554631696433,
-      "macro_f1_temporal": 0.9261955366305266,
-      "accuracy_temporal": 0.9233333333333333
-    },
-    "conclusion": "Khi phân tách theo chuỗi thời gian khám bệnh, mô hình duy trì AUROC = 0.9884 (độ lệch delta AUROC = +0.0189 so với strict patient split). Kết quả này khẳng định hệ thống có độ ổn định nội bộ cao trước sự biến thiên thời gian, tuy nhiên đây là kiểm tra độ bền nội bộ (Internal Robustness Check), không thay thế được ngoại kiểm độc lập."
   },
   "fairness": {
     "metadata": {
       "total_test_samples": 302,
       "n_bootstrap": 2000,
-      "seed": 42,
-      "model_evaluated": "Multimodal Cross-Attention CDSS"
+      "model_evaluated": "xattn_frozen",
+      "seed": 101,
+      "disclaimer": "Synthetic cohort: subgroup results describe the pipeline, not fairness on real patients."
     },
     "subgroups": {
       "gender_M": {
-        "sample_size": 169,
-        "sample_ratio": 0.5596026490066225,
-        "macro_auroc": 0.9762453724066497,
+        "sample_size": 206,
+        "class_counts": [
+          8,
+          38,
+          106,
+          54
+        ],
+        "classes_in_auroc": [
+          "ASTHMA",
+          "COPD",
+          "HEART_FAILURE",
+          "PNEUMONIA"
+        ],
+        "macro_auroc": 0.9509,
         "macro_auroc_ci95": [
-          0.9581144392686118,
-          0.9902063624759646
+          0.9262,
+          0.9705
         ],
-        "macro_f1": 0.9008073397045082,
+        "macro_f1": 0.6205,
         "macro_f1_ci95": [
-          0.8576042001196142,
-          0.9386423614132956
-        ],
-        "accuracy": 0.893491124260355
+          0.5555,
+          0.6836
+        ]
       },
       "gender_F": {
-        "sample_size": 124,
-        "sample_ratio": 0.4105960264900662,
-        "macro_auroc": 0.9667183797270318,
+        "sample_size": 96,
+        "class_counts": [
+          63,
+          33,
+          0,
+          0
+        ],
+        "classes_in_auroc": [
+          "ASTHMA",
+          "COPD"
+        ],
+        "macro_auroc": 0.9245,
         "macro_auroc_ci95": [
-          0.9397152009278198,
-          0.9880324449829674
+          0.8496,
+          0.9772
         ],
-        "macro_f1": 0.8732289417315855,
+        "macro_f1": 0.8547,
         "macro_f1_ci95": [
-          0.8135512837254747,
-          0.9217199537512037
+          0.7777,
+          0.9208
         ],
-        "accuracy": 0.8629032258064516
+        "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
       },
       "age_under_65": {
-        "sample_size": 146,
-        "sample_ratio": 0.48344370860927155,
-        "macro_auroc": 0.9837987046913865,
+        "sample_size": 237,
+        "class_counts": [
+          66,
+          64,
+          106,
+          1
+        ],
+        "classes_in_auroc": [
+          "ASTHMA",
+          "COPD",
+          "HEART_FAILURE",
+          "PNEUMONIA"
+        ],
+        "macro_auroc": 0.9141,
         "macro_auroc_ci95": [
-          0.9704672344390399,
-          0.9940589705093081
+          0.8926,
+          0.9333
         ],
-        "macro_f1": 0.8790687176878543,
+        "macro_f1": 0.6757,
         "macro_f1_ci95": [
-          0.8075955046094295,
-          0.9393660745608406
-        ],
-        "accuracy": 0.9178082191780822
+          0.642,
+          0.7025
+        ]
       },
       "age_65_and_older": {
-        "sample_size": 156,
-        "sample_ratio": 0.5165562913907285,
-        "macro_auroc": 0.7379484860948166,
+        "sample_size": 65,
+        "class_counts": [
+          5,
+          7,
+          0,
+          53
+        ],
+        "classes_in_auroc": [
+          "ASTHMA",
+          "COPD",
+          "PNEUMONIA"
+        ],
+        "macro_auroc": 0.8144,
         "macro_auroc_ci95": [
-          0.7095597991294397,
-          0.7630217765820343
+          0.6854,
+          0.9361
         ],
-        "macro_f1": 0.6424895354422562,
+        "macro_f1": 0.5152,
         "macro_f1_ci95": [
-          0.6018022430802416,
-          0.9042937580128919
+          0.4413,
+          0.591
         ],
-        "accuracy": 0.8333333333333334
+        "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
       },
       "smoking_NEVER": {
-        "sample_size": 133,
-        "sample_ratio": 0.44039735099337746,
-        "macro_auroc": 0.953284105575078,
+        "sample_size": 160,
+        "class_counts": [
+          57,
+          49,
+          0,
+          54
+        ],
+        "classes_in_auroc": [
+          "ASTHMA",
+          "COPD",
+          "PNEUMONIA"
+        ],
+        "macro_auroc": 0.9244,
         "macro_auroc_ci95": [
-          0.921597284939689,
-          0.9814046770132212
+          0.8943,
+          0.9504
         ],
-        "macro_f1": 0.7306732601397332,
+        "macro_f1": 0.6388,
         "macro_f1_ci95": [
-          0.7143704160694984,
-          0.7434810479375698
+          0.5669,
+          0.7088
         ],
-        "accuracy": 0.9473684210526315
+        "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
       },
       "smoking_FORMER": {
-        "sample_size": 99,
-        "sample_ratio": 0.32781456953642385,
-        "macro_auroc": 0.9542124993740021,
+        "sample_size": 142,
+        "class_counts": [
+          14,
+          22,
+          106,
+          0
+        ],
+        "classes_in_auroc": [
+          "ASTHMA",
+          "COPD",
+          "HEART_FAILURE"
+        ],
+        "macro_auroc": 0.9662,
         "macro_auroc_ci95": [
-          0.914098705400085,
-          0.9836876453771453
+          0.9239,
+          0.996
         ],
-        "macro_f1": 0.8504689754689754,
+        "macro_f1": 0.8565,
         "macro_f1_ci95": [
-          0.7711610859079544,
-          0.9122222819850831
+          0.7579,
+          0.9407
         ],
-        "accuracy": 0.8080808080808081
+        "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
       },
       "smoking_CURRENT": {
-        "sample_size": 70,
-        "sample_ratio": 0.23178807947019867,
-        "macro_auroc": 0.9289157746089421,
-        "macro_auroc_ci95": [
-          0.8553705002156128,
-          0.987806294810682
+        "sample_size": 0,
+        "class_counts": [
+          0,
+          0,
+          0,
+          0
         ],
-        "macro_f1": 0.8251373626373626,
-        "macro_f1_ci95": [
-          0.7116485086710961,
-          0.9126137963022198
-        ],
-        "accuracy": 0.8285714285714286
+        "classes_in_auroc": [],
+        "macro_auroc": null,
+        "macro_auroc_ci95": null,
+        "macro_f1": null,
+        "macro_f1_ci95": null,
+        "note": "fewer than two classes present (or empty subgroup) - not estimable"
       }
     }
   },
-  "metadata": {
-    "last_updated": "2026-11-19T09:23:46.551861+00:00",
-    "responsible_member": "Member 2 (Biomedical Data Engineer & Privacy)",
-    "phase": "Phase 3 / Backlog 09",
-    "data_manifest": "data/DATA_MANIFEST.json",
-    "seed": 42
+  "error_analysis": {
+    "confusion_matrix": [
+      [
+        61,
+        9,
+        0,
+        1
+      ],
+      [
+        9,
+        61,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        106,
+        0
+      ],
+      [
+        35,
+        1,
+        6,
+        12
+      ]
+    ],
+    "top_confused_pairs": [
+      "ASTHMA<->PNEUMONIA (36)",
+      "ASTHMA<->COPD (18)",
+      "HEART_FAILURE<->PNEUMONIA (6)"
+    ],
+    "cases": [
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-1062",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9301,
+        "age": 83,
+        "spo2": 99.6,
+        "temperature": 37.5,
+        "wbc": 8.29,
+        "crp": 0.78,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-0484",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9274,
+        "age": 83,
+        "spo2": 100.0,
+        "temperature": 37.5,
+        "wbc": 8.75,
+        "crp": 0.1,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-1189",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9243,
+        "age": 82,
+        "spo2": 98.8,
+        "temperature": 38.3,
+        "wbc": 7.3042,
+        "crp": 19.39,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-0361",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9234,
+        "age": 82,
+        "spo2": 96.5,
+        "temperature": 38.6,
+        "wbc": 10.1,
+        "crp": 9.37,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-0052",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9205,
+        "age": 82,
+        "spo2": 92.0,
+        "temperature": 37.2,
+        "wbc": 9.43,
+        "crp": 32.5,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-1997",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9142,
+        "age": 83,
+        "spo2": 92.4,
+        "temperature": 35.0,
+        "wbc": 8.45,
+        "crp": 23.62,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-0414",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9135,
+        "age": 82,
+        "spo2": 94.2,
+        "temperature": 38.1,
+        "wbc": 9.79,
+        "crp": 0.1,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-1956",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9132,
+        "age": 83,
+        "spo2": 95.5,
+        "temperature": 37.5,
+        "wbc": 7.2389,
+        "crp": 0.18,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-1316",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.9127,
+        "age": 83,
+        "spo2": 92.7,
+        "temperature": 37.5,
+        "wbc": 8.37,
+        "crp": 10.3,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->PNEUMONIA",
+        "patient_id": "PT-1072",
+        "true": "PNEUMONIA",
+        "pred": "ASTHMA",
+        "confidence": 0.91,
+        "age": 83,
+        "spo2": 94.4,
+        "temperature": 37.7,
+        "wbc": 8.51,
+        "crp": 58.45,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-1113",
+        "true": "COPD",
+        "pred": "ASTHMA",
+        "confidence": 0.94,
+        "age": 42,
+        "spo2": 94.8,
+        "temperature": 37.3,
+        "wbc": 7.91,
+        "crp": 0.1,
+        "smoking": "FORMER",
+        "note_is_mtsamples": true
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-1859",
+        "true": "ASTHMA",
+        "pred": "COPD",
+        "confidence": 0.8348,
+        "age": 18,
+        "spo2": 94.8,
+        "temperature": 36.7,
+        "wbc": 6.12,
+        "crp": 0.1,
+        "smoking": "FORMER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-0174",
+        "true": "COPD",
+        "pred": "ASTHMA",
+        "confidence": 0.833,
+        "age": 23,
+        "spo2": 96.4,
+        "temperature": 35.9,
+        "wbc": 4.39,
+        "crp": 13.914,
+        "smoking": "FORMER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-0572",
+        "true": "ASTHMA",
+        "pred": "COPD",
+        "confidence": 0.8249,
+        "age": 18,
+        "spo2": 100.0,
+        "temperature": 36.6,
+        "wbc": 7.6776,
+        "crp": 0.86,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-1843",
+        "true": "ASTHMA",
+        "pred": "COPD",
+        "confidence": 0.7848,
+        "age": 18,
+        "spo2": 100.0,
+        "temperature": 37.1,
+        "wbc": 9.98,
+        "crp": 13.23,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-0429",
+        "true": "ASTHMA",
+        "pred": "COPD",
+        "confidence": 0.7443,
+        "age": 18,
+        "spo2": 95.3,
+        "temperature": 38.1,
+        "wbc": 7.4519,
+        "crp": 1.62,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-0906",
+        "true": "COPD",
+        "pred": "ASTHMA",
+        "confidence": 0.7299,
+        "age": 18,
+        "spo2": 88.6,
+        "temperature": 38.1,
+        "wbc": 3.29,
+        "crp": 26.52,
+        "smoking": "FORMER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-0672",
+        "true": "COPD",
+        "pred": "ASTHMA",
+        "confidence": 0.7186,
+        "age": 30,
+        "spo2": 98.8,
+        "temperature": 36.1,
+        "wbc": 7.27,
+        "crp": 13.9207,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-0141",
+        "true": "ASTHMA",
+        "pred": "COPD",
+        "confidence": 0.6968,
+        "age": 39,
+        "spo2": 83.6,
+        "temperature": 37.5,
+        "wbc": 5.48,
+        "crp": 0.1,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "ASTHMA<->COPD",
+        "patient_id": "PT-0397",
+        "true": "COPD",
+        "pred": "ASTHMA",
+        "confidence": 0.5981,
+        "age": 35,
+        "spo2": 94.1,
+        "temperature": 37.7,
+        "wbc": 3.07,
+        "crp": 0.1,
+        "smoking": "FORMER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "HEART_FAILURE<->PNEUMONIA",
+        "patient_id": "PT-0864",
+        "true": "PNEUMONIA",
+        "pred": "HEART_FAILURE",
+        "confidence": 0.9751,
+        "age": 83,
+        "spo2": 82.1,
+        "temperature": 37.5,
+        "wbc": 9.42,
+        "crp": 29.2,
+        "smoking": "NEVER",
+        "note_is_mtsamples": true
+      },
+      {
+        "pair": "HEART_FAILURE<->PNEUMONIA",
+        "patient_id": "PT-0325",
+        "true": "PNEUMONIA",
+        "pred": "HEART_FAILURE",
+        "confidence": 0.963,
+        "age": 82,
+        "spo2": 87.5,
+        "temperature": 38.3,
+        "wbc": 7.1251,
+        "crp": 3.17,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "HEART_FAILURE<->PNEUMONIA",
+        "patient_id": "PT-0464",
+        "true": "PNEUMONIA",
+        "pred": "HEART_FAILURE",
+        "confidence": 0.938,
+        "age": 83,
+        "spo2": 85.1,
+        "temperature": 37.4,
+        "wbc": 9.3,
+        "crp": 37.13,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "HEART_FAILURE<->PNEUMONIA",
+        "patient_id": "PT-0349",
+        "true": "PNEUMONIA",
+        "pred": "HEART_FAILURE",
+        "confidence": 0.9053,
+        "age": 83,
+        "spo2": 88.2,
+        "temperature": 36.9,
+        "wbc": 8.99,
+        "crp": 0.1,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "HEART_FAILURE<->PNEUMONIA",
+        "patient_id": "PT-0244",
+        "true": "PNEUMONIA",
+        "pred": "HEART_FAILURE",
+        "confidence": 0.502,
+        "age": 83,
+        "spo2": 86.8,
+        "temperature": 36.8,
+        "wbc": 10.14,
+        "crp": 17.61,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      },
+      {
+        "pair": "HEART_FAILURE<->PNEUMONIA",
+        "patient_id": "PT-1801",
+        "true": "PNEUMONIA",
+        "pred": "HEART_FAILURE",
+        "confidence": 0.408,
+        "age": 84,
+        "spo2": 88.2,
+        "temperature": 36.3,
+        "wbc": 8.73,
+        "crp": 13.8938,
+        "smoking": "NEVER",
+        "note_is_mtsamples": false
+      }
+    ],
+    "case_studies": {
+      "PT-0044": {
+        "split": "test",
+        "true": "ASTHMA",
+        "probabilities": {
+          "ASTHMA": 0.5797,
+          "COPD": 0.4073,
+          "HEART_FAILURE": 0.0072,
+          "PNEUMONIA": 0.0057
+        }
+      },
+      "PT-0254": {
+        "split": "test",
+        "true": "COPD",
+        "probabilities": {
+          "ASTHMA": 0.0503,
+          "COPD": 0.9273,
+          "HEART_FAILURE": 0.021,
+          "PNEUMONIA": 0.0014
+        }
+      }
+    }
+  },
+  "generalization": {
+    "split_method": "Temporal split, group-aware (patient + note source groups ordered by earliest encounter; 70/15/15)",
+    "validation_nature": "Internal robustness check on synthetic timestamps - NOT external hospital validation",
+    "train_samples": 1396,
+    "val_samples": 304,
+    "test_samples": 300,
+    "split_detail": {
+      "train": {
+        "n": 1396,
+        "from": "1913-06-17 04:54:18",
+        "to": "2026-08-20 02:46:00",
+        "class_counts": {
+          "0": 425,
+          "1": 217,
+          "2": 389,
+          "3": 365
+        }
+      },
+      "val": {
+        "n": 304,
+        "from": "2011-03-15 00:00:00",
+        "to": "2026-08-19 00:51:00",
+        "class_counts": {
+          "0": 47,
+          "1": 119,
+          "2": 80,
+          "3": 58
+        }
+      },
+      "test": {
+        "n": 300,
+        "from": "2014-11-12 00:00:00",
+        "to": "2026-08-15 07:36:00",
+        "class_counts": {
+          "0": 28,
+          "1": 164,
+          "2": 31,
+          "3": 77
+        }
+      }
+    },
+    "metrics": {
+      "macro_auroc_temporal": 0.8789,
+      "ci95": [
+        0.8504,
+        0.9064
+      ],
+      "macro_auroc_strict": 0.9583,
+      "delta_macro_auroc": -0.0793
+    },
+    "by_model": {
+      "bert_frozen": {
+        "macro_auroc_temporal": 0.8794,
+        "ci95": [
+          0.8454,
+          0.9095
+        ],
+        "macro_auroc_strict": 0.9044,
+        "delta_macro_auroc": -0.025
+      },
+      "catboost": {
+        "macro_auroc_temporal": 0.9357,
+        "ci95": [
+          0.9162,
+          0.9541
+        ],
+        "macro_auroc_strict": 0.9257,
+        "delta_macro_auroc": 0.0101
+      },
+      "tfidf_lr": {
+        "macro_auroc_temporal": 0.9036,
+        "ci95": [
+          0.8763,
+          0.9285
+        ],
+        "macro_auroc_strict": 0.917,
+        "delta_macro_auroc": -0.0135
+      },
+      "xattn_frozen": {
+        "macro_auroc_temporal": 0.8789,
+        "ci95": [
+          0.8504,
+          0.9064
+        ],
+        "macro_auroc_strict": 0.9583,
+        "delta_macro_auroc": -0.0793
+      }
+    }
+  },
+  "sensitivity_grouped_cv_posthoc": {
+    "post_hoc": true,
+    "design": "StratifiedGroupKFold(5) over all 2,000 rows on merged patient+note groups; 15% of remaining groups as validation; seed 42 (docs/11_ANALYSIS_PLAN.md A.6)",
+    "n_folds": 5,
+    "test_fold_sizes": [
+      422,
+      365,
+      441,
+      368,
+      404
+    ],
+    "models": [
+      {
+        "model": "lr_tabular",
+        "label": "Logistic Regression (bảng)",
+        "fold_auroc": [
+          0.937,
+          0.9033,
+          0.8829,
+          0.8997,
+          0.9201
+        ],
+        "auroc_mean": 0.9086,
+        "auroc_sd": 0.0206
+      },
+      {
+        "model": "catboost",
+        "label": "CatBoost (bảng)",
+        "fold_auroc": [
+          0.9342,
+          0.907,
+          0.8416,
+          0.9076,
+          0.8709
+        ],
+        "auroc_mean": 0.8923,
+        "auroc_sd": 0.0362
+      },
+      {
+        "model": "tfidf_lr",
+        "label": "TF-IDF + LR (văn bản)",
+        "fold_auroc": [
+          0.969,
+          0.9108,
+          0.7592,
+          0.9378,
+          0.9434
+        ],
+        "auroc_mean": 0.904,
+        "auroc_sd": 0.0836
+      },
+      {
+        "model": "bert_frozen",
+        "label": "Bio_ClinicalBERT đóng băng (văn bản)",
+        "fold_auroc": [
+          0.9298,
+          0.7859,
+          0.7721,
+          0.8192,
+          0.8593
+        ],
+        "auroc_mean": 0.8333,
+        "auroc_sd": 0.0636
+      },
+      {
+        "model": "bert_ft",
+        "label": "Bio_ClinicalBERT fine-tune (văn bản)",
+        "fold_auroc": [
+          0.9838,
+          0.9202,
+          0.6333,
+          0.9636,
+          0.9693
+        ],
+        "auroc_mean": 0.894,
+        "auroc_sd": 0.1476
+      },
+      {
+        "model": "xattn_frozen",
+        "label": "Cross-attention (đóng băng) – triển khai",
+        "fold_auroc": [
+          0.9638,
+          0.9328,
+          0.9462,
+          0.9367,
+          0.9671
+        ],
+        "auroc_mean": 0.9493,
+        "auroc_sd": 0.0156
+      },
+      {
+        "model": "ensemble_cb_bertft",
+        "label": "Ensemble CatBoost + BERT-FT",
+        "fold_auroc": [
+          0.9803,
+          0.9411,
+          0.8159,
+          0.9584,
+          0.9611
+        ],
+        "auroc_mean": 0.9314,
+        "auroc_sd": 0.066
+      }
+    ]
+  },
+  "dca": {
+    "is_mock": false,
+    "target_disease": "HEART_FAILURE",
+    "target_class": 2,
+    "hypothetical_intervention": "NT-proBNP + siêu âm tim sớm (analysis plan 3.2)",
+    "test_sample_size": 302,
+    "heart_failure_test_prevalence": 0.351,
+    "predefined_threshold_range": [
+      0.05,
+      0.3
+    ],
+    "formula": "Net reduction per 100 = (NB_model - NB_treat_all) * (1 - p_t) / p_t * 100 (Vickers 2016)",
+    "prevalence_note": "HF prevalence 35.1% in the synthetic test set; net benefit is a within-cohort comparison and does not transfer to primary care.",
+    "at_thresholds": {
+      "pt_0.10": {
+        "treat_all": 0.2789,
+        "models": {
+          "xattn_frozen": {
+            "net_benefit": 0.3451,
+            "delta_nb_vs_treat_all": 0.0662,
+            "net_reduction_in_interventions_per_100": 59.6026
+          },
+          "catboost": {
+            "net_benefit": 0.3389,
+            "delta_nb_vs_treat_all": 0.06,
+            "net_reduction_in_interventions_per_100": 53.9735
+          },
+          "bert_ft": {
+            "net_benefit": 0.3355,
+            "delta_nb_vs_treat_all": 0.0567,
+            "net_reduction_in_interventions_per_100": 50.9934
+          },
+          "ensemble_cb_bertft": {
+            "net_benefit": 0.3374,
+            "delta_nb_vs_treat_all": 0.0585,
+            "net_reduction_in_interventions_per_100": 52.649
+          },
+          "lr_tabular": {
+            "net_benefit": 0.3293,
+            "delta_nb_vs_treat_all": 0.0504,
+            "net_reduction_in_interventions_per_100": 45.3642
+          }
+        }
+      },
+      "pt_0.20": {
+        "treat_all": 0.1887,
+        "models": {
+          "xattn_frozen": {
+            "net_benefit": 0.3435,
+            "delta_nb_vs_treat_all": 0.1548,
+            "net_reduction_in_interventions_per_100": 61.9205
+          },
+          "catboost": {
+            "net_benefit": 0.3411,
+            "delta_nb_vs_treat_all": 0.1523,
+            "net_reduction_in_interventions_per_100": 60.9272
+          },
+          "bert_ft": {
+            "net_benefit": 0.327,
+            "delta_nb_vs_treat_all": 0.1382,
+            "net_reduction_in_interventions_per_100": 55.298
+          },
+          "ensemble_cb_bertft": {
+            "net_benefit": 0.3328,
+            "delta_nb_vs_treat_all": 0.144,
+            "net_reduction_in_interventions_per_100": 57.6159
+          },
+          "lr_tabular": {
+            "net_benefit": 0.3154,
+            "delta_nb_vs_treat_all": 0.1267,
+            "net_reduction_in_interventions_per_100": 50.6623
+          }
+        }
+      }
+    },
+    "curves": {
+      "threshold": [
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.1,
+        0.11,
+        0.12,
+        0.13,
+        0.14,
+        0.15,
+        0.16,
+        0.17,
+        0.18,
+        0.19,
+        0.2,
+        0.21,
+        0.22,
+        0.23,
+        0.24,
+        0.25,
+        0.26,
+        0.27,
+        0.28,
+        0.29,
+        0.3
+      ],
+      "treat_all": [
+        0.31683513419309867,
+        0.3095674228547274,
+        0.30214341664886424,
+        0.2945580190037432,
+        0.28680590932246564,
+        0.2788815305371597,
+        0.27077907582409405,
+        0.2624924744130042,
+        0.2540153764177514,
+        0.24534113660865547,
+        0.23646279703934556,
+        0.2273730684326711,
+        0.21806431022101652,
+        0.2085285091261509,
+        0.19875725615239967,
+        0.18874172185430468,
+        0.17847262972587813,
+        0.16794022754287657,
+        0.15713425647200482,
+        0.14604391774137335,
+        0.13465783664459163,
+        0.12296402362627529,
+        0.11094983216910098,
+        0.09860191317144956,
+        0.08590616546963903,
+        0.07284768211920528
+      ],
+      "treat_none": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "xattn_frozen": {
+        "net_benefit": [
+          0.34750784245381666,
+          0.3467662392560237,
+          0.3460086876023642,
+          0.34552260293694215,
+          0.3450986099992723,
+          0.3451066961000736,
+          0.34485452786665677,
+          0.3451234196267309,
+          0.3450559488467687,
+          0.3445248729400893,
+          0.3439813011297234,
+          0.3440555029959004,
+          0.3435330726881034,
+          0.3437247617509288,
+          0.34322622843594147,
+          0.3435430463576159,
+          0.34395171430966553,
+          0.34445576498556635,
+          0.3440698374473209,
+          0.3436737539212269,
+          0.34326710816777045,
+          0.3428494719885449,
+          0.3424203937222172,
+          0.3419793966151582,
+          0.34152597705437926,
+          0.34105960264900664
+        ],
+        "ci95_low": [
+          0.2925975949808296,
+          0.29214985205016203,
+          0.2912759025849178,
+          0.29037935502447454,
+          0.28978968051815734,
+          0.29027777777777775,
+          0.29020016370265644,
+          0.2910671282360024,
+          0.29057052599528055,
+          0.28991221315262594,
+          0.2892384105960265,
+          0.2890137180700095,
+          0.2885811457751536,
+          0.28816023259570345,
+          0.28771155261221487,
+          0.2880794701986755,
+          0.2876603235811887,
+          0.2896077432501274,
+          0.2891115507009547,
+          0.2886023004531196,
+          0.2880794701986755,
+          0.28754250939681403,
+          0.28699083734010705,
+          0.28642384105960267,
+          0.28584087305288686,
+          0.28524124881740776
+        ],
+        "ci95_high": [
+          0.40031805507145346,
+          0.3995402987177681,
+          0.3987458164209926,
+          0.39822199827238697,
+          0.39775853285787055,
+          0.3984547461368653,
+          0.3982532182454051,
+          0.39812236604455137,
+          0.39756984090736075,
+          0.39699484059756646,
+          0.39640144137125033,
+          0.39657442447177543,
+          0.3959297454719539,
+          0.39638992085285085,
+          0.39600707219360637,
+          0.39571605960264894,
+          0.39627797803671716,
+          0.39703472575989124,
+          0.39642964651242785,
+          0.3958086441268734,
+          0.39517108167770404,
+          0.3950398245928046,
+          0.39490497142338743,
+          0.3944168506254599,
+          0.39391847775394073,
+          0.3935903500473035
+        ]
+      },
+      "catboost": {
+        "net_benefit": [
+          0.34105960264900664,
+          0.3393687473580386,
+          0.3392793562629068,
+          0.33976389288799314,
+          0.3395313295975548,
+          0.33885209713024284,
+          0.3383064216087507,
+          0.3397049969897652,
+          0.3396133059298166,
+          0.33967349453257356,
+          0.3387222438644332,
+          0.33900977609586885,
+          0.3408202345807069,
+          0.3400904538846713,
+          0.3401193688169406,
+          0.34105960264900664,
+          0.3413110906194987,
+          0.3425878757004585,
+          0.3420916831512858,
+          0.3415824329034507,
+          0.34216335540838855,
+          0.34168605691784504,
+          0.3411956817563277,
+          0.340691685062546,
+          0.34017349127879865,
+          0.33964049195837276
+        ],
+        "ci95_low": [
+          0.2857790170791216,
+          0.28342081161053967,
+          0.28348020366018656,
+          0.28433270947307804,
+          0.28421512262571863,
+          0.2832873436350257,
+          0.282859587766947,
+          0.28340984346779047,
+          0.2835074598462358,
+          0.28391152009856774,
+          0.28299084534476043,
+          0.28271050141911075,
+          0.28520306391127426,
+          0.2845158294298175,
+          0.28480398168588017,
+          0.2864238410596026,
+          0.28610948109648754,
+          0.28680378672100526,
+          0.28644534273673344,
+          0.2861493551760195,
+          0.2858719646799117,
+          0.28556917844997315,
+          0.2852580967068856,
+          0.2845796541574687,
+          0.2838821005503218,
+          0.2833491012298959
+        ],
+        "ci95_high": [
+          0.3949111188567445,
+          0.3932048752994222,
+          0.3934424624368012,
+          0.3936114310394471,
+          0.39350120078596895,
+          0.39293598233995586,
+          0.3925236252697373,
+          0.39403973509933776,
+          0.39407779553931643,
+          0.39382026798090247,
+          0.3926957537982079,
+          0.3927901292967518,
+          0.3951567860847363,
+          0.3945243094815054,
+          0.3938762161720219,
+          0.39486754966887416,
+          0.3945060357112918,
+          0.3960901681100356,
+          0.39571794099939794,
+          0.39543394911118857,
+          0.39514348785871967,
+          0.39484517630212995,
+          0.3945386918261816,
+          0.39422369389256806,
+          0.39376340826415446,
+          0.39310548722800376
+        ]
+      },
+      "bert_ft": {
+        "net_benefit": [
+          0.34105960264900664,
+          0.34063688882626464,
+          0.3392793562629068,
+          0.33774834437086093,
+          0.337238920020377,
+          0.3355408388520971,
+          0.33380459855644024,
+          0.3329319686935581,
+          0.33219152013397274,
+          0.33050977976282153,
+          0.32995714842228285,
+          0.3295490381583097,
+          0.3292906726242719,
+          0.3284606687126474,
+          0.32769193034093697,
+          0.32698675496688745,
+          0.3254673484784978,
+          0.3248429274919341,
+          0.32428829448697,
+          0.32380620425235274,
+          0.32339955849889623,
+          0.3219080007159478,
+          0.32160029030209564,
+          0.3213760117733628,
+          0.3212386904206697,
+          0.3211920529801325
+        ],
+        "ci95_low": [
+          0.2854522481700941,
+          0.28574573763562067,
+          0.28429911699779253,
+          0.28246472790095023,
+          0.28196637799286806,
+          0.2799852832965416,
+          0.2783224198229035,
+          0.276791089704997,
+          0.276725089442034,
+          0.27482096103496073,
+          0.2740455784962992,
+          0.2738883632923368,
+          0.27350494694007815,
+          0.2718462283960588,
+          0.2706187147412313,
+          0.26986754966887416,
+          0.2682957498532987,
+          0.2685409237561555,
+          0.2673518534445687,
+          0.2666390728476821,
+          0.26708057395143486,
+          0.2648984249149812,
+          0.26444139526444704,
+          0.2639762693156733,
+          0.26357965674843764,
+          0.26348155156102177
+        ],
+        "ci95_high": [
+          0.3952596723597072,
+          0.39488516274482177,
+          0.3937611265399131,
+          0.39245608983587676,
+          0.39186467506003925,
+          0.39036975717439293,
+          0.3888319443410968,
+          0.3881735400361228,
+          0.38749333942300374,
+          0.38572308640073927,
+          0.3850847292559408,
+          0.3848982970671712,
+          0.3843054336551504,
+          0.38363148118236146,
+          0.38300731747199734,
+          0.3824503311258278,
+          0.3808837706429709,
+          0.3797036848361351,
+          0.37959920873828157,
+          0.3790562913907285,
+          0.37858719646799116,
+          0.37721496330767856,
+          0.3770389186246938,
+          0.37656824871228844,
+          0.37585929484189906,
+          0.37607615894039725
+        ]
+      },
+      "ensemble_cb_bertft": {
+        "net_benefit": [
+          0.338271174625305,
+          0.3368324644215866,
+          0.33753471480452896,
+          0.33659660236107114,
+          0.336911432937923,
+          0.33738042678440033,
+          0.33707865168539325,
+          0.33699578567128236,
+          0.33614980589175614,
+          0.33482211612505774,
+          0.3346318659914297,
+          0.33333333333333337,
+          0.33335992978536666,
+          0.3342755612986594,
+          0.33390564957893876,
+          0.3327814569536424,
+          0.332509011652276,
+          0.33231448463236546,
+          0.33417906596714547,
+          0.335308469850122,
+          0.3355408388520971,
+          0.3381958117057455,
+          0.33997096979043817,
+          0.3394039735099338,
+          0.338821005503218,
+          0.3382213812677389
+        ],
+        "ci95_low": [
+          0.28300365981178116,
+          0.280962026208257,
+          0.2827262693156733,
+          0.28102505038871295,
+          0.28126773888363293,
+          0.2821651949963208,
+          0.2820057295929757,
+          0.2817466887417219,
+          0.2811619852325493,
+          0.2796569382411828,
+          0.27872516556291393,
+          0.27719567959634184,
+          0.27706454958908483,
+          0.27733807139395894,
+          0.2772463412640013,
+          0.2756622516556292,
+          0.27578694777433144,
+          0.2750891492613347,
+          0.27822310140190937,
+          0.2791869989543395,
+          0.2792494481236203,
+          0.2828888491140147,
+          0.28454141340832806,
+          0.28384841795437826,
+          0.28313590150172563,
+          0.28240302743614004
+        ],
+        "ci95_high": [
+          0.3928197978389683,
+          0.391297379174299,
+          0.3922657195755892,
+          0.391595882522315,
+          0.3915453751546466,
+          0.3925772626931567,
+          0.3920687923208572,
+          0.3919325707405178,
+          0.39096064550506204,
+          0.3898833359002002,
+          0.3897594468250876,
+          0.38837511825922416,
+          0.3883746908162451,
+          0.3891132288806332,
+          0.3882399231461041,
+          0.38741721854304634,
+          0.3870452259200268,
+          0.3866552046187807,
+          0.38880192655027085,
+          0.38953032415475763,
+          0.3896247240618102,
+          0.3911804188294254,
+          0.39382200852762406,
+          0.3931337380426784,
+          0.3924225818487081,
+          0.3916863765373699
+        ]
+      },
+      "lr_tabular": {
+        "net_benefit": [
+          0.338271174625305,
+          0.3366211075102156,
+          0.33454390087588126,
+          0.3331413763317017,
+          0.3310166654537516,
+          0.3292862398822664,
+          0.32725649229853415,
+          0.326158940397351,
+          0.32476973433812895,
+          0.32242414908362854,
+          0.3211920529801325,
+          0.3200883002207506,
+          0.3197957392483843,
+          0.3182846066871265,
+          0.31681792167443384,
+          0.3153973509933775,
+          0.3157850616145528,
+          0.3145695364238411,
+          0.3124193687107595,
+          0.3112582781456954,
+          0.31346578366445915,
+          0.3149275102917487,
+          0.3142520185067586,
+          0.3136497424576895,
+          0.3131237757671859,
+          0.31267738883632923
+        ],
+        "ci95_low": [
+          0.2831692227256884,
+          0.280962026208257,
+          0.27832372000284844,
+          0.27669881946443997,
+          0.27410577832763267,
+          0.27224981604120674,
+          0.2701828633082819,
+          0.2692655027092113,
+          0.2678313161300145,
+          0.2652067611273679,
+          0.26392676275808336,
+          0.2623699148533586,
+          0.2622277188223091,
+          0.2602144241641092,
+          0.2586000735835173,
+          0.2574503311258278,
+          0.2573130606086009,
+          0.25589234165393104,
+          0.25350369828846653,
+          0.2525270128964796,
+          0.254939293598234,
+          0.25630481474852335,
+          0.2559976866551755,
+          0.2555141648270788,
+          0.2544492118272549,
+          0.25496688741721857
+        ],
+        "ci95_high": [
+          0.3924712443360056,
+          0.3910824996477385,
+          0.3890256711528875,
+          0.38756838468183125,
+          0.38531493341095985,
+          0.3837472406181015,
+          0.3822466329339981,
+          0.3812462372065021,
+          0.3795596407094465,
+          0.3779608809487139,
+          0.3763245033112583,
+          0.3752838221381267,
+          0.3756592595547753,
+          0.3741883379098691,
+          0.37389931322050524,
+          0.37253725165562906,
+          0.372967138905189,
+          0.3721344880285277,
+          0.3706459103810097,
+          0.36964970372952244,
+          0.3719646799116998,
+          0.3735457311616252,
+          0.3724938764401705,
+          0.37215323767476083,
+          0.37137743680626806,
+          0.37088457899716165
+        ]
+      }
+    }
+  },
+  "robustness": {
+    "is_mock": false,
+    "note": "Mean macro AUROC over seeds. Missing text = empty note string encoded by the same BERT; missing tabular = train median / mode; random missingness imputed with train median (analysis plan section 4). Models were trained on complete data (no modality dropout).",
+    "scenarios": [
+      {
+        "scenario": "full",
+        "label": "Đầy đủ",
+        "cross_attention_auroc": 0.9556,
+        "tabular_only_auroc": 0.9254,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "tab_missing_10",
+        "label": "Thiếu 10% biến số",
+        "cross_attention_auroc": 0.9364,
+        "tabular_only_auroc": 0.8966,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "tab_missing_30",
+        "label": "Thiếu 30% biến số",
+        "cross_attention_auroc": 0.9081,
+        "tabular_only_auroc": 0.8559,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "tab_missing_50",
+        "label": "Thiếu 50% biến số",
+        "cross_attention_auroc": 0.8883,
+        "tabular_only_auroc": 0.8227,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "no_tabular",
+        "label": "Mất toàn bộ bảng",
+        "cross_attention_auroc": 0.6778,
+        "tabular_only_auroc": 0.5,
+        "text_only_auroc": 0.9749
+      },
+      {
+        "scenario": "no_text",
+        "label": "Mất văn bản",
+        "cross_attention_auroc": 0.9018,
+        "tabular_only_auroc": 0.9254,
+        "text_only_auroc": 0.5007
+      }
+    ],
+    "by_model": {
+      "full": {
+        "xattn_frozen": {
+          "mean": 0.9556,
+          "sd": 0.0082
+        },
+        "xattn_ft": {
+          "mean": 0.961,
+          "sd": 0.0146
+        },
+        "concat_frozen": {
+          "mean": 0.929,
+          "sd": 0.0215
+        },
+        "catboost": {
+          "mean": 0.9254,
+          "sd": 0.0025
+        },
+        "lr_tabular": {
+          "mean": 0.9449,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.9292,
+          "sd": 0.0188
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "tfidf_lr": {
+          "mean": 0.917,
+          "sd": 0.0
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.978,
+          "sd": 0.0028
+        }
+      },
+      "tab_missing_10": {
+        "xattn_frozen": {
+          "mean": 0.9364,
+          "sd": 0.011
+        },
+        "xattn_ft": {
+          "mean": 0.9427,
+          "sd": 0.0148
+        },
+        "concat_frozen": {
+          "mean": 0.8954,
+          "sd": 0.02
+        },
+        "catboost": {
+          "mean": 0.8966,
+          "sd": 0.003
+        },
+        "lr_tabular": {
+          "mean": 0.9138,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.8964,
+          "sd": 0.0095
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9757,
+          "sd": 0.0029
+        }
+      },
+      "tab_missing_30": {
+        "xattn_frozen": {
+          "mean": 0.9081,
+          "sd": 0.0164
+        },
+        "xattn_ft": {
+          "mean": 0.9099,
+          "sd": 0.0076
+        },
+        "concat_frozen": {
+          "mean": 0.8503,
+          "sd": 0.0135
+        },
+        "catboost": {
+          "mean": 0.8559,
+          "sd": 0.0049
+        },
+        "lr_tabular": {
+          "mean": 0.8694,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.8475,
+          "sd": 0.0147
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9755,
+          "sd": 0.0029
+        }
+      },
+      "tab_missing_50": {
+        "xattn_frozen": {
+          "mean": 0.8883,
+          "sd": 0.0124
+        },
+        "xattn_ft": {
+          "mean": 0.889,
+          "sd": 0.014
+        },
+        "concat_frozen": {
+          "mean": 0.8134,
+          "sd": 0.0199
+        },
+        "catboost": {
+          "mean": 0.8227,
+          "sd": 0.0056
+        },
+        "lr_tabular": {
+          "mean": 0.8223,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.8124,
+          "sd": 0.0226
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.977,
+          "sd": 0.0018
+        }
+      },
+      "no_tabular": {
+        "xattn_frozen": {
+          "mean": 0.6778,
+          "sd": 0.0422
+        },
+        "xattn_ft": {
+          "mean": 0.6581,
+          "sd": 0.0555
+        },
+        "concat_frozen": {
+          "mean": 0.7437,
+          "sd": 0.025
+        },
+        "catboost": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "lr_tabular": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "bert_ft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        },
+        "bert_frozen": {
+          "mean": 0.8986,
+          "sd": 0.027
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9749,
+          "sd": 0.0035
+        }
+      },
+      "no_text": {
+        "xattn_frozen": {
+          "mean": 0.9018,
+          "sd": 0.0079
+        },
+        "xattn_ft": {
+          "mean": 0.9103,
+          "sd": 0.0144
+        },
+        "concat_frozen": {
+          "mean": 0.9306,
+          "sd": 0.0212
+        },
+        "catboost": {
+          "mean": 0.9254,
+          "sd": 0.0025
+        },
+        "lr_tabular": {
+          "mean": 0.9449,
+          "sd": 0.0
+        },
+        "ft_transformer": {
+          "mean": 0.9292,
+          "sd": 0.0188
+        },
+        "bert_ft": {
+          "mean": 0.5007,
+          "sd": 0.0061
+        },
+        "bert_frozen": {
+          "mean": 0.4997,
+          "sd": 0.0018
+        },
+        "tfidf_lr": {
+          "mean": 0.5,
+          "sd": 0.0
+        },
+        "ensemble_cb_bertft": {
+          "mean": 0.9254,
+          "sd": 0.0025
+        }
+      }
+    }
+  },
+  "rag": {
+    "is_mock": false,
+    "evaluated_at": "2026-11-23T10:48:08.373260+00:00",
+    "qdrant_target": "in_memory_ephemeral",
+    "qdrant_points_count": 64,
+    "qdrant_vector_dim_verified": 768,
+    "qdrant_corpus_sync_verified": true,
+    "qdrant_chunk_id_match_count": 64,
+    "qdrant_content_sha256_match_count": 64,
+    "qdrant_metadata_match_count": 64,
+    "qdrant_checked_metadata_fields": [
+      "source_id",
+      "version",
+      "target_disease",
+      "section_title",
+      "page_or_section",
+      "clinical_category",
+      "evidence_level",
+      "source_verified"
+    ],
+    "qdrant_vector_semantics_verified": false,
+    "qdrant_sync_scope_note": "Read-only check verified 768-D vector dimension, chunk_id set, text_content SHA-256, and 8 provenance metadata fields against data/guidelines/*.json; it does NOT verify semantic embedding quality because offline deterministic 768-D hashed fallback vectors are active instead of all-mpnet-base-v2.",
+    "corpus_size_chunks": 64,
+    "ingested_guideline_json_chunks": 64,
+    "dense_encoder": "768d_hashed_deterministic_cpu_fallback (all-mpnet-base-v2 offline unavailable)",
+    "dense_encoder_is_semantic_model": false,
+    "retrieval_scope_note": "Recall/MRR/nDCG metrics reflect live Qdrant RRF using deterministic 768-D hashed fallback vectors (all-mpnet-base-v2 offline unavailable), NOT a real semantic encoder.",
+    "query_count": 60,
+    "cohens_kappa": 0.9449,
+    "modes": {
+      "dense_only": {
+        "recall_at_1": 0.7833,
+        "recall_at_3": 0.9167,
+        "recall_at_5": 0.9833,
+        "mrr": 0.8688,
+        "ndcg_at_5": 0.8729
+      },
+      "bm25_only": {
+        "recall_at_1": 0.9,
+        "recall_at_3": 0.9833,
+        "recall_at_5": 0.9833,
+        "mrr": 0.9352,
+        "ndcg_at_5": 0.9367
+      },
+      "hybrid_rrf": {
+        "recall_at_1": 0.9,
+        "recall_at_3": 0.95,
+        "recall_at_5": 1.0,
+        "mrr": 0.9319,
+        "ndcg_at_5": 0.9354
+      }
+    },
+    "grounding_audit_50_cases": {
+      "audit_status": "canonical_strict_holdout",
+      "audit_method": "pipeline_offset_invariant_and_out_of_note_string_rejection_only",
+      "audit_scope_limitation": "Automatic metrics verify character-offset substring matching on display_note and rejection of out-of-note probe strings only; they do NOT establish semantic correctness, negation fidelity, or clinical validity. Evaluated on canonical strict N=302 hold-out split.",
+      "notes_source_path": "data/processed_rebuilt_strict/test.parquet",
+      "notes_source_is_canonical_strict_302": true,
+      "dataset_total_rows": 302,
+      "cases_tested": 50,
+      "notes_from_dataset_count": 50,
+      "notes_from_fallback_template_count": 0,
+      "total_genuine_claims": 200,
+      "grounded_claims": 199,
+      "genuine_claim_grounding_rate": 0.995,
+      "injected_out_of_note_probes": 50,
+      "rejected_out_of_note_probes": 50,
+      "out_of_note_probe_rejection_rate": 1.0,
+      "span_substring_match_rate": 1.0,
+      "manual_semantic_precision_20_spans": null,
+      "manual_semantic_audit_status": "pending_human_review",
+      "manual_audit_sample_file": "results/grounding_manual_audit_20_samples.json",
+      "sampled_20_spans_checked": 0,
+      "exported_samples_for_review": 20
+    }
+  },
+  "latency": {
+    "is_mock": false,
+    "measured_at": "2026-11-23T10:51:41.663379+00:00",
+    "measurement_mode": "in_process_asgi_testclient",
+    "target_url": "in-process://fastapi.TestClient",
+    "device_info": "Windows 11 | AMD64 | CPU (20 logical cores)",
+    "note_length_chars": 340,
+    "num_warm_requests": 100,
+    "endpoints": {
+      "/api/v1/agent/explain": {
+        "status_codes_observed": [
+          200
+        ],
+        "cold_ms": 147.48,
+        "mean_ms": 20.14,
+        "p50_ms": 19.15,
+        "p95_ms": 27.92,
+        "p99_ms": 32.05,
+        "cold_status_code": 200
+      },
+      "/api/v1/predict/baseline": {
+        "status_codes_observed": [
+          200
+        ],
+        "cold_ms": 64713.53,
+        "mean_ms": 226.25,
+        "p50_ms": 203.07,
+        "p95_ms": 332.14,
+        "p99_ms": 387.04,
+        "cold_status_code": 200,
+        "note": "Heuristic baseline fallback executed (MCDSS_ALLOW_HEURISTIC_BASELINE=1)."
+      },
+      "/api/v1/predict/multimodal": {
+        "status_codes_observed": [
+          200
+        ],
+        "cold_ms": 2022.38,
+        "mean_ms": 756.53,
+        "p50_ms": 781.97,
+        "p95_ms": 943.31,
+        "p99_ms": 993.1,
+        "cold_status_code": 200,
+        "note": "Checkpoint + Bio_ClinicalBERT multimodal inference measured (HTTP 200)."
+      }
+    }
+  },
+  "latency_docker_lightweight": {
+    "is_mock": false,
+    "measured_at": "2026-11-19T03:33:53.482548+00:00",
+    "measurement_mode": "http_docker_end_to_end",
+    "target_url": "http://127.0.0.1:8000",
+    "device_info": "Windows 11 | AMD64 | CPU (16 logical cores)",
+    "note_length_chars": 340,
+    "num_warm_requests": 200,
+    "endpoints": {
+      "/api/v1/agent/explain": {
+        "status_codes_observed": [
+          200
+        ],
+        "cold_ms": 169.03,
+        "mean_ms": 63.49,
+        "p50_ms": 62.92,
+        "p95_ms": 84.23,
+        "p99_ms": 92.25,
+        "cold_status_code": 200
+      },
+      "/api/v1/predict/baseline": {
+        "status_codes_observed": [
+          503
+        ],
+        "cold_ms": 32.76,
+        "mean_ms": 47.57,
+        "p50_ms": 47.77,
+        "p95_ms": 51.24,
+        "p99_ms": 52.4,
+        "cold_status_code": 503,
+        "note": "HTTP 503 baseline_models_unavailable safeguard (default when Member 1 fitted baseline models are absent)."
+      },
+      "/api/v1/predict/multimodal": {
+        "status_codes_observed": [
+          503
+        ],
+        "cold_ms": 54.87,
+        "mean_ms": 48.3,
+        "p50_ms": 48.16,
+        "p95_ms": 50.55,
+        "p99_ms": 52.45,
+        "cold_status_code": 503,
+        "note": "HTTP 503 safeguard measured (multimodal inference NOT exercised: missing torch in deploy image or missing Bio_ClinicalBERT cache)."
+      }
+    }
+  },
+  "superseded": {
+    "member2_backlog09_2026-11-19": "DCA, robustness, temporal and fairness numbers produced by scripts/evaluate_research_hardening_member2.py on the 2026-11-18 dataset are withdrawn: that dataset leaked labels through unredacted diagnoses and reused MTSamples notes (TF-IDF AUROC 0.962 with numbers masked); the script trained its own fusion model without validation and with a fixed temperature of 1.15, and the intervention formula divided by p_t instead of p_t/(1-p_t)."
   }
 }

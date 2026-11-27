@@ -1,5 +1,12 @@
 # BACKLOG 10 – THÀNH VIÊN 2 (Biomedical Data Engineer & Privacy)
 
+> **RÀ SOÁT CỦA THÀNH VIÊN 1 (2026-11-23)**
+> - ❌→✅ `references.bib`: `moons2025probast` (Annals 2025) **không tồn tại**; `moons2024tripod` (E&E riêng) không tìm thấy; `probastai2024bmj` sai tác giả/năm/tên bài (đúng: Moons et al., BMJ 2025;388:e082505); Hunik đã xuất bản JMIR Med Inform 2025;13:e62862; QĐ suy tim là 1857 (không phải 1856). Đã sửa; còn 36 mục.
+> - ❌→✅ Bảng 1 trong `02_clinical_cohort.tex` tính trên bộ dữ liệu bị thu hồi → thay bằng `generated/tab_cohort.tex` sinh tự động từ dữ liệu canonical (lộ ra bất thường: tuổi trung vị COPD ~35, viêm phổi ~100; chỉ 478 bệnh nhân Synthea gốc).
+> - ❌→✅ Sơ đồ TRIPOD flow ghi N₁ = 2.450 và số loại trừ n = 450 / 3.999 không khớp dữ liệu nguồn (1.171 bệnh nhân Synthea; 2.000 bản ghi từ 478 bệnh nhân gốc; 305 ghi chú MTSamples) – TV1 đã sửa cả TikZ và SVG.
+> - ⚠️ PROBAST miền Analysis đổi thành Unclear; mục 4.1/4.8 phụ lục đã sửa.
+
+
 **Trạng thái thực thi:** [✓] ĐÃ HOÀN THÀNH 100% CÁC NHIỆM VỤ  
 **Ngày hoàn tất:** 2026-11-19  
 **Người thực hiện:** Thành viên 2 (Biomedical Data Engineer & Privacy)  

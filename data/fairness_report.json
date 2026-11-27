@@ -2,114 +2,174 @@
   "metadata": {
     "total_test_samples": 302,
     "n_bootstrap": 2000,
-    "seed": 42,
-    "model_evaluated": "Multimodal Cross-Attention CDSS"
+    "model_evaluated": "xattn_frozen",
+    "seed": 101,
+    "disclaimer": "Synthetic cohort: subgroup results describe the pipeline, not fairness on real patients."
   },
   "subgroups": {
     "gender_M": {
-      "sample_size": 169,
-      "sample_ratio": 0.5596026490066225,
-      "macro_auroc": 0.9762453724066497,
+      "sample_size": 206,
+      "class_counts": [
+        8,
+        38,
+        106,
+        54
+      ],
+      "classes_in_auroc": [
+        "ASTHMA",
+        "COPD",
+        "HEART_FAILURE",
+        "PNEUMONIA"
+      ],
+      "macro_auroc": 0.9509,
       "macro_auroc_ci95": [
-        0.9581144392686118,
-        0.9902063624759646
+        0.9262,
+        0.9705
       ],
-      "macro_f1": 0.9008073397045082,
+      "macro_f1": 0.6205,
       "macro_f1_ci95": [
-        0.8576042001196142,
-        0.9386423614132956
-      ],
-      "accuracy": 0.893491124260355
+        0.5555,
+        0.6836
+      ]
     },
     "gender_F": {
-      "sample_size": 124,
-      "sample_ratio": 0.4105960264900662,
-      "macro_auroc": 0.9667183797270318,
+      "sample_size": 96,
+      "class_counts": [
+        63,
+        33,
+        0,
+        0
+      ],
+      "classes_in_auroc": [
+        "ASTHMA",
+        "COPD"
+      ],
+      "macro_auroc": 0.9245,
       "macro_auroc_ci95": [
-        0.9397152009278198,
-        0.9880324449829674
+        0.8496,
+        0.9772
       ],
-      "macro_f1": 0.8732289417315855,
+      "macro_f1": 0.8547,
       "macro_f1_ci95": [
-        0.8135512837254747,
-        0.9217199537512037
+        0.7777,
+        0.9208
       ],
-      "accuracy": 0.8629032258064516
+      "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
     },
     "age_under_65": {
-      "sample_size": 146,
-      "sample_ratio": 0.48344370860927155,
-      "macro_auroc": 0.9837987046913865,
+      "sample_size": 237,
+      "class_counts": [
+        66,
+        64,
+        106,
+        1
+      ],
+      "classes_in_auroc": [
+        "ASTHMA",
+        "COPD",
+        "HEART_FAILURE",
+        "PNEUMONIA"
+      ],
+      "macro_auroc": 0.9141,
       "macro_auroc_ci95": [
-        0.9704672344390399,
-        0.9940589705093081
+        0.8926,
+        0.9333
       ],
-      "macro_f1": 0.8790687176878543,
+      "macro_f1": 0.6757,
       "macro_f1_ci95": [
-        0.8075955046094295,
-        0.9393660745608406
-      ],
-      "accuracy": 0.9178082191780822
+        0.642,
+        0.7025
+      ]
     },
     "age_65_and_older": {
-      "sample_size": 156,
-      "sample_ratio": 0.5165562913907285,
-      "macro_auroc": 0.7379484860948166,
+      "sample_size": 65,
+      "class_counts": [
+        5,
+        7,
+        0,
+        53
+      ],
+      "classes_in_auroc": [
+        "ASTHMA",
+        "COPD",
+        "PNEUMONIA"
+      ],
+      "macro_auroc": 0.8144,
       "macro_auroc_ci95": [
-        0.7095597991294397,
-        0.7630217765820343
+        0.6854,
+        0.9361
       ],
-      "macro_f1": 0.6424895354422562,
+      "macro_f1": 0.5152,
       "macro_f1_ci95": [
-        0.6018022430802416,
-        0.9042937580128919
+        0.4413,
+        0.591
       ],
-      "accuracy": 0.8333333333333334
+      "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
     },
     "smoking_NEVER": {
-      "sample_size": 133,
-      "sample_ratio": 0.44039735099337746,
-      "macro_auroc": 0.953284105575078,
+      "sample_size": 160,
+      "class_counts": [
+        57,
+        49,
+        0,
+        54
+      ],
+      "classes_in_auroc": [
+        "ASTHMA",
+        "COPD",
+        "PNEUMONIA"
+      ],
+      "macro_auroc": 0.9244,
       "macro_auroc_ci95": [
-        0.921597284939689,
-        0.9814046770132212
+        0.8943,
+        0.9504
       ],
-      "macro_f1": 0.7306732601397332,
+      "macro_f1": 0.6388,
       "macro_f1_ci95": [
-        0.7143704160694984,
-        0.7434810479375698
+        0.5669,
+        0.7088
       ],
-      "accuracy": 0.9473684210526315
+      "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
     },
     "smoking_FORMER": {
-      "sample_size": 99,
-      "sample_ratio": 0.32781456953642385,
-      "macro_auroc": 0.9542124993740021,
+      "sample_size": 142,
+      "class_counts": [
+        14,
+        22,
+        106,
+        0
+      ],
+      "classes_in_auroc": [
+        "ASTHMA",
+        "COPD",
+        "HEART_FAILURE"
+      ],
+      "macro_auroc": 0.9662,
       "macro_auroc_ci95": [
-        0.914098705400085,
-        0.9836876453771453
+        0.9239,
+        0.996
       ],
-      "macro_f1": 0.8504689754689754,
+      "macro_f1": 0.8565,
       "macro_f1_ci95": [
-        0.7711610859079544,
-        0.9122222819850831
+        0.7579,
+        0.9407
       ],
-      "accuracy": 0.8080808080808081
+      "note": "one-vs-rest AUROC averaged over the classes present in this subgroup only"
     },
     "smoking_CURRENT": {
-      "sample_size": 70,
-      "sample_ratio": 0.23178807947019867,
-      "macro_auroc": 0.9289157746089421,
-      "macro_auroc_ci95": [
-        0.8553705002156128,
-        0.987806294810682
+      "sample_size": 0,
+      "class_counts": [
+        0,
+        0,
+        0,
+        0
       ],
-      "macro_f1": 0.8251373626373626,
-      "macro_f1_ci95": [
-        0.7116485086710961,
-        0.9126137963022198
-      ],
-      "accuracy": 0.8285714285714286
+      "classes_in_auroc": [],
+      "macro_auroc": null,
+      "macro_auroc_ci95": null,
+      "macro_f1": null,
+      "macro_f1_ci95": null,
+      "note": "fewer than two classes present (or empty subgroup) - not estimable"
     }
   }
 }

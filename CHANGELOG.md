@@ -4,6 +4,31 @@ Tất cả các thay đổi quan trọng trong dự án M-CDSS (Multimodal Clini
 
 ---
 
+## [Phase 3 / Backlog 08–10, Thành viên 1 + rà soát] - 2026-11-23
+
+### Đã sửa – dữ liệu canonical (thay bản 2026-11-18)
+- `scripts/rebuild_canonical_dataset.py` viết lại: dùng pipeline Phase 1 (`process_and_save_patient_splits`) trên `data/raw_rebuilt/` + bộ khử định danh Phase 3. **Cùng bệnh nhân, cùng split** với benchmark 2026-10-28 (1425/273/302); mọi cột ngoài ghi chú giống hệt.
+- Bản 2026-11-18 bị loại vì: đọc `data/raw/` (bản cũ, không che chẩn đoán), gán lại nhãn để ép 500 ca/lớp, xáo lại split và băm `source_note_group` theo từng bệnh nhân (audit pass vô nghĩa). Đo lại: 86–90% ghi chú còn tên chẩn đoán; 42% ghi chú test trùng thân ghi chú train gắn một nhãn (độ thuần 0,92); TF-IDF che hết số đạt AUROC 0,962.
+- `scripts/audit_data_leakage.py` thêm kiểm tra nội dung: tỷ lệ tên chẩn đoán chưa che, và trùng lặp thân ghi chú **mang thông tin nhãn** (template chung cho mọi lớp được phép).
+- `src/data_pipeline/manifest.py`: thêm `content_sha256` (không phụ thuộc phiên bản pyarrow); `verify_manifest` kiểm tra hash nội dung.
+
+### Đã sửa – mô hình & đánh giá
+- `src/models/backbone_loader.py`: bỏ fallback BERT ngẫu nhiên ở `text_encoder.py`, `train_multimodal.py`, `evaluate_clinical_utility.py`; thiếu trọng số ⇒ lỗi rõ ràng.
+- `src/models/checkpoint_io.py`: không ghi checkpoint khi `--eval-only`/0 epoch; smoke test ghi ra `*.smoke.pt`; checkpoint mang `provenance` (revision backbone, hash manifest, git commit).
+- `scripts/run_research_experiments.py` (RQ1–RQ4, temporal), `scripts/build_results_registry.py`, `scripts/export_latex_tables.py`, `src/evaluation/stats.py`, `src/data_pipeline/note_variants.py`, `src/models/text_tail.py`.
+- `data/checkpoints/multimodal_best.pt` thay mới: cross-attention (BERT đóng băng), seed chọn theo NLL validation thấp nhất trong 5 seed.
+- `src/api/baseline_service.py` + `/predict/baseline` phục vụ mô hình baseline đã huấn luyện (seed 42); `/evaluation/benchmark` không còn số liệu gán cứng trong mã nguồn.
+
+### Thu hồi
+- Kết quả Backlog 09 của Thành viên 2 (DCA, missing-modality, temporal, fairness, error analysis 30 ca) và script sinh ra chúng được chuyển vào `data/legacy_invalid_2026-11-19/` kèm README lý do.
+- `docs/11_ANALYSIS_PLAN.md` mục 3.5: công thức số can thiệp tránh được sửa thành (NB_model − NB_all)·(1 − p_t)/p_t·100 (Vickers 2016); phụ lục A đăng ký trước phần M1, hash đóng băng tại `results/preregistration/`.
+- `results/registry.json`: các mục `rag`, `latency` của Thành viên 3 bị mất khi merge PR #22 đã được khôi phục từ commit `9ecaf31`.
+
+### Đính chính rà soát 2026-11-18
+- Nhận định "trọng số Bio_ClinicalBERT chỉ là file `.incomplete`" là chưa chính xác: snapshot `d5892b39…` có `pytorch_model.bin` đầy đủ; chỉ các blob tải dở là `.incomplete`. Kết quả AUROC 0,58 nhiều khả năng sinh trên máy khác. Lỗi checkpoint 0 epoch và lỗi fallback ngẫu nhiên vẫn đúng và đã được sửa.
+
+---
+
 ## [Phase 3 / Backlog 08] - 2026-11-18: Toàn Vẹn Khoa Học & Khả Năng Tái Lập (Integrity & Reproducibility)
 
 ### 1. Phân Tích Nguyên Nhân Gốc Của Sai Số $N = 287 / 286$ vs $N = 302$ (Root Cause Analysis)

@@ -1,5 +1,16 @@
 # BACKLOG 10 – THÀNH VIÊN 1 (Lead ML / Modeling & Evaluation)
 
+> **Trạng thái 2026-11-27: HOÀN THÀNH phần TV1** (+ sửa phần của TV2/TV3 phát hiện khi rà soát)
+>
+> | Nhiệm vụ | Kết quả |
+> | :--- | :--- |
+> | 1.1 Abstract / Intro / Methods | ✅ viết lại `00`, `01`, `03`; tiêu đề và từ khoá bỏ khẳng định quá mức |
+> | 1.2 Results | ✅ `07` dùng `\input{generated/*}` + macro; Discussion/Limitations trong `08`; `scripts/check_paper.py`: 0 macro thiếu, 0 bib thiếu, 0 ref hỏng, 0 TODO. **Chưa biên dịch PDF** (máy không có TeX). |
+> | 1.3 Model card & release notes | ✅ `MODEL_CARD.md` (sinh từ registry), `RELEASE_NOTES.md` (chưa gắn tag – chờ nhóm duyệt) |
+> | 1.4 Q&A | ✅ `docs/thuyết trình/QA_MO_HINH_VA_KET_QUA_MEMBER_1.md` (sinh từ registry) |
+> | Bổ sung | Slide 13–17 sinh từ registry (`scripts/export_slide_results.py`); điền số vào kịch bản video & Q&A TV3; Bảng 1 sinh tự động; sửa 2 tài liệu tham khảo không tồn tại; sửa sơ đồ TRIPOD flow; README gỡ bảng số liệu bịa. |
+
+
 ## Nhiệm vụ 1.1 – Abstract, Introduction, Methods
 - Viết lại `docs/paper_latex/sections/00_abstract.tex`: bỏ hoàn toàn `[TODO]`; nêu đúng kết quả RQ1–RQ5 (kể cả "fusion không vượt text-only/ensemble" nếu đúng như vậy, và phát hiện văn bản mã hoá lại sinh hiệu).
 - Bỏ các khẳng định không có bằng chứng: "hiệu chuẩn đạt chuẩn lâm sàng", "chứng minh tính bổ trợ", "100% chống ảo giác" (thay bằng "100% span khớp chuỗi trên bộ test; độ đúng ngữ nghĩa kiểm thủ công x/20").

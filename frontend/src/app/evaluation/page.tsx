@@ -315,10 +315,13 @@ export default function AblationEvaluationPage() {
               <div className="space-y-1">
                 <div className="font-bold">Nguồn dữ liệu: results/registry.json (Phase 3 Registry)</div>
                 <p>
-                  Các khối <strong>RQ5 (Đánh giá RAG 60 truy vấn / 64 chunks &amp; kiểm tra khớp chuỗi sơ bộ 50 ca)</strong> và{" "}
-                  <strong>Đo độ trễ Latency (200 requests)</strong> là <strong>số liệu đo thực tế</strong> của Thành viên 3.
-                  Các khối <strong>RQ1 / RQ2 / RQ4 Missing-Modality</strong> hiện đang hiển thị khung dữ liệu mock ({" "}
-                  <code>is_mock = true</code>) chờ Thành viên 1 &amp; 2 chạy đa seed ở Backlog 08&ndash;09.
+                  Mọi khối dưới đây đọc trực tiếp từ <code>results/registry.json</code>; khối nào còn là dữ liệu giả lập sẽ
+                  hiện nhãn <strong>MOCK</strong> theo cờ <code>is_mock</code>.
+                  {registry?.metadata?.is_mock_for_member1_member2 === false && (
+                    <> RQ1/RQ2/RQ4 là kết quả thực nghiệm 5 seed trên tập test strict (N = 302).</>
+                  )}{" "}
+                  <strong>Lưu ý:</strong> dữ liệu bán tổng hợp; các lớp suy tim và viêm phổi trong tập test mỗi lớp chỉ đến từ
+                  một bệnh nhân Synthea gốc – không diễn giải như hiệu năng lâm sàng.
                 </p>
               </div>
             </div>
@@ -486,7 +489,57 @@ export default function AblationEvaluationPage() {
               </div>
             )}
 
-            {/* Mock Placeholder Panels for RQ2 & RQ4 waiting on Member 1 & 2 */}
+            {/* RQ1: fair multi-seed comparison (results/registry.json) */}
+            {registry?.rq1_multiseed_comparison?.models && (
+              <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                    RQ1: So Sánh Công Bằng (5 seed, test strict N = 302)
+                  </h4>
+                  {registry.rq1_multiseed_comparison.is_mock !== false && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 font-mono font-semibold">
+                      MOCK
+                    </span>
+                  )}
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-left text-slate-500 border-b border-slate-200 dark:border-slate-800">
+                        <th className="py-2 pr-3">Mô hình</th>
+                        <th className="py-2 pr-3">AUROC (TB ± SD)</th>
+                        <th className="py-2 pr-3">CI 95% (seed đại diện)</th>
+                        <th className="py-2 pr-3">Macro-F1</th>
+                        <th className="py-2 pr-3">ECE</th>
+                        <th className="py-2">p Holm vs triển khai</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {registry.rq1_multiseed_comparison.models.map((m) => (
+                        <tr key={m.model} className="border-b border-slate-100 dark:border-slate-800/60">
+                          <td className="py-1.5 pr-3 font-medium">{m.label ?? m.model}</td>
+                          <td className="py-1.5 pr-3 font-mono">
+                            {m.auroc_mean.toFixed(3)} ± {m.auroc_sd.toFixed(3)}
+                          </td>
+                          <td className="py-1.5 pr-3 font-mono">
+                            [{m.auroc_ci95[0].toFixed(3)}; {m.auroc_ci95[1].toFixed(3)}]
+                          </td>
+                          <td className="py-1.5 pr-3 font-mono">{m.f1_mean.toFixed(3)}</td>
+                          <td className="py-1.5 pr-3 font-mono">{m.ece_mean.toFixed(3)}</td>
+                          <td className="py-1.5 font-mono">
+                            {m.holm_adjusted_p == null ? "—" : m.holm_adjusted_p.toFixed(3)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {registry.rq1_multiseed_comparison.note && (
+                  <p className="text-[11px] text-slate-500">{registry.rq1_multiseed_comparison.note}</p>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {registry?.rq2_text_signal_decomposition?.variants && (
                 <div className="p-6 rounded-2xl border border-amber-500/30 bg-white dark:bg-slate-900 shadow-sm space-y-4">
@@ -494,9 +547,11 @@ export default function AblationEvaluationPage() {
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white">
                       RQ2: Phân Rã Tín Hiệu Văn Bản
                     </h4>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 font-mono font-semibold">
-                      MOCK (Chờ TV1)
-                    </span>
+                    {registry.rq2_text_signal_decomposition.is_mock !== false && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 font-mono font-semibold">
+                        MOCK
+                      </span>
+                    )}
                   </div>
                   <div className="w-full h-64">
                     <ResponsiveContainer width="100%" height="100%">
@@ -521,9 +576,11 @@ export default function AblationEvaluationPage() {
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white">
                       RQ4: Độ Bền Khi Khuyết Phương Thức
                     </h4>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 font-mono font-semibold">
-                      MOCK (Chờ TV2)
-                    </span>
+                    {registry.rq4_missing_modality.is_mock !== false && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200 font-mono font-semibold">
+                        MOCK
+                      </span>
+                    )}
                   </div>
                   <div className="w-full h-64">
                     <ResponsiveContainer width="100%" height="100%">

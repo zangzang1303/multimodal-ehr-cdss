@@ -36,6 +36,19 @@ def compute_sha256(file_path: Union[str, Path]) -> str:
     return h.hexdigest()
 
 
+def compute_content_sha256(df: pd.DataFrame) -> str:
+    """Serialisation-independent hash of a split (column names, dtypes as text, values).
+
+    Parquet bytes differ across pyarrow versions even for identical data, so the
+    file SHA-256 alone cannot be checked on a teammate's machine. This hash is
+    computed from the row-ordered values and is what verify_manifest() requires.
+    """
+    h = hashlib.sha256()
+    h.update("|".join(map(str, df.columns)).encode("utf-8"))
+    h.update(pd.util.hash_pandas_object(df.astype(str), index=False).values.tobytes())
+    return h.hexdigest()
+
+
 def generate_manifest(
     data_dir: Union[str, Path] = DEFAULT_CANONICAL_DIR,
     output_path: Union[str, Path] = DEFAULT_MANIFEST_PATH,
@@ -45,7 +58,7 @@ def generate_manifest(
     """Generates the canonical data manifest dictionary and writes DATA_MANIFEST.json."""
     data_path = Path(data_dir)
     manifest = {
-        "manifest_version": "1.0.0",
+        "manifest_version": "1.1.0",
         "canonical_data_dir": str(data_path.relative_to(ROOT_DIR) if data_path.is_relative_to(ROOT_DIR) else data_path).replace("\\", "/"),
         "recreation_command": reproduce_command,
         "commit": commit_hash or "HEAD",
@@ -69,6 +82,7 @@ def generate_manifest(
         manifest["splits"][split_name] = {
             "path": rel_file_path,
             "sha256": sha256,
+            "content_sha256": compute_content_sha256(df),
             "row_count": row_count,
             "class_distribution": class_dist_formatted,
             "features_count": len(df.columns),
@@ -120,7 +134,18 @@ def verify_manifest(
 
         # 1. SHA-256 verification
         actual_sha = compute_sha256(parquet_file)
-        if actual_sha != expected["sha256"]:
+        expected_content = expected.get("content_sha256")
+        if expected_content:
+            actual_content = compute_content_sha256(pd.read_parquet(parquet_file))
+            if actual_content != expected_content:
+                failures.append(
+                    f"Content checksum mismatch for {split_name}.parquet: "
+                    f"expected {expected_content[:16]}..., got {actual_content[:16]}..."
+                )
+            elif actual_sha != expected["sha256"]:
+                logger.warning("%s.parquet: file bytes differ but content hash matches "
+                               "(different pyarrow serialisation)", split_name)
+        elif actual_sha != expected["sha256"]:
             failures.append(
                 f"Checksum mismatch for {split_name}.parquet: "
                 f"expected {expected['sha256'][:16]}..., got {actual_sha[:16]}..."

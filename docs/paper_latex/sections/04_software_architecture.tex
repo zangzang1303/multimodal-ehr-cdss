@@ -53,7 +53,7 @@ Bảng~\ref{tab:rest_endpoints} tổng hợp toàn bộ hệ thống điểm cu�
 
 \begin{table}[htbp]
 \centering
-\caption{Độ trễ HTTP đầu-cuối thực tế qua Docker M-CDSS trên CPU (200 lượt gọi ấm, đơn vị: ms)}
+\caption{Độ trễ trên CPU (ms). Khối trên: HTTP đầu-cuối qua Docker bản nhẹ (200 lượt; hai điểm cuối dự đoán trả 503 vì image không có torch). Khối dưới: đo nội tiến trình với mô hình thật.}
 \label{tab:system_latency}
 \begin{tabularx}{\linewidth}{@{}lrrrrrr@{}}
 \toprule
@@ -62,8 +62,13 @@ Bảng~\ref{tab:rest_endpoints} tổng hợp toàn bộ hệ thống điểm cu�
 \texttt{POST /api/v1/agent/explain} & 200 & 169.03 & 63.49 & 62.92 & 84.23 & 92.25 \\
 \texttt{POST /api/v1/predict/baseline} (safeguard) & 503 & 32.76 & 47.57 & 47.77 & 51.24 & 52.40 \\
 \texttt{POST /api/v1/predict/multimodal} (safeguard) & 503 & 54.87 & 48.30 & 48.16 & 50.55 & 52.45 \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Đo nội tiến trình (\latMode), mô hình thật, CPU: \latDevice; 100 lượt gọi ấm}} \\
+\texttt{POST /api/v1/agent/explain} & \latStatusExplain & -- & -- & \latPfiftyExplain & \latPninetyfiveExplain & -- \\
+\texttt{POST /api/v1/predict/baseline} (3 mô hình) & \latStatusBaseline & -- & -- & \latPfiftyBaseline & \latPninetyfiveBaseline & -- \\
+\texttt{POST /api/v1/predict/multimodal} (BERT đầy đủ) & \latStatusMultimodal & -- & -- & \latPfiftyMultimodal & \latPninetyfiveMultimodal & -- \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Ở chế độ giải trình mặc định \texttt{deterministic\_template}, toàn bộ chuỗi HTTP FastAPI $\leftrightarrow$ Qdrant lai (\texttt{v1.20.0}, 64 vector) $\leftrightarrow$ kiểm chứng tọa độ ký tự trên \texttt{/api/v1/agent/explain} đạt $p_{50} = 62.92\,\text{ms}$ ($p_{95} = 84.23\,\text{ms}$). Điểm cuối \texttt{/api/v1/predict/baseline} mặc định trả về HTTP 503 (\texttt{baseline\_models\_unavailable}, $p_{95} = 51.24\,\text{ms}$) khi chưa có trọng số baseline thật từ Thành viên 1, còn \texttt{/api/v1/predict/multimodal} trả về HTTP 503 an toàn có cấu trúc ($p_{95} = 50.55\,\text{ms}$) trong image triển khai nhẹ (\texttt{requirements-deploy.txt} không đóng gói \texttt{torch} và thiếu cache \texttt{Bio\_ClinicalBERT}). \texttt{[TODO-TV1/TV2: Bổ sung độ trễ suy luận \texttt{HTTP 200} của \texttt{/predict/baseline} và \texttt{/predict/multimodal} trên máy có đầy đủ trọng số, cache \texttt{Bio\_ClinicalBERT} và phần cứng mục tiêu]}.
+Ở chế độ giải trình mặc định \texttt{deterministic\_template}, toàn bộ chuỗi HTTP FastAPI $\leftrightarrow$ Qdrant lai (\texttt{v1.20.0}, 64 vector) $\leftrightarrow$ kiểm chứng tọa độ ký tự trên \texttt{/api/v1/agent/explain} đạt $p_{50} = 62.92\,\text{ms}$ ($p_{95} = 84.23\,\text{ms}$). Điểm cuối \texttt{/api/v1/predict/baseline} mặc định trả về HTTP 503 (\texttt{baseline\_models\_unavailable}, $p_{95} = 51.24\,\text{ms}$) trong image nhẹ, còn \texttt{/api/v1/predict/multimodal} trả về HTTP 503 an toàn có cấu trúc ($p_{95} = 50.55\,\text{ms}$) vì \texttt{requirements-deploy.txt} không đóng gói \texttt{torch}. Với mô hình thật (đo nội tiến trình trên CPU, khối dưới của Bảng~\ref{tab:system_latency}), \texttt{/predict/multimodal} có $p_{50}=\latPfiftyMultimodal$\,ms ($p_{95}=\latPninetyfiveMultimodal$\,ms) do chạy đầy đủ 12 khối BERT trên chuỗi đệm 512 token, và \texttt{/predict/baseline} (ba mô hình) có $p_{50}=\latPfiftyBaseline$\,ms. Độ trễ HTTP 200 trong Docker với image đầy đủ (\texttt{MCDSS\_INSTALL\_ML=1}) và trên GPU chưa được đo.

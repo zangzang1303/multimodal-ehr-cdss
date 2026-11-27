@@ -1,7 +1,7 @@
 {
   "is_mock": false,
-  "evaluated_at": "2026-11-19T04:03:28.541413+00:00",
-  "qdrant_target": "http://127.0.0.1:6333",
+  "evaluated_at": "2026-11-23T10:48:08.373260+00:00",
+  "qdrant_target": "in_memory_ephemeral",
   "qdrant_points_count": 64,
   "qdrant_vector_dim_verified": 768,
   "qdrant_corpus_sync_verified": true,
@@ -37,10 +37,10 @@
     },
     "bm25_only": {
       "recall_at_1": 0.9,
-      "recall_at_3": 0.95,
-      "recall_at_5": 1.0,
-      "mrr": 0.9319,
-      "ndcg_at_5": 0.9354
+      "recall_at_3": 0.9833,
+      "recall_at_5": 0.9833,
+      "mrr": 0.9352,
+      "ndcg_at_5": 0.9367
     },
     "hybrid_rrf": {
       "recall_at_1": 0.9,
@@ -51,18 +51,18 @@
     }
   },
   "grounding_audit_50_cases": {
-    "audit_status": "preliminary_non_strict_holdout",
+    "audit_status": "canonical_strict_holdout",
     "audit_method": "pipeline_offset_invariant_and_out_of_note_string_rejection_only",
-    "audit_scope_limitation": "Automatic metrics verify character-offset substring matching on display_note and rejection of out-of-note probe strings only; they do NOT establish semantic correctness, negation fidelity, or clinical validity. PRELIMINARY non-strict hold-out audit only: sourced from data/processed/test.parquet (N=287), NOT an official evaluation on the pending canonical strict N=302 split.",
-    "notes_source_path": "data/processed/test.parquet",
-    "notes_source_is_canonical_strict_302": false,
-    "dataset_total_rows": 287,
+    "audit_scope_limitation": "Automatic metrics verify character-offset substring matching on display_note and rejection of out-of-note probe strings only; they do NOT establish semantic correctness, negation fidelity, or clinical validity. Evaluated on canonical strict N=302 hold-out split.",
+    "notes_source_path": "data/processed_rebuilt_strict/test.parquet",
+    "notes_source_is_canonical_strict_302": true,
+    "dataset_total_rows": 302,
     "cases_tested": 50,
     "notes_from_dataset_count": 50,
     "notes_from_fallback_template_count": 0,
     "total_genuine_claims": 200,
-    "grounded_claims": 200,
-    "genuine_claim_grounding_rate": 1.0,
+    "grounded_claims": 199,
+    "genuine_claim_grounding_rate": 0.995,
     "injected_out_of_note_probes": 50,
     "rejected_out_of_note_probes": 50,
     "out_of_note_probe_rejection_rate": 1.0,

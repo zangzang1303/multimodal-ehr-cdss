@@ -1,5 +1,13 @@
 # BACKLOG 08 – THÀNH VIÊN 2 (Biomedical Data Engineer & Privacy)
 
+> **RÀ SOÁT CỦA THÀNH VIÊN 1 (2026-11-23) – trạng thái thực tế: HOÀN THÀNH SAU KHI SỬA**
+> - ✅ Bộ khử định danh mới (BHYT, học hàm, bệnh viện viết HOA) và `src/data_pipeline/manifest.py` – giữ nguyên, thêm `content_sha256`.
+> - ❌→✅ `scripts/rebuild_canonical_dataset.py` (bản 2026-11-18) **bị viết lại**: đọc `data/raw/` cũ thay vì `data/raw_rebuilt/`, gán lại nhãn để ép 500 ca/lớp, xáo lại split, băm `source_note_group` theo từng bệnh nhân (audit pass vô nghĩa). Kết quả: 86–90% ghi chú còn tên chẩn đoán, 42% ghi chú test trùng thân ghi chú train; TF-IDF che số đạt AUROC 0.962. Bản sửa dùng pipeline Phase 1 → cùng bệnh nhân/split với benchmark 2026-10-28, PHI 0%, không rò rỉ.
+> - ❌→✅ Hồi quy khử định danh: regex bệnh viện mới bỏ sót "Bệnh viện Bạch Mai ngày…" (3 test Phase 1 fail) – đã khôi phục quy tắc cũ chạy song song.
+> - ❌→✅ Artefact 2.3 (DCA, fairness, confusion) đã được sinh lại từ checkpoint mới; fairness N=302 trước đây tính trên dữ liệu rò rỉ.
+> - ⚠️ 2.4 PROBAST: chấm lại Analysis = Unclear (không phải Low) trong bài báo.
+
+
 ## Trạng thái thực thi: ĐÃ HOÀN THÀNH (100% DONE)
 - **Ngày hoàn tất:** 2026-11-18
 - **Tập dữ liệu chuẩn Canonical:** `data/processed_rebuilt_strict/`

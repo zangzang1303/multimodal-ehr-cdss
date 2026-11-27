@@ -1,99 +1,74 @@
 {
   "metadata": {
-    "generated_at": "2026-11-05T08:28:03.150032+00:00",
-    "split": "data\\processed_rebuilt_strict",
+    "generated_at": "2026-11-27T00:09:09.101338+00:00",
+    "split": "data/processed_rebuilt_strict",
     "split_rows": {
       "train": 1425,
       "val": 273,
       "test": 302
     },
-    "audit_file": "data\\rebuilt_strict_split_audit.json",
-    "baseline_file": "data\\rebuilt_strict_results_2026-10-28.json",
-    "seed": 42,
-    "device": "cuda",
-    "text_model": "emilyalsentzer/Bio_ClinicalBERT",
-    "text_backbone_frozen": true,
-    "max_length": 512,
-    "epochs_max": 12,
-    "batch_size": 16,
-    "note": "Frozen text backbone; not directly equivalent to Phase 1 fine-tuned text baseline."
-  },
-  "strict_baseline_auroc": {
-    "baseline_1_classical_tabular": 0.922315,
-    "baseline_2_tabular_deep": 0.897621,
-    "baseline_3_text_only": 0.973453
+    "source": "results/registry.json (representative seed = lowest validation NLL)",
+    "note": "Frozen Bio_ClinicalBERT for text/concat/cross-attention; see registry for all seeds."
   },
   "variants": {
     "tabular": {
-      "selected_epoch": 3,
-      "validation_nll": 0.5569965243339539,
-      "temperature": 1.2365299463272095,
+      "model_key": "ft_transformer",
+      "seed": 13,
+      "temperature": 1.2719873189926147,
+      "validation_nll": 0.5766652822494507,
       "test": {
-        "macro_auroc": 0.8987648505679356,
-        "macro_auprc": 0.699662654972183,
-        "macro_f1": 0.5386303167338636,
-        "accuracy": 0.6556291390728477,
-        "brier_score": 0.47632452825211136,
-        "ece": 0.10129639901072772
-      },
-      "delta_auroc_vs_strict_baselines": {
-        "baseline_1_classical_tabular": -0.02355014943206435,
-        "baseline_2_tabular_deep": 0.0011438505679356448,
-        "baseline_3_text_only": -0.07468814943206437
+        "macro_auroc": 0.9486819998724927,
+        "macro_auprc": 0.8155764130495263,
+        "macro_f1": 0.8014959048941315,
+        "accuracy": 0.8178807947019867,
+        "brier_score": 0.2714307259156828,
+        "ece": 0.0637487232290356,
+        "mce": 0.12807234128316247
       }
     },
     "text": {
-      "selected_epoch": 1,
-      "validation_nll": 1.3727705478668213,
-      "temperature": 1.0,
+      "model_key": "bert_frozen",
+      "seed": 13,
+      "temperature": 0.9360771775245667,
+      "validation_nll": 0.7232038974761963,
       "test": {
-        "macro_auroc": 0.6605452038124725,
-        "macro_auprc": 0.40144397350597044,
-        "macro_f1": 0.1483843537414966,
-        "accuracy": 0.2152317880794702,
-        "brier_score": 0.7674891804251837,
-        "ece": 0.07728824621399505
-      },
-      "delta_auroc_vs_strict_baselines": {
-        "baseline_1_classical_tabular": -0.2617697961875275,
-        "baseline_2_tabular_deep": -0.2370757961875275,
-        "baseline_3_text_only": -0.3129077961875275
+        "macro_auroc": 0.9044013503060274,
+        "macro_auprc": 0.7422179084703044,
+        "macro_f1": 0.570740261694429,
+        "accuracy": 0.6821192052980133,
+        "brier_score": 0.4557396564657654,
+        "ece": 0.10442083166135069,
+        "mce": 0.2330407202243805
       }
     },
     "concat": {
-      "selected_epoch": 2,
-      "validation_nll": 0.6157954931259155,
-      "temperature": 1.3245905637741089,
+      "model_key": "concat_frozen",
+      "seed": 101,
+      "temperature": 1.281031608581543,
+      "validation_nll": 0.5594486594200134,
       "test": {
-        "macro_auroc": 0.9119578375795265,
-        "macro_auprc": 0.7416809525442074,
-        "macro_f1": 0.6379864068410037,
-        "accuracy": 0.7152317880794702,
-        "brier_score": 0.41475167988102635,
-        "ece": 0.10494911463450121
-      },
-      "delta_auroc_vs_strict_baselines": {
-        "baseline_1_classical_tabular": -0.010357162420473465,
-        "baseline_2_tabular_deep": 0.014336837579526529,
-        "baseline_3_text_only": -0.06149516242047348
+        "macro_auroc": 0.8924136876440052,
+        "macro_auprc": 0.7071576940549549,
+        "macro_f1": 0.5478616548138281,
+        "accuracy": 0.6655629139072847,
+        "brier_score": 0.4928326928368043,
+        "ece": 0.13773709969804782,
+        "mce": 0.22929326766127844
       }
     },
     "cross_attention": {
-      "selected_epoch": 3,
-      "validation_nll": 0.44421452283859253,
-      "temperature": 1.3541077375411987,
+      "model_key": "xattn_frozen",
+      "seed": 101,
+      "temperature": 1.2117172479629517,
+      "validation_nll": 0.4004893898963928,
       "test": {
-        "macro_auroc": 0.9594141527959706,
-        "macro_auprc": 0.8536225677057602,
-        "macro_f1": 0.6503384600981267,
-        "accuracy": 0.7748344370860927,
-        "brier_score": 0.34959917250530276,
-        "ece": 0.097339602594344
-      },
-      "delta_auroc_vs_strict_baselines": {
-        "baseline_1_classical_tabular": 0.03709915279597065,
-        "baseline_2_tabular_deep": 0.06179315279597064,
-        "baseline_3_text_only": -0.01403884720402937
+        "macro_auroc": 0.9582665640929405,
+        "macro_auprc": 0.8438211934114959,
+        "macro_f1": 0.7196455581658823,
+        "accuracy": 0.7947019867549668,
+        "brier_score": 0.3206120215201325,
+        "ece": 0.07725492593468422,
+        "mce": 0.2736928992801242
       }
     }
   }
